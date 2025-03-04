@@ -62,6 +62,8 @@ async function chooseStrategy(
     In this environment you have access to a set of tools you can use to answer the user's question.
     Here are the functions available in JSONSchema format:
     ${JSON.stringify(actions)}
+    Example output:
+    {"strategy": "example"}
     With the above available tools in mind, choose from one of the following strategies to use while handling the user's query:
     ${JSON.stringify(strategies)}\
   `;
@@ -88,6 +90,8 @@ async function chooseStrategy(
     ],
     schema
   });
+
+  console.log("Chosen strategy", object)
 
   return object as StrategySelection;
 }
