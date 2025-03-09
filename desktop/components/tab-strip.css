@@ -3,7 +3,6 @@ tab-strip {
   flex-grow: 1;
   align-items: center;
   gap: var(--space-2);
-  overflow-x: scroll;
   overflow: visible;
 }
 
@@ -84,6 +83,7 @@ tab-strip .icon-button {
   border: 0;
   color: var(--color-text);
   background: transparent;
+  flex-shrink: 0;
 }
 
 .icon-button {

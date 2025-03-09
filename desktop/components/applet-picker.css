@@ -69,7 +69,7 @@ applet-picker .picker-applet-list .header {
 
 applet-picker .picker-applet-list .title {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   align-items: center;
   flex-grow: 1;
 }
@@ -80,12 +80,13 @@ applet-picker .picker-applet-list h2 {
 
 applet-picker .picker-applet-list .url,
 applet-picker .picker-applet-list .description {
-  padding-left: 16px;
+  padding-left: 20px;
 }
 
 applet-picker .picker-applet-list .url {
   color: var(--color-text-faded);
   font-size: var(--text-sm);
+  margin: var(--space-1) 0;
 }
 
 applet-picker .picker-applet-list .picker-applet-icon {

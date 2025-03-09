@@ -88,7 +88,7 @@ export class ThreadView extends LitElement {
   }
 
   loadingTemplate() {
-    return html` <div class="block loading">Thinking...</div> `;
+    return html` <div class="loading">Thinking...</div> `;
   }
 
   interactionTemplate(interaction: Interaction) {

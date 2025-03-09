@@ -11,8 +11,8 @@ command-bar {
 }
 
 command-bar .input-container {
-  border-radius: 4px;
-  padding: 4px;
+  border-radius: var(--rounded);
+  padding: var(--space-1) var(--space-4);
   /* border: 1px solid var(--color-border); */
   background: var(--color-input);
 }

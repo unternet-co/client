@@ -1,22 +1,77 @@
 @import url(./reset.css);
-@import url('https://fonts.googleapis.com/css2?family=Commissioner:wght@100..900&family=Sometype+Mono:ital,wght@0,400..700;1,400..700&display=swap');
 
+@font-face {
+  font-family: 'iA Writer Mono';
+  src: url('/fonts/iA Writer Mono V.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iA Writer Mono';
+  src: url('/fonts/iA Writer Mono V-Italic.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'iA Writer Quattro';
+  src: url('/fonts/iA Writer Quattro V.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iA Writer Quattro';
+  src: url('/fonts/iA Writer Quattro Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+/* Fallback static fonts */
+@font-face {
+  font-family: 'iA Writer Quattro S';
+  src: url('/fonts/iAWriterQuattroS-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iA Writer Quattro S';
+  src: url('/fonts/iAWriterQuattroS-Italic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'iA Writer Quattro S';
+  src: url('/fonts/iAWriterQuattroS-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'iA Writer Quattro S';
+  src: url('/fonts/iAWriterQuattroS-BoldItalic.woff2') format('woff2');
+  font-weight: bold;
+  font-style: italic;
+}
 
 :root {
   /* Colors */
-  --color-gray-0: #fcfdff;
-  --color-gray-5: #f0f1f3;
-  --color-gray-10: #e4e5e7;
-  --color-gray-15: #d8d9db;
-  --color-gray-20: #cccdd0;
-  --color-gray-30: #b4b5b8;
-  --color-gray-40: #9c9da0;
-  --color-gray-50: #858588;
-  --color-gray-60: #6e6e71;
-  --color-gray-70: #565759;
-  --color-gray-80: #3f3f41;
-  --color-gray-90: #28282a;
-  --color-gray-100: #111112;
+  --color-neutral-0: #fcfdff;
+  --color-neutral-5: #f0f1f3;
+  --color-neutral-10: #e4e5e7;
+  --color-neutral-15: #d8d9db;
+  --color-neutral-20: #cccdd0;
+  --color-neutral-30: #b4b5b8;
+  --color-neutral-40: #9c9da0;
+  --color-neutral-50: #858588;
+  --color-neutral-60: #6e6e71;
+  --color-neutral-70: #565759;
+  --color-neutral-80: #3f3f41;
+  --color-neutral-90: #28282a;
+  --color-neutral-100: #111112;
 
   --color-action: #0f2fe4;
   --color-error: #df4815;
@@ -39,26 +94,26 @@
   --rounded-sm: 2px;
   --rounded: 4px;
 
-  --font-sans: 'Commissioner', system-ui, sans-serif;
-  --font-mono: 'Sometime Mono', monospace;
+  --font-sans: 'iA Writer Quattro', 'iA Writer Quattro S', system-ui, sans-serif;
+  --font-mono: 'iA Writer Mono', monospace;
 
   /* Font size */
   --text-scale: 1.125;
-  --text-3xl: calc(var(--text-xxl) * var(--text-scale));
-  --text-xxl: calc(var(--text-xl) * var(--text-scale));
+  --text-3xl: calc(var(--text-2xl) * var(--text-scale));
+  --text-2xl: calc(var(--text-xl) * var(--text-scale));
   --text-xl: calc(var(--text-lg) * var(--text-scale));
   --text-lg: calc(var(--text-base) * var(--text-scale));
-  --text-base: 16px;
+  --text-base: 14px;
   --text-sm: calc(var(--text-base) / var(--text-scale));
   --text-xs: calc(var(--text-sm) / var(--text-scale));
 
   /* Theme */
-  --color-page: var(--color-gray-0);
-  --color-page-alt: var(--color-gray-5);
-  --color-text: var(--color-gray-90);
-  --color-text-faded: var(--color-gray-60);
-  --color-border: var(--color-gray-15);
-  --color-input: var(--color-gray-15);
+  --color-page: var(--color-neutral-0);
+  --color-page-alt: var(--color-neutral-5);
+  --color-text: var(--color-neutral-90);
+  --color-text-faded: var(--color-neutral-60);
+  --color-border: var(--color-neutral-15);
+  --color-input: var(--color-neutral-15);
 }
 
 * {
@@ -79,8 +134,8 @@ body {
   height: 100%;
   padding: 0;
   margin: 0;
-  overflow: hidden;
-  overscroll-behavior: contain;
+  /* overflow: hidden; */
+  /* overscroll-behavior: contain; */
   user-select: none;
 }
 
@@ -97,6 +152,8 @@ textarea {
   /* -webkit-font-smoothing: antialiased; */
   /* -moz-osx-font-smoothing: grayscale; */
   /* font-smooth: always; */
+
+  line-height: 1.3;
 }
 
 body {
@@ -105,7 +162,7 @@ body {
   -webkit-overflow-scrolling: touch;
   display: flex;
   direction: column;
-  position: fixed;
+  /* position: fixed; */
   padding-bottom: env(safe-area-inset-bottom);
 }
 
@@ -125,7 +182,7 @@ h1 {
 }
 
 h2 {
-  font-size: var(--text-xxl);
+  font-size: var(--text-2xl);
 }
 
 h3 {
@@ -210,13 +267,14 @@ input.error {
 .prose code {
   font-family: var(--font-mono);
   padding: 0.2em 0.4em;
-  background: var(--color-gray-15);
+  background: var(--color-neutral-15);
   border-radius: 3px;
 }
 
 .prose pre {
+  font-family: var(--font-mono);
   padding: 1.5em;
-  background: var(--color-gray-15);
+  background: var(--color-neutral-15);
   border-radius: 6px;
   overflow-x: auto;
   margin-bottom: 1.5em;
@@ -231,7 +289,7 @@ input.error {
 .prose hr {
   border: none;
   border-bottom: 1px solid var(--color-page);
-  border-top: 1px solid var(--color-gray-20);
+  border-top: 1px solid var(--color-neutral-20);
   margin: var(--space-9) 0;
 }
 
@@ -250,7 +308,7 @@ input.error {
   font-size: var(--text-sm);
   padding: 0.2em 0.4em;
   background: var(--color-page);
-  border: 1px solid var(--color-gray-40);
+  border: 1px solid var(--color-neutral-40);
   border-bottom-width: 2px;
   border-radius: 4px;
 }
