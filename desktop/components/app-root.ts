@@ -3,8 +3,9 @@ import { customElement, property } from 'lit/decorators.js';
 import './app-root.css';
 import './top-bar';
 import './thread-view';
+import './resource-picker';
+import './resource-bar';
 import './command-bar';
-import './context-bar';
 
 @customElement('app-root')
 export class AppRoot extends LitElement {
@@ -18,7 +19,7 @@ export class AppRoot extends LitElement {
       <top-bar></top-bar>
       <thread-view></thread-view>
       <command-bar></command-bar>
-      <context-bar></context-bar>
+      <resource-bar></resource-bar>
     `;
   }
 }

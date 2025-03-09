@@ -1,6 +1,6 @@
-import { Interaction } from '../modules/interactions';
-import { Process, processes } from '../modules/processes';
-import { type Resource } from '../modules/resources';
+import { Interaction } from '../core/interactions';
+import { Process, processes } from '../core/processes';
+import { type Resource } from '../core/resources';
 
 export async function interactionsToMessages(interactions: Interaction[]) {
   let messages = [];

@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { Process, processes } from '@unternet/kernel';
+import { Process, processes, Resource, resources } from '@unternet/kernel';
 import '@web-applets/sdk/dist/components/applet-frame';
 import './applet-view.css';
 
@@ -15,13 +15,22 @@ export class AppletView extends LitElement {
   src: string = '';
 
   @property({ attribute: false })
+  resource: Resource;
+
+  @property({ attribute: false })
   data: any;
 
   connectedCallback(): void {
     super.connectedCallback();
+    this.loadResource();
+  }
+
+  async loadResource() {
+    this.resource = (await resources.get(this.src)) as Resource;
   }
 
   updated(changedProperties: Map<string, any>) {
+    if (changedProperties.has('src') && !this.resource) this.loadResource();
     if (changedProperties.has('processId') && this.processId)
       this.attachProcess(this.processId);
   }
@@ -36,9 +45,12 @@ export class AppletView extends LitElement {
 
   render() {
     if (!this.src) return;
-    return html`<applet-frame
-      src=${this.src}
-      .data=${this.data}
-    ></applet-frame>`;
+    return html`
+      <header class="applet-header">
+        <img src=${this.resource?.icons && this.resource.icons[0].src} />${this
+          .resource?.name}
+      </header>
+      <applet-frame src=${this.src} .data=${this.data}></applet-frame>
+    `;
   }
 }

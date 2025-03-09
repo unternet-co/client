@@ -86,9 +86,10 @@
   --space-4: calc(var(--space-base) * 2);
   --space-5: calc(var(--space-base) * 3);
   --space-6: calc(var(--space-base) * 4);
-  --space-7: calc(var(--space-base) * 5);
-  --space-8: calc(var(--space-base) * 6);
-  --space-9: calc(var(--space-base) * 7);
+  --space-7: calc(var(--space-base) * 6);
+  --space-8: calc(var(--space-base) * 8);
+  --space-9: calc(var(--space-base) * 10);
+  --space-10: calc(var(--space-base) * 12);
 
   /* Border radius */
   --rounded-sm: 2px;
@@ -108,6 +109,7 @@
   --text-xs: calc(var(--text-sm) / var(--text-scale));
 
   /* Theme */
+
   --color-page: var(--color-neutral-0);
   --color-page-alt: var(--color-neutral-5);
   --color-text: var(--color-neutral-90);

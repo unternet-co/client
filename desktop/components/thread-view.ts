@@ -12,7 +12,7 @@ import { resolveMarkdown } from 'lit-markdown';
 import './thread-view.css';
 import { resources } from '@unternet/kernel';
 import './applet-view';
-import { WebOutput } from '@unternet/kernel/modules/interactions';
+import { WebOutput } from '@unternet/kernel/core/interactions';
 import { repeat } from 'lit/directives/repeat.js';
 import { config } from '../features/config';
 import { Tab, tabs } from '../features/tabs';

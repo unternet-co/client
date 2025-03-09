@@ -1,10 +1,6 @@
-export { resources, type Resource } from './modules/resources';
-export { interactions } from './modules/interactions';
-export { workspaces, type Workspace } from './modules/workspaces';
-export type {
-  Interaction,
-  DataOutput,
-  TextOutput,
-} from './modules/interactions';
-export { processes, type Process } from './modules/processes';
-export { operator } from './modules/operator';
+export { resources, type Resource } from './core/resources';
+export { interactions } from './core/interactions';
+export { workspaces, type Workspace } from './core/workspaces';
+export type { Interaction, DataOutput, TextOutput } from './core/interactions';
+export { processes, type Process } from './core/processes';
+export { operator } from './core/operator';

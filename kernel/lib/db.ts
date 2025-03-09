@@ -1,8 +1,8 @@
 import Dexie, { Table } from 'dexie';
-import { Interaction } from '../modules/interactions';
-import { Process } from '../modules/processes';
-import { Resource } from '../modules/resources';
-import { Workspace } from '../modules/workspaces';
+import { Interaction } from '../core/interactions';
+import { Process } from '../core/processes';
+import { Resource } from '../core/resources';
+import { Workspace } from '../core/workspaces';
 
 export class Database extends Dexie {
   interactions!: Table<Interaction, number>;

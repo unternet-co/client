@@ -3,16 +3,23 @@ import db from '../lib/db';
 
 export interface Config {
   activeTab: number;
+  isResourcePickerOpen: boolean;
 }
 
 const initConfig = {
   activeTab: 0,
+  isResourcePickerOpen: false,
 };
+
+async function toggleResourcePicker() {
+  const value = await config.get('isResourcePickerOpen');
+  return config.set('isResourcePickerOpen', !value);
+}
 
 async function set<K extends keyof Config>(key: K, value: Config[K]) {
   try {
     await db.config.put({ key, value: JSON.stringify(value) });
-    console.log(`[Config] ${key} saved successfully`);
+    console.log(`[Config] Set`, { [key]: value });
   } catch (error) {
     console.error(`[Config] Error saving ${key}:`, error);
   }
@@ -61,6 +68,7 @@ function subscribeToKey<K extends keyof Config>(
 }
 
 export const config = {
+  toggleResourcePicker,
   all,
   get,
   set,

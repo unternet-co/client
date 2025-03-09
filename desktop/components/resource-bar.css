@@ -41,6 +41,6 @@ resource-bar .applet-icon {
 
 resource-bar .applet-name {
   display: block;
-  color: var(--color-text-faded);
-  font-size: var(--text-xs);
+  font-weight: 500;
+  font-size: 12px;
 }

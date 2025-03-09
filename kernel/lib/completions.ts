@@ -3,7 +3,7 @@ import {
   decodeActionId,
   interactionsToMessages,
 } from './utils';
-import { Interaction } from '../modules/interactions';
+import { Interaction } from '../core/interactions';
 import { ActionChoice } from '../lib/types';
 import { ResourceAction, Resource } from '../modules/resources';
 import { generateObject, streamText } from 'ai';

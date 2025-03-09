@@ -1,5 +1,5 @@
 import { AppletAction } from '@web-applets/sdk';
-import { Workspace } from '../modules/workspaces';
+import { Workspace } from '../core/workspaces';
 
 export interface IndexedAction {
   key: string;

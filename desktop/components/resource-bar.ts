@@ -12,7 +12,7 @@ export class ResourceBar extends LitElement {
   resources: Resource[] = [];
 
   @property({ attribute: false })
-  isPickerOpen: boolean = true;
+  isPickerOpen: boolean = false;
 
   connectedCallback(): void {
     super.connectedCallback();
@@ -32,6 +32,7 @@ export class ResourceBar extends LitElement {
         target !== buttonNode &&
         !pickerNode.contains(target)
       ) {
+        console.log('tggl');
         this.togglePicker();
       }
     });
