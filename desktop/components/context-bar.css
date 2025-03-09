@@ -41,6 +41,6 @@ context-bar .applet-icon {
 
 context-bar .applet-name {
   display: block;
-  font-weight: 500;
-  font-size: 12px;
+  color: var(--color-text-faded);
+  font-size: var(--text-xs);
 }

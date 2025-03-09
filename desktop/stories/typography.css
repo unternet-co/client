@@ -1,0 +1,43 @@
+.type-scale {
+  padding: var(--space-8);
+}
+
+.type-scale > div {
+  margin-bottom: var(--space-4);
+}
+
+.type-scale .text-3xl { font-size: var(--text-3xl); }
+.type-scale .text-2xl { font-size: var(--text-2xl); }
+.type-scale .text-xl { font-size: var(--text-xl); }
+.type-scale .text-lg { font-size: var(--text-lg); }
+.type-scale .text-base { font-size: var(--text-base); }
+.type-scale .text-sm { font-size: var(--text-sm); }
+.type-scale .text-xs { font-size: var(--text-xs); }
+
+.type-faces {
+  padding: var(--space-8);
+}
+
+.type-faces .font-group {
+  margin-bottom: var(--space-4);
+}
+
+.type-faces .font-group h3 {
+  margin-bottom: var(--space-2);
+}
+
+.type-faces .font-sans {
+  font-family: var(--font-sans);
+}
+
+.type-faces .font-mono {
+  font-family: var(--font-mono);
+}
+
+.type-prose {
+  padding: var(--space-8);
+}
+
+.type-prose .prose {
+  max-width: 65ch;
+}

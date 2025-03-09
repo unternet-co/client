@@ -20,9 +20,9 @@ thread-view {
 .interaction .page {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-5);
   height: 100%;
-  padding: 6px 12px;
+  padding: var(--space-3) var(--space-5);
 }
 
 .interaction .page {
@@ -40,14 +40,12 @@ thread-view {
 }
 
 .interaction-input {
-  padding: 6px 12px;
   font-weight: 500;
-  /* font-size: 1.2em; */
+  padding: var(--space-4) var(--space-5);
   background: var(--color-input);
-  border: 1px solid var(--color-border);
   align-self: flex-start;
   user-select: text;
-  border-radius: 4px;
+  border-radius: var(--rounded);
 }
 
 .data-output,
@@ -55,7 +53,7 @@ thread-view {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--color-neutral-3);
+  color: var(--color-text-faded);
   padding: 4px;
 }
 
@@ -70,15 +68,14 @@ thread-view {
 
 .block,
 .applet-output {
-  line-height: 1.2rem;
   border: 1px solid var(--color-border);
-  border-radius: 4px;
+  border-radius: var(--rounded);
   background: var(--color-page);
   overflow: hidden;
 }
 
 .block {
-  padding: 12px;
+  padding: var(--space-4) var(--space-5);
   user-select: text;
 }
 
@@ -102,16 +99,16 @@ thread-view {
 
 .block code {
   font-weight: 600;
-  font-size: 13px;
+  font-size: var(--text-xs);
 }
 
 .block pre {
   white-space: pre-wrap;
   font-size: 12px;
   line-height: 1.3em;
-  background: var(--color-neutral-8);
+  background: var(--color-neutral-15);
   padding: 20px;
-  border-radius: 4px;
+  border-radius: var(--rounded);
   word-break: break-word;
 }
 

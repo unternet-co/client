@@ -1,0 +1,18 @@
+/* Storybook-specific styles */
+.sb-show-main {
+  background: var(--color-neutral-10) !important;
+}
+
+#storybook-root {
+  min-height: 100vh;
+  background: var(--color-neutral-10);
+  color: var(--color-neutral-90);
+}
+
+/* Undo some of the globals */
+body {
+  overflow: auto;
+  overscroll-behavior: unset;
+  position: unset;
+}
+  
