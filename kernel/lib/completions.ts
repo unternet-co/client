@@ -5,9 +5,9 @@ import {
 } from './utils';
 import { Interaction } from '../core/interactions';
 import { ActionChoice } from '../lib/types';
-import { ResourceAction, Resource } from '../modules/resources';
+import { ResourceAction } from '../core/resources';
 import { generateObject, streamText } from 'ai';
-import {jsonSchema} from '@ai-sdk/ui-utils'
+import { jsonSchema } from '@ai-sdk/ui-utils';
 import { fromConfig, modelOptions } from './model';
 
 interface completionsOptions extends modelOptions {
@@ -15,16 +15,16 @@ interface completionsOptions extends modelOptions {
 }
 
 interface ToolSelection {
-  id: string,
-  arguments?: any
+  id: string;
+  arguments?: any;
 }
 
 interface ToolSelections {
-  tools: ToolSelection[]
+  tools: ToolSelection[];
 }
 
 interface StrategySelection {
-  strategy: string
+  strategy: string;
 }
 
 /* STREAM TEXT */
@@ -68,16 +68,18 @@ async function chooseStrategy(
     ${JSON.stringify(strategies)}\
   `;
 
-  const schema = jsonSchema(createObjectSchema({
-    strategy: {
-      type: 'string',
-      enum: Object.keys(strategies),
-    },
-  }));
+  const schema = jsonSchema(
+    createObjectSchema({
+      strategy: {
+        type: 'string',
+        enum: Object.keys(strategies),
+      },
+    })
+  );
 
   const messages = await interactionsToMessages(history);
 
-  const model = fromConfig(options ?? {})
+  const model = fromConfig(options ?? {});
 
   const { object } = await generateObject({
     model,
@@ -88,10 +90,10 @@ async function chooseStrategy(
         content: prompt,
       },
     ],
-    schema
+    schema,
   });
 
-  console.log("Chosen strategy", object)
+  console.log('Chosen strategy', object);
 
   return object as StrategySelection;
 }
@@ -105,7 +107,7 @@ async function chooseActions(
   hint?: string,
   options?: completionsOptions
 ): Promise<ActionChoice[]> {
-  const model = fromConfig(options ?? {})
+  const model = fromConfig(options ?? {});
 
   num = num || 1;
   const prompt = `\
