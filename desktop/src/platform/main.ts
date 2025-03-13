@@ -3,9 +3,13 @@ const path = require('path');
 
 let mainWindow;
 
-try {
-  require('electron-reloader')(module);
-} catch (_) {}
+const isDev = process.env.NODE_ENV !== 'production';
+
+if (isDev) {
+  try {
+    require('electron-reloader')(module);
+  } catch (_) {}
+}
 
 function createWindow() {
   /* Create the browser window. */
@@ -55,12 +59,8 @@ function createWindow() {
 
   /* Load web content */
 
-  // if (!app.isPackaged) {
-  // win.loadURL('http://localhost:8181');
-  // win.webContents.openDevTools();
-  // } else {
   win.loadFile(path.join(__dirname, 'index.html'));
-  // }
+  if (isDev) win.webContents.openDevTools();
 }
 
 ipcMain.handle('fetch', async (event, url) => {
