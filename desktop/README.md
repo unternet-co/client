@@ -1,6 +1,0 @@
-- `/public/`: public assets
-- `/src/`
-  - `elements/`: HTML elements
-  - `lib/`: utils, etc.
-  - `platform/`: Electron & system code, main process
-  - `models/`
