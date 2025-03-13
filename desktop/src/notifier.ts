@@ -15,7 +15,7 @@ export class Notifier<Notification> {
     this.subscribers.push(subscriber);
     this.onSubscribe(subscriber);
     return {
-      dispose: () => this.removeObserver(subscriber),
+      dispose: () => this.removeSubscriber(subscriber),
     };
   };
 
