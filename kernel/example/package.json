@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@unternet/kernel": "file:.."
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  }
+}

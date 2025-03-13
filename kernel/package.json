@@ -3,15 +3,24 @@
   "type": "module",
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",
-    "@unternet/sdk": "latest",
+    "@unternet/kernel": "file:",
     "@web-applets/sdk": "^0.1.5",
     "ai": "^4.0.20",
-    "dexie": "^4.0.10",
     "ollama-ai-provider": "^1.2.0",
-    "openai": "^4.76.1",
-    "store-thing": "^0.1.5"
+    "openai": "^4.76.1"
   },
+  "scripts": {
+    "build": "tsc"
+  },
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "directories": {
+    "example": "example"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "devDependencies": {
-    "vite": "^6.0.3"
+    "typescript": "^5.8.2"
   }
 }
