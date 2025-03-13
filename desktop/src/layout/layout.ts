@@ -1,5 +1,6 @@
 import './style.css';
 import template from './template.html';
+import { tabs } from '../tabs/tab-model';
 
 export class MainLayout {
   element: HTMLElement;

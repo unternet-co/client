@@ -1,10 +1,10 @@
 export class Notifier<Notification> {
   private subscribers: ((notification?: Notification) => void)[] = [];
-  private initialValueGetter: () => Notification | undefined;
+  private defaultNotificationGetter: () => Notification | undefined;
   private disposed = false;
 
-  constructor(initialValueGetter?: () => Notification) {
-    this.initialValueGetter = initialValueGetter;
+  constructor(defaultNotificationGetter?: () => Notification) {
+    this.defaultNotificationGetter = defaultNotificationGetter;
   }
 
   readonly subscribe = (subscriber: (notification?: Notification) => void) => {
@@ -12,12 +12,18 @@ export class Notifier<Notification> {
       throw new Error('Emitter is disposed');
     }
 
-    if (this.initialValueGetter) subscriber(this.initialValueGetter());
     this.subscribers.push(subscriber);
+    this.onSubscribe(subscriber);
     return {
       dispose: () => this.removeObserver(subscriber),
     };
   };
+
+  onSubscribe(subscriber: (notification?: Notification) => void) {
+    if (this.defaultNotificationGetter) {
+      subscriber(this.defaultNotificationGetter());
+    }
+  }
 
   notify(notification?: Notification): void {
     if (this.disposed) {
@@ -25,7 +31,11 @@ export class Notifier<Notification> {
     }
 
     for (const subscriber of this.subscribers) {
-      subscriber(notification);
+      if (!notification && this.defaultNotificationGetter) {
+        subscriber(this.defaultNotificationGetter());
+      } else {
+        subscriber(notification);
+      }
     }
   }
 
