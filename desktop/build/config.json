@@ -1,0 +1,9 @@
+{
+  "main": "src/platform/main.ts",
+  "preload": "src/platform/preload.ts",
+  "renderer": "src/index.ts",
+  "renderer_outfile": "bundle.ts",
+  "static_dir": "src/static/",
+  "out_dir": "dist/",
+  "port": 8181
+}

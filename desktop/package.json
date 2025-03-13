@@ -1,37 +1,27 @@
 {
-  "name": "operator-electron",
+  "name": "@unternet/client-desktop",
   "version": "0.1.5",
-  "description": "Unternet Operator.",
-  "main": "window/main.js",
-  "productName": "Operator",
-  "author": "Rupert Manfredi <rupert@unternet.co>",
+  "main": "dist/main.cjs",
   "homepage": "https://unternet.co",
   "scripts": {
-    "dev": "concurrently 'npm run dev:web' 'npm run dev:window'",
-    "dev:web": "vite",
-    "dev:window": "electron ./window/main.js",
-    "build": "vite build",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "dev": "node scripts/watch.js",
+    "build": "node scripts/build.js"
   },
   "license": "ISC",
   "dependencies": {
     "@unternet/kernel": "*",
-    "@web-applets/sdk": "latest",
+    "@web-applets/sdk": "^0.2.6",
     "dexie": "^4.0.11",
     "electron-is-dev": "^3.0.1",
     "lit": "^3.2.1",
     "lit-markdown": "^1.3.2"
   },
   "devDependencies": {
-    "@storybook/addon-a11y": "^8.5.8",
-    "@storybook/addon-essentials": "^8.5.8",
-    "@storybook/addon-links": "^8.5.8",
-    "@storybook/core-common": "^8.5.8",
-    "@storybook/web-components": "^8.5.8",
-    "@storybook/web-components-vite": "^8.5.8",
-    "storybook": "^8.5.8",
-    "electron": "31.3.1",
-    "vite": "^6.0.3"
+    "chokidar": "^4.0.3",
+    "electron": "^35.0.1",
+    "electron-reloader": "^1.2.3",
+    "esbuild": "^0.25.1",
+    "live-server": "^1.2.2",
+    "livereload": "^0.9.3"
   }
 }
