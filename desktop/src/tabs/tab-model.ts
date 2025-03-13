@@ -14,6 +14,11 @@ class TabModel {
     this._tabs.push(tab);
     this._watchNotifier.notify();
   }
+
+  dispose() {
+    this._watchNotifier.dispose();
+    this._tabs = [];
+  }
 }
 
 export const tabs = new TabModel();
