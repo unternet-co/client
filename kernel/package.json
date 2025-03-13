@@ -1,6 +1,7 @@
 {
   "name": "@unternet/kernel",
   "type": "module",
+  "version": "0.2.0",
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",
     "@unternet/kernel": "file:",
@@ -12,7 +13,6 @@
   "scripts": {
     "build": "tsc"
   },
-  "version": "1.0.0",
   "main": "dist/index.js",
   "directories": {
     "example": "example"

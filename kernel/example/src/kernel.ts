@@ -2,15 +2,27 @@ import { type LanguageModel } from 'ai';
 import {
   Interpreter,
   Interaction,
+  Dispatcher,
   type InteractionInput,
-} from '@unternet/kernel';
+  Resource,
+  ResourceMap,
+} from '../../src/index';
+
+interface KernelInit {
+  model: LanguageModel;
+  resources?: ResourceMap;
+}
 
 export class Kernel {
   interpreter: Interpreter;
+  dispatcher: Dispatcher;
   interactions: Interaction[] = [];
+  resources: ResourceMap;
 
-  constructor(model: LanguageModel) {
+  constructor({ model, resources }: KernelInit) {
     this.interpreter = new Interpreter(model);
+    this.dispatcher = new Dispatcher();
+    this.resources = resources || new ResourceMap();
   }
 
   addInteraction(interaction: Interaction) {
