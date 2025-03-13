@@ -19,7 +19,6 @@ async function watch() {
 
   electronProcess.on('error', (err) => {
     console.error(`Error: ${err.message}`);
-    process.exit(1);
   });
 
   electronProcess.on('exit', (code) => {

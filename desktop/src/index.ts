@@ -1,5 +1,3 @@
-class AppView {
-  constructor(el: HTMLElement) {}
-}
+import { MainLayout } from './layout/layout';
 
-console.log('hi!');
+const layout = new MainLayout(document.body);
