@@ -1,7 +1,7 @@
 // import { ModalBox } from '../components/modal-box';
 
 import { html, render } from 'lit';
-import '../styles.css';
+import '../layout-part.css';
 
 interface ModalSpecification {
   title: string;

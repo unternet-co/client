@@ -30,6 +30,9 @@ async function buildBrowser() {
     target: 'esnext',
     sourcemap: isDev,
     minify: !isDev,
+    loader: {
+      '.html': 'text',
+    },
   });
 
   copyRecursively(config.static_dir, config.out_dir);

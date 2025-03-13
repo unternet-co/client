@@ -1,13 +1,12 @@
-import './style.css';
+import './layout.css';
+import template from './template.html';
+import { createFragment, createEl } from '../utils';
 
 export class MainLayout {
-  el: HTMLElement;
+  element: HTMLElement;
 
-  constructor(el: HTMLElement) {
-    this.el = el;
-    el.innerHTML = /*html*/ `
-      <div class="top-bar"></div>
-      <div class="tab-view"></div>
-    `;
+  constructor(element: HTMLElement) {
+    this.element = element;
+    element.innerHTML = template;
   }
 }
