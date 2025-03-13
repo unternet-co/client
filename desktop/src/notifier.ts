@@ -39,10 +39,10 @@ export class Notifier<Notification> {
     }
   }
 
-  private removeObserver(
-    observer: (notification?: Notification) => void
+  private removeSubscriber(
+    subscriber: (notification?: Notification) => void
   ): void {
-    this.subscribers = this.subscribers.filter((l) => l !== observer);
+    this.subscribers = this.subscribers.filter((l) => l !== subscriber);
   }
 
   dispose(): void {
