@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2020", "DOM"],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
-  }
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true
+  },
+  "include": ["src", "./global.d.ts"]
 }
