@@ -62,7 +62,7 @@ async function allActions() {
         },
       });
     } else {
-      for (const action of resource.actions) {
+      for (const action of Object.values(resource.actions)) {
         actions.push({
           id: encodeActionURI({ url: resource.url, actionId: action.id }),
           description: `${resource.description}\n\n${action.description}`,
