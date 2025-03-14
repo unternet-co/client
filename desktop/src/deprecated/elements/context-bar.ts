@@ -1,8 +1,9 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { resources, type Resource } from '@unternet/kernel';
+import { resources, type Resource } from '../kernel/resources';
 import './resource-picker';
 import './resource-bar.css';
+import toolboxIcon from '../../common/icons/toolbox.svg';
 
 @customElement('resource-bar')
 export class ResourceBar extends LitElement {
@@ -64,7 +65,7 @@ export class ResourceBar extends LitElement {
           class="icon-button"
           id="picker-toggle-button"
         >
-          <img src="/icons/toolbox.svg" />
+          <img src=${toolboxIcon} />
         </button>
       </div>
     `;

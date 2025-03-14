@@ -3,6 +3,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { tabs, type Tab } from '../tabs';
 import './tab-strip.css';
 import { config } from '../config';
+import plusIcon from '../../common/icons/plus.svg';
+import closeIcon from '../../common/icons/close.svg';
 
 @customElement('tab-strip')
 export class TabStrip extends LitElement {
@@ -83,19 +85,20 @@ export class TabStrip extends LitElement {
           >${tab.title}</span
         >
         <span class="tab-close-button" @click=${() => tabs.close(tab.id)}>
-          <img src="/icons/close.svg" />
+          <img src=${closeIcon} />
         </span>
       </li>
     `;
   }
 
   render() {
+    console.log('hello!', plusIcon);
     return html`
       <ol class="tabs-list">
         ${this.tabs.map(this.tabTemplate.bind(this))}
       </ol>
       <button class="icon-button" @click=${this.createTab.bind(this)}>
-        <img src="/icons/plus.svg" />
+        <img src=${plusIcon} />
       </button>
     `;
   }

@@ -1,10 +1,10 @@
-import { AppletAction } from '@web-applets/sdk';
-import { Workspace } from '../core/workspaces';
+import { AppletActionDescriptor } from '@web-applets/sdk';
+import { Workspace } from '../kernel/workspaces';
 
 export interface IndexedAction {
   key: string;
   appletUrl: string;
-  action: AppletAction;
+  action: AppletActionDescriptor;
 }
 
 export interface JSONSchema {

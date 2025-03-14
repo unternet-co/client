@@ -1,21 +1,20 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import {
-  interactions,
+  resources,
   Resource,
   DataOutput,
   Interaction,
   TextOutput,
   workspaces,
-} from '@unternet/kernel';
+} from '..';
 import { resolveMarkdown } from 'lit-markdown';
 import './thread-view.css';
-import { resources } from '@unternet/kernel';
 import './applet-view';
-import { WebOutput } from '@unternet/kernel/core/interactions';
+import { WebOutput } from '../kernel/interactions';
 import { repeat } from 'lit/directives/repeat.js';
-import { config } from '../../features/config';
-import { Tab, tabs } from '../../features/tabs';
+import { config } from '../config';
+import { Tab, tabs } from '../tabs';
 import { Subscription } from 'dexie';
 
 @customElement('thread-view')

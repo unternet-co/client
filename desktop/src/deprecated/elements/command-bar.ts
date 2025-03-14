@@ -1,9 +1,9 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import './command-bar.css';
-import { operator } from '@unternet/kernel';
-import { tabs } from '../../features/tabs';
-import { config } from '../../features/config';
+import { operator } from '../kernel/operator';
+import { tabs } from '../tabs';
+import { config } from '../config';
 
 @customElement('command-bar')
 export class CommandBar extends LitElement {

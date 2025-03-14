@@ -1,7 +1,7 @@
 interface UriComponents {
-  protocol?: string;
+  protocol: string;
   resourceUri: string;
-  actionId?: string;
+  actionId: string;
 }
 
 export function encodeActionUri({
@@ -10,6 +10,10 @@ export function encodeActionUri({
   actionId,
 }: UriComponents) {
   let uriString = '';
+  // uriString += `${protocol}__`;
+  // uriString += resourceUri;
+  // uriString += `__${actionId}`;
+  // return uriString;
   if (protocol) uriString += `${protocol}:`;
   uriString += resourceUri;
   if (actionId) uriString += `#${actionId}`;
@@ -26,6 +30,8 @@ export function decodeActionUri(encodedActionURI: string): UriComponents {
     resourceUri = `${protocol}:${resourceUri}`;
     protocol = undefined;
   }
+
+  // const [protocol, resourceUri, actionId] = encodedActionURI.split('__');
 
   return {
     protocol,

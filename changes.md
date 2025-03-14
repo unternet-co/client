@@ -1,0 +1,3 @@
+- Change build system to build entire app & html, not point to server
+- Add model layer, for efficient in-memory storage, and separate from persistence services
+- Change primary views to plain JS classes, reserving web components for reusable elements

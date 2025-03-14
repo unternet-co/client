@@ -2,28 +2,28 @@
 
 @font-face {
   font-family: 'iA Writer Mono';
-  src: url('/fonts/iA Writer Mono V.ttf') format('truetype-variations');
+  src: url('./fonts/iA Writer Mono V.ttf') format('truetype-variations');
   font-weight: 100 900;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'iA Writer Mono';
-  src: url('/fonts/iA Writer Mono V-Italic.ttf') format('truetype-variations');
+  src: url('./fonts/iA Writer Mono V-Italic.ttf') format('truetype-variations');
   font-weight: 100 900;
   font-style: italic;
 }
 
 @font-face {
   font-family: 'iA Writer Quattro';
-  src: url('/fonts/iA Writer Quattro V.ttf') format('truetype-variations');
+  src: url('./fonts/iA Writer Quattro V.ttf') format('truetype-variations');
   font-weight: 100 900;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'iA Writer Quattro';
-  src: url('/fonts/iA Writer Quattro Italic.ttf') format('truetype');
+  src: url('./fonts/iA Writer Quattro Italic.ttf') format('truetype');
   font-weight: normal;
   font-style: italic;
 }
@@ -31,28 +31,28 @@
 /* Fallback static fonts */
 @font-face {
   font-family: 'iA Writer Quattro S';
-  src: url('/fonts/iAWriterQuattroS-Regular.woff2') format('woff2');
+  src: url('./fonts/iAWriterQuattroS-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'iA Writer Quattro S';
-  src: url('/fonts/iAWriterQuattroS-Italic.woff2') format('woff2');
+  src: url('./fonts/iAWriterQuattroS-Italic.woff2') format('woff2');
   font-weight: normal;
   font-style: italic;
 }
 
 @font-face {
   font-family: 'iA Writer Quattro S';
-  src: url('/fonts/iAWriterQuattroS-Bold.woff2') format('woff2');
+  src: url('./fonts/iAWriterQuattroS-Bold.woff2') format('woff2');
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'iA Writer Quattro S';
-  src: url('/fonts/iAWriterQuattroS-BoldItalic.woff2') format('woff2');
+  src: url('./fonts/iAWriterQuattroS-BoldItalic.woff2') format('woff2');
   font-weight: bold;
   font-style: italic;
 }
@@ -204,9 +204,6 @@ h6 {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 500;
-}
-
-input {
 }
 
 input.error {

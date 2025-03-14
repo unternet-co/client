@@ -15,14 +15,14 @@ export class Interpreter {
   ): Promise<InteractionOutput> {
     const tools = Resource.toTools(resources);
 
-    const { text, toolCalls } = await generateText({
+    const outputs = await generateText({
       model: this.model,
       messages: Interaction.toMessages(interactions),
       tools: tools,
     });
 
-    console.log(toolCalls);
+    console.log(outputs);
 
-    return Interaction.createTextOutput(text);
+    return Interaction.createTextOutput(outputs.text);
   }
 }

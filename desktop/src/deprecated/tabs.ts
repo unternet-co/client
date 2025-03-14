@@ -1,4 +1,4 @@
-import { interactions, workspaces, type Workspace } from '@unternet/kernel';
+import { workspaces, type Workspace } from '.';
 import db from './db';
 import { liveQuery } from 'dexie';
 import { config } from './config';

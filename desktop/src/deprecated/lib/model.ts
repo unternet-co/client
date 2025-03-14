@@ -14,7 +14,7 @@ export interface modelOptions {
 export function fromConfig({
   type = 'openai',
   model,
-  apiKey = import.meta.env.VITE_OPENAI_API_KEY,
+  apiKey = process.env.OPENAI_API_KEY,
   baseURL,
 }: modelOptions = {}) {
   if (type === 'ollama' || !apiKey) {

@@ -1,12 +1,19 @@
 const esbuild = require('esbuild');
 const fs = require('fs');
 const path = require('path');
-const { copyRecursively } = require('./utils.js');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+
+console.log(process.env);
 
 const config = JSON.parse(
   fs.readFileSync(path.join('build', 'config.json'), 'utf8')
 );
 const isDev = process.env.NODE_ENV !== 'production';
+
+let env = {};
+for (const key of config.env) {
+  env[`process.env.${key}`] = JSON.stringify(process.env[key]);
+}
 
 async function buildMain() {
   return esbuild.build({
@@ -30,12 +37,20 @@ async function buildBrowser() {
     target: 'esnext',
     sourcemap: isDev,
     minify: !isDev,
+    define: env,
     loader: {
       '.html': 'text',
+      '.svg': 'file',
+      '.woff2': 'file',
+      '.woff': 'file',
+      '.ttf': 'file',
     },
   });
 
-  copyRecursively(config.static_dir, config.out_dir);
+  fs.copyFileSync(
+    `${config.in_dir}/index.html`,
+    `${config.out_dir}/index.html`
+  );
 }
 
 async function buildAll() {

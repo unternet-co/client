@@ -1,6 +1,6 @@
-import { Interaction } from '../core/interactions';
-import { Process, processes } from '../core/processes';
-import { type Resource } from '../core/resources';
+import { Interaction } from '../kernel/interactions';
+import { Process, processes } from '../kernel/processes';
+import { type Resource } from '../kernel/resources';
 
 export async function interactionsToMessages(interactions: Interaction[]) {
   let messages = [];
@@ -76,7 +76,9 @@ export async function getMetadata(url: string): Promise<Partial<Resource>> {
 
   url = new URL(url).href;
   // TODO: Allow importer of kernel to specify fetch function, i.e. use a proxy
-  const html = await system.fetch(url);
+  // const html = await system.fetch(url);
+  const response = await fetch(url);
+  const html = await response.text();
   const parser = new DOMParser();
   const dom = parser.parseFromString(html, 'text/html');
   const manifestLink = dom.querySelector(
@@ -87,7 +89,9 @@ export async function getMetadata(url: string): Promise<Partial<Resource>> {
     const baseUrl = new URL(url).origin;
     const manifestUrl = new URL(manifestLink.getAttribute('href'), baseUrl)
       .href;
-    const manifestText = await system.fetch(manifestUrl);
+    // const manifestText = await system.fetch(manifestUrl);
+    const response = await fetch(manifestUrl);
+    const manifestText = await response.text();
     if (manifestText) {
       const manifest = JSON.parse(manifestText);
       metadata = manifest;

@@ -1,7 +1,6 @@
 import { Kernel } from './kernel';
 import { openai } from '@ai-sdk/openai';
 import 'dotenv/config';
-import { ResourceMap } from '../../src';
 
 const greeter = {
   uri: 'greeter',
@@ -13,12 +12,11 @@ const greeter = {
   },
 };
 
-const initResources = new ResourceMap();
-initResources.add(greeter);
-
 const model = openai('gpt-4-turbo');
-const kernel = new Kernel({ model, resources: initResources });
+const kernel = new Kernel({ model, resources: [greeter] });
 
 // Add resources, protocol handlers
 
-kernel.handleInput({ text: 'Write a short poem' });
+kernel.handleInput({
+  text: 'Say hello to the user, using the greeter function',
+});

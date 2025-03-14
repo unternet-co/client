@@ -3,9 +3,9 @@ import {
   decodeActionId,
   interactionsToMessages,
 } from './utils';
-import { Interaction } from '../core/interactions';
-import { ActionChoice } from '../lib/types';
-import { ResourceAction } from '../core/resources';
+import { Interaction } from '../kernel/interactions';
+import { ActionChoice } from './types';
+import { ResourceAction } from '../kernel/resources';
 import { generateObject, streamText } from 'ai';
 import { jsonSchema } from '@ai-sdk/ui-utils';
 import { fromConfig, modelOptions } from './model';

@@ -56,6 +56,6 @@ export class ResourceMap extends Map<string, Resource> {
   }
 
   isEmpty() {
-    return Object.keys(this).length === 0;
+    return this.size === 0;
   }
 }
