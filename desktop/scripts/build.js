@@ -45,10 +45,7 @@ async function buildBrowser() {
     },
   });
 
-  fs.copyFileSync(
-    `${config.in_dir}/index.html`,
-    `${config.out_dir}/index.html`
-  );
+  fs.copyFileSync(config.html_entrypoint, `${config.out_dir}/index.html`);
 }
 
 async function buildAll() {

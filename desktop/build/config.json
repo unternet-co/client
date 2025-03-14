@@ -3,7 +3,7 @@
   "preload": "src/platform/preload.ts",
   "renderer": "src/index.ts",
   "renderer_outfile": "bundle.ts",
-  "in_dir": "src",
+  "html_entrypoint": "index.html",
   "out_dir": "dist",
   "port": 8181,
   "env": ["OPENAI_API_KEY"]
