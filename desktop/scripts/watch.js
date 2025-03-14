@@ -1,4 +1,4 @@
-const { buildBrowser, buildMain } = require('../build/build.js');
+const { buildBrowser, buildMain } = require('./build.js');
 const chokidar = require('chokidar');
 const { spawn } = require('child_process');
 const path = require('path');
