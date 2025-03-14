@@ -11,17 +11,43 @@ command-bar {
 }
 
 command-bar .input-container {
-  border-radius: 4px;
-  padding: 4px;
-  /* border: 1px solid var(--color-border); */
-  background: var(--color-neutral-7);
+  border-radius: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  background: var(--color-neutral-9);
+  height: 38px;
 }
 
-command-bar input {
-  width: 100%;
-  height: 100%;
-  border: none;
-  background: none;
+command-bar .command-input {
   outline: none;
-  padding: 4px;
+  line-height: 20px;
+}
+
+command-bar .resource-pill {
+  background-color: var(--color-neutral-7);
+  border: 1px solid var(--color-neutral-6);
+  border-radius: var(--space-1);
+  padding: var(--space-1);
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.applet-icon {
+  width: 14px;
+  margin-bottom: -2px;
+}
+
+.tribute-container {
+  padding: var(--space-2);
+  background-color: var(--color-neutral-7);
+  border: 1px solid var(--color-neutral-6);
+  border-radius: var(--space-1);
+}
+
+.tribute-container li.highlight {
+  padding: var(--space-2);
+  box-sizing: border-box;
+  background: var(--brand-action-50, #d6e4ff);
+  border: 1px solid var(--brand-action-600, #1d58ff);
+  border-radius: var(--space-1);
 }
