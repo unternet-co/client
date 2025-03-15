@@ -1,0 +1,52 @@
+command-bar {
+  width: 100%;
+  padding: 8px 0;
+  /* box-shadow: 0 -12px 16px var(--color-page-alt); */
+  background: var(--color-page);
+  border-top: 1px solid var(--color-border);
+}
+
+.blurred command-bar {
+  background: var(--color-page-alt);
+}
+
+command-bar .input-container {
+  border-radius: var(--rounded);
+  padding: var(--space-1) var(--space-4);
+  /* border: 1px solid var(--color-border); */
+  background: var(--color-input);
+}
+
+command-bar .command-input {
+  outline: none;
+  line-height: 20px;
+}
+
+command-bar .resource-pill {
+  background-color: var(--color-neutral-7);
+  border: 1px solid var(--color-neutral-6);
+  border-radius: var(--space-1);
+  padding: var(--space-1);
+  font-weight: 500;
+  line-height: 14px;
+}
+
+.applet-icon {
+  width: 14px;
+  margin-bottom: -2px;
+}
+
+.tribute-container {
+  padding: var(--space-2);
+  background-color: var(--color-neutral-7);
+  border: 1px solid var(--color-neutral-6);
+  border-radius: var(--space-1);
+}
+
+.tribute-container li.highlight {
+  padding: var(--space-2);
+  box-sizing: border-box;
+  background: var(--brand-action-50, #d6e4ff);
+  border: 1px solid var(--brand-action-600, #1d58ff);
+  border-radius: var(--space-1);
+}
