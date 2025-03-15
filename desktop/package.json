@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "chokidar": "^4.0.3",
+    "dotenv": "^16.4.7",
     "electron": "^35.0.1",
     "electron-reloader": "^1.2.3",
     "esbuild": "^0.25.1",
