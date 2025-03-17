@@ -1,7 +1,9 @@
-export class Notifier<Notification> {
+import { IDisposable } from './disposable';
+
+export class Notifier<Notification> implements IDisposable {
   private subscribers: ((notification?: Notification) => void)[] = [];
   private defaultNotificationGetter: () => Notification | undefined;
-  private disposed = false;
+  disposed = false;
 
   constructor(defaultNotificationGetter?: () => Notification) {
     this.defaultNotificationGetter = defaultNotificationGetter;

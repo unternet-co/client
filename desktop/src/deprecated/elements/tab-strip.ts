@@ -36,7 +36,6 @@ export class TabStrip extends LitElement {
     const tabTitle = this.querySelector(
       `#tab-handle-${this.selected} > .tab-title`
     ) as HTMLElement;
-    console.log(tabTitle);
     tabTitle.contentEditable = 'true';
     this.selectContents(tabTitle);
 
@@ -92,7 +91,6 @@ export class TabStrip extends LitElement {
   }
 
   render() {
-    console.log('hello!', plusIcon);
     return html`
       <ol class="tabs-list">
         ${this.tabs.map(this.tabTemplate.bind(this))}

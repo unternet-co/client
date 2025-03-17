@@ -1,4 +1,6 @@
 import './common/global.css';
-import { MainLayout } from './layout/layout';
+import './layout/app-root';
+// import './deprecated/elements/app-layout';
 
-const layout = new MainLayout(document.body);
+import { MainLayout } from './layout/layout';
+new MainLayout(document.body);

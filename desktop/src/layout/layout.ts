@@ -1,16 +1,28 @@
 import './style.css';
-import template from './template.html';
-
-import '../deprecated/elements/top-bar';
-import '../deprecated/elements/thread-view';
-import '../deprecated/elements/command-bar';
-import '../deprecated/elements/resource-bar';
+import { TabStrip } from '../tabs/tab-strip';
+import { appendEl, createEl } from '../utils';
 
 export class MainLayout {
   element: HTMLElement;
+  private contentsEl: HTMLElement;
+  private tabStrip: TabStrip;
 
-  constructor(element: HTMLElement) {
-    this.element = element;
-    element.innerHTML = template;
+  constructor(parentEl: HTMLElement) {
+    this.element = appendEl(
+      parentEl,
+      createEl('main', { className: 'layout' })
+    );
+
+    const topBar = appendEl(
+      this.element,
+      createEl('div', { className: 'top-bar' })
+    );
+
+    this.tabStrip = new TabStrip(topBar);
+
+    this.contentsEl = appendEl(
+      parentEl,
+      createEl('div', { className: 'contents' })
+    );
   }
 }

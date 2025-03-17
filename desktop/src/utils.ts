@@ -5,11 +5,16 @@ export function isElectron() {
   );
 }
 
+export function appendEl(parent: HTMLElement, child: HTMLElement) {
+  parent.appendChild(child);
+  return child;
+}
+
 export function createEl(
   name: string,
   properties: Record<string, any> = {},
   ...children: (string | Node)[]
-) {
+): HTMLElement {
   const element = document.createElement(name);
   if (properties) Object.assign(element, properties);
 
