@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import './top-bar.css';
-import './tab-strip';
+import '../../tabs/tab-strip';
 
 @customElement('top-bar')
 export class TopBar extends LitElement {

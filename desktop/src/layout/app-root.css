@@ -1,6 +1,6 @@
 /* Main layout */
 
-.layout {
+app-root {
   display: flex;
   flex-direction: column;
   width: 100%;

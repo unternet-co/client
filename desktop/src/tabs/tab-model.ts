@@ -11,7 +11,7 @@ export interface BaseTab {
 
 export interface WorkspaceTab extends BaseTab {
   type: 'workspace';
-  workspaceId: string;
+  workspaceId?: string;
 }
 
 export type Tab = BaseTab | WorkspaceTab;
@@ -38,28 +38,34 @@ export class TabModel implements IDisposable {
   disposed = false;
 
   constructor() {
-    this.add({
-      title: 'Hello world!',
-      id: '12391893712',
-      type: 'workspace',
-    });
+    this.create();
+    this.create();
   }
 
   all() {
     return this.tabs;
   }
 
-  add(tab: Tab) {
+  setActive(id: string) {
+    this.activeTab = id;
+  }
+
+  create() {
+    const tab = {
+      id: crypto.randomUUID(),
+      title: 'New workspace',
+      type: 'workspace',
+    } as Tab;
+
     this.tabs.push(tab);
     this.activeTab = tab.id;
     this.changeNotifier.notify({ type: 'add', tab, activeTab: this.activeTab });
   }
 
-  remove(tabId: Tab['id']) {
+  close(tabId: Tab['id']) {
     const index = this.tabs.findIndex((tab) => tab.id === tabId);
     if (index) {
       this.tabs.splice(index, 1);
-      this.activeTab = this.tabs[index - 1];
       this.changeNotifier.notify({
         type: 'remove',
         index,
