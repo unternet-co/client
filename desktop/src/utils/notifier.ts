@@ -2,7 +2,7 @@ import { IDisposable } from './disposable';
 
 export class Notifier<Notification> implements IDisposable {
   private subscribers: ((notification?: Notification) => void)[] = [];
-  private defaultNotificationGetter: () => Notification | undefined;
+  private defaultNotificationGetter: (() => Notification) | undefined;
   disposed = false;
 
   constructor(defaultNotificationGetter?: () => Notification) {

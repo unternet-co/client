@@ -7,7 +7,7 @@ export class Disposable {
   disposed = false;
 
   constructor(disposeCallback?: () => void) {
-    this.dispose = disposeCallback;
+    if (disposeCallback) this.dispose = disposeCallback;
   }
 
   dispose(): void {

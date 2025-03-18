@@ -1,15 +1,7 @@
-const { app, BrowserWindow, shell, ipcMain } = require('electron');
-const path = require('path');
-
-let mainWindow;
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import path from 'path';
 
 const isDev = process.env.NODE_ENV !== 'production';
-
-if (isDev) {
-  try {
-    require('electron-reloader')(module);
-  } catch (_) {}
-}
 
 function createWindow() {
   /* Create the browser window. */
@@ -59,8 +51,13 @@ function createWindow() {
 
   /* Load web content */
 
-  win.loadFile(path.join(__dirname, 'index.html'));
-  if (isDev) win.webContents.openDevTools();
+  console.log(isDev);
+  if (isDev) {
+    win.loadURL('http://localhost:5173');
+    win.webContents.openDevTools();
+  } else {
+    win.loadFile(path.join(__dirname, 'index.html'));
+  }
 }
 
 ipcMain.handle('fetch', async (event, url) => {
