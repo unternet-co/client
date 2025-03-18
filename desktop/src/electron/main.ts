@@ -19,7 +19,7 @@ function createWindow() {
     },
     // frame: false,
     titleBarStyle: 'hidden',
-    trafficLightPosition: { x: 12, y: 12 },
+    trafficLightPosition: { x: 11, y: 11 },
   });
 
   /* Handle links */

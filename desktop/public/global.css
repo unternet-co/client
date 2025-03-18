@@ -48,7 +48,7 @@
   --text-2xl: calc(var(--text-xl) * var(--text-scale));
   --text-xl: calc(var(--text-lg) * var(--text-scale));
   --text-lg: calc(var(--text-base) * var(--text-scale));
-  --text-base: 15px;
+  --text-base: 13px;
   --text-sm: calc(var(--text-base) / var(--text-scale));
   --text-xs: calc(var(--text-sm) / var(--text-scale));
 

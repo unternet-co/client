@@ -1,0 +1,5 @@
+resource-bar {
+  /* background: var(--color-page); */
+  border-top: 1px solid var(--color-border);
+  height: 28px;
+}

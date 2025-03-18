@@ -1,6 +1,9 @@
 import './layout.css';
 import '../tab-strip';
 import { ITab, tabStore } from '../../models/tabs';
+import '../workspace/command-bar';
+import '../workspace/workspace-view';
+import '../workspace/resource-bar';
 import { appendEl, createEl } from '../../utils/dom';
 
 export class AppLayout {
@@ -30,9 +33,11 @@ export class AppLayout {
   updateTabView(tab: ITab) {
     if (tab.type === 'workspace') {
       const template = /*html*/ `
-        <workspace-view></workspace-view>
-        <command-bar></command-bar>
-        <resource-bar></resource-bar>
+        <div class="workspace">
+          <workspace-view></workspace-view>
+          <command-bar></command-bar>
+          <resource-bar></resource-bar>
+        </div>
       `;
 
       this.tabContentsContainer.innerHTML = template;

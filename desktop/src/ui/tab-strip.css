@@ -32,10 +32,10 @@ tab-strip .tab-handle {
   -webkit-app-region: no-drag;
   gap: var(--space-2);
   border: 1px solid var(--color-border);
-  padding: 0 var(--space-9);
+  padding: 0 var(--space-7);
   width: fit-content;
   max-width: 280px;
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   border-bottom: 0;
 }
 
