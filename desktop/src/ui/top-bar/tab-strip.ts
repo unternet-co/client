@@ -1,5 +1,5 @@
 import { html, render } from 'lit';
-import { ITab, tabStore } from '../models/tabs';
+import { ITab, tabStore } from '../../models/tabs';
 import './tab-strip.css';
 
 export class TabStrip extends HTMLElement {
@@ -46,7 +46,7 @@ export class TabStrip extends HTMLElement {
   }
 
   tabTemplate(tab: ITab) {
-    const isActive = tab.id === this.selected;
+    const isActive = tab.id === tabStore.activeTab!.id;
     const isEditable = isActive && this.isEditable;
     return html`
       <li

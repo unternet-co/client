@@ -41,7 +41,7 @@ tab-strip .tab-handle {
 
 tab-strip .tab-handle.active:not(.blurred *) {
   background: var(--color-page);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.08); */
 }
 .blurred tab-strip .tab-handle.active {
   color: var(--color-text-faded);
@@ -50,6 +50,7 @@ tab-strip .tab-handle.active:not(.blurred *) {
 tab-strip .tab-handle:not(.active) {
   border: 1px solid var(--color-border);
   border-bottom: 0;
+  color: var(--color-text-faded);
 }
 
 tab-strip .tab-close-button {

@@ -43,7 +43,7 @@ export class TabStore {
   create() {
     const tab = {
       id: crypto.randomUUID(),
-      title: 'New workspace',
+      title: crypto.randomUUID(),
       type: 'workspace',
     } as ITab;
 

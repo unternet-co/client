@@ -1,13 +1,14 @@
+import { ITab, tabStore } from '../models/tabs';
 import './layout.css';
-import '../tab-strip';
-import { ITab, tabStore } from '../../models/tabs';
-import '../workspace/command-bar';
-import '../workspace/workspace-view';
-import '../workspace/resource-bar';
-import { appendEl, createEl } from '../../utils/dom';
+import './top-bar/tab-strip';
+import './workspaces/command-bar';
+import './workspaces/resource-bar';
+import { WorkspaceView } from './workspaces/workspace';
+import { IDisposable } from '../utils/disposable';
 
 export class AppLayout {
   tabContentsContainer: HTMLElement;
+  tabContentsDisposable: IDisposable;
 
   constructor(el: HTMLElement) {
     const template = /*html*/ `
@@ -31,16 +32,9 @@ export class AppLayout {
   // TODO: Keep all views active, just change visibility
   // Implement some sort of tab view manager
   updateTabView(tab: ITab) {
+    if (this.tabContentsDisposable) this.tabContentsDisposable.dispose();
     if (tab.type === 'workspace') {
-      const template = /*html*/ `
-        <div class="workspace">
-          <workspace-view></workspace-view>
-          <command-bar></command-bar>
-          <resource-bar></resource-bar>
-        </div>
-      `;
-
-      this.tabContentsContainer.innerHTML = template;
+      this.tabContentsDisposable = new WorkspaceView(this.tabContentsContainer);
     }
   }
 }

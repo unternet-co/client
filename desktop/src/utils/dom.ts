@@ -3,6 +3,10 @@ export function appendEl(parent: HTMLElement, child: HTMLElement) {
   return child;
 }
 
+export function clearNode(el: HTMLElement) {
+  el.innerHTML = '';
+}
+
 export function createEl(
   name: string,
   properties: Record<string, any> = {},
