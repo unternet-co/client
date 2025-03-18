@@ -4,7 +4,7 @@ import './top-bar/tab-strip';
 import './workspaces/command-bar';
 import './workspaces/resource-bar';
 import { WorkspaceView } from './workspaces/workspace';
-import { IDisposable } from '../utils/disposable';
+import { IDisposable } from '../base/disposable';
 
 export class AppLayout {
   tabContentsContainer: HTMLElement;

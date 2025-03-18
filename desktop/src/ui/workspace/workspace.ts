@@ -1,15 +1,16 @@
 import { tabStore } from '../../models/tabs';
-import { Disposable, DisposableGroup } from '../../base/disposable';
+import { DisposableGroup, IDisposable } from '../../base/disposable';
 import { clearNode } from '../../utils/dom';
 import './workspace.css';
 
-export class WorkspaceView extends Disposable {
+export class WorkspaceView implements IDisposable {
   element: HTMLElement;
+  disposed: boolean = false;
   disposables = new DisposableGroup();
 
   constructor(el: HTMLElement) {
-    super();
     this.element = el;
+    this.disposed;
 
     const template = /*html*/ `
       <div class="workspace">
@@ -26,6 +27,7 @@ export class WorkspaceView extends Disposable {
 
   dispose() {
     clearNode(this.element);
-    super.dispose();
+    this.disposables.dispose();
+    this.disposed = true;
   }
 }

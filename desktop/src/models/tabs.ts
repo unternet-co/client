@@ -1,4 +1,4 @@
-import { Notifier } from '../utils/notifier';
+import { Notifier } from '../base/notifier';
 import {
   DatabaseService,
   tabDatabaseService,

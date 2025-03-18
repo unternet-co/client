@@ -1,4 +1,4 @@
 import { AppLayout } from './ui/layout';
-import { Disposable } from './utils/disposable';
+import { Disposable } from './base/disposable';
 
 new AppLayout(document.body);

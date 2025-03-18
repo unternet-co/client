@@ -1,3 +1,3 @@
-import { Disposable } from '../../utils/disposable';
+import { Disposable } from '../../base/disposable';
 
 class TopBar extends Disposable {}
