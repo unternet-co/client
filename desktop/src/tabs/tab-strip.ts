@@ -34,24 +34,6 @@ export class TabStrip extends HTMLElement {
     tabModel.setActive(id);
   }
 
-  // handleDoubleClickTab() {
-  //   this.isEditable = true;
-  //   tabTitle.contentEditable = 'true';
-  //   this.selectContents(tabTitle);
-
-  //   tabTitle.onblur = () => (this.isEditable = false);
-
-  //   tabTitle.onkeydown = (e: KeyboardEvent) => {
-  //     if (e.key === 'Enter') {
-  //       e.preventDefault();
-  //       tabs.setTitle(this.selected, tabTitle.innerText);
-  //       this.isEditable = false;
-  //     } else if (e.key === 'Escape') {
-  //       this.isEditable = false;
-  //     }
-  //   };
-  // }
-
   selectContents(elem: HTMLElement) {
     const range = document.createRange();
     range.selectNodeContents(elem);
@@ -86,4 +68,3 @@ export class TabStrip extends HTMLElement {
 }
 
 customElements.define('tab-strip', TabStrip);
-console.log('hiii');

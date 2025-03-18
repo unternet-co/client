@@ -1,5 +1,5 @@
-import { IDisposable } from '../disposable';
-import { Notifier } from '../notifier';
+import { IDisposable } from '../utils/disposable';
+import { Notifier } from '../utils/notifier';
 
 type TabType = 'workspace' | 'home';
 
@@ -38,7 +38,6 @@ export class TabModel implements IDisposable {
   disposed = false;
 
   constructor() {
-    this.create();
     this.create();
   }
 

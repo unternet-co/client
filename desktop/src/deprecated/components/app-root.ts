@@ -1,5 +1,6 @@
+import './common/global.css';
 import './app-root.css';
-import '../tabs/tab-strip';
+import './tabs/tab-strip';
 
 class AppRoot extends HTMLElement {
   connectedCallback() {
