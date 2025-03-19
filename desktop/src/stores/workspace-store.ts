@@ -18,7 +18,7 @@ export interface WorkspaceNotification {
   workspaceId: Workspace['id'];
 }
 
-export class WorkspaceModel {
+export class WorkspaceStore {
   readonly workspaces: { [id: Workspace['id']]: Workspace } = {};
   private interactions: Interaction[] = [];
   private activeWorkspaceId?: Workspace['id'];
@@ -123,7 +123,7 @@ export class WorkspaceModel {
   }
 }
 
-export const workspaceModel = new WorkspaceModel(
+export const workspaceStore = new WorkspaceStore(
   workspaceDatabase,
   interactionDatabase
 );

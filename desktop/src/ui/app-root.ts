@@ -1,4 +1,4 @@
-import { Tab, tabModel } from '../stores/tabs';
+import { Tab, tabStore } from '../stores/tabs';
 import { appendEl, createEl } from '../utils/dom';
 import { html, render } from 'lit';
 import './top-bar/top-bar';
@@ -13,17 +13,17 @@ export class AppRoot extends HTMLElement {
     this.contentEl = appendEl(this, createEl('div', { className: 'contents' }));
 
     this.updateContents();
-    tabModel.subscribe(() => this.updateContents());
+    tabStore.subscribe(() => this.updateContents());
   }
 
   updateContents() {
-    const contentViews = tabModel.all().map(this.viewForTab.bind(this));
+    const contentViews = tabStore.all().map(this.viewForTab.bind(this));
     render(contentViews, this.contentEl);
   }
 
   viewForTab(tab: Tab) {
     if (!tab) return;
-    const isActive = tab.id === tabModel.activeTab?.id;
+    const isActive = tab.id === tabStore.activeTab?.id;
     if (tab.type === 'workspace') {
       return html`<workspace-view
         for=${tab.id}

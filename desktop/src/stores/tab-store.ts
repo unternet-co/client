@@ -1,7 +1,7 @@
 import { Disposable } from '../base/disposable';
 import { Notifier } from '../base/notifier';
 import { DatabaseService } from '../services/db-service';
-import { workspaceModel } from './workspaces';
+import { workspaceStore } from './workspace-store';
 import { ulid } from 'ulid';
 import { tabDatabase } from '../services/db-service';
 import { Tab } from '../data-types';
@@ -11,9 +11,9 @@ export interface TabChangeNotification {
   newTab?: Tab;
 }
 
-export class TabModel extends Disposable {
+export class TabStore extends Disposable {
   private tabs: Tab[] = [];
-  private workspaceModel = workspaceModel;
+  private workspaceStore = workspaceStore;
   private databaseService: DatabaseService<string, Tab>;
   private notifier = new Notifier<TabChangeNotification>();
   readonly subscribe = this.notifier.subscribe;
@@ -30,7 +30,7 @@ export class TabModel extends Disposable {
     if (this.tabs.length) {
       this.activeTabId = this.tabs[0].id;
       if (this.tabs[0].workspaceId) {
-        this.workspaceModel.setActive(this.tabs[0].workspaceId);
+        this.workspaceStore.setActive(this.tabs[0].workspaceId);
       }
     }
     this.notifier.notify({ activeTab: this.activeTab });
@@ -42,7 +42,7 @@ export class TabModel extends Disposable {
 
   setActive(tab: Tab) {
     this.activeTabId = tab.id;
-    if (tab.workspaceId) this.workspaceModel.setActive(tab.workspaceId);
+    if (tab.workspaceId) this.workspaceStore.setActive(tab.workspaceId);
     this.notifier.notify({ activeTab: this.activeTab });
   }
 
@@ -73,7 +73,7 @@ export class TabModel extends Disposable {
       type: 'workspace',
     } as Tab;
 
-    const workspace = this.workspaceModel.create();
+    const workspace = this.workspaceStore.create();
     tab.workspaceId = workspace.id;
     this.tabs.push(tab);
     this.activeTabId = tab.id;
@@ -91,7 +91,7 @@ export class TabModel extends Disposable {
     const wasActive = this.activeTabId === tabId;
     this.tabs.splice(index, 1);
     this.databaseService.delete(tabId);
-    if (tab.workspaceId) this.workspaceModel.delete(tab.workspaceId);
+    if (tab.workspaceId) this.workspaceStore.delete(tab.workspaceId);
 
     if (wasActive && this.tabs.length > 0) {
       this.activeTabId = this.tabs[index]
@@ -111,4 +111,4 @@ export class TabModel extends Disposable {
   }
 }
 
-export const tabModel = new TabModel(tabDatabase);
+export const tabStore = new TabStore(tabDatabase);

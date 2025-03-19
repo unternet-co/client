@@ -1,6 +1,6 @@
 import { html, render, TemplateResult } from 'lit';
 import { Interaction, InteractionOutput } from '../../stores/interactions';
-import { Workspace, workspaceModel } from '../../stores/workspaces';
+import { Workspace, workspaceStore } from '../../stores/workspaces';
 import './interaction-history.css';
 
 class InteractionHistory extends HTMLElement {
@@ -9,13 +9,13 @@ class InteractionHistory extends HTMLElement {
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
     this.updateInteractions();
-    workspaceModel.subscribeToWorkspace(this.workspaceId, () =>
+    workspaceStore.subscribeToWorkspace(this.workspaceId, () =>
       this.updateInteractions()
     );
   }
 
   updateInteractions() {
-    const interactions = workspaceModel.getInteractions(this.workspaceId);
+    const interactions = workspaceStore.getInteractions(this.workspaceId);
 
     const template = (interaction: Interaction) => html`
       <div class="interaction">

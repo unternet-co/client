@@ -1,34 +1,34 @@
-import { Tab, TabModel, tabModel } from '../../stores/tabs';
+import { Tab, tabStore, tabStore } from '../../stores/tabs';
 import { appendEl, createEl } from '../../utils/dom';
 import { render, html } from 'lit';
 import './tab-handle';
 import './top-bar.css';
 
 export class TopBar extends HTMLElement {
-  tabModel: TabModel;
+  tabStore: tabStore;
   tabsContainer: HTMLElement;
 
   // TODO: Add dependency injection using decorators for model
   connectedCallback() {
-    this.tabModel = tabModel;
+    this.tabStore = tabStore;
 
     this.tabsContainer = appendEl(
       this,
       createEl('div', { className: 'tab-list' })
     );
 
-    tabModel.subscribe(this.updateTabs.bind(this));
+    tabStore.subscribe(this.updateTabs.bind(this));
     this.updateTabs();
   }
 
   updateTabs() {
-    const tabs = tabModel.all();
+    const tabs = tabStore.all();
 
     const tabTemplate = (tab: Tab) => html`
       <tab-handle
-        ?active=${tabModel.activeTab?.id === tab.id}
-        @select=${() => tabModel.setActive(tab)}
-        @close=${() => tabModel.close(tab)}
+        ?active=${tabStore.activeTab?.id === tab.id}
+        @select=${() => tabStore.setActive(tab)}
+        @close=${() => tabStore.close(tab)}
       >
         ${tab.title}
       </tab-handle>
@@ -38,7 +38,7 @@ export class TopBar extends HTMLElement {
   }
 
   disconnectedCallback() {
-    tabModel.dispose();
+    tabStore.dispose();
   }
 }
 
