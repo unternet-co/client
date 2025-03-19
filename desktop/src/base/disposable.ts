@@ -23,7 +23,6 @@ export class Disposable {
 
   dispose(): void {
     if (this.disposeCallback) this.disposeCallback();
-    if (this.disposables) this.disposables.dispose();
     this.disposed = true;
   }
 }
@@ -33,6 +32,10 @@ export class DisposableGroup {
 
   add(disposable: Disposable) {
     this.disposables.push(disposable);
+  }
+
+  attachListener(target: EventTarget, type: string, listener: EventListener) {
+    this.add(Disposable.createEventListener(target, type, listener));
   }
 
   dispose() {

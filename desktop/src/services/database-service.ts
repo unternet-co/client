@@ -1,21 +1,27 @@
 import { Table } from 'dexie';
-import { db } from '../lib/indexed-db';
-import { ITab } from '../models/tabs';
+import { db } from '../adapters/indexed-db';
 
-export class DatabaseService<id, T> {
+export class DatabaseService<Id, T> {
   private table: Table;
 
   constructor(tableName: string) {
     this.table = db[tableName];
   }
 
-  create(item: T) {
-    // this.table.add(item);
+  create(item: T): Promise<void> {
+    return this.table.add(item);
   }
 
-  update(id: id, item: Partial<T>) {
-    this.table.update(id, item);
+  async delete(id: Id): Promise<void> {
+    return this.table.delete(id);
+  }
+
+  async update(id: Id, item: Partial<T>): Promise<void> {
+    await this.table.update(id, item);
+    return;
+  }
+
+  all(): Promise<T[]> {
+    return this.table.toArray();
   }
 }
-
-export const tabDatabaseService = new DatabaseService<string, ITab>('tabs');

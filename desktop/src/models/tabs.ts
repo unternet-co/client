@@ -1,79 +1,89 @@
+import { Disposable } from '../base/disposable';
 import { Notifier } from '../base/notifier';
-import {
-  DatabaseService,
-  tabDatabaseService,
-} from '../services/database-service';
+import { DatabaseService } from '../services/database-service';
 
-export interface ITab {
-  id?: string;
+export interface Tab {
+  id: string;
   title: string;
   type: 'workspace' | 'home';
   workspaceId?: string;
 }
 
 export interface TabChangeNotification {
-  activeTab: ITab;
+  activeTab?: Tab;
 }
 
-export class TabStore {
-  private tabs: ITab[] = [];
-  private databaseService: DatabaseService<string, ITab>;
-  private changeNotifier = new Notifier<TabChangeNotification | void>();
-  readonly subscribe = this.changeNotifier.subscribe;
-  private activeTabId: ITab['id'];
-  disposed = false;
+export class TabModel extends Disposable {
+  private tabs: Tab[] = [];
+  private databaseService: DatabaseService<string, Tab>;
+  private notifier = new Notifier<TabChangeNotification | void>();
+  readonly subscribe = this.notifier.subscribe;
+  private activeTabId: Tab['id'];
 
-  constructor(databaseService: DatabaseService<string, ITab>) {
+  constructor(databaseService: DatabaseService<string, Tab>) {
+    super();
     this.databaseService = databaseService;
-    this.create();
+    this.loadTabs();
+  }
+
+  async loadTabs() {
+    this.tabs = await this.databaseService.all();
+    if (this.tabs.length) this.activeTabId = this.tabs[0].id;
+    this.notifier.notify({ activeTab: this.activeTab });
   }
 
   all() {
     return this.tabs;
   }
 
-  setActive(id?: string) {
+  setActive(id: string) {
     this.activeTabId = id;
+    this.notifier.notify({ activeTab: this.activeTab });
   }
 
-  get activeTab(): ITab | undefined {
+  get activeTab(): Tab | undefined {
     return this.tabs.find((t) => t.id === this.activeTabId);
   }
 
   create() {
     const tab = {
       id: crypto.randomUUID(),
-      title: crypto.randomUUID(),
+      title: 'New workspace',
       type: 'workspace',
-    } as ITab;
+    } as Tab;
 
     this.tabs.push(tab);
     this.activeTabId = tab.id;
-    this.changeNotifier.notify({ activeTab: tab });
+    this.notifier.notify({ activeTab: tab });
 
     this.databaseService.create(tab);
   }
 
-  close(tabId: ITab['id']) {
+  close(tabId: Tab['id']) {
     const index = this.tabs.findIndex((tab) => tab.id === tabId);
+    if (index === -1) return;
 
-    if (index === this.tabs.length - 1 && index !== 0) {
-      this.activeTabId = this.tabs[index - 1].id;
+    const wasActive = this.activeTabId === tabId;
+    this.tabs.splice(index, 1);
+    this.databaseService.delete(tabId);
+
+    if (wasActive && this.tabs.length > 0) {
+      this.activeTabId = this.tabs[index]
+        ? this.tabs[index].id
+        : this.tabs[index - 1].id;
     }
 
-    if (index >= 0) {
-      this.tabs.splice(index, 1);
-      this.changeNotifier.notify({
-        activeTab: this.tabs[index - 1],
-      });
-    }
+    this.notifier.notify({
+      activeTab: this.tabs.find((tab) => tab.id === this.activeTabId),
+    });
   }
 
   dispose() {
-    this.changeNotifier.dispose();
+    this.notifier.dispose();
     this.tabs = [];
-    this.disposed = true;
+    super.dispose();
   }
 }
 
-export const tabStore = new TabStore(tabDatabaseService);
+export const tabDatabase = new DatabaseService<string, Tab>('tabs');
+export const tabModel = new TabModel(tabDatabase);

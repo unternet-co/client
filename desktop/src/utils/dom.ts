@@ -1,10 +1,16 @@
-export function appendEl(parent: HTMLElement, child: HTMLElement) {
+export function appendEl(parent: Node, child: HTMLElement) {
   parent.appendChild(child);
   return child;
 }
 
 export function clearNode(el: HTMLElement) {
   el.innerHTML = '';
+}
+
+export function attachStyles(shadow: ShadowRoot, styles: string) {
+  const sheet = new CSSStyleSheet();
+  sheet.replaceSync(styles);
+  shadow.adoptedStyleSheets = [sheet];
 }
 
 export function createEl(

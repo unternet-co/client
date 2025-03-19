@@ -8,3 +8,15 @@
 .workspace-content {
   flex-grow: 1;
 }
+
+.resource-bar {
+  border-top: 1px solid var(--color-border);
+  height: 30px;
+}
+
+.command-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}

@@ -1,4 +1,4 @@
-import { Message } from '../types.js';
+import { Message } from '../shared-types.js';
 
 export class Interaction {
   input: InteractionInput;
