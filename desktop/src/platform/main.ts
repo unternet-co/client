@@ -60,7 +60,7 @@ function createWindow() {
   /* Load web content */
 
   win.loadFile(path.join(__dirname, 'index.html'));
-  if (isDev) win.webContents.openDevTools();
+  // if (isDev) win.webContents.openDevTools();
 }
 
 ipcMain.handle('fetch', async (event, url) => {
