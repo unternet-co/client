@@ -1,5 +1,5 @@
 import { Table } from 'dexie';
-import { db } from '../../adapters/indexed-db';
+import { db } from '../../lib/indexed-db';
 
 export class DatabaseService<Id, T> {
   table: Table;

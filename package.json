@@ -1,19 +1,46 @@
 {
+  "name": "unternet-client",
+  "description": "Unternet Client",
+  "version": "0.2.0",
+  "author": {
+    "name": "Rupert Manfredi",
+    "email": "rupert@unternet.co"
+  },
   "workspaces": [
     "kernel",
     "desktop"
   ],
+  "main": "desktop/dist/main.js",
+  "build": {
+    "appId": "com.electron.unternet-client",
+    "files": [
+      "desktop/dist/index.html",
+      "desktop/dist/preload.js",
+      "desktop/dist/bundle.ts",
+      "desktop/dist/main.js",
+      "desktop/dist/bundle.css",
+      "desktop/dist/*.svg",
+      "desktop/dist/*.woff",
+      "desktop/dist/*.woff2",
+      "desktop/dist/*.ttf"
+    ],
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
+  },
   "scripts": {
     "dev": "npm run dev:desktop",
     "build": "npm run build:desktop",
     "package": "npm run package:desktop",
     "package:desktop": "cd desktop && npm run package",
-    "build:desktop": "cd desktop && npm run build",
-    "dev:desktop": "cd desktop && npm run dev"
+    "build:desktop": "cd desktop && rm -rf dist && npm run build",
+    "dev:desktop": "NODE_ENV=development cd desktop && npm run dev",
+    "app:dir": "rm -rf dist && electron-builder --dir",
+    "app:dist": "rm -rf dist && electron-builder"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
-    "rollup": "^4.34.9",
-    "vite": "^6.2.2"
+    "electron-builder": "^25.1.8",
+    "rollup": "^4.34.9"
   }
 }
