@@ -1,0 +1,15 @@
+/* Main layout */
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+/* Contents */
+
+.contents {
+  background: var(--color-page-alt);
+  flex-grow: 1;
+}

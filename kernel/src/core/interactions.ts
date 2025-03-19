@@ -1,4 +1,4 @@
-import { Message } from '../types.js';
+import { Message } from '../shared-types.js';
 
 export class Interaction {
   input: InteractionInput;
@@ -52,20 +52,25 @@ export interface InteractionInput {
 
 /* Output data structures */
 
-export interface InteractionOutput {
+export interface InteractionBaseOutput {
   type: string;
 }
 
-export interface InteractionTextOutput extends InteractionOutput {
+export interface InteractionTextOutput extends InteractionBaseOutput {
   type: 'text';
   content: string;
 }
 
-export interface InteractionProposalOutput extends InteractionOutput {
+export interface InteractionProposalOutput extends InteractionBaseOutput {
   type: 'actionproposal';
 }
 
-export interface InteractionProcessOutput extends InteractionOutput {
+export interface InteractionProcessOutput extends InteractionBaseOutput {
   type: 'process';
   processId: string | number;
 }
+
+export type InteractionOutput =
+  | InteractionTextOutput
+  | InteractionProposalOutput
+  | InteractionProcessOutput;
