@@ -41,7 +41,6 @@ export class Kernel {
       this.interactions,
       this.resources
     );
-    console.log(output);
 
     // // Add the output to the interaction
     // this.interactions[interactionIndex].outputs.push(output);

@@ -1,0 +1,32 @@
+interaction-history,
+interaction-history .interaction {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+interaction-history {
+  max-width: 560px;
+  width: 100%;
+  gap: var(--space-7);
+}
+
+interaction-history .interaction-input,
+interaction-history .interaction-output {
+  user-select: text;
+}
+
+interaction-history .interaction-input {
+  font-weight: 500;
+  padding: 0 var(--space-2);
+  /* background: var(--color-input); */
+  border: none;
+  align-self: flex-start;
+}
+
+interaction-history .interaction-output {
+  padding: var(--space-6) var(--space-7);
+  border-radius: var(--rounded);
+  border: 1px solid var(--color-border);
+  background: var(--color-page);
+}
