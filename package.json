@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "electron-builder": "^25.1.8",
     "rollup": "^4.34.9"
   }
 }
