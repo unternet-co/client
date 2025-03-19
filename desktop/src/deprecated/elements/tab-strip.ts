@@ -92,7 +92,6 @@ export class TabStrip extends LitElement {
   }
 
   render() {
-    console.log('hello!', plusIcon);
     return html`
       <ol class="tabs-list">
         ${this.tabs.map(this.tabTemplate.bind(this))}
