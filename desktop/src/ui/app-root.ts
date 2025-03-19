@@ -24,7 +24,6 @@ export class AppRoot extends HTMLElement {
   viewForTab(tab: Tab) {
     if (!tab) return;
     const isActive = tab.id === tabModel.activeTab?.id;
-    console.log(tab.id);
     if (tab.type === 'workspace') {
       return html`<workspace-view
         for=${tab.id}

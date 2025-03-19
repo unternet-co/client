@@ -21,6 +21,7 @@ export class CommandInputElement extends HTMLElement {
 
   connectedCallback() {
     this.input = appendEl(this.shadow, createEl('input')) as HTMLInputElement;
+    this.input.focus();
     this.input.placeholder = 'Search or type a command...';
     this.disposables.attachListener(
       this.input,
@@ -30,7 +31,6 @@ export class CommandInputElement extends HTMLElement {
   }
 
   handleKeyDown(e: KeyboardEvent) {
-    console.log(e);
     if (e.key === 'Enter') {
       this.dispatchEvent(new CommandSubmitEvent(this.input.value));
       this.input.value = '';
@@ -61,12 +61,12 @@ export class CommandInputElement extends HTMLElement {
       }
 
       input:focus {
-        max-width: 530px;
+        /* max-width: 500px; */
         text-align: left;
         background: var(--color-page);
         border: 1px solid var(--color-border);
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-        padding: 6px var(--space-4);
+        /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.05); */
+        /* padding: 6px var(--space-4); */
       }
     `;
   }

@@ -1,6 +1,7 @@
 import { html, render, TemplateResult } from 'lit';
 import { Interaction, InteractionOutput } from '../../models/interaction';
 import { Workspace, workspaceModel } from '../../models/workspaces';
+import './interaction-history.css';
 
 class InteractionHistory extends HTMLElement {
   workspaceId: Workspace['id'];

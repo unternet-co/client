@@ -51,7 +51,7 @@ function createWindow() {
 
   /* Load web content */
 
-  console.log(isDev);
+  console.log('Dev mode: ', isDev);
   if (isDev) {
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();

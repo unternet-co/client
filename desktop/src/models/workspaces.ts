@@ -121,7 +121,6 @@ export class WorkspaceModel {
   }
 
   getInteractions(workspaceId: Workspace['id']) {
-    console.log('getitng');
     return this.interactions.filter((x) => x.workspaceId === workspaceId);
   }
 }

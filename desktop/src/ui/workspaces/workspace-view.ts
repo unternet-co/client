@@ -14,7 +14,6 @@ export class WorkspaceView extends HTMLElement {
   // TODO: Implement dependency injection with decorators
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
-    console.log('IDDD', this.workspaceId);
     render(this.template, this);
   }
 

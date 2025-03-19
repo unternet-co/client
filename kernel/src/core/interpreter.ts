@@ -21,8 +21,6 @@ export class Interpreter {
       tools: tools,
     });
 
-    console.log(outputs);
-
     return Interaction.createTextOutput(outputs.text);
   }
 }

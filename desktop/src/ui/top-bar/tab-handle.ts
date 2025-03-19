@@ -77,7 +77,7 @@ export class TabHandleElement extends HTMLElement {
       }
 
       :host([active]) {
-        background: var(--color-neutral-5);
+        background: var(--color-neutral-0);
       }
 
       .title {

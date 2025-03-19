@@ -56,6 +56,22 @@ export class TabModel extends Disposable {
     return this.tabs.find((t) => t.id === this.activeTabId);
   }
 
+  get activeTabIndex(): number {
+    return this.tabs.findIndex((t) => t.id === this.activeTabId);
+  }
+
+  activateNext() {
+    if (this.activeTabIndex + 1 < this.tabs.length) {
+      this.setActive(this.tabs[this.activeTabIndex + 1]);
+    }
+  }
+
+  activatePrev() {
+    if (this.activeTabIndex - 1 >= 0) {
+      this.setActive(this.tabs[this.activeTabIndex - 1]);
+    }
+  }
+
   create() {
     const tab = {
       id: ulid(),
@@ -100,4 +116,5 @@ export class TabModel extends Disposable {
     super.dispose();
   }
 }
+
 export const tabModel = new TabModel(tabDatabase);
