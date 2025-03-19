@@ -1,7 +1,6 @@
-import { AppLayout } from './ui/layout';
 import { tabModel } from './models/tabs';
-
-new AppLayout(document.body);
+import { appendEl } from './utils/dom';
+import './ui/app-root';
 
 document.addEventListener('keydown', (e: KeyboardEvent) => {
   if (e.key === 'w' && e.metaKey) {

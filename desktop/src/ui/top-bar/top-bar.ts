@@ -1,23 +1,19 @@
-import { Disposable } from '../../base/disposable';
 import { Tab, TabModel, tabModel } from '../../models/tabs';
 import { appendEl, createEl } from '../../utils/dom';
 import { render, html } from 'lit';
 import './tab-handle';
 import './top-bar.css';
 
-export class TopBar extends Disposable {
-  element: HTMLElement;
+export class TopBar extends HTMLElement {
   tabModel: TabModel;
   tabsContainer: HTMLElement;
 
   // TODO: Add dependency injection using decorators for model
-  constructor(el: HTMLElement) {
-    super();
-    this.element = el;
+  connectedCallback() {
     this.tabModel = tabModel;
 
     this.tabsContainer = appendEl(
-      this.element,
+      this,
       createEl('div', { className: 'tab-list' })
     );
 
@@ -40,4 +36,10 @@ export class TopBar extends Disposable {
 
     render(tabs.map(tabTemplate), this.tabsContainer);
   }
+
+  disconnectedCallback() {
+    tabModel.dispose();
+  }
 }
+
+customElements.define('top-bar', TopBar);

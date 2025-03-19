@@ -14,18 +14,9 @@ export class Kernel {
     this.interpreter = new Interpreter(model);
   }
 
-  async handleInput(input: InteractionInput) {
-    const activeWorkspace = workspaceModel.getActiveWorkspace();
-    console.log(activeWorkspace);
-    if (!activeWorkspace) return;
-
-    const interaction = workspaceModel.createInteraction(
-      activeWorkspace.id,
-      input
-    );
-    const recentInteractions = workspaceModel.getInteractions(
-      activeWorkspace.id
-    );
+  async handleInput(workspaceId: Workspace['id'], input: InteractionInput) {
+    const interaction = workspaceModel.createInteraction(workspaceId, input);
+    const recentInteractions = workspaceModel.getInteractions(workspaceId);
     const output = await this.interpreter.generateOutput(recentInteractions);
     workspaceModel.addOutput(interaction.id, output);
   }

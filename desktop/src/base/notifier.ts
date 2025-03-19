@@ -1,8 +1,8 @@
-import { IDisposable } from './disposable';
+import { Disposable, IDisposable } from './disposable';
 
-export class Notifier<Notification> implements IDisposable {
+export class Notifier<Notification = undefined> implements IDisposable {
   private subscribers: ((notification?: Notification) => void)[] = [];
-  private defaultNotificationGetter: (() => Notification) | undefined;
+  private defaultNotificationGetter?: () => Notification;
   disposed = false;
 
   constructor(defaultNotificationGetter?: () => Notification) {
@@ -16,9 +16,7 @@ export class Notifier<Notification> implements IDisposable {
 
     this.subscribers.push(subscriber);
     this.onSubscribe(subscriber);
-    return {
-      dispose: () => this.removeSubscriber(subscriber),
-    };
+    return new Disposable(() => this.removeSubscriber(subscriber));
   };
 
   onSubscribe(subscriber: (notification?: Notification) => void) {

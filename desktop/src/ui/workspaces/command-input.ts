@@ -12,7 +12,6 @@ export class CommandInputElement extends HTMLElement {
   private input: HTMLInputElement;
   private shadow: ShadowRoot;
   private disposables = new DisposableGroup();
-  public test: number;
 
   constructor() {
     super();
@@ -31,6 +30,7 @@ export class CommandInputElement extends HTMLElement {
   }
 
   handleKeyDown(e: KeyboardEvent) {
+    console.log(e);
     if (e.key === 'Enter') {
       this.dispatchEvent(new CommandSubmitEvent(this.input.value));
       this.input.value = '';
