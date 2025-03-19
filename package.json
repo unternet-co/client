@@ -10,8 +10,20 @@
     "kernel",
     "desktop"
   ],
+  "main": "desktop/dist/main.js",
   "build": {
-   "appId": "your.id",
+    "appId": "com.electron.unternet-client",
+    "files": [
+      "desktop/dist/index.html",
+      "desktop/dist/preload.js",
+      "desktop/dist/bundle.ts",
+      "desktop/dist/main.js",
+      "desktop/dist/bundle.css",
+      "desktop/dist/*.svg",
+      "desktop/dist/*.woff",
+      "desktop/dist/*.woff2",
+      "desktop/dist/*.ttf"
+    ],
     "mac": {
       "category": "public.app-category.developer-tools"
     }
@@ -21,8 +33,10 @@
     "build": "npm run build:desktop",
     "package": "npm run package:desktop",
     "package:desktop": "cd desktop && npm run package",
-    "build:desktop": "cd desktop && npm run build",
-    "dev:desktop": "cd desktop && npm run dev"
+    "build:desktop": "cd desktop && rm -rf dist && npm run build",
+    "dev:desktop": "NODE_ENV=development cd desktop && npm run dev",
+    "app:dir": "rm -rf dist && electron-builder --dir",
+    "app:dist": "rm -rf dist && electron-builder"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
