@@ -1,8 +1,21 @@
 {
+  "name": "unternet-client",
+  "description": "Unternet Client",
+  "version": "0.2.0",
+  "author": {
+    "name": "Rupert Manfredi",
+    "email": "rupert@unternet.co"
+  },
   "workspaces": [
     "kernel",
     "desktop"
   ],
+  "build": {
+   "appId": "your.id",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
+  },
   "scripts": {
     "dev": "npm run dev:desktop",
     "build": "npm run build:desktop",
