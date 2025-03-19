@@ -10,7 +10,7 @@ export class InteractionDatabaseService extends DatabaseService<
     super('interactions');
   }
 
-  forWorkspace(workspaceId: Workspace['id']) {
-    this.table.where({ workspaceId });
+  deleteWithWorkspace(workspaceId: Workspace['id']) {
+    return this.table.where('workspaceId').equals(workspaceId).delete();
   }
 }

@@ -12,6 +12,7 @@ export class CommandInputElement extends HTMLElement {
   private input: HTMLInputElement;
   private shadow: ShadowRoot;
   private disposables = new DisposableGroup();
+  public test: number;
 
   constructor() {
     super();
@@ -54,13 +55,13 @@ export class CommandInputElement extends HTMLElement {
         text-align: center;
         border: 1px solid transparent;
         padding: 5px var(--space-4);
-        background: var(--color-neutral-10);
+        background: var(--color-neutral-15);
         border-radius: var(--rounded);
         outline: none;
       }
 
       input:focus {
-        max-width: 600px;
+        max-width: 530px;
         text-align: left;
         background: var(--color-page);
         border: 1px solid var(--color-border);

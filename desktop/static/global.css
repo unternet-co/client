@@ -58,7 +58,7 @@
   --color-page-alt: var(--color-neutral-5);
   --color-text: var(--color-neutral-90);
   --color-text-faded: var(--color-neutral-60);
-  --color-border: var(--color-neutral-15);
+  --color-border: #d8d8d8;
   --color-input: var(--color-neutral-15);
 }
 
@@ -87,7 +87,8 @@ body {
 
 body,
 input,
-textarea {
+textarea,
+input {
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: var(--text-base);
@@ -98,7 +99,6 @@ textarea {
   /* -webkit-font-smoothing: antialiased; */
   /* -moz-osx-font-smoothing: grayscale; */
   /* font-smooth: always; */
-
   line-height: 1.3;
 }
 

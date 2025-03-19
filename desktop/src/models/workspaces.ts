@@ -62,9 +62,14 @@ export class WorkspaceModel {
 
   delete(id: Workspace['id']) {
     delete this.workspaces[id];
-    if (!Object.keys(this.workspaces).length)
-      this.activeWorkspaceId = undefined;
+    this.interactions = this.interactions.filter((x) => x.workspaceId !== id);
     this.workspaceDatabase.delete(id);
+    this.interactionDatabase.deleteWithWorkspace(id);
+
+    if (Object.keys(this.workspaces).length === 0) {
+      this.activeWorkspaceId = undefined;
+    }
+
     this.notifier.notify();
   }
 

@@ -64,8 +64,8 @@ export class TabHandleElement extends HTMLElement {
         align-items: center;
         -webkit-app-region: no-drag;
         gap: var(--space-3);
-        border-left: 1px solid var(--color-neutral-20);
-        border-right: 1px solid var(--color-neutral-20);
+        border-left: 1px solid var(--color-border);
+        border-right: 1px solid var(--color-border);
         padding: 0 var(--space-6);
         padding-right: var(--space-4);
         margin-right: -1px; /* Remove double-borders */
