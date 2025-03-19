@@ -1,6 +1,6 @@
 import { CommandSubmitEvent } from './command-input';
 import { kernel } from '../../kernel';
-import { Workspace } from '../../models/workspaces';
+import { Workspace } from '../../stores/workspaces';
 import './command-input';
 import './interaction-history';
 import './workspace-view.css';

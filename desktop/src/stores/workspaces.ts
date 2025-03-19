@@ -3,18 +3,16 @@ import {
   Interaction,
   InteractionInput,
   InteractionOutput,
-} from './interaction';
-import { workspaceDatabase, DatabaseService } from '../services/db';
+} from '../data-types';
 import {
+  workspaceDatabase,
+  DatabaseService,
   interactionDatabase,
   InteractionDatabaseService,
-} from '../services/db';
+} from '../services/db-service';
 import { ulid } from 'ulid';
 import { DisposableGroup } from '../base/disposable';
-
-export interface Workspace {
-  id: string;
-}
+import { Workspace } from '../data-types';
 
 export interface WorkspaceNotification {
   workspaceId: Workspace['id'];

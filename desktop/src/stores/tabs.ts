@@ -1,16 +1,10 @@
 import { Disposable } from '../base/disposable';
 import { Notifier } from '../base/notifier';
-import { DatabaseService } from '../services/db/db-service';
+import { DatabaseService } from '../services/db-service';
 import { workspaceModel } from './workspaces';
 import { ulid } from 'ulid';
-import { tabDatabase } from '../services/db';
-
-export interface Tab {
-  id: string;
-  title: string;
-  type: 'workspace' | 'home';
-  workspaceId?: string;
-}
+import { tabDatabase } from '../services/db-service';
+import { Tab } from '../data-types';
 
 export interface TabChangeNotification {
   activeTab?: Tab;

@@ -1,4 +1,4 @@
-import { tabModel } from '../models/tabs';
+import { tabModel } from '../stores/tabs';
 
 export class ShortcutService {
   constructor() {

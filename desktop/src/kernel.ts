@@ -1,6 +1,11 @@
 import { Interpreter, InteractionInput, LanguageModel } from '@unternet/kernel';
+<<<<<<< Updated upstream
 import { Workspace, workspaceModel, WorkspaceModel } from './models/workspaces';
 import { createModel } from './adapters/llm';
+=======
+import { Workspace, workspaceModel, WorkspaceModel } from './stores/workspaces';
+import { createModel } from './integrations/llm';
+>>>>>>> Stashed changes
 
 export interface KernelInit {
   model: LanguageModel;

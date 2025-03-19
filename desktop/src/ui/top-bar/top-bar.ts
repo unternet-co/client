@@ -1,4 +1,4 @@
-import { Tab, TabModel, tabModel } from '../../models/tabs';
+import { Tab, TabModel, tabModel } from '../../stores/tabs';
 import { appendEl, createEl } from '../../utils/dom';
 import { render, html } from 'lit';
 import './tab-handle';
