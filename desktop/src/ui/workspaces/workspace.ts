@@ -42,11 +42,11 @@ export class WorkspaceView extends Disposable {
       this.handleCommandSubmit.bind(this)
     );
 
+    this.updateContent();
     this.workspaceModel.subscribe(() => this.updateContent());
   }
 
   updateContent() {
-    console.log('ih');
     this.contentContainer.innerHTML = this.workspaceModel
       .getInteractions()
       .map((interaction) => {
