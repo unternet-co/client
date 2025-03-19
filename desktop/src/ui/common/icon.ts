@@ -62,6 +62,14 @@ export class IconElement extends HTMLElement {
         display: inline-block;
       }
 
+      :host(.icon-button) {
+        border-radius: 4px;
+      }
+
+      :host(.icon-button:hover) {
+        background: var(--color-neutral-10);
+      }
+
       img {
         width: 100%;
         height: 100%;

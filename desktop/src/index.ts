@@ -6,7 +6,7 @@ new AppLayout(document.body);
 document.addEventListener('keydown', (e: KeyboardEvent) => {
   if (e.key === 'w' && e.metaKey) {
     e.preventDefault();
-    if (tabModel.activeTab) tabModel.close(tabModel.activeTab.id);
+    if (tabModel.activeTab) tabModel.close(tabModel.activeTab);
   }
 });
 

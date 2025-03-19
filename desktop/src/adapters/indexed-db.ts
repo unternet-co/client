@@ -1,11 +1,11 @@
 import Dexie, { Table } from 'dexie';
 import { Tab } from '../models/tabs';
-import { WorkspaceRecord } from '../models/workspaces';
+import { Workspace } from '../models/workspaces';
 import { Interaction } from '../models/interaction';
 
 export class IndexedDB extends Dexie {
   tabs!: Table<Tab, string>;
-  workspaces!: Table<WorkspaceRecord, string>;
+  workspaces!: Table<Workspace, string>;
   interactions!: Table<Interaction, string>;
 
   constructor() {
@@ -13,6 +13,8 @@ export class IndexedDB extends Dexie {
 
     this.version(1).stores({
       tabs: 'id',
+      workspaces: 'id',
+      interactions: 'id,workspaceId',
     });
   }
 }

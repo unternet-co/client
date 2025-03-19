@@ -31,8 +31,8 @@ export class TopBar extends Disposable {
     const tabTemplate = (tab: Tab) => html`
       <tab-handle
         ?active=${tabModel.activeTab?.id === tab.id}
-        @select=${() => tabModel.setActive(tab.id)}
-        @close=${() => tabModel.close(tab.id)}
+        @select=${() => tabModel.setActive(tab)}
+        @close=${() => tabModel.close(tab)}
       >
         ${tab.title}
       </tab-handle>

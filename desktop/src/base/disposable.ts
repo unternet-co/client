@@ -34,7 +34,11 @@ export class DisposableGroup {
     this.disposables.push(disposable);
   }
 
-  attachListener(target: EventTarget, type: string, listener: EventListener) {
+  attachListener(
+    target: EventTarget,
+    type: string,
+    listener: (e: any) => void
+  ) {
     this.add(Disposable.createEventListener(target, type, listener));
   }
 

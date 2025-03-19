@@ -9,6 +9,12 @@ export class TabSelectEvent extends Event {
   }
 }
 
+export class TabCloseEvent extends Event {
+  constructor() {
+    super('close');
+  }
+}
+
 export class TabHandleElement extends HTMLElement {
   shadow: ShadowRoot;
   active: boolean;
@@ -28,6 +34,16 @@ export class TabHandleElement extends HTMLElement {
     this.disposables.attachListener(this, 'mousedown', () => {
       this.dispatchEvent(new TabSelectEvent());
     });
+
+    const iconElement = this.shadow.querySelector('un-icon') as HTMLElement;
+    this.disposables.attachListener(
+      iconElement,
+      'mousedown',
+      (e: MouseEvent) => {
+        e.stopPropagation();
+        this.dispatchEvent(new TabCloseEvent());
+      }
+    );
   }
 
   get template() {
@@ -35,7 +51,8 @@ export class TabHandleElement extends HTMLElement {
       <span class="title">
         <slot></slot>
       </span>        
-      <un-icon src=${ICON_GLYPHS.close} size=${ICON_SIZES.medium}></un-icon>
+      <un-icon class="icon-button" src=${ICON_GLYPHS.close} size=${ICON_SIZES.medium}>
+      </un-icon>
     `;
   }
 
@@ -68,6 +85,15 @@ export class TabHandleElement extends HTMLElement {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+      }
+
+      un-icon {
+        opacity: 0;
+        transition: opacity linear 0.1s;
+      }
+
+      :host([active]) un-icon, :host(:hover) un-icon {
+        opacity: 1;
       }
     `;
   }

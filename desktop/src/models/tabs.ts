@@ -1,6 +1,9 @@
 import { Disposable } from '../base/disposable';
 import { Notifier } from '../base/notifier';
-import { DatabaseService } from '../services/database-service';
+import { DatabaseService } from '../services/db/db-service';
+import { workspaceModel } from './workspaces';
+import { ulid } from 'ulid';
+import { tabDatabase } from '../services/db';
 
 export interface Tab {
   id: string;
@@ -11,12 +14,14 @@ export interface Tab {
 
 export interface TabChangeNotification {
   activeTab?: Tab;
+  newTab?: Tab;
 }
 
 export class TabModel extends Disposable {
   private tabs: Tab[] = [];
+  private workspaceModel = workspaceModel;
   private databaseService: DatabaseService<string, Tab>;
-  private notifier = new Notifier<TabChangeNotification | void>();
+  private notifier = new Notifier<TabChangeNotification>();
   readonly subscribe = this.notifier.subscribe;
   private activeTabId: Tab['id'];
 
@@ -28,7 +33,12 @@ export class TabModel extends Disposable {
 
   async loadTabs() {
     this.tabs = await this.databaseService.all();
-    if (this.tabs.length) this.activeTabId = this.tabs[0].id;
+    if (this.tabs.length) {
+      this.activeTabId = this.tabs[0].id;
+      if (this.tabs[0].workspaceId) {
+        this.workspaceModel.setActive(this.tabs[0].workspaceId);
+      }
+    }
     this.notifier.notify({ activeTab: this.activeTab });
   }
 
@@ -36,8 +46,9 @@ export class TabModel extends Disposable {
     return this.tabs;
   }
 
-  setActive(id: string) {
-    this.activeTabId = id;
+  setActive(tab: Tab) {
+    this.activeTabId = tab.id;
+    if (tab.workspaceId) this.workspaceModel.setActive(tab.workspaceId);
     this.notifier.notify({ activeTab: this.activeTab });
   }
 
@@ -47,25 +58,30 @@ export class TabModel extends Disposable {
 
   create() {
     const tab = {
-      id: crypto.randomUUID(),
+      id: ulid(),
       title: 'New workspace',
       type: 'workspace',
     } as Tab;
 
+    const workspace = this.workspaceModel.create();
+    tab.workspaceId = workspace.id;
     this.tabs.push(tab);
     this.activeTabId = tab.id;
-    this.notifier.notify({ activeTab: tab });
+    this.notifier.notify({ activeTab: tab, newTab: tab });
 
     this.databaseService.create(tab);
   }
 
-  close(tabId: Tab['id']) {
-    const index = this.tabs.findIndex((tab) => tab.id === tabId);
+  // TODO: Make this add to history, not delete
+  close(tab: Tab) {
+    const tabId = tab.id;
+    const index = this.tabs.findIndex((x) => x.id === tabId);
     if (index === -1) return;
 
     const wasActive = this.activeTabId === tabId;
     this.tabs.splice(index, 1);
     this.databaseService.delete(tabId);
+    if (tab.workspaceId) this.workspaceModel.delete(tab.workspaceId);
 
     if (wasActive && this.tabs.length > 0) {
       this.activeTabId = this.tabs[index]
@@ -84,6 +100,4 @@ export class TabModel extends Disposable {
     super.dispose();
   }
 }
-
-export const tabDatabase = new DatabaseService<string, Tab>('tabs');
 export const tabModel = new TabModel(tabDatabase);

@@ -1,8 +1,8 @@
 import { Table } from 'dexie';
-import { db } from '../adapters/indexed-db';
+import { db } from '../../adapters/indexed-db';
 
 export class DatabaseService<Id, T> {
-  private table: Table;
+  table: Table;
 
   constructor(tableName: string) {
     this.table = db[tableName];

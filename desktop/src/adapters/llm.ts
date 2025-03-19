@@ -11,10 +11,10 @@ export interface modelOptions {
   baseURL?: string;
 }
 
-export function fromConfig({
+export function createModel({
   type = 'openai',
   model,
-  apiKey = process.env.OPENAI_API_KEY,
+  apiKey = import.meta.env.APP_OPENAI_API_KEY,
   baseURL,
 }: modelOptions = {}) {
   if (type === 'ollama' || !apiKey) {
