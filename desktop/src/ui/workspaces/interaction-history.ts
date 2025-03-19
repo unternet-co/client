@@ -1,6 +1,6 @@
 import { html, render, TemplateResult } from 'lit';
-import { Interaction, InteractionOutput } from '../../stores/interactions';
-import { Workspace, workspaceStore } from '../../stores/workspaces';
+import { Interaction, InteractionOutput, Workspace } from '../../data-types';
+import { workspaceStore } from '../../stores/workspace-store';
 import './interaction-history.css';
 
 class InteractionHistory extends HTMLElement {

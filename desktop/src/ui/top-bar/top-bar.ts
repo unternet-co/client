@@ -1,11 +1,12 @@
-import { Tab, tabStore, tabStore } from '../../stores/tabs';
+import { tabStore } from '../../stores/tab-store';
+import { Tab } from '../../data-types';
 import { appendEl, createEl } from '../../utils/dom';
 import { render, html } from 'lit';
 import './tab-handle';
 import './top-bar.css';
 
 export class TopBar extends HTMLElement {
-  tabStore: tabStore;
+  tabStore: typeof tabStore;
   tabsContainer: HTMLElement;
 
   // TODO: Add dependency injection using decorators for model

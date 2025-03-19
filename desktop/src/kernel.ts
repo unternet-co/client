@@ -1,11 +1,7 @@
 import { Interpreter, InteractionInput, LanguageModel } from '@unternet/kernel';
-<<<<<<< Updated upstream
-import { Workspace, workspaceStore, workspaceStore } from './models/workspaces';
-import { createModel } from './adapters/llm';
-=======
-import { Workspace, workspaceStore, workspaceStore } from './stores/workspaces';
-import { createModel } from './integrations/llm';
->>>>>>> Stashed changes
+import { workspaceStore } from './stores/workspace-store';
+import { Workspace } from './data-types';
+import { createModel } from './ext/llm';
 
 export interface KernelInit {
   model: LanguageModel;
@@ -13,7 +9,7 @@ export interface KernelInit {
 
 export class Kernel {
   interpreter: Interpreter;
-  workspaceStore: workspaceStore;
+  workspaceStore = workspaceStore;
 
   constructor({ model }: KernelInit) {
     this.interpreter = new Interpreter(model);

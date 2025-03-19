@@ -1,4 +1,4 @@
-import { tabStore } from '../stores/tabs';
+import { tabStore } from '../stores/tab-store';
 
 export class ShortcutService {
   constructor() {

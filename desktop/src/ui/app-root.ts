@@ -1,5 +1,6 @@
-import { Tab, tabStore } from '../stores/tabs';
+import { tabStore } from '../stores/tab-store';
 import { appendEl, createEl } from '../utils/dom';
+import { Tab } from '../data-types';
 import { html, render } from 'lit';
 import './top-bar/top-bar';
 import './workspaces/workspace-view';
