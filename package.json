@@ -4,8 +4,10 @@
     "desktop"
   ],
   "scripts": {
+    "clean": "rm -rf desktop/dist && rm -rf kernel/dist && rm -rf dist",
     "dev": "npm run dev:desktop",
-    "build": "npm run build:desktop",
+    "build": "npm run build:kernel && npm run build:desktop",
+    "build:kernel": "cd kernel && npm run build",
     "package": "npm run package:desktop",
     "package:desktop": "cd desktop && npm run package",
     "build:desktop": "cd desktop && npm run build",
