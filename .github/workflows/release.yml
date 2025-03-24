@@ -52,8 +52,10 @@ jobs:
           echo $BRANCH_NAME
           VERSION_PART="patch"
           if [[ "$BRANCH_NAME" =~ ^(feat|feature)$ ]]; then
+            echo "minor"
             VERSION_PART="minor"
           elif [[ "$BRANCH_NAME" =~ ^(major|breaking)$ ]]; then
+            echo "major"
             VERSION_PART="major"
           fi
           echo "bump=$VERSION_PART" >> $GITHUB_OUTPUT
