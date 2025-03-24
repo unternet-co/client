@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
     "dev:electron": "tsc && electron .",
-    "dev:web": "vite"
+    "dev:web": "vite",
+    "build": "vite build"
   },
   "license": "ISC",
   "dependencies": {
