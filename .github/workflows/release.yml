@@ -48,7 +48,7 @@ jobs:
       - name: Detect semver bump
         id: semver
         run: |
-          BRANCH_NAME=$(echo "${{ github.event.head_commit.message }}" | cut -d '/' -f1)
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
           echo $BRANCH_NAME
           VERSION_PART="patch"
           if [[ "$BRANCH_NAME" =~ ^(feat|feature)$ ]]; then
@@ -71,7 +71,7 @@ jobs:
           echo $NEW_VERSION
 
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-# git push origin feat/tagging --follow-tags
+      # git push origin feat/tagging --follow-tags
       - name: Update CHANGELOG
         run: |
           echo "## ${{ steps.bump_version.outputs.new_version }}" >> CHANGELOG.md
