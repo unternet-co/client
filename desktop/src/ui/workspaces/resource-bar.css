@@ -1,12 +1,11 @@
 resource-bar {
-  background: var(--color-page);
   flex-shrink: 0;
-  border-top: 1px solid var(--color-border);
-  /* -webkit-app-region: drag; */
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 0 12px;
+  border-top: 1px solid var(--color-border);
+  height: 30px;
 }
 
 .blurred resource-bar {

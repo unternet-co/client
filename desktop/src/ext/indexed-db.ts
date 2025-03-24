@@ -1,8 +1,8 @@
 import Dexie, { Table } from 'dexie';
-import { Tab, Workspace, Interaction } from '../data-types';
+import { Workspace } from '../models/workspaces';
+import { Interaction } from '../models/interactions';
 
 export class IndexedDB extends Dexie {
-  tabs!: Table<Tab, string>;
   workspaces!: Table<Workspace, string>;
   interactions!: Table<Interaction, string>;
 
@@ -10,7 +10,6 @@ export class IndexedDB extends Dexie {
     super('DB');
 
     this.version(1).stores({
-      tabs: 'id',
       workspaces: 'id',
       interactions: 'id,workspaceId',
     });

@@ -10,6 +10,11 @@ app-root {
 /* Contents */
 
 .contents {
+  overflow: hidden;
   background: var(--color-page-alt);
   flex-grow: 1;
+}
+
+.hide-unless-active:not([active]) {
+  display: none;
 }

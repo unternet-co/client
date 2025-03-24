@@ -1,15 +1,22 @@
 import { CommandSubmitEvent } from './command-input';
-import { kernel } from '../../kernel';
-import { Workspace } from '../../data-types';
 import './command-input';
 import './interaction-history';
 import './workspace-view.css';
+import './resource-bar';
 import { html, render } from 'lit';
+import { Workspace } from '../../models/workspaces';
+import { Kernel } from '../../kernel';
+import { dependencies } from '../../base/dependencies';
 
 export class WorkspaceView extends HTMLElement {
   workspaceId: Workspace['id'];
-
+  kernel: Kernel;
   static observedAttributes = ['for'];
+
+  constructor() {
+    super();
+    this.kernel = dependencies.resolve('Kernel');
+  }
 
   // TODO: Implement dependency injection with decorators
   connectedCallback() {
@@ -32,7 +39,7 @@ export class WorkspaceView extends HTMLElement {
   }
 
   handleCommandSubmit(e: CommandSubmitEvent) {
-    kernel.handleInput(this.workspaceId, { text: e.value });
+    this.kernel.handleInput(this.workspaceId, { text: e.value });
   }
 }
 

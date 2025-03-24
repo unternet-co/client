@@ -1,7 +1,6 @@
 import { Interpreter, InteractionInput, LanguageModel } from '@unternet/kernel';
-import { workspaceStore } from './stores/workspace-store';
-import { Workspace } from './data-types';
-import { createModel } from './ext/llm';
+import { Workspace, WorkspaceModel } from './models/workspaces';
+import { dependencies } from './base/dependencies';
 
 export interface KernelInit {
   model: LanguageModel;
@@ -9,18 +8,20 @@ export interface KernelInit {
 
 export class Kernel {
   interpreter: Interpreter;
-  workspaceStore = workspaceStore;
+  workspaceModel: WorkspaceModel;
 
   constructor({ model }: KernelInit) {
+    this.workspaceModel = dependencies.resolve('WorkspaceModel');
     this.interpreter = new Interpreter(model);
   }
 
   async handleInput(workspaceId: Workspace['id'], input: InteractionInput) {
-    const interaction = workspaceStore.createInteraction(workspaceId, input);
-    const recentInteractions = workspaceStore.getInteractions(workspaceId);
+    const interaction = this.workspaceModel.createInteraction(
+      workspaceId,
+      input
+    );
+    const recentInteractions = this.workspaceModel.getInteractions(workspaceId);
     const output = await this.interpreter.generateOutput(recentInteractions);
-    workspaceStore.addOutput(interaction.id, output);
+    this.workspaceModel.addOutput(interaction.id, output);
   }
 }
-
-export const kernel = new Kernel({ model: createModel() });

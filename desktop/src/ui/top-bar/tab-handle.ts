@@ -1,3 +1,4 @@
+import { html, render } from 'lit';
 import { DisposableGroup } from '../../base/disposable';
 import { attachStyles } from '../../utils/dom';
 import '../common/icon';
@@ -17,42 +18,46 @@ export class TabCloseEvent extends Event {
 
 export class TabHandleElement extends HTMLElement {
   shadow: ShadowRoot;
-  active: boolean;
-  titleElement: HTMLElement;
+  isStatic: boolean;
   disposables = new DisposableGroup();
 
-  static observedAttributes = ['active'];
+  static observedAttributes = ['static'];
 
-  constructor() {
-    super();
+  connectedCallback() {
     this.shadow = this.attachShadow({ mode: 'open' });
-
     attachStyles(this.shadow, this.styles);
-    this.shadow.innerHTML = this.template;
-    this.titleElement = this.shadow.querySelector('.title')!;
+
+    this.isStatic = typeof this.getAttribute('static') === 'string';
+    render(this.template, this.shadow);
 
     this.disposables.attachListener(this, 'mousedown', () => {
       this.dispatchEvent(new TabSelectEvent());
     });
+  }
 
-    const iconElement = this.shadow.querySelector('un-icon') as HTMLElement;
-    this.disposables.attachListener(
-      iconElement,
-      'mousedown',
-      (e: MouseEvent) => {
-        e.stopPropagation();
-        this.dispatchEvent(new TabCloseEvent());
-      }
-    );
+  disconnectedCallback() {
+    this.disposables.dispose();
+  }
+
+  handleMouseDown(e: MouseEvent) {
+    e.stopPropagation();
+    this.dispatchEvent(new TabCloseEvent());
   }
 
   get template() {
-    return /*html*/ `
-      <span class="title">
+    return html`
+      <span class="inner">
         <slot></slot>
-      </span>        
-      <un-icon class="icon-button" src=${ICON_GLYPHS.close} size=${ICON_SIZES.medium}>
-      </un-icon>
+      </span>
+      ${!this.isStatic
+        ? html`<un-icon
+            @mousedown=${this.handleMouseDown.bind(this)}
+            class="icon-button"
+            src=${ICON_GLYPHS.close}
+            size=${ICON_SIZES.medium}
+          >
+          </un-icon>`
+        : null}
     `;
   }
 
@@ -80,7 +85,12 @@ export class TabHandleElement extends HTMLElement {
         background: var(--color-neutral-0);
       }
 
-      .title {
+      :host([static]) {
+        padding: 0 var(--space-5);
+      }
+
+      .inner {
+        display: flex;
         max-width: 180px;
         flex-grow: 1;
         white-space: nowrap;
