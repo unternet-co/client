@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - feat/tagging # TODO: Remove before merging
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.0" # TODO: Fetch from nvmrc file
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  release:
+    name: Version, Tag, Release
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.0"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Detect semver bump
+        id: semver
+        run: |
+          BRANCH_NAME=$(echo "${{ github.event.head_commit.message }}" | cut -d '/' -f1)
+          VERSION_PART="patch"
+          if [[ "$BRANCH_NAME" =~ ^(feat|feature)$ ]]; then
+            VERSION_PART="minor"
+          elif [[ "$BRANCH_NAME" =~ ^(major|breaking)$ ]]; then
+            VERSION_PART="major"
+          fi
+          echo "bump=$VERSION_PART" >> $GITHUB_OUTPUT
+
+      - name: Bump version and commit
+        id: bump_version
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          CURRENT_VERSION=$(node -p "require('./desktop/package.json').version")
+          NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }} -m "chore(release): bump version to %s [skip ci]")
+
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+          git push origin feat/tagging --follow-tags
+
+      - name: Update CHANGELOG
+        run: |
+          echo "## ${{ steps.bump_version.outputs.new_version }}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "- Changes from commit: ${{ github.event.head_commit.message }}" >> CHANGELOG.md
+
+          git add CHANGELOG.md
+          git commit -m "chore: update changelog for ${{ steps.bump_version.outputs.new_version }} [skip ci]" || echo "No changes to commit"
+          git push
+
+      - name: Upload release with .dmg
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.bump_version.outputs.new_version }}
+          files: | # TODO: Update with dmg file
+            dist/*.html
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
