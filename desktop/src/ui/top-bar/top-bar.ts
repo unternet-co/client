@@ -1,19 +1,14 @@
 import { appendEl, createEl } from '../../utils/dom';
 import { render, html } from 'lit';
-import './tab-handle';
-import './top-bar.css';
 import { ICON_GLYPHS } from '../common/icon';
 import { Tab, TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
+import './tab-handle';
+import './top-bar.css';
 
 export class TopBar extends HTMLElement {
-  tabModel: TabModel;
+  tabModel = dependencies.resolve<TabModel>('TabModel');
   tabsContainer: HTMLElement;
-
-  constructor() {
-    super();
-    this.tabModel = dependencies.resolve('TabModel');
-  }
 
   // TODO: Add dependency injection using decorators for model
   connectedCallback() {

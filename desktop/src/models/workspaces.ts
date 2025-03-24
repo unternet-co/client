@@ -52,7 +52,6 @@ export class WorkspaceModel {
     const workspaceRecords = await this.workspaceDatabase.all();
     for (const record of workspaceRecords) {
       this.workspaces.set(record.id, record);
-
       this.notifier.notify({ workspaceId: record.id });
     }
   }
@@ -79,6 +78,7 @@ export class WorkspaceModel {
       workspaceId: id,
     });
     this.interactions.set(id, workspaceInteractions);
+    this.notifier.notify({ workspaceId: id });
   }
 
   deactivate(id: Workspace['id']): void {
@@ -113,14 +113,19 @@ export class WorkspaceModel {
       outputs: [],
     };
 
-    this.interactions.get(workspaceId)?.push(interaction);
+    if (!this.interactions.has(workspaceId)) {
+      this.interactions.set(workspaceId, []);
+    }
+    this.interactions.get(workspaceId)!.push(interaction);
     this.interactionDatabase.create(interaction);
     this.notifier.notify({ workspaceId });
+    console.log('in interactions', interaction);
     return interaction;
   }
 
   addOutput(interactionId: Interaction['id'], output: InteractionOutput) {
     const interaction = this.getInteraction(interactionId);
+    console.log(interaction, output);
 
     if (interaction) {
       interaction.outputs.push(output);
@@ -132,17 +137,15 @@ export class WorkspaceModel {
   }
 
   getInteraction(id: Interaction['id']) {
-    for (const key in this.interactions.keys) {
-      const interaction = this.interactions
-        .get(key)
-        ?.find((x: Interaction) => x.id === id);
+    console.log(this.interactions.keys());
+    for (const [interactionId, interactions] of this.interactions.entries()) {
+      console.log('gettig', interactions);
+      const interaction = interactions.find((x: Interaction) => x.id === id);
       if (interaction) return interaction;
     }
   }
 
   getInteractions(workspaceId: Workspace['id']): Interaction[] {
-    console.log(workspaceId);
-    console.log(this.interactions);
     return this.interactions.get(workspaceId) || [];
   }
 }

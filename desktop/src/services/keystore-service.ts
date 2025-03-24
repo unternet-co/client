@@ -10,7 +10,6 @@ export class KeyStoreService<ValueType> {
     this._name = name;
 
     const currentValue = localStorage.getItem(name);
-    console.log(currentValue);
     if (currentValue) {
       this._value = JSON.parse(currentValue) as ValueType;
     } else {

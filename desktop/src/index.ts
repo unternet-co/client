@@ -32,5 +32,4 @@ dependencies.registerSingleton('Kernel', new Kernel({ model: createModel() }));
 
 new ShortcutService(dependencies.resolve('TabModel'));
 
-console.log('creating element');
 appendEl(document.body, createEl('app-root'));

@@ -10,18 +10,17 @@ import { dependencies } from '../../base/dependencies';
 
 export class WorkspaceView extends HTMLElement {
   workspaceId: Workspace['id'];
-  kernel: Kernel;
+  kernel = dependencies.resolve<Kernel>('Kernel');
   static observedAttributes = ['for'];
-
-  constructor() {
-    super();
-    this.kernel = dependencies.resolve('Kernel');
-  }
 
   // TODO: Implement dependency injection with decorators
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
     render(this.template, this);
+  }
+
+  handleCommandSubmit(e: CommandSubmitEvent) {
+    this.kernel.handleInput(this.workspaceId, { text: e.value });
   }
 
   get template() {
@@ -36,10 +35,6 @@ export class WorkspaceView extends HTMLElement {
       </div>
       <resource-bar for=${this.workspaceId}></resource-bar>
     `;
-  }
-
-  handleCommandSubmit(e: CommandSubmitEvent) {
-    this.kernel.handleInput(this.workspaceId, { text: e.value });
   }
 }
 

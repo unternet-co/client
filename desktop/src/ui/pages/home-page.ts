@@ -5,28 +5,29 @@ import { TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
 
 export class HomePage extends HTMLElement {
-  workspaceModel: WorkspaceModel;
-  tabModel: TabModel;
-
-  constructor() {
-    super();
-    this.workspaceModel = dependencies.resolve('WorkspaceModel');
-    this.tabModel = dependencies.resolve('TabModel');
-  }
+  private workspaceModel =
+    dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  private tabModel = dependencies.resolve<TabModel>('TabModel');
+  private recentContainer: HTMLUListElement;
 
   connectedCallback() {
     render(this.template, this);
-    this.updateWorkspaces(this.workspaceModel.all());
+    this.recentContainer = this.querySelector(
+      '.recent-workspaces'
+    ) as HTMLUListElement;
+    this.updateWorkspaces();
+    this.workspaceModel.subscribe(this.updateWorkspaces.bind(this));
   }
 
-  updateWorkspaces(workspaces: Workspace[]) {
+  updateWorkspaces() {
+    const workspaces = this.workspaceModel.all();
     const template = workspaces.map((workspace) => {
-      return html`<li @click=${() => this.tabModel.activate(workspace.id)}>
+      return html`<li @click=${() => this.tabModel.create(workspace.id)}>
         ${workspace.title}
       </li>`;
     });
 
-    render(template, this);
+    render(template, this.recentContainer);
   }
 
   get template() {

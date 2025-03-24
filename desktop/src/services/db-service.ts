@@ -21,7 +21,6 @@ export class DatabaseService<Id, T> {
   // TODO: Expand to allow multiple conditions
   async where(conditions: WhereConditions) {
     const condition = Object.keys(conditions)[0];
-    console.log(condition, conditions[condition]);
     return this.table.where(condition).equals(conditions[condition]).toArray();
   }
 

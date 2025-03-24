@@ -1,7 +1,7 @@
 import { Disposable } from '../base/disposable';
 import { Notifier } from '../base/notifier';
 import { KeyStoreService } from '../services/keystore-service';
-import { WorkspaceModel } from './workspaces';
+import { Workspace, WorkspaceModel } from './workspaces';
 
 export interface Tab {
   type: 'page' | 'workspace';
@@ -61,7 +61,7 @@ export class TabModel extends Disposable {
       }
     }
 
-    this.activeTabId = this.tabs[0]?.id;
+    this.activeTabId = tabData.activeTabId;
     this.tabs = tabData.tabs;
     this.notifier.notify({ activeTab: this.activeTab });
   }
@@ -74,6 +74,10 @@ export class TabModel extends Disposable {
     this.activeTabId = id;
     this.store.update({ activeTabId: id });
     this.notifier.notify({ activeTab: this.activeTab });
+  }
+
+  has(id: Tab['id']) {
+    return !!this.tabs.find((tab) => tab.id === id);
   }
 
   get activeTab(): Tab | undefined {
@@ -91,7 +95,6 @@ export class TabModel extends Disposable {
   }
 
   getTitle(id: Tab['id']) {
-    console.log(id, this.workspaceModel.get(id));
     return this.workspaceModel.get(id)?.title;
   }
 
@@ -101,8 +104,15 @@ export class TabModel extends Disposable {
     }
   }
 
-  create() {
-    const workspace = this.workspaceModel.create();
+  create(id?: Workspace['id']) {
+    let workspace: Workspace;
+
+    if (id) {
+      workspace = this.workspaceModel.get(id)!;
+      this.workspaceModel.activate(id);
+    } else {
+      workspace = this.workspaceModel.create();
+    }
 
     const tab = {
       type: 'workspace',

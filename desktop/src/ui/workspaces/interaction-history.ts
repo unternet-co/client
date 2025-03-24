@@ -1,19 +1,14 @@
 import { html, render, TemplateResult } from 'lit';
 import { Interaction, InteractionOutput } from '../../models/interactions';
-import './interaction-history.css';
 import { appendEl, createEl } from '../../utils/dom';
 import { Workspace, WorkspaceModel } from '../../models/workspaces';
 import { dependencies } from '../../base/dependencies';
+import './interaction-history.css';
 
 class InteractionHistory extends HTMLElement {
-  workspaceModel: WorkspaceModel;
+  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   workspaceId: Workspace['id'];
   interactionsContainer: HTMLElement;
-
-  constructor() {
-    super();
-    this.workspaceModel = dependencies.resolve('WorkspaceModel');
-  }
 
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';

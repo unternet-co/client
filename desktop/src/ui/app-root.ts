@@ -9,12 +9,7 @@ import { dependencies } from '../base/dependencies';
 
 export class AppRoot extends HTMLElement {
   private contentEl: HTMLElement;
-  private tabModel: TabModel;
-
-  constructor() {
-    super();
-    this.tabModel = dependencies.resolve('TabModel');
-  }
+  tabModel = dependencies.resolve<TabModel>('TabModel');
 
   connectedCallback() {
     appendEl(this, createEl('top-bar'));

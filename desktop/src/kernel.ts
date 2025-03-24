@@ -8,10 +8,9 @@ export interface KernelInit {
 
 export class Kernel {
   interpreter: Interpreter;
-  workspaceModel: WorkspaceModel;
+  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
 
   constructor({ model }: KernelInit) {
-    this.workspaceModel = dependencies.resolve('WorkspaceModel');
     this.interpreter = new Interpreter(model);
   }
 
@@ -22,6 +21,7 @@ export class Kernel {
     );
     const recentInteractions = this.workspaceModel.getInteractions(workspaceId);
     const output = await this.interpreter.generateOutput(recentInteractions);
+    console.log('in kernel', interaction);
     this.workspaceModel.addOutput(interaction.id, output);
   }
 }
