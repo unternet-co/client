@@ -13,28 +13,50 @@
   "main": "desktop/dist/main.js",
   "build": {
     "appId": "com.electron.unternet-client",
+    "productName": "Unternet Client",
     "files": [
-      "desktop/dist/index.html",
-      "desktop/dist/preload.js",
-      "desktop/dist/bundle.ts",
-      "desktop/dist/main.js",
-      "desktop/dist/bundle.css",
-      "desktop/dist/*.svg",
-      "desktop/dist/*.woff",
-      "desktop/dist/*.woff2",
-      "desktop/dist/*.ttf"
+      "desktop/dist/**/*"
     ],
+    "directories": {
+      "output": "release"
+    },
+    "_publish": {
+      "provider": "generic",
+      "url": "https://unternet-update-server.com/updates",
+      "channel": "latest"
+    },
     "mac": {
-      "category": "public.app-category.developer-tools"
+      "category": "public.app-category.developer-tools",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "target": ["dmg", "zip"]
+    },
+    "win": {
+      "target": ["nsis"]
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Development"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     }
   },
   "scripts": {
     "dev": "npm run dev:desktop",
-    "build": "npm run build:desktop",
-    "package": "npm run package:desktop",
-    "package:desktop": "cd desktop && npm run package",
-    "build:desktop": "cd desktop && rm -rf dist && npm run build",
+    "build": "npm run build:kernel && npm run build:desktop",
+    "build:kernel": "cd kernel && npm run build",
+    "build:desktop": "cd desktop && rm -rf dist && NODE_ENV=production npm run build",
     "dev:desktop": "NODE_ENV=development cd desktop && npm run dev",
+    "package:desktop": "cd desktop && npm run package",
+    "package:electron": "npm run package:all",
+    "package:all": "electron-builder -mwl",
+    "package:mac": "electron-builder --mac",
+    "package:win": "electron-builder --win",
+    "package:linux": "electron-builder --linux",
     "app:dir": "rm -rf dist && electron-builder --dir",
     "app:dist": "rm -rf dist && electron-builder"
   },
@@ -42,5 +64,9 @@
     "concurrently": "^9.1.2",
     "electron-builder": "^25.1.8",
     "rollup": "^4.34.9"
+  },
+  "dependencies": {
+    "electron-log": "^5.3.2",
+    "electron-updater": "^6.3.9"
   }
 }
