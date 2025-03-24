@@ -1,7 +1,67 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog, MessageBoxOptions } from 'electron';
 import path from 'path';
+import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
 
+// Force production mode if not explicitly set (e.g., in packaged builds)
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'production';
+}
 const isDev = process.env.NODE_ENV !== 'production';
+
+// Configure logging
+autoUpdater.logger = log;
+(autoUpdater.logger as any).transports.file.level = 'info';
+
+function formatReleaseNotes(notes: string | { note: string }[] | undefined): string {
+  if (typeof notes === 'string') return notes;
+  if (Array.isArray(notes)) return notes.map(n => n.note).join('\n\n');
+  return '';
+}
+
+
+
+// Configure auto-updater
+function setupAutoUpdater() {
+  if (isDev) {
+    return;
+  }
+  
+  // Check for updates
+  autoUpdater.on('update-downloaded', (info) => {
+    const releaseNotes =
+    typeof info.releaseNotes === 'string'
+      ? info.releaseNotes
+      : Array.isArray(info.releaseNotes)
+        ? info.releaseNotes.map(note => note.note).join('\n\n')
+        : '';
+  
+      const dialogOpts: MessageBoxOptions = {
+        type: 'info',
+        buttons: ['Restart', 'Later'],
+        title: 'Application Update',
+        message: process.platform === 'win32' ? releaseNotes : info.releaseName,
+        detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+      };
+        
+    
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      if (returnValue.response === 0) autoUpdater.quitAndInstall();
+    });
+  });
+  
+  autoUpdater.on('error', (error) => {
+    log.error('Error in auto-updater:', error);
+  });
+  
+  // Check for updates every hour
+  setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, 60 * 60 * 1000);
+  
+  // Initial check
+  autoUpdater.checkForUpdates();
+}
 
 function createWindow() {
   /* Create the browser window. */
@@ -57,6 +117,7 @@ function createWindow() {
     win.webContents.openDevTools();
   } else {
     win.loadFile(path.join(__dirname, 'index.html'));
+    win.webContents.openDevTools();
   }
 }
 
@@ -93,5 +154,11 @@ ipcMain.handle('fetch', async (event, url) => {
 //   mainWindow.webContents.send('applets', appletData);
 // });
 
-app.on('ready', createWindow);
+
+// app.disableHardwareAcceleration();
+
+app.on('ready', () => {
+  createWindow();
+  // setupAutoUpdater();
+});
 app.on('window-all-closed', app.quit);
