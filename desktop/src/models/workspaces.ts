@@ -3,17 +3,14 @@ import {
   Interaction,
   InteractionInput,
   InteractionOutput,
-} from './interaction';
-import { workspaceDatabase, DatabaseService } from '../services/db';
-import {
-  interactionDatabase,
-  InteractionDatabaseService,
-} from '../services/db';
+} from './interactions';
+import { DatabaseService } from '../services/db-service';
 import { ulid } from 'ulid';
 import { DisposableGroup } from '../base/disposable';
 
 export interface Workspace {
   id: string;
+  title: string;
 }
 
 export interface WorkspaceNotification {
@@ -21,16 +18,15 @@ export interface WorkspaceNotification {
 }
 
 export class WorkspaceModel {
-  readonly workspaces: { [id: Workspace['id']]: Workspace } = {};
-  private interactions: Interaction[] = [];
-  private activeWorkspaceId?: Workspace['id'];
+  readonly workspaces = new Map<Workspace['id'], Workspace>();
+  private interactions = new Map<Workspace['id'], Interaction[]>();
   private notifier = new Notifier<WorkspaceNotification>();
   readonly subscribe = this.notifier.subscribe;
   private disposables = new DisposableGroup();
 
   constructor(
     public workspaceDatabase: DatabaseService<string, Workspace>,
-    public interactionDatabase: InteractionDatabaseService
+    public interactionDatabase: DatabaseService<string, Interaction>
   ) {
     this.workspaceDatabase = workspaceDatabase;
     this.interactionDatabase = interactionDatabase;
@@ -53,20 +49,40 @@ export class WorkspaceModel {
   }
 
   async load() {
-    this.interactions = await this.interactionDatabase.all();
     const workspaceRecords = await this.workspaceDatabase.all();
     for (const record of workspaceRecords) {
-      this.workspaces[record.id] = record;
+      this.workspaces.set(record.id, record);
       this.notifier.notify({ workspaceId: record.id });
     }
   }
 
-  getActiveWorkspace() {
-    if (this.activeWorkspaceId) return this.workspaces[this.activeWorkspaceId];
+  all(): Workspace[] {
+    let workspaces: Workspace[] = [];
+    for (const workspace of this.workspaces.values()) {
+      workspaces.push(workspace);
+    }
+    return workspaces;
   }
 
-  setActive(id: Workspace['id']) {
-    this.activeWorkspaceId = id;
+  get(id: Workspace['id']): Workspace | undefined {
+    return this.workspaces.get(id);
+  }
+
+  setTitle(id: Workspace['id'], title: string) {
+    this.workspaces[id].title = title;
+    this.workspaceDatabase.update(id, { title });
+  }
+
+  async activate(id: Workspace['id']): Promise<void> {
+    const workspaceInteractions = await this.interactionDatabase.where({
+      workspaceId: id,
+    });
+    this.interactions.set(id, workspaceInteractions);
+    this.notifier.notify({ workspaceId: id });
+  }
+
+  deactivate(id: Workspace['id']): void {
+    this.interactions.delete(id);
   }
 
   create() {
@@ -75,22 +91,17 @@ export class WorkspaceModel {
       title: 'New workspace',
     };
 
-    this.workspaces[workspace.id] = workspace;
+    this.workspaces.set(workspace.id, workspace);
     this.workspaceDatabase.create(workspace);
     this.notifier.notify();
     return workspace;
   }
 
   delete(id: Workspace['id']) {
-    delete this.workspaces[id];
-    this.interactions = this.interactions.filter((x) => x.workspaceId !== id);
+    this.workspaces.delete(id);
+    this.interactions.delete(id);
     this.workspaceDatabase.delete(id);
-    this.interactionDatabase.deleteWithWorkspace(id);
-
-    if (Object.keys(this.workspaces).length === 0) {
-      this.activeWorkspaceId = undefined;
-    }
-
+    this.interactionDatabase.deleteWhere({ workspaceId: id });
     this.notifier.notify({ workspaceId: id });
   }
 
@@ -102,14 +113,19 @@ export class WorkspaceModel {
       outputs: [],
     };
 
-    this.interactions.push(interaction);
+    if (!this.interactions.has(workspaceId)) {
+      this.interactions.set(workspaceId, []);
+    }
+    this.interactions.get(workspaceId)!.push(interaction);
     this.interactionDatabase.create(interaction);
     this.notifier.notify({ workspaceId });
+    console.log('in interactions', interaction);
     return interaction;
   }
 
   addOutput(interactionId: Interaction['id'], output: InteractionOutput) {
-    const interaction = this.interactions.find((x) => x.id === interactionId);
+    const interaction = this.getInteraction(interactionId);
+    console.log(interaction, output);
 
     if (interaction) {
       interaction.outputs.push(output);
@@ -120,12 +136,16 @@ export class WorkspaceModel {
     }
   }
 
-  getInteractions(workspaceId: Workspace['id']) {
-    return this.interactions.filter((x) => x.workspaceId === workspaceId);
+  getInteraction(id: Interaction['id']) {
+    console.log(this.interactions.keys());
+    for (const [interactionId, interactions] of this.interactions.entries()) {
+      console.log('gettig', interactions);
+      const interaction = interactions.find((x: Interaction) => x.id === id);
+      if (interaction) return interaction;
+    }
+  }
+
+  getInteractions(workspaceId: Workspace['id']): Interaction[] {
+    return this.interactions.get(workspaceId) || [];
   }
 }
-
-export const workspaceModel = new WorkspaceModel(
-  workspaceDatabase,
-  interactionDatabase
-);

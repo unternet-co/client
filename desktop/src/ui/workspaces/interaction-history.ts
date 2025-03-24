@@ -1,21 +1,30 @@
 import { html, render, TemplateResult } from 'lit';
-import { Interaction, InteractionOutput } from '../../models/interaction';
-import { Workspace, workspaceModel } from '../../models/workspaces';
+import { Interaction, InteractionOutput } from '../../models/interactions';
+import { appendEl, createEl } from '../../utils/dom';
+import { Workspace, WorkspaceModel } from '../../models/workspaces';
+import { dependencies } from '../../base/dependencies';
 import './interaction-history.css';
 
 class InteractionHistory extends HTMLElement {
+  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   workspaceId: Workspace['id'];
+  interactionsContainer: HTMLElement;
 
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
+
+    this.interactionsContainer = appendEl(
+      this,
+      createEl('div', { className: 'inner' })
+    );
     this.updateInteractions();
-    workspaceModel.subscribeToWorkspace(this.workspaceId, () =>
+    this.workspaceModel.subscribeToWorkspace(this.workspaceId, () =>
       this.updateInteractions()
     );
   }
 
   updateInteractions() {
-    const interactions = workspaceModel.getInteractions(this.workspaceId);
+    const interactions = this.workspaceModel.getInteractions(this.workspaceId);
 
     const template = (interaction: Interaction) => html`
       <div class="interaction">
@@ -24,7 +33,7 @@ class InteractionHistory extends HTMLElement {
       </div>
     `;
 
-    render(interactions.map(template), this);
+    render(interactions.map(template), this.interactionsContainer);
   }
 
   outputTemplate(output: InteractionOutput) {

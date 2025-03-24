@@ -1,29 +1,30 @@
-import { tabModel } from '../models/tabs';
+import { TabModel } from '../models/tabs';
 
 export class ShortcutService {
-  constructor() {
+  constructor(private tabModel: TabModel) {
+    this.tabModel = tabModel;
+
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'w' && e.metaKey) {
         e.preventDefault();
-        if (tabModel.activeTab) tabModel.close(tabModel.activeTab);
+        if (this.tabModel.activeTab)
+          this.tabModel.close(this.tabModel.activeTab.id);
       }
 
       if (e.key === 't' && e.metaKey) {
         e.preventDefault();
-        tabModel.create();
+        this.tabModel.create();
       }
 
       if (e.key === ']' && e.metaKey && e.shiftKey) {
         e.preventDefault();
-        tabModel.activateNext();
+        this.tabModel.activateNext();
       }
 
       if (e.key === '[' && e.metaKey && e.shiftKey) {
         e.preventDefault();
-        tabModel.activatePrev();
+        this.tabModel.activatePrev();
       }
     });
   }
 }
-
-export const shortcutService = new ShortcutService();
