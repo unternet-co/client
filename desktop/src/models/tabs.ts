@@ -1,16 +1,27 @@
 import { Disposable } from '../base/disposable';
 import { Notifier } from '../base/notifier';
-import { DatabaseService } from '../services/db/db-service';
-import { workspaceModel } from './workspaces';
-import { ulid } from 'ulid';
-import { tabDatabase } from '../services/db';
+import { KeyStoreService } from '../services/keystore-service';
+import { Workspace, WorkspaceModel } from './workspaces';
 
 export interface Tab {
+  type: 'page' | 'workspace';
   id: string;
-  title: string;
-  type: 'workspace' | 'home';
-  workspaceId?: string;
 }
+
+export interface TabStoreData {
+  activeTabId: string;
+  tabs: Tab[];
+}
+
+export const initTabStoreData: TabStoreData = {
+  activeTabId: 'home',
+  tabs: [
+    {
+      type: 'page',
+      id: 'home',
+    },
+  ],
+};
 
 export interface TabChangeNotification {
   activeTab?: Tab;
@@ -19,26 +30,39 @@ export interface TabChangeNotification {
 
 export class TabModel extends Disposable {
   private tabs: Tab[] = [];
-  private workspaceModel = workspaceModel;
-  private databaseService: DatabaseService<string, Tab>;
+  private store: KeyStoreService<TabStoreData>;
+  private workspaceModel: WorkspaceModel;
   private notifier = new Notifier<TabChangeNotification>();
   readonly subscribe = this.notifier.subscribe;
   private activeTabId: Tab['id'];
 
-  constructor(databaseService: DatabaseService<string, Tab>) {
+  constructor(
+    store: KeyStoreService<TabStoreData>,
+    workspaceModel: WorkspaceModel
+  ) {
     super();
-    this.databaseService = databaseService;
+    this.store = store;
+    this.workspaceModel = workspaceModel;
     this.loadTabs();
   }
 
+  get(id: Tab['id']) {
+    return this.tabs.find((tab: Tab) => tab.id === id);
+  }
+
+  // TODO: Make this just load workspaces directly, have workspace ID
+  // Store active tab in app config JSON
   async loadTabs() {
-    this.tabs = await this.databaseService.all();
-    if (this.tabs.length) {
-      this.activeTabId = this.tabs[0].id;
-      if (this.tabs[0].workspaceId) {
-        this.workspaceModel.setActive(this.tabs[0].workspaceId);
+    const tabData = this.store.get();
+
+    for (const tab of tabData.tabs) {
+      if (tab.type === 'workspace' && tab.id) {
+        await this.workspaceModel.activate(tab.id);
       }
     }
+
+    this.activeTabId = tabData.activeTabId;
+    this.tabs = tabData.tabs;
     this.notifier.notify({ activeTab: this.activeTab });
   }
 
@@ -46,10 +70,14 @@ export class TabModel extends Disposable {
     return this.tabs;
   }
 
-  setActive(tab: Tab) {
-    this.activeTabId = tab.id;
-    if (tab.workspaceId) this.workspaceModel.setActive(tab.workspaceId);
+  activate(id: Tab['id']) {
+    this.activeTabId = id;
+    this.store.update({ activeTabId: id });
     this.notifier.notify({ activeTab: this.activeTab });
+  }
+
+  has(id: Tab['id']) {
+    return !!this.tabs.find((tab) => tab.id === id);
   }
 
   get activeTab(): Tab | undefined {
@@ -62,48 +90,69 @@ export class TabModel extends Disposable {
 
   activateNext() {
     if (this.activeTabIndex + 1 < this.tabs.length) {
-      this.setActive(this.tabs[this.activeTabIndex + 1]);
+      this.activate(this.tabs[this.activeTabIndex + 1].id);
     }
+  }
+
+  getTitle(id: Tab['id']) {
+    return this.workspaceModel.get(id)?.title;
   }
 
   activatePrev() {
     if (this.activeTabIndex - 1 >= 0) {
-      this.setActive(this.tabs[this.activeTabIndex - 1]);
+      this.activate(this.tabs[this.activeTabIndex - 1].id);
     }
   }
 
-  create() {
+  create(id?: Workspace['id']) {
+    let workspace: Workspace;
+
+    if (id) {
+      workspace = this.workspaceModel.get(id)!;
+      this.workspaceModel.activate(id);
+    } else {
+      workspace = this.workspaceModel.create();
+    }
+
     const tab = {
-      id: ulid(),
-      title: 'New workspace',
       type: 'workspace',
+      id: workspace.id,
     } as Tab;
 
-    const workspace = this.workspaceModel.create();
-    tab.workspaceId = workspace.id;
     this.tabs.push(tab);
     this.activeTabId = tab.id;
-    this.notifier.notify({ activeTab: tab, newTab: tab });
+    this.persist();
 
-    this.databaseService.create(tab);
+    this.notifier.notify({ activeTab: tab, newTab: tab });
+  }
+
+  persist() {
+    this.store.update({
+      activeTabId: this.activeTabId,
+      tabs: this.tabs,
+    });
   }
 
   // TODO: Make this add to history, not delete
-  close(tab: Tab) {
-    const tabId = tab.id;
-    const index = this.tabs.findIndex((x) => x.id === tabId);
+  close(id: Tab['id']) {
+    const index = this.tabs.findIndex((x) => x.id === id);
     if (index === -1) return;
 
-    const wasActive = this.activeTabId === tabId;
+    const tab = this.tabs[index];
+    const wasActive = this.activeTabId === id;
     this.tabs.splice(index, 1);
-    this.databaseService.delete(tabId);
-    if (tab.workspaceId) this.workspaceModel.delete(tab.workspaceId);
+
+    if (tab.type === 'workspace') {
+      this.workspaceModel.deactivate(id);
+    }
 
     if (wasActive && this.tabs.length > 0) {
       this.activeTabId = this.tabs[index]
         ? this.tabs[index].id
         : this.tabs[index - 1].id;
     }
+
+    this.persist();
 
     this.notifier.notify({
       activeTab: this.tabs.find((tab) => tab.id === this.activeTabId),
@@ -116,5 +165,3 @@ export class TabModel extends Disposable {
     super.dispose();
   }
 }
-
-export const tabModel = new TabModel(tabDatabase);

@@ -1,36 +1,52 @@
-import { Tab, TabModel, tabModel } from '../../models/tabs';
 import { appendEl, createEl } from '../../utils/dom';
 import { render, html } from 'lit';
+import { ICON_GLYPHS } from '../common/icon';
+import { Tab, TabModel } from '../../models/tabs';
+import { dependencies } from '../../base/dependencies';
 import './tab-handle';
 import './top-bar.css';
 
 export class TopBar extends HTMLElement {
-  tabModel: TabModel;
+  tabModel = dependencies.resolve<TabModel>('TabModel');
   tabsContainer: HTMLElement;
 
   // TODO: Add dependency injection using decorators for model
   connectedCallback() {
-    this.tabModel = tabModel;
-
     this.tabsContainer = appendEl(
       this,
       createEl('div', { className: 'tab-list' })
     );
 
-    tabModel.subscribe(this.updateTabs.bind(this));
+    this.tabModel.subscribe(this.updateTabs.bind(this));
     this.updateTabs();
   }
 
+  iconFor(tabId: Tab['id']) {
+    if (tabId === 'home') {
+      return html`<un-icon src=${ICON_GLYPHS.home}></un-icon>`;
+    }
+    return null;
+  }
+
+  handleSelect(tab: Tab) {
+    if (this.tabModel.activeTab?.id !== tab.id) {
+      this.tabModel.activate(tab.id);
+    }
+  }
+
   updateTabs() {
-    const tabs = tabModel.all();
+    const tabs = this.tabModel.all();
 
     const tabTemplate = (tab: Tab) => html`
       <tab-handle
-        ?active=${tabModel.activeTab?.id === tab.id}
-        @select=${() => tabModel.setActive(tab)}
-        @close=${() => tabModel.close(tab)}
+        ?static=${tab.type === 'page'}
+        ?active=${this.tabModel.activeTab?.id === tab.id}
+        @select=${() => this.handleSelect(tab)}
+        @close=${() => this.tabModel.close(tab.id)}
       >
-        ${tab.title}
+        ${tab.type === 'page'
+          ? this.iconFor(tab.id)
+          : this.tabModel.getTitle(tab.id)}
       </tab-handle>
     `;
 
@@ -38,7 +54,7 @@ export class TopBar extends HTMLElement {
   }
 
   disconnectedCallback() {
-    tabModel.dispose();
+    this.tabModel.dispose();
   }
 }
 
