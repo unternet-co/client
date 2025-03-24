@@ -56,6 +56,7 @@ jobs:
             VERSION_PART="major"
           fi
           echo "bump=$VERSION_PART" >> $GITHUB_OUTPUT
+          echo $VERSION_PART
 
       - name: Bump version and commit
         id: bump_version
@@ -67,8 +68,6 @@ jobs:
           NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }} -m "chore(release): bump version to %s [skip ci]")
 
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
-
-          git push origin feat/tagging --follow-tags
 
       - name: Update CHANGELOG
         run: |
