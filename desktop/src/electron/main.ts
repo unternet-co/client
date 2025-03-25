@@ -26,6 +26,13 @@ function setupAutoUpdater() {
   if (isDev) {
     return;
   }
+
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: "unternet-co",
+    repo: "client",
+  });
+  
   
   // Check for updates
   autoUpdater.on('update-downloaded', (info) => {
@@ -117,7 +124,6 @@ function createWindow() {
     win.webContents.openDevTools();
   } else {
     win.loadFile(path.join(__dirname, 'index.html'));
-    win.webContents.openDevTools();
   }
 }
 
@@ -159,6 +165,6 @@ ipcMain.handle('fetch', async (event, url) => {
 
 app.on('ready', () => {
   createWindow();
-  // setupAutoUpdater();
+  setupAutoUpdater();
 });
 app.on('window-all-closed', app.quit);
