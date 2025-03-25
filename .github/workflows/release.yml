@@ -73,9 +73,9 @@ jobs:
           STRIPPED_VERSION=${NEW_VERSION#v} 
           echo "New version: $NEW_VERSION"
 
-          echo "new_version=$STRIPPED_VERSION" >> $GITHUB_OUTPUT
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-          git add package.json package-lock.json
+          echo "::set-output name=new_version::${STRIPPED_VERSION}"
+          echo "::set-output name=tag_name::${TAG_NAME}"
+          git add .
           git commit -m "chore(release): bump version to $STRIPPED_VERSION [skip ci]"
         # git push origin feat/tagging --follow-tags
       - name: Update CHANGELOG
