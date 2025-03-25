@@ -41,19 +41,31 @@ interaction-history .interaction-output {
 /******/
 
 interaction-history {
-  overflow-y: scroll;
   width: 100%;
+  flex-grow: 1;
 }
 
 interaction-history .inner {
-  padding: var(--space-5) 0 var(--space-8) 0;
-  margin: 0 auto;
-  flex-shrink: 0;
-  max-width: 560px;
+  height: 100%;
   width: 100%;
+}
+
+interaction-history .inner::part(slot) {
+  gap: var(--space-6);
+  padding: var(--space-6) 0;
+}
+
+interaction-history .interaction {
   display: flex;
   flex-direction: column;
-  gap: var(--space-7);
+  margin: 0 auto;
+  gap: var(--space-4);
+  width: 580px;
+}
+
+/* Reversed, so first-child is the last child visually */
+interaction-history .interaction:first-child {
+  margin-bottom: 0;
 }
 
 interaction-history .interaction {
