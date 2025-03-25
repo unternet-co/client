@@ -1,1 +1,0 @@
-- Change URI syntax to the full version, move to generating objects not tool calls
