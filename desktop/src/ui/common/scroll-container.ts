@@ -38,14 +38,21 @@ class MessageScroll extends HTMLElement {
     // Scroll to bottom (= 0 with column-reverse) on connect
     this.#slot.scrollTop = 0;
 
+    // Log the scroll position
+    // (Timeout is here so we don't take into account scroll event
+    // as element becomes visible again)
     this.#slot.addEventListener('scroll', () => {
-      this.#lastScrollTop = this.#slot.scrollTop;
+      setTimeout(() => {
+        this.#lastScrollTop = this.#slot.scrollTop;
+        console.log(this.#lastScrollTop);
+      }, 100);
     });
 
     // Whenever element is made visible, return to prior scroll position
     const intersectionObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
+          console.log('intersection', this.#lastScrollTop);
           this.#slot.scrollTop = this.#lastScrollTop;
         }
       }
