@@ -67,6 +67,7 @@ jobs:
 
           CURRENT_VERSION=$(node -p "require('./desktop/package.json').version")
           echo $CURRENT_VERSION
+          cd desktop
           NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }} -m "chore(release): bump version to %s [skip ci]")
           echo "New version: $NEW_VERSION"
 
