@@ -1,5 +1,6 @@
 class MessageScroll extends HTMLElement {
-  #slot: HTMLElement;
+  #slot;
+  #lastScrollTop = 0;
 
   constructor() {
     super();
@@ -34,7 +35,22 @@ class MessageScroll extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#slot.scrollTop = this.#slot.scrollHeight;
+    // Scroll to bottom (= 0 with column-reverse) on connect
+    this.#slot.scrollTop = 0;
+
+    this.#slot.addEventListener('scroll', () => {
+      this.#lastScrollTop = this.#slot.scrollTop;
+    });
+
+    // Whenever element is made visible, return to prior scroll position
+    const intersectionObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          this.#slot.scrollTop = this.#lastScrollTop;
+        }
+      }
+    });
+    intersectionObserver.observe(this);
   }
 }
 
