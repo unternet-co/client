@@ -67,6 +67,7 @@
   "devDependencies": {
     "concurrently": "^9.1.2",
     "electron-builder": "^25.1.8",
+    "electron-notarize": "^1.2.2",
     "rollup": "^4.34.9"
   },
   "dependencies": {
