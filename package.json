@@ -20,10 +20,11 @@
     "directories": {
       "output": "release"
     },
-    "_publish": {
-      "provider": "generic",
-      "url": "https://unternet-update-server.com/updates",
-      "channel": "latest"
+    "publish": {
+      "provider": "github",
+      "owner": "unternet-co",
+      "repo": "client",
+      "releaseType": "release"
     },
     "mac": {
       "category": "public.app-category.developer-tools",
@@ -33,8 +34,11 @@
       "entitlementsInherit": "build/entitlements.mac.plist",
       "target": ["dmg", "zip"]
     },
+    "afterSign": "desktop/src/electron/notarize.ts",
     "win": {
-      "target": ["nsis"]
+      "target": ["nsis"],
+      "certificateFile": "windows-certs.pfx",
+      "certificatePassword": "env:WINDOWS_CERTS_PASSWORD"
     },
     "linux": {
       "target": ["AppImage", "deb"],
