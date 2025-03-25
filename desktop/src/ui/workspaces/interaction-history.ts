@@ -3,6 +3,7 @@ import { Interaction, InteractionOutput } from '../../models/interactions';
 import { appendEl, createEl } from '../../utils/dom';
 import { Workspace, WorkspaceModel } from '../../models/workspaces';
 import { dependencies } from '../../base/dependencies';
+import '../common/scroll-container';
 import './interaction-history.css';
 
 class InteractionHistory extends HTMLElement {
@@ -15,7 +16,7 @@ class InteractionHistory extends HTMLElement {
 
     this.interactionsContainer = appendEl(
       this,
-      createEl('div', { className: 'inner' })
+      createEl('message-scroll', { className: 'inner' })
     );
     this.updateInteractions();
     this.workspaceModel.subscribeToWorkspace(this.workspaceId, () =>
@@ -24,7 +25,9 @@ class InteractionHistory extends HTMLElement {
   }
 
   updateInteractions() {
-    const interactions = this.workspaceModel.getInteractions(this.workspaceId);
+    const interactions = this.workspaceModel
+      .allInteractions(this.workspaceId)
+      .reverse();
 
     const template = (interaction: Interaction) => html`
       <div class="interaction">
