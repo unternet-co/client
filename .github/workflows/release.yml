@@ -68,7 +68,7 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./desktop/package.json').version")
           echo $CURRENT_VERSION
           cd desktop
-          NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }}")
+          NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }})
           TAG_NAME=$NEW_VERSION
           STRIPPED_VERSION=${NEW_VERSION#v} 
           echo "New version: $NEW_VERSION"
@@ -76,7 +76,7 @@ jobs:
           echo "new_version=$STRIPPED_VERSION" >> $GITHUB_OUTPUT
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
           git add .
-          git commit -m "chore(release): bump version to %s [skip ci]
+          git commit -m "chore(release): bump version to %s [skip ci]"
         # git push origin feat/tagging --follow-tags
       - name: Update CHANGELOG
         run: |
