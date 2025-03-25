@@ -68,9 +68,11 @@ jobs:
           CURRENT_VERSION=$(node -p "require('./desktop/package.json').version")
           echo $CURRENT_VERSION
           NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }} -m "chore(release): bump version to %s [skip ci]")
-          echo $NEW_VERSION
+          echo "New version: $NEW_VERSION"
 
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        env:
+          VERSION_PART: ${{ steps.semver.outputs.bump }}
       # git push origin feat/tagging --follow-tags
       - name: Update CHANGELOG
         run: |
