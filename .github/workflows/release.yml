@@ -50,16 +50,14 @@ jobs:
         run: |
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
           echo $BRANCH_NAME
-          VERSION_PART="patch"
-          if [[ "$BRANCH_NAME" =~ ^(feat|feature)$ ]]; then
-            echo "minor"
+          if [[ "$BRANCH_NAME" =~ ^feat/|^feature/ ]]; then
             VERSION_PART="minor"
-          elif [[ "$BRANCH_NAME" =~ ^(major|breaking)$ ]]; then
-            echo "major"
+          elif [[ "$BRANCH_NAME" =~ ^major/|^breaking/ ]]; then
             VERSION_PART="major"
-          fi
+          else
+            VERSION_PART="patch"
+          fi          
           echo "bump=$VERSION_PART" >> $GITHUB_OUTPUT
-          echo $VERSION_PART
 
       - name: Bump version and commit
         id: bump_version
