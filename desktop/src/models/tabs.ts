@@ -135,7 +135,6 @@ export class TabModel extends Disposable {
 
   // TODO: Make this add to history, not delete
   close(id: Tab['id']) {
-    console.log('close', id);
     const index = this.tabs.findIndex((x) => x.id === id);
     if (index === -1) return;
 

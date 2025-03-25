@@ -68,6 +68,12 @@ interaction-history .interaction:first-child {
   margin-bottom: 0;
 }
 
+interaction-history .interaction {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
 interaction-history .interaction-input,
 interaction-history .interaction-output {
   user-select: text;
