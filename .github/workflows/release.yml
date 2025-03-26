@@ -79,6 +79,7 @@ jobs:
 
           NEW_ENTRY="## ${TAG_NAME}
             - ${COMMIT_MESSAGE}
+
           "
           echo "$NEW_ENTRY$(cat CHANGELOG.md 2>/dev/null)" > CHANGELOG.md
 
