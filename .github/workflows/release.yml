@@ -68,9 +68,8 @@ jobs:
           cd desktop
 
           echo "Bumping version"
-          NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }})
-          STRIPPED_VERSION=$(echo "$NEW_VERSION" | tail -n 1 | tr -d '\n')
-          TAG_NAME=${STRIPPED_VERSION#v}
+          npm version ${{ steps.semver.outputs.bump }}
+          TAG_NAME=$(node -p "require('./package.json').version")
           echo $TAG_NAME
 
           echo "Generating Changelog"
