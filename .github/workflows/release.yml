@@ -70,11 +70,9 @@ jobs:
           NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }})
           STRIPPED_VERSION=$(echo "$NEW_VERSION_RAW" | tail -n 1 | tr -d '\n')
           TAG_NAME=${STRIPPED_VERSION#v}
-          echo "New version: $TAG_NAME"
-
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
           git add .
-          git commit -m "chore(release): bump version to $STRIPPED_VERSION [skip ci]"
+          git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
         # git push origin feat/tagging --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -85,7 +83,7 @@ jobs:
 
           echo "## ${{ steps.bump_version.outputs.tag_name }}" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
-          echo "- Changes from commit: ${{ github.event.head_commit.message }}" >> CHANGELOG.md
+          echo "- ${{ github.event.head_commit.message }}" >> CHANGELOG.md
 
           git add CHANGELOG.md
           git commit -m "chore: update changelog for ${{ steps.bump_version.outputs.new_version }} [skip ci]" || echo "No changes to commit"
