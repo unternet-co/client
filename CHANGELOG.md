@@ -1,3 +1,6 @@
+## 0.2.0
+- fix todos
+
 ## Changes prior to changelog introduction
 
 - Change build system & folder structure to build entire app & html together (not have a separate web server)
