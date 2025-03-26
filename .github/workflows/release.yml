@@ -69,7 +69,7 @@ jobs:
 
           echo "Bumping version"
           NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }})
-          STRIPPED_VERSION=$(echo "$NEW_VERSION_RAW" | tail -n 1 | tr -d '\n')
+          STRIPPED_VERSION=$(echo "$NEW_VERSION" | tail -n 1 | tr -d '\n')
           TAG_NAME=${STRIPPED_VERSION#v}          
           echo TAG_NAME
           COMMIT_MESSAGE=${{ github.event.head_commit.message }}
