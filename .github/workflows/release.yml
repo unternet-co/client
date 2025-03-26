@@ -67,8 +67,8 @@ jobs:
           git config user.email "github-actions@github.com"
 
           cd desktop
-          NEW_VERSION_RAW=$(npm version minor)
-          =$(echo "$NEW_VERSION_RAW" | tail -n 1 | tr -d '\n')
+          NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }})
+          STRIPPED_VERSION=$(echo "$NEW_VERSION_RAW" | tail -n 1 | tr -d '\n')
           TAG_NAME=${STRIPPED_VERSION#v}
           echo "New version: $TAG_NAME"
 
