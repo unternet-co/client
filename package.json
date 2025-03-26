@@ -41,9 +41,7 @@
     "win": {
       "target": [
         "nsis"
-      ],
-      "certificateFile": "windows-certs.pfx",
-      "certificatePassword": "env:WINDOWS_CERTS_PASSWORD"
+      ]
     },
     "linux": {
       "target": [
