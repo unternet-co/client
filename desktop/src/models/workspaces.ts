@@ -119,16 +119,37 @@ export class WorkspaceModel {
     this.interactions.get(workspaceId)!.push(interaction);
     this.interactionDatabase.create(interaction);
     this.notifier.notify({ workspaceId });
-    console.log('in interactions', interaction);
+
     return interaction;
   }
 
-  addOutput(interactionId: Interaction['id'], output: InteractionOutput) {
+  addOutput(
+    interactionId: Interaction['id'],
+    output: InteractionOutput
+  ): number {
     const interaction = this.getInteraction(interactionId);
-    console.log(interaction, output);
+    if (!interaction) {
+      throw new Error('Interaction does not exist!');
+    }
 
-    if (interaction) {
-      interaction.outputs.push(output);
+    interaction.outputs.push(output);
+    this.interactionDatabase.update(interaction.id, {
+      outputs: interaction.outputs,
+    });
+    this.notifier.notify({ workspaceId: interaction.workspaceId });
+    const outputIndex = interaction.outputs.length - 1;
+    return outputIndex;
+  }
+
+  updateOutput(
+    interactionId: Interaction['id'],
+    outputIndex: number,
+    update: Partial<InteractionOutput>
+  ) {
+    const interaction = this.getInteraction(interactionId);
+
+    if (interaction && interaction[outputIndex]) {
+      interaction[outputIndex] = { ...interaction[outputIndex], ...update };
       this.interactionDatabase.update(interaction.id, {
         outputs: interaction.outputs,
       });
@@ -136,13 +157,19 @@ export class WorkspaceModel {
     }
   }
 
-  getInteraction(id: Interaction['id']) {
-    console.log(this.interactions.keys());
-    for (const [interactionId, interactions] of this.interactions.entries()) {
-      console.log('gettig', interactions);
-      const interaction = interactions.find((x: Interaction) => x.id === id);
-      if (interaction) return interaction;
+  getInteraction(id: Interaction['id']): Interaction {
+    let interaction: Interaction | null = null;
+    for (const interactions of this.interactions.values()) {
+      const possibleInteraction = interactions.find(
+        (x: Interaction) => x.id === id
+      );
+      if (possibleInteraction) {
+        interaction = possibleInteraction;
+        continue;
+      }
     }
+    if (!interaction) throw new Error('No interaction with this ID!');
+    return interaction;
   }
 
   allInteractions(workspaceId: Workspace['id']): Interaction[] {
