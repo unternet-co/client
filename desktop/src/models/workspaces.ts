@@ -146,6 +146,6 @@ export class WorkspaceModel {
   }
 
   allInteractions(workspaceId: Workspace['id']): Interaction[] {
-    return Array.from(this.interactions.get(workspaceId) || []);
+    return this.interactions.get(workspaceId) || [];
   }
 }
