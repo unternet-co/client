@@ -3,11 +3,7 @@ import path from 'path';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 
-// Force production mode if not explicitly set (e.g., in packaged builds)
-if (!process.env.NODE_ENV) {
-  process.env.NODE_ENV = 'production';
-}
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
 // Configure logging
 autoUpdater.logger = log;
