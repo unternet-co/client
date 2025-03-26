@@ -19,7 +19,7 @@ export class Kernel {
       workspaceId,
       input
     );
-    const recentInteractions = this.workspaceModel.getInteractions(workspaceId);
+    const recentInteractions = this.workspaceModel.allInteractions(workspaceId);
     const output = await this.interpreter.generateOutput(recentInteractions);
     console.log('in kernel', interaction);
     this.workspaceModel.addOutput(interaction.id, output);

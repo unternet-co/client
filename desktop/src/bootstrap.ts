@@ -7,8 +7,6 @@ import { KeyStoreService } from './services/keystore-service';
 import { ShortcutService } from './services/shortcut-service';
 import { Kernel } from './kernel';
 import { createModel } from './ext/llm';
-import { appendEl, createEl } from './utils/dom';
-import './ui/app-root';
 
 const workspaceDatabaseService = new DatabaseService<string, Workspace>(
   'workspaces'
@@ -31,5 +29,3 @@ dependencies.registerSingleton(
 dependencies.registerSingleton('Kernel', new Kernel({ model: createModel() }));
 
 new ShortcutService(dependencies.resolve('TabModel'));
-
-appendEl(document.body, createEl('app-root'));

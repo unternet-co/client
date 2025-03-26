@@ -52,10 +52,6 @@ export class TopBar extends HTMLElement {
 
     render(tabs.map(tabTemplate), this.tabsContainer);
   }
-
-  disconnectedCallback() {
-    this.tabModel.dispose();
-  }
 }
 
 customElements.define('top-bar', TopBar);

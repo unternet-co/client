@@ -4,7 +4,7 @@ import {
   InteractionInput,
   InteractionOutput,
 } from './interactions';
-import { DatabaseService } from '../services/db-service';
+import { DatabaseService } from '../services/database-service';
 import { ulid } from 'ulid';
 import { DisposableGroup } from '../base/disposable';
 
@@ -145,7 +145,7 @@ export class WorkspaceModel {
     }
   }
 
-  getInteractions(workspaceId: Workspace['id']): Interaction[] {
-    return this.interactions.get(workspaceId) || [];
+  allInteractions(workspaceId: Workspace['id']): Interaction[] {
+    return Array.from(this.interactions.get(workspaceId) || []);
   }
 }

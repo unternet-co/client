@@ -13,12 +13,6 @@ workspace-view .workspace-content {
   overflow: hidden;
 }
 
-resource-bar,
-.command-bar {
-  /* background: var(--color-neutral-0); */
-  /* background: #f0f0f0; */
-}
-
 .command-bar {
   border-top: 1px solid var(--color-border);
   display: flex;
@@ -26,3 +20,8 @@ resource-bar,
   justify-content: center;
   padding: var(--space-4);
 }
+
+/* resource-bar,
+.command-bar {
+  background: var(--color-neutral-0);
+} */
