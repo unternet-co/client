@@ -68,18 +68,20 @@ jobs:
           cd desktop
 
           COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+
+          echo "Bumping version"
+          npm version ${{ steps.semver.outputs.bump }} --no-git-tag-version
+          TAG_NAME=$(node -p "require('./package.json').version")
+          echo $TAG_NAME
+
           echo "Generating Changelog"
           echo "## ${TAG_NAME}" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "- ${COMMIT_MESSAGE}" >> CHANGELOG.md
 
-          echo "Bumping version"
-          npm version ${{ steps.semver.outputs.bump }}
-          TAG_NAME=$(node -p "require('./package.json').version")
-          echo $TAG_NAME          
-
           git add .
           git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
+          git tag -a $TAG_NAME -m "chore(release): ${TAG_NAME}"
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
