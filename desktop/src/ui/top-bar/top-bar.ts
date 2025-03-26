@@ -3,6 +3,7 @@ import { render, html } from 'lit';
 import { ICON_GLYPHS } from '../common/icon';
 import { Tab, TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
+import { WorkspaceModel } from '../../models/workspaces';
 import './tab-handle';
 import './top-bar.css';
 
@@ -34,6 +35,16 @@ export class TopBar extends HTMLElement {
     }
   }
 
+  handleRename(tab: Tab, e: CustomEvent) {
+    if (tab.type === 'workspace') {
+      const workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+      workspaceModel.setTitle(tab.id, e.detail.value);
+      
+      // Force an immediate UI update by re-rendering all tabs
+      this.updateTabs();
+    }
+  }
+
   updateTabs() {
     const tabs = this.tabModel.all();
 
@@ -43,6 +54,7 @@ export class TopBar extends HTMLElement {
         ?active=${this.tabModel.activeTab?.id === tab.id}
         @select=${() => this.handleSelect(tab)}
         @close=${() => this.tabModel.close(tab.id)}
+        @rename=${(e: CustomEvent) => this.handleRename(tab, e)}
       >
         ${tab.type === 'page'
           ? this.iconFor(tab.id)
