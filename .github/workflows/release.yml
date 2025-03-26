@@ -77,9 +77,11 @@ jobs:
           echo "" >> CHANGELOG.md
           echo "- ${{ github.event.head_commit.message }}" >> CHANGELOG.md
 
+          echo "Tagging"
+          git tag $TAG_NAME 
+
           git add .
-          git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
-          git tag $TAG_NAME
+          git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"          
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
