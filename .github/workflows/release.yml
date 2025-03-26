@@ -67,7 +67,7 @@ jobs:
 
           cd desktop
 
-          COMMIT_MESSAGE=${{ github.event.head_commit.message }}
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
           echo "Generating Changelog"
           echo "## ${TAG_NAME}" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
