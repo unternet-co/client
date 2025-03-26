@@ -67,15 +67,16 @@ jobs:
 
           cd desktop
 
-          echo "Bumping version"
-          npm version ${{ steps.semver.outputs.bump }}
-          TAG_NAME=$(node -p "require('./package.json').version")
-          echo $TAG_NAME
-
+          COMMIT_MESSAGE=${{ github.event.head_commit.message }}
           echo "Generating Changelog"
           echo "## ${TAG_NAME}" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "- ${COMMIT_MESSAGE}" >> CHANGELOG.md
+
+          echo "Bumping version"
+          npm version ${{ steps.semver.outputs.bump }}
+          TAG_NAME=$(node -p "require('./package.json').version")
+          echo $TAG_NAME          
 
           git add .
           git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
