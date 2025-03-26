@@ -8,7 +8,7 @@ top-bar {
   background: var(--color-neutral-10);
   background: #f0f0f0;
   padding-left: 82px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 top-bar::-webkit-scrollbar {
@@ -19,9 +19,31 @@ top-bar::-webkit-scrollbar {
   background: var(--color-page-alt);
 }
 
-top-bar .tab-list {
+top-bar .static-tab-list {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  margin: 0;
+  height: 100%;
+}
+
+top-bar .workspace-tabs-scroll-container {
   flex-grow: 1;
-  overflow: visible;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  display: flex;
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+top-bar .workspace-tabs-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+top-bar .workspace-tab-list {
   display: flex;
   align-items: stretch;
   justify-content: flex-start;
