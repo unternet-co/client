@@ -19,9 +19,23 @@ export class Kernel {
       workspaceId,
       input
     );
+
     const recentInteractions = this.workspaceModel.allInteractions(workspaceId);
     const output = await this.interpreter.generateOutput(recentInteractions);
-    console.log('in kernel', interaction);
-    this.workspaceModel.addOutput(interaction.id, output);
+
+    if (output.type === 'text') {
+      const outputIndex = this.workspaceModel.addOutput(interaction.id, {
+        type: output.type,
+        content: '',
+      });
+      let text = '';
+      for await (const chunk of output.textStream) {
+        console.log(chunk);
+        text += chunk;
+        this.workspaceModel.updateOutput(interaction.id, outputIndex, {
+          content: text,
+        });
+      }
+    }
   }
 }
