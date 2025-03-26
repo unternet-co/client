@@ -1,4 +1,4 @@
-import { encodeActionUri } from '../lib/uri-encoder.js';
+import { encodeActionUri } from '../uri-encoder.js';
 import { JSONSchemaDefinition } from '../shared-types.js';
 import { tool, ToolSet, jsonSchema } from 'ai';
 
