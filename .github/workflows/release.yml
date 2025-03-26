@@ -5,7 +5,8 @@ on:
     branches:
       - main
       - feat/tagging # TODO: Remove before merging
-
+permissions:
+  contents: write
 jobs:
   build:
     name: Build
@@ -56,15 +57,12 @@ jobs:
             VERSION_PART="major"
           else
             VERSION_PART="patch"
-          fi          
+          fi
           echo "bump=$VERSION_PART" >> $GITHUB_OUTPUT
 
       - name: Bump version and commit
         id: bump_version
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
           CURRENT_VERSION=$(node -p "require('./desktop/package.json').version")
           echo $CURRENT_VERSION
           cd desktop
@@ -78,6 +76,10 @@ jobs:
           git add .
           git commit -m "chore(release): bump version to $STRIPPED_VERSION [skip ci]"
         # git push origin feat/tagging --follow-tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: "GitHub Actions"
+          GIT_AUTHOR_EMAIL: "github-actions@github.com"
       - name: Update CHANGELOG
         run: |
           echo "## ${{ steps.bump_version.outputs.new_version }}" >> CHANGELOG.md
@@ -96,3 +98,5 @@ jobs:
             dist/*.html
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_AUTHOR_NAME: "GitHub Actions"
+          GIT_AUTHOR_EMAIL: "github-actions@github.com"
