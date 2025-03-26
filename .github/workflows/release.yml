@@ -63,26 +63,24 @@ jobs:
         id: bump_version
         run: |
           git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-          cd desktop
-
-          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          git config user.email "github-actions@github.com"          
 
           echo "Bumping version"
           npm version ${{ steps.semver.outputs.bump }} --no-git-tag-version
+
+          echo "Syncing version across packages"
+          npm run sync-version
           TAG_NAME=$(node -p "require('./package.json').version")
-          echo $TAG_NAME
 
           echo "Generating Changelog"
-          cd ..
-
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
           NEW_ENTRY="## ${TAG_NAME}
-            - ${COMMIT_MESSAGE}
+          - ${COMMIT_MESSAGE}
 
           "
           echo "$NEW_ENTRY$(cat CHANGELOG.md 2>/dev/null)" > CHANGELOG.md
 
+          echo "Commiting changes"
           git add .
           git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
           git tag -a $TAG_NAME -m "chore(release): ${TAG_NAME}"

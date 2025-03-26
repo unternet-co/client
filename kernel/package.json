@@ -1,7 +1,17 @@
 {
   "name": "@unternet/kernel",
-  "type": "module",
   "version": "0.2.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "./dist/index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",
     "@web-applets/sdk": "^0.1.5",
@@ -9,16 +19,6 @@
     "ollama-ai-provider": "^1.2.0",
     "openai": "^4.76.1"
   },
-  "scripts": {
-    "build": "tsc"
-  },
-  "main": "./dist/index.js",
-  "directories": {
-    "example": "example"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
     "typescript": "^5.8.2"
   }

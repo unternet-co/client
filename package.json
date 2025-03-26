@@ -1,17 +1,20 @@
 {
+  "name": "@unternet/client",
+  "version": "0.1.5",
   "workspaces": [
     "kernel",
     "desktop"
   ],
   "scripts": {
+    "build": "npm run build:kernel && npm run build:desktop",
+    "build:desktop": "cd desktop && npm run build",
+    "build:kernel": "cd kernel && npm run build",
     "clean": "rm -rf desktop/dist && rm -rf kernel/dist && rm -rf dist",
     "dev": "npm run dev:desktop",
-    "build": "npm run build:kernel && npm run build:desktop",
-    "build:kernel": "cd kernel && npm run build",
+    "dev:desktop": "cd desktop && npm run dev",
     "package": "npm run package:desktop",
     "package:desktop": "cd desktop && npm run package",
-    "build:desktop": "cd desktop && npm run build",
-    "dev:desktop": "cd desktop && npm run dev"
+    "sync-version": "cd desktop && npm version $npm_package_version && cd ../kernel && npm version $npm_package_version"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
