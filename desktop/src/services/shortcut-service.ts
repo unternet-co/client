@@ -25,6 +25,18 @@ export class ShortcutService {
         e.preventDefault();
         this.tabModel.activatePrev();
       }
+
+      // command+1-9 to tab between workspaces
+      const numKey = parseInt(e.key);
+      if (!isNaN(numKey) && numKey >= 1 && numKey <= 9 && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        const workspaceTabs = this.tabModel.all().filter(tab => tab.type === 'workspace');
+        const tabIndex = numKey - 1; 
+        
+        if (tabIndex < workspaceTabs.length) {
+          this.tabModel.activate(workspaceTabs[tabIndex].id);
+        }
+      }
     });
   }
 }
