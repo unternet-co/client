@@ -124,16 +124,6 @@ export class HomePage extends HTMLElement {
 
   get template() {
     return html`
-      <style>
-        .recent-workspaces li {
-          cursor: pointer;
-          padding: 8px;
-        }
-        .recent-workspaces li:hover,
-        .recent-workspaces li.selected {
-          background: var(--hover-bg-color, #f0f0f0);
-        }
-      </style>
       <command-input @submit=${this.handleCommandSubmit.bind(this)}></command-input>
       <ul class="recent-workspaces"></ul>
     `;
