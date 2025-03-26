@@ -65,14 +65,12 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          CURRENT_VERSION=$(node -p "require('./desktop/package.json').version")          
+
           cd desktop
           NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }})
-          TAG_NAME=$NEW_VERSION
-          STRIPPED_VERSION=${NEW_VERSION#v} 
-          echo "New version: $NEW_VERSION"
+          TAG_NAME=${NEW_VERSION#v} 
+          echo "New version: $TAG_NAME"
 
-          echo "new_version=${STRIPPED_VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
           git add .
           git commit -m "chore(release): bump version to $STRIPPED_VERSION [skip ci]"
@@ -84,7 +82,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          echo "## ${{ steps.bump_version.outputs.new_version }}" >> CHANGELOG.md
+          echo "## ${{ steps.bump_version.outputs.tag_name }}" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
           echo "- Changes from commit: ${{ github.event.head_commit.message }}" >> CHANGELOG.md
 
