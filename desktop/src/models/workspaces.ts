@@ -148,8 +148,13 @@ export class WorkspaceModel {
   ) {
     const interaction = this.getInteraction(interactionId);
 
-    if (interaction && interaction[outputIndex]) {
-      interaction[outputIndex] = { ...interaction[outputIndex], ...update };
+    if (interaction && interaction.outputs[outputIndex]) {
+      interaction.outputs[outputIndex] = {
+        ...interaction.outputs[outputIndex],
+        ...update,
+      };
+      console.log(interaction);
+      console.log(this.interactions.get(interaction.workspaceId));
       this.interactionDatabase.update(interaction.id, {
         outputs: interaction.outputs,
       });

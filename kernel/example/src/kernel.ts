@@ -6,6 +6,7 @@ import {
   Resource,
   InteractionInput,
   ResourceMap,
+  createInteraction,
 } from '../../src/index';
 
 interface KernelInit {
@@ -33,14 +34,11 @@ export class Kernel {
   }
 
   async handleInput(input: InteractionInput) {
-    const interaction = Interaction.createWithInput(input);
+    const interaction = createInteraction(input);
     const interactionId = this.addInteraction(interaction);
 
     // Get output from the interpreter
-    const output = await this.interpreter.generateOutput(
-      this.interactions,
-      this.resources
-    );
+    const output = await this.interpreter.generateOutput(this.interactions);
 
     // // Add the output to the interaction
     // this.interactions[interactionIndex].outputs.push(output);

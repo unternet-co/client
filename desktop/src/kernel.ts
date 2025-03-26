@@ -30,6 +30,7 @@ export class Kernel {
       });
       let text = '';
       for await (const chunk of output.textStream) {
+        console.log(chunk);
         text += chunk;
         this.workspaceModel.updateOutput(interaction.id, outputIndex, {
           content: text,

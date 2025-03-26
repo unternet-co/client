@@ -13,6 +13,13 @@ export class Modal {
   element: HTMLElement;
   contents: HTMLElement;
 
+  constructor(el: HTMLElement, init: ModalInit) {
+    this.title = init.title;
+    this.element = el;
+    render(this.template, this.element);
+    this.contents = el.querySelector('.modal-contents')!;
+  }
+
   static create(init: ModalInit) {
     // Create a element container for the modal
     const modalRoot = document.createElement('div');
@@ -28,13 +35,6 @@ export class Modal {
     modalRoot.onmousedown = () => modal.close();
 
     return modal;
-  }
-
-  constructor(el: HTMLElement, init: ModalInit) {
-    this.title = init.title;
-    this.element = el;
-    render(this.template, this.element);
-    this.contents = el.querySelector('.modal-contents')!;
   }
 
   close() {
