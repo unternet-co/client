@@ -59,36 +59,30 @@ jobs:
           fi
           echo "bump=$VERSION_PART" >> $GITHUB_OUTPUT
 
-      - name: Bump version and commit
+      - name: Bump version, update changelog and commit
         id: bump_version
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
           cd desktop
+
+          echo "Bumping version"
           NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }})
           STRIPPED_VERSION=$(echo "$NEW_VERSION_RAW" | tail -n 1 | tr -d '\n')
           TAG_NAME=${STRIPPED_VERSION#v}
-          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
-          git add .          
+
+          echo "Generating Changelog"
+          echo "## ${TAG_NAME}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "- ${{ github.event.head_commit.message }}" >> CHANGELOG.md
+
+          git add .
           git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
           git tag $TAG_NAME
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Update CHANGELOG
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-
-          echo "## ${{ steps.bump_version.outputs.tag_name }}" >> CHANGELOG.md
-          echo "" >> CHANGELOG.md
-          echo "- ${{ github.event.head_commit.message }}" >> CHANGELOG.md
-
-          git add CHANGELOG.md
-          git commit -m "chore: update changelog for ${{ steps.bump_version.outputs.tag_name }} [skip ci]" || echo "No changes to commit"
-          git push
-
       - name: Upload release with .dmg
         uses: softprops/action-gh-release@v2
         with:
