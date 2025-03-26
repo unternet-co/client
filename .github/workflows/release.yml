@@ -71,6 +71,7 @@ jobs:
           echo "Syncing version across packages"
           npm run sync-version
           TAG_NAME=$(node -p "require('./package.json').version")
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
 
           echo "Generating Changelog"
           COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
@@ -91,7 +92,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.bump_version.outputs.tag_name }}
-          files: | # TODO: Update with dmg file
-            dist/*.html
+          files: |
+            dist/*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
