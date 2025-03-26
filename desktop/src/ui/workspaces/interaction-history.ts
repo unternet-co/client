@@ -1,5 +1,6 @@
 import { html, render, TemplateResult } from 'lit';
-import { Interaction, InteractionOutput } from '../../models/interactions';
+import { InteractionOutput } from '../../models/interactions';
+import { resolveMarkdown } from 'lit-markdown';
 import { appendEl, createEl } from '../../utils/dom';
 import { Workspace, WorkspaceModel } from '../../models/workspaces';
 import { dependencies } from '../../base/dependencies';
@@ -25,26 +26,34 @@ class InteractionHistory extends HTMLElement {
   }
 
   updateInteractions() {
-    const interactions = this.workspaceModel
-      .allInteractions(this.workspaceId)
-      .reverse();
+    const interactions = Array.from(
+      this.workspaceModel.allInteractions(this.workspaceId)
+    );
 
-    const template = (interaction: Interaction) => html`
-      <div class="interaction">
-        <div class="interaction-input">${interaction.input.text}</div>
-        ${interaction.outputs.map((output) => this.outputTemplate(output))}
-      </div>
-    `;
+    const templates: TemplateResult[] = [];
 
-    render(interactions.map(template), this.interactionsContainer);
+    for (let i = interactions.length - 1; i >= 0; i--) {
+      templates.push(html`
+        <div class="interaction">
+          <div class="interaction-input">${interactions[i].input.text}</div>
+          ${interactions[i].outputs.map((output) =>
+            this.outputTemplate(output)
+          )}
+        </div>
+      `);
+    }
+
+    render(templates, this.interactionsContainer);
   }
 
   outputTemplate(output: InteractionOutput) {
     let template: TemplateResult = html``;
     if (output.type === 'text') {
-      template = html`${output.content}`;
+      template = html`${resolveMarkdown(output.content)}`;
     }
-    return html`<div class="interaction-output">${template}</div>`;
+    return html`<div class="interaction-output" data-format="markdown">
+      ${template}
+    </div>`;
   }
 }
 
