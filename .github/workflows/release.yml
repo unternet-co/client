@@ -70,15 +70,18 @@ jobs:
           echo "Bumping version"
           NEW_VERSION=$(npm version ${{ steps.semver.outputs.bump }})
           STRIPPED_VERSION=$(echo "$NEW_VERSION_RAW" | tail -n 1 | tr -d '\n')
-          TAG_NAME=${STRIPPED_VERSION#v}
+          TAG_NAME=${STRIPPED_VERSION#v}          
+          echo TAG_NAME
+          COMMIT_MESSAGE=${{ github.event.head_commit.message }}
 
           echo "Generating Changelog"
           echo "## ${TAG_NAME}" >> CHANGELOG.md
           echo "" >> CHANGELOG.md
-          echo "- ${{ github.event.head_commit.message }}" >> CHANGELOG.md
+          echo "- ${COMMIT_MESSAGE}" >> CHANGELOG.md
 
           echo "Tagging"
-          git tag $TAG_NAME 
+          COMMIT_MESSAGE=${{ github.event.head_commit.message }}
+          git tag -a $TAG_NAME -m "${COMMIT_MESSAGE}"
 
           git add .
           git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"          
