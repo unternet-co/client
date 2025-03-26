@@ -69,8 +69,12 @@ export class WorkspaceModel {
   }
 
   setTitle(id: Workspace['id'], title: string) {
-    this.workspaces[id].title = title;
-    this.workspaceDatabase.update(id, { title });
+    const workspace = this.workspaces.get(id);
+    if (workspace) {
+      workspace.title = title;
+      this.workspaceDatabase.update(id, { title });
+      this.notifier.notify({ workspaceId: id });
+    }
   }
 
   async activate(id: Workspace['id']): Promise<void> {
