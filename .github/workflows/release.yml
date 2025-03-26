@@ -50,7 +50,6 @@ jobs:
         id: semver
         run: |
           BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          echo $BRANCH_NAME
           if [[ "$BRANCH_NAME" =~ ^feat/|^feature/ ]]; then
             VERSION_PART="minor"
           elif [[ "$BRANCH_NAME" =~ ^major/|^breaking/ ]]; then
@@ -71,9 +70,10 @@ jobs:
           STRIPPED_VERSION=$(echo "$NEW_VERSION_RAW" | tail -n 1 | tr -d '\n')
           TAG_NAME=${STRIPPED_VERSION#v}
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
-          git add .
+          git add .          
           git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
-        # git push origin feat/tagging --follow-tags
+          git tag $TAG_NAME
+          git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update CHANGELOG
@@ -86,13 +86,13 @@ jobs:
           echo "- ${{ github.event.head_commit.message }}" >> CHANGELOG.md
 
           git add CHANGELOG.md
-          git commit -m "chore: update changelog for ${{ steps.bump_version.outputs.new_version }} [skip ci]" || echo "No changes to commit"
+          git commit -m "chore: update changelog for ${{ steps.bump_version.outputs.tag_name }} [skip ci]" || echo "No changes to commit"
           git push
 
       - name: Upload release with .dmg
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.bump_version.outputs.new_version }}
+          tag_name: ${{ steps.bump_version.outputs.tag_name }}
           files: | # TODO: Update with dmg file
             dist/*.html
         env:
