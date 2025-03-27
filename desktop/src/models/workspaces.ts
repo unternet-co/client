@@ -13,6 +13,7 @@ export interface Workspace {
   title: string;
   createdAt: number;
   lastOpenedAt: number;
+  lastModifiedAt: number;
 }
 
 export interface WorkspaceNotification {
@@ -105,6 +106,7 @@ export class WorkspaceModel {
       title: 'New workspace',
       createdAt: now,
       lastOpenedAt: now,
+      lastModifiedAt: now,
     };
 
     this.workspaces.set(workspace.id, workspace);
@@ -195,5 +197,15 @@ export class WorkspaceModel {
 
   allInteractions(workspaceId: Workspace['id']): Interaction[] {
     return this.interactions.get(workspaceId) || [];
+  }
+
+  updateLastModified(id: Workspace['id']): void {
+    const workspace = this.workspaces.get(id);
+    if (workspace) {
+      // Update the lastModifiedAt timestamp
+      workspace.lastModifiedAt = Date.now();
+      this.workspaceDatabase.update(id, { lastModifiedAt: workspace.lastModifiedAt });
+      this.notifier.notify({ workspaceId: id });
+    }
   }
 }

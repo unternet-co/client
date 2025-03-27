@@ -50,8 +50,8 @@ export class HomePage extends HTMLElement {
     // Get all actual workspaces
     this.workspaces = this.workspaceModel.all()
       .filter(workspace => workspace.title.toLowerCase().includes(filterValue))
-      // Sort by lastOpenedAt (most recent first)
-      .sort((a, b) => (b.lastOpenedAt || 0) - (a.lastOpenedAt || 0));
+      // Sort by lastModifiedAt (most recent first)
+      .sort((a, b) => (b.lastModifiedAt || 0) - (a.lastModifiedAt || 0));
 
     render(this.workspaceTemplate, this.recentContainer);
     
@@ -190,11 +190,8 @@ export class HomePage extends HTMLElement {
           @click=${() => this.openWorkspace(workspace.id)}>
           <div class="workspace-title">${workspace.title}</div>
           <div class="workspace-metadata">
-            ${workspace.lastOpenedAt ? 
-              html`<span class="last-opened">Last opened: ${this.formatTimestamp(workspace.lastOpenedAt)}</span>` : 
-              ''}
-            ${workspace.createdAt ? 
-              html`<span class="created-at">Created: ${this.formatTimestamp(workspace.createdAt)}</span>` : 
+            ${workspace.lastModifiedAt ? 
+              html`<span class="last-modified">Last modified: ${this.formatTimestamp(workspace.lastModifiedAt)}</span>` : 
               ''}
           </div>
           <button 
