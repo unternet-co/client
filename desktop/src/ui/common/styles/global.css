@@ -107,7 +107,7 @@ body {
   color: var(--color-text);
   -webkit-overflow-scrolling: touch;
   display: flex;
-  direction: column;
+  flex-direction: column;
   /* position: fixed; */
   padding-bottom: env(safe-area-inset-bottom);
 }
