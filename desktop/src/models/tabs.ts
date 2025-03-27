@@ -20,10 +20,7 @@ export const initTabStoreData: TabStoreData = {
       type: 'page',
       id: 'home',
     },
-    {
-      type: 'page',
-      id: 'settings',
-    },
+    // Settings is now a standalone button, not a tab
   ],
 };
 
