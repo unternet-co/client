@@ -12,9 +12,9 @@ class InteractionHistory extends HTMLElement {
   workspaceId: Workspace['id'];
   interactionsContainer: HTMLElement;
   private thinkingIndicator: HTMLDivElement | null = null;
-private thinkingAnimationInterval: number | null = null;
-private isThinking = false;
-private lastInteractionCount = 0;
+  private thinkingAnimationInterval: number | null = null;
+  private isThinking = false;
+  private lastInteractionCount = 0;
 
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
@@ -28,6 +28,9 @@ private lastInteractionCount = 0;
       this.handleWorkspaceNotification();
       this.updateInteractions()
     });
+    
+    // Initialize the last interaction count
+    this.lastInteractionCount = this.workspaceModel.allInteractions(this.workspaceId).length;
   }
 
   handleWorkspaceNotification() {
