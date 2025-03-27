@@ -47,7 +47,9 @@ export class HomePage extends HTMLElement {
     
     // Get all actual workspaces
     this.workspaces = this.workspaceModel.all()
-      .filter(workspace => workspace.title.toLowerCase().includes(filterValue));
+      .filter(workspace => workspace.title.toLowerCase().includes(filterValue))
+      // Sort by lastOpenedAt (most recent first)
+      .sort((a, b) => (b.lastOpenedAt || 0) - (a.lastOpenedAt || 0));
 
     render(this.workspaceTemplate, this.recentContainer);
     
@@ -151,6 +153,26 @@ export class HomePage extends HTMLElement {
     }
   }
 
+  private formatTimestamp(timestamp: number): string {
+    if (!timestamp) return 'Unknown';
+    
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      // Today - show time
+      return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } else if (diffDays === 1) {
+      return 'Yesterday';
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    } else {
+      return date.toLocaleDateString();
+    }
+  }
+
   private get workspaceTemplate() {
     const workspacesToRender = [...this.workspaces];
     
@@ -164,7 +186,15 @@ export class HomePage extends HTMLElement {
         <li 
           class="workspace ${index === this.selectedIndex ? 'selected' : ''} ${workspace.id === this.newWorkspaceId ? 'new-workspace' : ''}"
           @click=${() => this.openWorkspace(workspace.id)}>
-          ${workspace.title}
+          <div class="workspace-title">${workspace.title}</div>
+          <div class="workspace-metadata">
+            ${workspace.lastOpenedAt ? 
+              html`<span class="last-opened">Last opened: ${this.formatTimestamp(workspace.lastOpenedAt)}</span>` : 
+              ''}
+            ${workspace.createdAt ? 
+              html`<span class="created-at">Created: ${this.formatTimestamp(workspace.createdAt)}</span>` : 
+              ''}
+          </div>
         </li>
       `)}
     `;

@@ -56,12 +56,28 @@ command-input {
 
 .recent-workspaces .workspace {
   cursor: pointer;
-  padding: 8px;
   background: var(--color-neutral-0);
-  padding: var(--space-4) var(--space-5);
-  transition: all 0.3s ease;
+  padding: var(--space-5) var(--space-6);
+  /* transition: all 0.3s ease; */
   border-radius: var(--rounded);
   border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-lg);
+}
+
+.workspace-metadata {
+  display: flex;
+  flex-direction: column;
+  color: var(--color-neutral-50);
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.workspace:hover .workspace-metadata,
+.workspace.selected .workspace-metadata {
+  color: var(--color-neutral-0);
 }
 
 .recent-workspaces .workspace:hover,
