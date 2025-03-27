@@ -1,4 +1,5 @@
 import { TabModel } from '../models/tabs';
+import { SettingsPage } from '../ui/pages/settings-page';
 
 export class ShortcutService {
   constructor(private tabModel: TabModel) {
@@ -36,6 +37,12 @@ export class ShortcutService {
         if (tabIndex < tabs.length) {
           this.tabModel.activate(tabs[tabIndex].id);
         }
+      }
+      
+      // Ctrl+, to open settings (common shortcut in many applications)
+      if (e.key === ',' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        SettingsPage.open();
       }
     });
   }
