@@ -24,7 +24,6 @@ export class CommandInputElement extends HTMLElement {
     input {
       width: 100%;
       max-width: 560px;
-      text-align: center;
       border: 1px solid var(--color-border);
       padding: 6px var(--space-4);
       background: var(--color-neutral-10);
