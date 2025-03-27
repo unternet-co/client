@@ -2,7 +2,7 @@ import { html, render } from 'lit';
 import { DisposableGroup } from '../../base/disposable';
 import { attachStyles } from '../../utils/dom';
 import '../common/icon';
-import { ICON_GLYPHS, ICON_SIZES } from '../common/icon';
+import { ICON_MAP, ICON_SIZES } from '../common/icon';
 
 export class TabSelectEvent extends Event {
   constructor() {
@@ -53,7 +53,7 @@ export class TabHandleElement extends HTMLElement {
         ? html`<un-icon
             @mousedown=${this.handleMouseDown.bind(this)}
             class="icon-button"
-            src=${ICON_GLYPHS.close}
+            name="close"
             size=${ICON_SIZES.medium}
           >
           </un-icon>`

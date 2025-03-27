@@ -1,6 +1,6 @@
 import { appendEl, createEl } from '../../utils/dom';
 import { render, html } from 'lit';
-import { ICON_GLYPHS } from '../common/icon';
+import { ICON_MAP } from '../common/icon';
 import { Tab, TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
 import './tab-handle';
@@ -23,7 +23,7 @@ export class TopBar extends HTMLElement {
 
   iconFor(tabId: Tab['id']) {
     if (tabId === 'home') {
-      return html`<un-icon src=${ICON_GLYPHS.home}></un-icon>`;
+      return html`<un-icon name=${ICON_MAP.home}></un-icon>`;
     }
     return null;
   }
