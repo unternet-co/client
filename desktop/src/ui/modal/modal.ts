@@ -13,6 +13,17 @@ export class Modal {
   element: HTMLElement;
   contents: HTMLElement;
 
+  // Static initialization to set up global ESC key handler
+  static {
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && Modal.activeModals.length > 0) {
+        // Close the most recently opened modal (last in the array)
+        Modal.activeModals[Modal.activeModals.length - 1].close();
+        e.preventDefault();
+      }
+    });
+  }
+
   static create(init: ModalInit) {
     // Create a element container for the modal
     const modalRoot = document.createElement('div');
