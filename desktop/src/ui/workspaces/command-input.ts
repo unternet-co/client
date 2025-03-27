@@ -13,6 +13,7 @@ export class CommandInputElement extends HTMLElement {
   private input: HTMLInputElement;
   private shadow: ShadowRoot;
   private disposables = new DisposableGroup();
+  private _disabled = false;
 
   private static readonly STYLES = css`
     :host {
@@ -37,6 +38,11 @@ export class CommandInputElement extends HTMLElement {
       background: var(--color-page);
       border: 1px solid var(--color-border);
     }
+
+    input:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   `;
 
   constructor() {
@@ -48,6 +54,11 @@ export class CommandInputElement extends HTMLElement {
   connectedCallback() {
     this.setupInput();
     this.attachEventListeners();
+    
+    // Check if the disabled attribute is set
+    if (this.hasAttribute('disabled')) {
+      this.disabled = true;
+    }
   }
 
   private setupInput() {
@@ -77,6 +88,8 @@ export class CommandInputElement extends HTMLElement {
   }
 
   handleKeyDown(e: KeyboardEvent) {
+    if (this.disabled) return;
+    
     if (e.key === 'Enter') {
       this.dispatchEvent(new CommandSubmitEvent(this.input.value));
       this.input.value = '';
@@ -85,6 +98,35 @@ export class CommandInputElement extends HTMLElement {
   
   get value(): string {
     return this.input?.value ?? '';
+  }
+
+  // Add support for the disabled property
+  get disabled(): boolean {
+    return this._disabled;
+  }
+
+  set disabled(value: boolean) {
+    this._disabled = value;
+    if (this.input) {
+      this.input.disabled = value;
+    }
+    
+    if (value) {
+      this.setAttribute('disabled', '');
+    } else {
+      this.removeAttribute('disabled');
+    }
+  }
+
+  // Add support for observing the disabled attribute
+  static get observedAttributes() {
+    return ['disabled'];
+  }
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (name === 'disabled') {
+      this.disabled = newValue !== null;
+    }
   }
 
   disconnectedCallback() {

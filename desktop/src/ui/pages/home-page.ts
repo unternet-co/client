@@ -14,6 +14,8 @@ export class HomePage extends HTMLElement {
   private commandInput: HTMLElement;
   private selectedIndex: number = -1;
   private workspaces: Workspace[] = [];
+  private newWorkspaceId: string | null = null;
+  private pendingWorkspace: { id: string, title: string } | null = null;
 
   connectedCallback() {
     render(this.template, this);
@@ -42,10 +44,20 @@ export class HomePage extends HTMLElement {
 
   updateWorkspaces() {
     const filterValue = (this.commandInput as any).value?.toLowerCase() || '';
+    
+    // Get all actual workspaces
     this.workspaces = this.workspaceModel.all()
       .filter(workspace => workspace.title.toLowerCase().includes(filterValue));
 
     render(this.workspaceTemplate, this.recentContainer);
+    
+    // Clear the new workspace highlight after a delay
+    if (this.newWorkspaceId && !this.pendingWorkspace) {
+      setTimeout(() => {
+        this.newWorkspaceId = null;
+        this.updateWorkspaces();
+      }, 3000); // Remove glow effect after 3 seconds
+    }
   }
 
   handleKeyDown(e: KeyboardEvent) {
@@ -103,23 +115,59 @@ export class HomePage extends HTMLElement {
   }
 
   private async createWorkspaceWithCommand(command: string) {
-    const workspace = this.workspaceModel.create();
-    await this.workspaceModel.activate(workspace.id);
+    // Temporarily disable the command input
+    if (this.commandInput) {
+      (this.commandInput as any).disabled = true;
+    }
+    
+    try {
+      // Create a placeholder workspace item with a loading message
+      const tempId = `pending-${Date.now()}`;
+      this.pendingWorkspace = {
+        id: tempId,
+        title: 'Creating new workspace...'
+      };
+      this.newWorkspaceId = tempId;
+      this.updateWorkspaces();
+      
+      // Actually create the workspace
+      const workspace = this.workspaceModel.create();
+      await this.workspaceModel.activate(workspace.id);
 
-    const kernel = dependencies.resolve<Kernel>('Kernel');
-    await kernel.handleInput(workspace.id, { text: command });
-
-    this.tabModel.create(workspace.id);
+      const kernel = dependencies.resolve<Kernel>('Kernel');
+      await kernel.handleInput(workspace.id, { text: command });
+      
+      // Replace placeholder with the real workspace
+      this.pendingWorkspace = null;
+      this.newWorkspaceId = workspace.id;
+      
+      this.tabModel.create(workspace.id);
+      this.updateWorkspaces();
+    } finally {
+      // Re-enable the command input
+      if (this.commandInput) {
+        (this.commandInput as any).disabled = false;
+      }
+    }
   }
 
   private get workspaceTemplate() {
-    return this.workspaces.map((workspace, index) => html`
-      <li 
-        class="${index === this.selectedIndex ? 'selected' : ''}"
-        @click=${() => this.openWorkspace(workspace.id)}>
-        ${workspace.title}
-      </li>
-    `);
+    const workspacesToRender = [...this.workspaces];
+    
+    // Add the pending workspace at the beginning of the list if it exists
+    if (this.pendingWorkspace) {
+      workspacesToRender.unshift(this.pendingWorkspace as any);
+    }
+    
+    return html`
+      ${workspacesToRender.map((workspace, index) => html`
+        <li 
+          class="workspace ${index === this.selectedIndex ? 'selected' : ''} ${workspace.id === this.newWorkspaceId ? 'new-workspace' : ''}"
+          @click=${() => this.openWorkspace(workspace.id)}>
+          ${workspace.title}
+        </li>
+      `)}
+    `;
   }
 
   get template() {
