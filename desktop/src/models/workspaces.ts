@@ -11,6 +11,8 @@ import { DisposableGroup } from '../base/disposable';
 export interface Workspace {
   id: string;
   title: string;
+  createdAt: number;
+  lastOpenedAt: number;
 }
 
 export interface WorkspaceNotification {
@@ -78,6 +80,13 @@ export class WorkspaceModel {
   }
 
   async activate(id: Workspace['id']): Promise<void> {
+    const workspace = this.workspaces.get(id);
+    if (workspace) {
+      // Update the lastOpenedAt timestamp
+      workspace.lastOpenedAt = Date.now();
+      this.workspaceDatabase.update(id, { lastOpenedAt: workspace.lastOpenedAt });
+    }
+    
     const workspaceInteractions = await this.interactionDatabase.where({
       workspaceId: id,
     });
@@ -90,9 +99,12 @@ export class WorkspaceModel {
   }
 
   create() {
+    const now = Date.now();
     const workspace = {
       id: ulid(),
       title: 'New workspace',
+      createdAt: now,
+      lastOpenedAt: now,
     };
 
     this.workspaces.set(workspace.id, workspace);
