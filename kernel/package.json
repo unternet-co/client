@@ -1,11 +1,11 @@
 {
   "name": "@unternet/kernel",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "",
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "directories": {
     "example": "example"
   },
@@ -19,10 +19,6 @@
     "ai": "^4.0.20",
     "ollama-ai-provider": "^1.2.0",
     "openai": "^4.76.1"
-  },
-  "main": "dist/index.js",
-  "directories": {
-    "example": "example"
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
