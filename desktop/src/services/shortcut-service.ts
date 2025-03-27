@@ -30,11 +30,11 @@ export class ShortcutService {
       const numKey = parseInt(e.key);
       if (!isNaN(numKey) && numKey >= 1 && numKey <= 9 && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
-        const workspaceTabs = this.tabModel.all().filter(tab => tab.type === 'workspace');
+        const tabs = this.tabModel.all();
         const tabIndex = numKey - 1; 
-        
-        if (tabIndex < workspaceTabs.length) {
-          this.tabModel.activate(workspaceTabs[tabIndex].id);
+
+        if (tabIndex < tabs.length) {
+          this.tabModel.activate(tabs[tabIndex].id);
         }
       }
     });

@@ -62,14 +62,32 @@ top-bar .workspace-tab-list {
   height: 100%;
 }
 
-top-bar .settings-tab-container {
+top-bar .settings-button-container {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   margin-left: auto; /* Push to the right */
   height: 100%;
   flex-shrink: 0;
+  padding: 0 8px;
 }
 
-top-bar .settings-tab-container tab-handle {
+top-bar .settings-button {
   background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 4px;
+  -webkit-app-region: no-drag; /* Make button clickable in draggable area */
+}
+
+top-bar .settings-button:hover {
+  background-color: var(--color-neutral-20, rgba(0, 0, 0, 0.05));
+}
+
+top-bar .settings-button un-icon {
+  width: 18px;
+  height: 18px;
 }

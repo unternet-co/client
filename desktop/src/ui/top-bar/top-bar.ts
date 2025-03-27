@@ -24,7 +24,7 @@ export class TopBar extends HTMLElement {
   tabModel = dependencies.resolve<TabModel>('TabModel');
   staticTabsContainer: HTMLElement;
   workspaceTabsContainer: HTMLElement;
-  settingsTabContainer: HTMLElement;
+  settingsButtonContainer: HTMLElement;
 
   // TODO: Add dependency injection using decorators for model
   connectedCallback() {
@@ -46,10 +46,10 @@ export class TopBar extends HTMLElement {
       createEl('div', { className: 'workspace-tab-list' })
     );
     
-    // Container for settings tab (right-justified)
-    this.settingsTabContainer = appendEl(
+    // Container for settings button (right-justified)
+    this.settingsButtonContainer = appendEl(
       this,
-      createEl('div', { className: 'settings-tab-container' })
+      createEl('div', { className: 'settings-button-container' })
     );
 
     this.tabModel.subscribe(this.updateTabs.bind(this));
@@ -96,20 +96,19 @@ export class TopBar extends HTMLElement {
     if (tabId === 'home') {
       return html`<un-icon src=${ICON_GLYPHS.home}></un-icon>`;
     }
-    if (tabId === 'settings') {
-      return html`<un-icon src=${ICON_GLYPHS.settings}></un-icon>`;
-    }
     return null;
   }
 
   handleSelect(tab: Tab) {
-    if (tab.id === 'settings') {
-      // Open a settings modal instead of navigating to a tab
-      SettingsPage.open();
-    } else if (this.tabModel.activeTab?.id !== tab.id) {
+    if (this.tabModel.activeTab?.id !== tab.id) {
       this.tabModel.activate(tab.id);
       // Tab will be scrolled into view after activation in updateTabs
     }
+  }
+
+  openSettings() {
+    // Open the settings modal
+    SettingsPage.open();
   }
 
   handleRename(tab: Tab, e: CustomEvent) {
@@ -124,9 +123,8 @@ export class TopBar extends HTMLElement {
 
   updateTabs() {
     const tabs = this.tabModel.all();
-    const staticTabs = tabs.filter(tab => tab.type === 'page' && tab.id !== 'settings');
+    const staticTabs = tabs.filter(tab => tab.type === 'page' );
     const workspaceTabs = tabs.filter(tab => tab.type === 'workspace');
-    const settingsTab = tabs.find(tab => tab.id === 'settings');
 
     const tabTemplate = (tab: Tab) => html`
       <tab-handle
@@ -143,9 +141,16 @@ export class TopBar extends HTMLElement {
       </tab-handle>
     `;
 
+    // Render the settings button
+    const settingsButtonTemplate = html`
+      <button class="settings-button" @click=${() => this.openSettings()}>
+        <un-icon src=${ICON_GLYPHS.settings}></un-icon>
+      </button>
+    `;
+
     render(staticTabs.map(tabTemplate), this.staticTabsContainer);
     render(workspaceTabs.map(tabTemplate), this.workspaceTabsContainer);
-    render(tabTemplate(settingsTab!), this.settingsTabContainer);
+    render(settingsButtonTemplate, this.settingsButtonContainer);
     
     this.scrollActiveTabIntoView();
   }
