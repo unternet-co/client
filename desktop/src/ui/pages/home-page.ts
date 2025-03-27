@@ -5,6 +5,8 @@ import { TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
 import { CommandSubmitEvent } from '../workspaces/command-input';
 import { Kernel } from '../../kernel';
+import { Modal } from '../modal/modal';
+import { ICON_GLYPHS } from '../common/icon';
 
 export class HomePage extends HTMLElement {
   private workspaceModel =
@@ -195,9 +197,59 @@ export class HomePage extends HTMLElement {
               html`<span class="created-at">Created: ${this.formatTimestamp(workspace.createdAt)}</span>` : 
               ''}
           </div>
+          <button 
+            class="delete-button" 
+            @click=${(e: Event) => this.handleDeleteClick(e, workspace.id)}
+            title="Delete workspace">
+            <un-icon src="${ICON_GLYPHS.delete}" size="medium"></un-icon>
+          </button>
         </li>
       `)}
     `;
+  }
+
+  private handleDeleteClick(e: Event, workspaceId: string) {
+    // Prevent the click from bubbling up to the workspace item
+    e.stopPropagation();
+    
+    // Create confirmation modal
+    const modal = Modal.create({ title: 'Delete Workspace' });
+    
+    // Add confirmation content
+    const content = document.createElement('div');
+    content.classList.add('delete-confirmation');
+    
+    const message = document.createElement('p');
+    message.textContent = 'Are you sure you want to delete this workspace? This action cannot be undone.';
+    content.appendChild(message);
+    
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+    
+    const cancelButton = document.createElement('button');
+    cancelButton.classList.add('cancel-button');
+    cancelButton.textContent = 'Cancel';
+    cancelButton.onclick = () => modal.close();
+    
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('delete-confirm-button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.onclick = () => {
+      // Close the tab first if it exists
+      if (this.tabModel.has(workspaceId)) {
+        this.tabModel.close(workspaceId);
+      }
+      
+      // Then delete the workspace
+      this.workspaceModel.delete(workspaceId);
+      modal.close();
+    };
+    
+    buttonContainer.appendChild(cancelButton);
+    buttonContainer.appendChild(deleteButton);
+    content.appendChild(buttonContainer);
+    
+    modal.contents.appendChild(content);
   }
 
   get template() {
