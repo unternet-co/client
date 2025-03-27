@@ -17,7 +17,7 @@ export class HomePage extends HTMLElement {
   private selectedIndex: number = -1;
   private workspaces: Workspace[] = [];
   private newWorkspaceId: string | null = null;
-  private pendingWorkspace: { id: string, title: string } | null = null;
+
 
   connectedCallback() {
     render(this.template, this);
@@ -54,14 +54,6 @@ export class HomePage extends HTMLElement {
       .sort((a, b) => (b.lastModifiedAt || 0) - (a.lastModifiedAt || 0));
 
     render(this.workspaceTemplate, this.recentContainer);
-    
-    // Clear the new workspace highlight after a delay
-    if (this.newWorkspaceId && !this.pendingWorkspace) {
-      setTimeout(() => {
-        this.newWorkspaceId = null;
-        this.updateWorkspaces();
-      }, 3000); // Remove glow effect after 3 seconds
-    }
   }
 
   handleKeyDown(e: KeyboardEvent) {
@@ -125,28 +117,26 @@ export class HomePage extends HTMLElement {
     }
     
     try {
-      // Create a placeholder workspace item with a loading message
-      const tempId = `pending-${Date.now()}`;
-      this.pendingWorkspace = {
-        id: tempId,
-        title: 'Creating new workspace...'
-      };
-      this.newWorkspaceId = tempId;
+      // Create the workspace
+      const workspace = this.workspaceModel.create();
+      
+      // Mark it as new and being created
+      this.newWorkspaceId = workspace.id;
       this.updateWorkspaces();
       
-      // Actually create the workspace
-      const workspace = this.workspaceModel.create();
+      // Activate the workspace and handle the command
       await this.workspaceModel.activate(workspace.id);
-
       const kernel = dependencies.resolve<Kernel>('Kernel');
       await kernel.handleInput(workspace.id, { text: command });
       
-      // Replace placeholder with the real workspace
-      this.pendingWorkspace = null;
-      this.newWorkspaceId = workspace.id;
-      
       this.tabModel.create(workspace.id);
       this.updateWorkspaces();
+      
+      // Clear the new workspace highlight after a delay
+      setTimeout(() => {
+        this.newWorkspaceId = null;
+        this.updateWorkspaces();
+      }, 3000); // Remove glow effect after 3 seconds
     } finally {
       // Re-enable the command input
       if (this.commandInput) {
@@ -176,23 +166,18 @@ export class HomePage extends HTMLElement {
   }
 
   private get workspaceTemplate() {
-    const workspacesToRender = [...this.workspaces];
-    
-    // Add the pending workspace at the beginning of the list if it exists
-    if (this.pendingWorkspace) {
-      workspacesToRender.unshift(this.pendingWorkspace as any);
-    }
-    
     return html`
-      ${workspacesToRender.map((workspace, index) => html`
+      ${this.workspaces.map((workspace, index) => html`
         <li 
           class="workspace ${index === this.selectedIndex ? 'selected' : ''} ${workspace.id === this.newWorkspaceId ? 'new-workspace' : ''}"
           @click=${() => this.openWorkspace(workspace.id)}>
           <div class="workspace-title">${workspace.title}</div>
           <div class="workspace-metadata">
-            ${workspace.lastModifiedAt ? 
-              html`<span class="last-modified">Last modified: ${this.formatTimestamp(workspace.lastModifiedAt)}</span>` : 
-              ''}
+            ${!workspace.lastOpenedAt ? 
+              html`<span class="last-modified">Creating new workspace...</span>` : 
+              workspace.lastModifiedAt ? 
+                html`<span class="last-modified">Last modified: ${this.formatTimestamp(workspace.lastModifiedAt)}</span>` : 
+                ''}
           </div>
           <button 
             class="delete-button" 

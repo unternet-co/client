@@ -14,6 +14,7 @@ export class CommandInputElement extends HTMLElement {
   private shadow: ShadowRoot;
   private disposables = new DisposableGroup();
   private _disabled = false;
+  private _updatingAttribute = false;
 
   private static readonly STYLES = css`
     :host {
@@ -106,16 +107,22 @@ export class CommandInputElement extends HTMLElement {
   }
 
   set disabled(value: boolean) {
+    // Prevent infinite recursion by checking if the value has actually changed
+    if (this._disabled === value) return;
+    
     this._disabled = value;
     if (this.input) {
       this.input.disabled = value;
     }
     
+    // Use a flag to prevent attribute changes from triggering another cycle
+    this._updatingAttribute = true;
     if (value) {
       this.setAttribute('disabled', '');
     } else {
       this.removeAttribute('disabled');
     }
+    this._updatingAttribute = false;
   }
 
   // Add support for observing the disabled attribute
@@ -124,6 +131,9 @@ export class CommandInputElement extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    // Skip if we're in the middle of updating the attribute from the setter
+    if (this._updatingAttribute) return;
+    
     if (name === 'disabled') {
       this.disabled = newValue !== null;
     }
