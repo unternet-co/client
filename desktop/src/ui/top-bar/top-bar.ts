@@ -4,6 +4,7 @@ import { ICON_GLYPHS } from '../common/icon';
 import { Tab, TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
 import { WorkspaceModel } from '../../models/workspaces';
+import { SettingsPage } from '../pages/settings-page';
 import './tab-handle';
 import './top-bar.css';
 
@@ -11,6 +12,7 @@ export class TopBar extends HTMLElement {
   tabModel = dependencies.resolve<TabModel>('TabModel');
   staticTabsContainer: HTMLElement;
   workspaceTabsContainer: HTMLElement;
+  settingsTabContainer: HTMLElement;
 
   // TODO: Add dependency injection using decorators for model
   connectedCallback() {
@@ -31,6 +33,12 @@ export class TopBar extends HTMLElement {
       scrollContainer,
       createEl('div', { className: 'workspace-tab-list' })
     );
+    
+    // Container for settings tab (right-justified)
+    this.settingsTabContainer = appendEl(
+      this,
+      createEl('div', { className: 'settings-tab-container' })
+    );
 
     this.tabModel.subscribe(this.updateTabs.bind(this));
     this.updateTabs();
@@ -40,11 +48,17 @@ export class TopBar extends HTMLElement {
     if (tabId === 'home') {
       return html`<un-icon src=${ICON_GLYPHS.home}></un-icon>`;
     }
+    if (tabId === 'settings') {
+      return html`<un-icon src=${ICON_GLYPHS.settings}></un-icon>`;
+    }
     return null;
   }
 
   handleSelect(tab: Tab) {
-    if (this.tabModel.activeTab?.id !== tab.id) {
+    if (tab.id === 'settings') {
+      // Open a settings modal instead of navigating to a tab
+      SettingsPage.open();
+    } else if (this.tabModel.activeTab?.id !== tab.id) {
       this.tabModel.activate(tab.id);
       // Tab will be scrolled into view after activation in updateTabs
     }
@@ -62,8 +76,9 @@ export class TopBar extends HTMLElement {
 
   updateTabs() {
     const tabs = this.tabModel.all();
-    const staticTabs = tabs.filter(tab => tab.type === 'page');
+    const staticTabs = tabs.filter(tab => tab.type === 'page' && tab.id !== 'settings');
     const workspaceTabs = tabs.filter(tab => tab.type === 'workspace');
+    const settingsTab = tabs.find(tab => tab.id === 'settings');
 
     const tabTemplate = (tab: Tab) => html`
       <tab-handle
@@ -80,19 +95,13 @@ export class TopBar extends HTMLElement {
       </tab-handle>
     `;
 
-    // Render static tabs in the static container
     render(staticTabs.map(tabTemplate), this.staticTabsContainer);
-    
-    // Render workspace tabs in the scrollable container
     render(workspaceTabs.map(tabTemplate), this.workspaceTabsContainer);
+    render(tabTemplate(settingsTab!), this.settingsTabContainer);
     
-    // Scroll active tab into view if it's a workspace tab
     this.scrollActiveTabIntoView();
   }
   
-  /**
-   * Scrolls the active tab into view if it's a workspace tab
-   */
   private scrollActiveTabIntoView(): void {
     // Wait for the DOM to update
     setTimeout(() => {
