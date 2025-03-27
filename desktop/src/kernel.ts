@@ -15,6 +15,9 @@ export class Kernel {
   }
 
   async handleInput(workspaceId: Workspace['id'], input: InteractionInput) {
+    // Update the lastModifiedAt timestamp whenever a command is issued
+    this.workspaceModel.updateLastModified(workspaceId);
+    
     const interaction = this.workspaceModel.createInteraction(
       workspaceId,
       input
