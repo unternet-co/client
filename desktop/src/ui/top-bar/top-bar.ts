@@ -8,6 +8,18 @@ import { SettingsPage } from '../pages/settings-page';
 import './tab-handle';
 import './top-bar.css';
 
+// Define electronAPI type for TypeScript
+declare global {
+  interface Window {
+    electronAPI?: {
+      onWindowStateChange: (callback: (isFullscreen: boolean) => void) => void;
+      removeWindowStateListeners: () => void;
+      platform: string;
+      isFullScreen: () => Promise<boolean>;
+    }
+  }
+}
+
 export class TopBar extends HTMLElement {
   tabModel = dependencies.resolve<TabModel>('TabModel');
   staticTabsContainer: HTMLElement;
@@ -42,6 +54,42 @@ export class TopBar extends HTMLElement {
 
     this.tabModel.subscribe(this.updateTabs.bind(this));
     this.updateTabs();
+
+    const isMac = window.electronAPI?.platform === 'darwin';
+    this.classList.toggle('mac', isMac);
+    
+    // Initialize window state listeners
+    this.initializeWindowStateListeners();
+  }
+
+  disconnectedCallback() {
+    if (window.electronAPI) {
+      window.electronAPI.removeWindowStateListeners();
+    }
+  }
+
+  private initializeWindowStateListeners() : void {
+    if (window.electronAPI) {
+      window.electronAPI.isFullScreen()
+        .then(isFullscreen => {
+          this.toggleFullscreenClass(isFullscreen);
+        })
+        .catch(err => {
+          console.error('[TopBar] Error checking fullscreen state:', err);
+        });
+      
+      window.electronAPI.onWindowStateChange((isFullscreen) => {
+        this.toggleFullscreenClass(isFullscreen);
+      });
+    } 
+  }
+
+  private toggleFullscreenClass(isFullscreen: boolean) : void {
+    if (isFullscreen) {
+      this.classList.add('fullscreen');
+    } else {
+      this.classList.remove('fullscreen');
+    }
   }
 
   iconFor(tabId: Tab['id']) {

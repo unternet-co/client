@@ -7,9 +7,18 @@ top-bar {
   -webkit-app-region: drag;
   background: var(--color-neutral-10);
   background: #f0f0f0;
-  padding-left: 82px;
   overflow: visible;
   position: relative;
+}
+
+/* Default padding for macOS traffic lights */
+top-bar.mac {
+  padding-left: 76px;
+}
+
+/* When in fullscreen, remove the extra padding since there are no traffic lights */
+top-bar.mac.fullscreen {
+  padding-left: 0;
 }
 
 top-bar::-webkit-scrollbar {
