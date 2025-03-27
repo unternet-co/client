@@ -20,6 +20,10 @@ export const initTabStoreData: TabStoreData = {
       type: 'page',
       id: 'home',
     },
+    {
+      type: 'page',
+      id: 'settings',
+    },
   ],
 };
 

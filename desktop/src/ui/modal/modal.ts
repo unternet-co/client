@@ -25,7 +25,12 @@ export class Modal {
     Modal.activeModals.push(modal);
 
     // Add close event handlers
-    modalRoot.onmousedown = () => modal.close();
+    modalRoot.onmousedown = (event) => {
+      // Only close if clicking directly on the overlay (not on modal content)
+      if (event.target === modalRoot) {
+        modal.close();
+      }
+    };
 
     return modal;
   }

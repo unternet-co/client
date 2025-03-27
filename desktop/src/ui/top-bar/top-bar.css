@@ -9,6 +9,7 @@ top-bar {
   background: #f0f0f0;
   padding-left: 82px;
   overflow: visible;
+  position: relative;
 }
 
 top-bar::-webkit-scrollbar {
@@ -50,4 +51,16 @@ top-bar .workspace-tab-list {
   flex-shrink: 0;
   margin: 0;
   height: 100%;
+}
+
+top-bar .settings-tab-container {
+  display: flex;
+  align-items: stretch;
+  margin-left: auto; /* Push to the right */
+  height: 100%;
+  flex-shrink: 0;
+}
+
+top-bar .settings-tab-container tab-handle {
+  background-color: transparent;
 }
