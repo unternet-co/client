@@ -8,6 +8,9 @@ import { ShortcutService } from './services/shortcut-service';
 import { Kernel } from './kernel';
 import { createModel } from './ext/llm';
 import { appendEl, createEl } from './utils/dom';
+import './ui/common/styles/global.css';
+import './ui/common/styles/reset.css';
+import './ui/common/styles/markdown.css';
 import './ui/app-root';
 
 const workspaceDatabaseService = new DatabaseService<string, Workspace>(

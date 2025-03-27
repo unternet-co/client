@@ -16,7 +16,7 @@ export interface ResourceAction {
   params_schema?: JSONSchemaDefinition;
 }
 
-export class Resource {
+export interface Resource {
   uri: string;
   protocol: string;
   name?: string;
@@ -24,12 +24,22 @@ export class Resource {
   icons?: ResourceIcon[];
   description?: string;
   actions?: ResourceActionMap;
+}
 
-  static toTools(resourceMap?: ResourceMap): ToolSet {
+export class ResourceMap extends Map<string, Resource> {
+  add(resource: Resource) {
+    this.set(resource.uri, resource);
+  }
+
+  isEmpty() {
+    return this.size === 0;
+  }
+
+  toTools(): ToolSet {
     const tools: ToolSet = {};
-    if (!resourceMap || resourceMap.isEmpty()) return tools;
+    if (this.isEmpty()) return tools;
 
-    for (const resource of resourceMap.values()) {
+    for (const resource of this.values()) {
       for (const actionId in resource.actions) {
         const action = resource.actions[actionId];
 
@@ -47,15 +57,5 @@ export class Resource {
     }
 
     return tools;
-  }
-}
-
-export class ResourceMap extends Map<string, Resource> {
-  add(resource: Resource) {
-    this.set(resource.uri, resource);
-  }
-
-  isEmpty() {
-    return this.size === 0;
   }
 }

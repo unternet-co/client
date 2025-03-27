@@ -10,7 +10,8 @@
     "example": "example"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "chokidar 'src/**/*' -c 'npm run build'"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",
@@ -19,7 +20,12 @@
     "ollama-ai-provider": "^1.2.0",
     "openai": "^4.76.1"
   },
+  "main": "dist/index.js",
+  "directories": {
+    "example": "example"
+  },
   "devDependencies": {
+    "chokidar-cli": "^3.0.0",
     "typescript": "^5.8.2"
   }
 }
