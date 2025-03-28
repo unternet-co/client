@@ -1,7 +1,18 @@
 {
   "name": "@unternet/kernel",
+  "version": "0.3.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
   "type": "module",
-  "version": "0.2.0",
+  "main": "dist/index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "chokidar 'src/**/*' -c 'npm run build'"
+  },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",
     "@web-applets/sdk": "^0.1.5",
@@ -9,17 +20,6 @@
     "ollama-ai-provider": "^1.2.0",
     "openai": "^4.76.1"
   },
-  "scripts": {
-    "build": "tsc",
-    "dev": "chokidar 'src/**/*' -c 'npm run build'"
-  },
-  "main": "dist/index.js",
-  "directories": {
-    "example": "example"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
     "typescript": "^5.8.2"
