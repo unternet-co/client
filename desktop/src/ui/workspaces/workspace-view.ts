@@ -20,7 +20,7 @@ export class WorkspaceView extends HTMLElement {
   }
 
   handleCommandSubmit(e: CommandSubmitEvent) {
-    this.kernel.handleInput(this.workspaceId, { text: e.value });
+    this.kernel.handleInput(this.workspaceId, e.input);
   }
 
   get template() {

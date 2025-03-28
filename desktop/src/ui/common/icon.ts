@@ -3,6 +3,8 @@ import { appendEl, attachStyles, createEl } from '../../utils/dom';
 export const ICON_GLYPHS = {
   close: '/icons/close.svg',
   home: '/icons/home.svg',
+  settings: '/icons/settings.svg',
+  delete: '/icons/delete.svg',
 } as const;
 
 export const ICON_SIZES = {

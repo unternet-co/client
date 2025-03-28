@@ -7,8 +7,18 @@ top-bar {
   -webkit-app-region: drag;
   background: var(--color-neutral-10);
   background: #f0f0f0;
-  padding-left: 82px;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+}
+
+/* Default padding for macOS traffic lights */
+top-bar.mac {
+  padding-left: 76px;
+}
+
+/* When in fullscreen, remove the extra padding since there are no traffic lights */
+top-bar.mac.fullscreen {
+  padding-left: 0;
 }
 
 top-bar::-webkit-scrollbar {
@@ -19,13 +29,65 @@ top-bar::-webkit-scrollbar {
   background: var(--color-page-alt);
 }
 
-top-bar .tab-list {
-  flex-grow: 1;
-  overflow: visible;
+top-bar .static-tab-list {
   display: flex;
   align-items: stretch;
   justify-content: flex-start;
   flex-shrink: 0;
   margin: 0;
   height: 100%;
+}
+
+top-bar .workspace-tabs-scroll-container {
+  flex-grow: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  display: flex;
+  /* Hide scrollbar but keep functionality */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+top-bar .workspace-tabs-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+top-bar .workspace-tab-list {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-shrink: 0;
+  margin: 0;
+  height: 100%;
+}
+
+top-bar .settings-button-container {
+  display: flex;
+  align-items: center;
+  margin-left: auto; /* Push to the right */
+  height: 100%;
+  flex-shrink: 0;
+  padding: 0 8px;
+}
+
+top-bar .settings-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 4px;
+  -webkit-app-region: no-drag; /* Make button clickable in draggable area */
+}
+
+top-bar .settings-button:hover {
+  background-color: var(--color-neutral-20, rgba(0, 0, 0, 0.05));
+}
+
+top-bar .settings-button un-icon {
+  width: 18px;
+  height: 18px;
 }
