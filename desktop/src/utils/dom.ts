@@ -13,12 +13,12 @@ export function attachStyles(shadow: ShadowRoot, styles: string) {
   shadow.adoptedStyleSheets = [sheet];
 }
 
-export function createEl(
+export function createEl<T extends HTMLElement = HTMLElement>(
   name: string,
   properties: Record<string, any> = {},
   ...children: (string | Node)[]
-): HTMLElement {
-  const element = document.createElement(name);
+): T {
+  const element = document.createElement(name) as T;
   if (properties) Object.assign(element, properties);
 
   children.forEach((child) => {

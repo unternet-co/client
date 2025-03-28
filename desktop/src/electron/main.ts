@@ -18,8 +18,11 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
     },
     // frame: false,
-    titleBarStyle: 'hidden',
-    trafficLightPosition: { x: 12, y: 10 },
+    // only hide the title bar on macOS
+    ...(process.platform === 'darwin' ? { 
+      titleBarStyle: 'hidden',
+      trafficLightPosition: { x: 12, y: 9 },
+    } : {})
   });
 
   /* Handle links */
@@ -49,6 +52,16 @@ function createWindow() {
     `);
   });
 
+  /* Handle fullscreen */
+
+  win.on('enter-full-screen', () => {
+    win.webContents.send('window:enter-fullscreen');
+  });
+  
+  win.on('leave-full-screen', () => {
+    win.webContents.send('window:leave-fullscreen');
+  });
+
   /* Load web content */
 
   console.log('Dev mode: ', isDev);
@@ -69,6 +82,12 @@ ipcMain.handle('fetch', async (event, url) => {
     console.error('Fetch error:', error);
     throw error;
   }
+});
+
+// Handler to check if the window is in fullscreen mode
+ipcMain.handle('isFullScreen', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  return win ? win.isFullScreen() : false;
 });
 
 // ipcMain.on('request-applets', async (event) => {
