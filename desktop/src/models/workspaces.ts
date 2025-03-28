@@ -215,7 +215,6 @@ export class WorkspaceModel {
   updateModified(id: Workspace['id']): void {
     const workspace = this.workspaces.get(id);
     if (workspace) {
-      // Update the modified timestamp
       workspace.modified = Date.now();
       this.workspaceDatabase.update(id, {
         modified: workspace.modified,

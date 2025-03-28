@@ -20,6 +20,18 @@ declare global {
   }
 }
 
+// Define electronAPI type for TypeScript
+declare global {
+  interface Window {
+    electronAPI?: {
+      onWindowStateChange: (callback: (isFullscreen: boolean) => void) => void;
+      removeWindowStateListeners: () => void;
+      platform: string;
+      isFullScreen: () => Promise<boolean>;
+    };
+  }
+}
+
 export class TopBar extends HTMLElement {
   tabModel = dependencies.resolve<TabModel>('TabModel');
   modalService = dependencies.resolve<ModalService>('ModalService');
@@ -34,17 +46,14 @@ export class TopBar extends HTMLElement {
       this,
       createEl('div', { className: 'static-tab-list' })
     );
-
     const scrollContainer = appendEl(
       this,
       createEl('div', { className: 'workspace-tabs-scroll-container' })
     );
-
     this.workspaceTabsContainer = appendEl(
       scrollContainer,
       createEl('div', { className: 'workspace-tab-list' })
     );
-
     this.settingsButtonContainer = appendEl(
       this,
       createEl('div', { className: 'settings-button-container' })
@@ -55,7 +64,6 @@ export class TopBar extends HTMLElement {
 
     const isMac = window.electronAPI?.platform === 'darwin';
     this.classList.toggle('mac', isMac);
-
     this.initializeWindowStateListeners();
   }
 

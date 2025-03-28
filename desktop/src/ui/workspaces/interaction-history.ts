@@ -38,7 +38,6 @@ class InteractionHistory extends HTMLElement {
   handleWorkspaceNotification() {
     const interactions = this.workspaceModel.allInteractions(this.workspaceId);
     const currentInteractionCount = interactions.length;
-
     // If a new interaction was added, start the thinking animation
     if (currentInteractionCount > this.lastInteractionCount) {
       this.startThinkingAnimation();
@@ -70,7 +69,6 @@ class InteractionHistory extends HTMLElement {
       const interactionDiv = document.createElement('div');
       interactionDiv.className = 'interaction';
       interactionDiv.appendChild(this.thinkingIndicator);
-
       // Add it to the interaction history at the beginning (newest position)
       if (this.interactionsContainer) {
         // Insert at the beginning of the container (newest position)
@@ -97,7 +95,6 @@ class InteractionHistory extends HTMLElement {
     this.thinkingAnimationInterval = window.setInterval(() => {
       // Move to the next letter
       currentLetterIndex = (currentLetterIndex + 1) % text.length;
-
       // Update the thinking text with the new active letter
       this.updateThinkingText(text, currentLetterIndex);
     }, 200);
@@ -105,13 +102,11 @@ class InteractionHistory extends HTMLElement {
 
   stopThinkingAnimation() {
     if (!this.isThinking) return;
-
     this.isThinking = false;
     if (this.thinkingAnimationInterval !== null) {
       clearInterval(this.thinkingAnimationInterval);
       this.thinkingAnimationInterval = null;
     }
-
     if (this.thinkingIndicator) {
       // Remove the entire interaction div containing the thinking indicator
       const parentInteraction = this.thinkingIndicator.parentElement;

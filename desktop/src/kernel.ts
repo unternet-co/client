@@ -1,6 +1,5 @@
 import { Interpreter, InteractionInput, LanguageModel } from '@unternet/kernel';
 import { Workspace, WorkspaceModel } from './models/workspaces';
-import { dependencies } from './base/dependencies';
 
 export interface KernelInit {
   model: LanguageModel;
