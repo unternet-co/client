@@ -8,7 +8,6 @@ import {
   CommandSubmitEvent,
 } from '../workspaces/command-input';
 import { Kernel } from '../../kernel';
-import { ICON_MAP } from '../common/icon';
 import { ModalService } from '../../services/modal-service';
 import cn from 'classnames';
 import { DisposableGroup } from '../../base/disposable';
@@ -177,7 +176,7 @@ export class HomePage extends HTMLElement {
           @click=${(e: PointerEvent) => this.handleClickDelete(e, workspace.id)}
           title="Delete workspace"
         >
-          <un-icon src="${ICON_MAP.delete}" size="medium"></un-icon>
+          <un-icon name="delete"></un-icon>
         </button>
       </li>
     `;

@@ -2,7 +2,6 @@ import { css, html, render } from 'lit';
 import { DisposableGroup } from '../../base/disposable';
 import { attachStyles } from '../../utils/dom';
 import '../common/icon';
-import { ICON_MAP, ICON_SIZES } from '../common/icon';
 
 export class TabSelectEvent extends Event {
   constructor() {
@@ -129,7 +128,6 @@ export class TabHandleElement extends HTMLElement {
             @mousedown=${this.handleMouseDown.bind(this)}
             class="icon-button"
             name="close"
-            size=${ICON_SIZES.medium}
           >
           </un-icon>`
         : null}
