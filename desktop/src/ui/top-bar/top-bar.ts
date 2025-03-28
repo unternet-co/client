@@ -4,9 +4,9 @@ import { ICON_GLYPHS } from '../common/icon';
 import { Tab, TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
 import { WorkspaceModel } from '../../models/workspaces';
-import { SettingsPage } from '../pages/settings-page';
 import './tab-handle';
 import './top-bar.css';
+import { ModalService } from '../../services/modal-service';
 
 // Define electronAPI type for TypeScript
 declare global {
@@ -16,12 +16,13 @@ declare global {
       removeWindowStateListeners: () => void;
       platform: string;
       isFullScreen: () => Promise<boolean>;
-    }
+    };
   }
 }
 
 export class TopBar extends HTMLElement {
   tabModel = dependencies.resolve<TabModel>('TabModel');
+  modalService = dependencies.resolve<ModalService>('ModalService');
   staticTabsContainer: HTMLElement;
   workspaceTabsContainer: HTMLElement;
   settingsButtonContainer: HTMLElement;
@@ -33,20 +34,17 @@ export class TopBar extends HTMLElement {
       this,
       createEl('div', { className: 'static-tab-list' })
     );
-    
-    // Scrollable container for workspace tabs
+
     const scrollContainer = appendEl(
       this,
       createEl('div', { className: 'workspace-tabs-scroll-container' })
     );
-    
-    // Container for workspace tabs inside the scroll container
+
     this.workspaceTabsContainer = appendEl(
       scrollContainer,
       createEl('div', { className: 'workspace-tab-list' })
     );
-    
-    // Container for settings button (right-justified)
+
     this.settingsButtonContainer = appendEl(
       this,
       createEl('div', { className: 'settings-button-container' })
@@ -57,8 +55,7 @@ export class TopBar extends HTMLElement {
 
     const isMac = window.electronAPI?.platform === 'darwin';
     this.classList.toggle('mac', isMac);
-    
-    // Initialize window state listeners
+
     this.initializeWindowStateListeners();
   }
 
@@ -68,23 +65,24 @@ export class TopBar extends HTMLElement {
     }
   }
 
-  private initializeWindowStateListeners() : void {
+  private initializeWindowStateListeners(): void {
     if (window.electronAPI) {
-      window.electronAPI.isFullScreen()
-        .then(isFullscreen => {
+      window.electronAPI
+        .isFullScreen()
+        .then((isFullscreen) => {
           this.toggleFullscreenClass(isFullscreen);
         })
-        .catch(err => {
+        .catch((err) => {
           console.error('[TopBar] Error checking fullscreen state:', err);
         });
-      
+
       window.electronAPI.onWindowStateChange((isFullscreen) => {
         this.toggleFullscreenClass(isFullscreen);
       });
-    } 
+    }
   }
 
-  private toggleFullscreenClass(isFullscreen: boolean) : void {
+  private toggleFullscreenClass(isFullscreen: boolean): void {
     if (isFullscreen) {
       this.classList.add('fullscreen');
     } else {
@@ -107,24 +105,22 @@ export class TopBar extends HTMLElement {
   }
 
   openSettings() {
-    // Open the settings modal
-    SettingsPage.open();
+    this.modalService.open('settings');
   }
 
   handleRename(tab: Tab, e: CustomEvent) {
     if (tab.type === 'workspace') {
-      const workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+      const workspaceModel =
+        dependencies.resolve<WorkspaceModel>('WorkspaceModel');
       workspaceModel.setTitle(tab.id, e.detail.value);
-      
-      // Force an immediate UI update by re-rendering all tabs
       this.updateTabs();
     }
   }
 
   updateTabs() {
     const tabs = this.tabModel.all();
-    const staticTabs = tabs.filter(tab => tab.type === 'page' );
-    const workspaceTabs = tabs.filter(tab => tab.type === 'workspace');
+    const staticTabs = tabs.filter((tab) => tab.type === 'page');
+    const workspaceTabs = tabs.filter((tab) => tab.type === 'workspace');
 
     const tabTemplate = (tab: Tab) => html`
       <tab-handle
@@ -141,7 +137,6 @@ export class TopBar extends HTMLElement {
       </tab-handle>
     `;
 
-    // Render the settings button
     const settingsButtonTemplate = html`
       <button class="settings-button" @click=${() => this.openSettings()}>
         <un-icon src=${ICON_GLYPHS.settings}></un-icon>
@@ -151,24 +146,24 @@ export class TopBar extends HTMLElement {
     render(staticTabs.map(tabTemplate), this.staticTabsContainer);
     render(workspaceTabs.map(tabTemplate), this.workspaceTabsContainer);
     render(settingsButtonTemplate, this.settingsButtonContainer);
-    
+
     this.scrollActiveTabIntoView();
   }
-  
+
   private scrollActiveTabIntoView(): void {
-    // Wait for the DOM to update
     setTimeout(() => {
       const activeTab = this.tabModel.activeTab;
       if (activeTab && activeTab.type === 'workspace') {
         const tabElement = this.querySelector(`#tab-${activeTab.id}`);
-        const scrollContainer = this.querySelector('.workspace-tabs-scroll-container');
-        
+        const scrollContainer = this.querySelector(
+          '.workspace-tabs-scroll-container'
+        );
+
         if (tabElement && scrollContainer) {
-          // Use scrollIntoView with behavior: 'smooth' for a nice animation
           tabElement.scrollIntoView({
             behavior: 'smooth',
             block: 'nearest',
-            inline: 'nearest'
+            inline: 'nearest',
           });
         }
       }

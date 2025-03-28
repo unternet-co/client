@@ -1,7 +1,7 @@
 import { Disposable } from '../base/disposable';
 import { Notifier } from '../base/notifier';
 import { KeyStoreService } from '../services/keystore-service';
-import { Workspace, WorkspaceModel } from './workspaces';
+import { Workspace, WorkspaceModel, WorkspaceNotification } from './workspaces';
 
 export interface Tab {
   type: 'page' | 'workspace';
@@ -45,6 +45,13 @@ export class TabModel extends Disposable {
     this.store = store;
     this.workspaceModel = workspaceModel;
     this.loadTabs();
+    this.workspaceModel.subscribe(this.onWorkspaces.bind(this));
+  }
+
+  onWorkspaces(notification?: WorkspaceNotification) {
+    if (notification?.type === 'delete' && this.has(notification.workspaceId)) {
+      this.close(notification.workspaceId);
+    }
   }
 
   get(id: Tab['id']) {
@@ -134,7 +141,6 @@ export class TabModel extends Disposable {
     });
   }
 
-  // TODO: Make this add to history, not delete
   close(id: Tab['id']) {
     const index = this.tabs.findIndex((x) => x.id === id);
     if (index === -1) return;

@@ -1,26 +1,103 @@
-import { css } from 'lit';
+import { InteractionInput } from '../../models/interactions';
 import { DisposableGroup } from '../../base/disposable';
 import { attachStyles, appendEl, createEl } from '../../utils/dom';
 
 export class CommandSubmitEvent extends Event {
-  constructor(public readonly value: string) {
+  public input: InteractionInput;
+
+  constructor(value: string) {
     super('submit');
-    this.value = value;
+    this.input = { text: value };
   }
 }
 
 export class CommandInputElement extends HTMLElement {
-  private input: HTMLInputElement;
+  private input = createEl<HTMLInputElement>('input');
   private shadow: ShadowRoot;
   private disposables = new DisposableGroup();
   private _disabled = false;
-  private _updatingAttribute = false;
 
-  private static readonly STYLES = css`
+  constructor() {
+    super();
+    this.shadow = this.attachShadow({ mode: 'open' });
+    attachStyles(this.shadow, this.styles);
+  }
+
+  connectedCallback() {
+    this.input = appendEl(this.shadow, createEl('input')) as HTMLInputElement;
+    this.input.focus();
+    this.input.placeholder = 'Search or type a command...';
+    this.attachEventListeners();
+
+    if (this.hasAttribute('disabled')) {
+      this._disabled = true;
+    }
+  }
+
+  private attachEventListeners() {
+    this.disposables.attachListener(
+      this.input,
+      'keydown',
+      this.handleKeyDown.bind(this)
+    );
+
+    this.disposables.attachListener(this.input, 'input', (e: Event) => {
+      e.stopPropagation();
+      this.dispatchEvent(new Event('input'));
+    });
+
+    this.disposables.attachListener(this.input, 'blur', (e: Event) => {
+      e.stopPropagation();
+      this.dispatchEvent(new Event('blur'));
+    });
+  }
+
+  handleKeyDown(e: KeyboardEvent) {
+    if (this.disabled) return;
+
+    if (e.key === 'Enter') {
+      this.dispatchEvent(new CommandSubmitEvent(this.input.value));
+      this.input.value = '';
+    }
+  }
+
+  get value(): string {
+    return this.input?.value ?? '';
+  }
+
+  get disabled(): boolean {
+    return this._disabled;
+  }
+
+  set disabled(value: boolean) {
+    if (this._disabled === value) return;
+
+    if (value) {
+      this.setAttribute('disabled', '');
+    } else {
+      this.removeAttribute('disabled');
+    }
+  }
+
+  static get observedAttributes() {
+    return ['disabled'];
+  }
+
+  attributeChangedCallback(name: string, _: any, newValue: string | null) {
+    if (name === 'disabled') {
+      this._disabled = newValue !== null;
+    }
+  }
+
+  disconnectedCallback() {
+    this.disposables.dispose();
+  }
+
+  private readonly styles = /*css*/ `
     :host {
       width: 100%;
       display: flex;
-      justify-content: center; 
+      justify-content: center;
     }
 
     input {
@@ -45,103 +122,6 @@ export class CommandInputElement extends HTMLElement {
       cursor: not-allowed;
     }
   `;
-
-  constructor() {
-    super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-    attachStyles(this.shadow, CommandInputElement.STYLES.toString());
-  }
-
-  connectedCallback() {
-    this.setupInput();
-    this.attachEventListeners();
-    
-    // Check if the disabled attribute is set
-    if (this.hasAttribute('disabled')) {
-      this.disabled = true;
-    }
-  }
-
-  private setupInput() {
-    this.input = appendEl(this.shadow, createEl('input')) as HTMLInputElement;
-    this.input.focus();
-    this.input.placeholder = 'Search or type a command...';
-  }
-
-  private attachEventListeners() {
-    this.disposables.attachListener(
-      this.input,
-      'keydown',
-      this.handleKeyDown.bind(this)
-    );
-    
-    this.disposables.attachListener(
-      this.input,
-      'input',
-      () => this.dispatchEvent(new Event('change', { bubbles: true, composed: true }))
-    );
-    
-    this.disposables.attachListener(
-      this.input,
-      'blur',
-      () => this.dispatchEvent(new Event('blur', { bubbles: true, composed: true }))
-    );
-  }
-
-  handleKeyDown(e: KeyboardEvent) {
-    if (this.disabled) return;
-    
-    if (e.key === 'Enter') {
-      this.dispatchEvent(new CommandSubmitEvent(this.input.value));
-      this.input.value = '';
-    }
-  }
-  
-  get value(): string {
-    return this.input?.value ?? '';
-  }
-
-  // Add support for the disabled property
-  get disabled(): boolean {
-    return this._disabled;
-  }
-
-  set disabled(value: boolean) {
-    // Prevent infinite recursion by checking if the value has actually changed
-    if (this._disabled === value) return;
-    
-    this._disabled = value;
-    if (this.input) {
-      this.input.disabled = value;
-    }
-    
-    // Use a flag to prevent attribute changes from triggering another cycle
-    this._updatingAttribute = true;
-    if (value) {
-      this.setAttribute('disabled', '');
-    } else {
-      this.removeAttribute('disabled');
-    }
-    this._updatingAttribute = false;
-  }
-
-  // Add support for observing the disabled attribute
-  static get observedAttributes() {
-    return ['disabled'];
-  }
-
-  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    // Skip if we're in the middle of updating the attribute from the setter
-    if (this._updatingAttribute) return;
-    
-    if (name === 'disabled') {
-      this.disabled = newValue !== null;
-    }
-  }
-
-  disconnectedCallback() {
-    this.disposables.dispose();
-  }
 }
 
 customElements.define('command-input', CommandInputElement);

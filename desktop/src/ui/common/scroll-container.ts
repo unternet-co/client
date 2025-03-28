@@ -44,7 +44,6 @@ class MessageScroll extends HTMLElement {
     this.#slot.addEventListener('scroll', () => {
       setTimeout(() => {
         this.#lastScrollTop = this.#slot.scrollTop;
-        console.log(this.#lastScrollTop);
       }, 100);
     });
 
@@ -52,7 +51,6 @@ class MessageScroll extends HTMLElement {
     const intersectionObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
-          console.log('intersection', this.#lastScrollTop);
           this.#slot.scrollTop = this.#lastScrollTop;
         }
       }

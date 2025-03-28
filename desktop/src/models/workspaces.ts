@@ -11,13 +11,14 @@ import { DisposableGroup } from '../base/disposable';
 export interface Workspace {
   id: string;
   title: string;
-  createdAt: number;
-  lastOpenedAt: number;
-  lastModifiedAt: number;
+  created: number;
+  accessed: number;
+  modified: number;
 }
 
 export interface WorkspaceNotification {
   workspaceId: Workspace['id'];
+  type?: 'delete';
 }
 
 export class WorkspaceModel {
@@ -82,15 +83,21 @@ export class WorkspaceModel {
 
   async activate(id: Workspace['id']): Promise<void> {
     const workspace = this.workspaces.get(id);
+
     if (workspace) {
-      // Update the lastOpenedAt timestamp
-      workspace.lastOpenedAt = Date.now();
-      this.workspaceDatabase.update(id, { lastOpenedAt: workspace.lastOpenedAt });
+      // Update the accessed timestamp
+      workspace.accessed = Date.now();
+      this.workspaceDatabase.update(id, {
+        accessed: workspace.accessed,
+      });
     }
-    
+
+    if (this.interactions.get(id)) return;
+
     const workspaceInteractions = await this.interactionDatabase.where({
       workspaceId: id,
     });
+
     this.interactions.set(id, workspaceInteractions);
     this.notifier.notify({ workspaceId: id });
   }
@@ -104,9 +111,9 @@ export class WorkspaceModel {
     const workspace = {
       id: ulid(),
       title: 'New workspace',
-      createdAt: now,
-      lastOpenedAt: now,
-      lastModifiedAt: now,
+      created: now,
+      accessed: now,
+      modified: now,
     };
 
     this.workspaces.set(workspace.id, workspace);
@@ -120,7 +127,7 @@ export class WorkspaceModel {
     this.interactions.delete(id);
     this.workspaceDatabase.delete(id);
     this.interactionDatabase.deleteWhere({ workspaceId: id });
-    this.notifier.notify({ workspaceId: id });
+    this.notifier.notify({ workspaceId: id, type: 'delete' });
   }
 
   createInteraction(workspaceId: Workspace['id'], input: InteractionInput) {
@@ -137,42 +144,82 @@ export class WorkspaceModel {
     this.interactions.get(workspaceId)!.push(interaction);
     this.interactionDatabase.create(interaction);
     this.notifier.notify({ workspaceId });
-    console.log('in interactions', interaction);
+
     return interaction;
   }
 
-  addOutput(interactionId: Interaction['id'], output: InteractionOutput) {
+  addOutput(
+    interactionId: Interaction['id'],
+    output: InteractionOutput
+  ): number {
     const interaction = this.getInteraction(interactionId);
-    console.log(interaction, output);
-
-    if (interaction) {
-      interaction.outputs.push(output);
-      this.interactionDatabase.update(interaction.id, {
-        outputs: interaction.outputs,
-      });
-      this.notifier.notify({ workspaceId: interaction.workspaceId });
+    if (!interaction) {
+      throw new Error('Interaction does not exist!');
     }
+
+    interaction.outputs.push(output);
+
+    this.interactionDatabase.update(interaction.id, {
+      outputs: interaction.outputs,
+    });
+    this.notifier.notify({ workspaceId: interaction.workspaceId });
+    const outputIndex = interaction.outputs.length - 1;
+    return outputIndex;
   }
 
-  getInteraction(id: Interaction['id']) {
-    console.log(this.interactions.keys());
-    for (const [interactionId, interactions] of this.interactions.entries()) {
-      console.log('gettig', interactions);
-      const interaction = interactions.find((x: Interaction) => x.id === id);
-      if (interaction) return interaction;
+  updateOutput(
+    interactionId: Interaction['id'],
+    outputIndex: number,
+    update: Partial<InteractionOutput>
+  ) {
+    const interaction = this.getInteraction(interactionId);
+
+    if (!interaction) {
+      throw new Error(`Couldn't find interaction with ID '${interactionId}.`);
     }
+
+    if (!interaction.outputs[outputIndex]) {
+      throw new Error(`Couldn't find output with index '${outputIndex}'.`);
+    }
+
+    interaction.outputs[outputIndex] = {
+      ...interaction.outputs[outputIndex],
+      ...update,
+    };
+
+    this.interactionDatabase.update(interaction.id, {
+      outputs: interaction.outputs,
+    });
+    this.notifier.notify({ workspaceId: interaction.workspaceId });
+  }
+
+  getInteraction(id: Interaction['id']): Interaction {
+    let interaction: Interaction | null = null;
+    for (const interactions of this.interactions.values()) {
+      const possibleInteraction = interactions.find(
+        (x: Interaction) => x.id === id
+      );
+      if (possibleInteraction) {
+        interaction = possibleInteraction;
+        continue;
+      }
+    }
+    if (!interaction) throw new Error('No interaction with this ID!');
+    return interaction;
   }
 
   allInteractions(workspaceId: Workspace['id']): Interaction[] {
-    return Array.from(this.interactions.get(workspaceId) || []);
+    return this.interactions.get(workspaceId) || [];
   }
 
-  updateLastModified(id: Workspace['id']): void {
+  updateModified(id: Workspace['id']): void {
     const workspace = this.workspaces.get(id);
     if (workspace) {
-      // Update the lastModifiedAt timestamp
-      workspace.lastModifiedAt = Date.now();
-      this.workspaceDatabase.update(id, { lastModifiedAt: workspace.lastModifiedAt });
+      // Update the modified timestamp
+      workspace.modified = Date.now();
+      this.workspaceDatabase.update(id, {
+        modified: workspace.modified,
+      });
       this.notifier.notify({ workspaceId: id });
     }
   }

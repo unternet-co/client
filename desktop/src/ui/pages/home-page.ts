@@ -1,23 +1,30 @@
 import { html, render } from 'lit';
-import './home-page.css';
+import { formatTimestamp } from '../../utils';
 import { Workspace, WorkspaceModel } from '../../models/workspaces';
 import { TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
-import { CommandSubmitEvent } from '../workspaces/command-input';
+import {
+  CommandInputElement,
+  CommandSubmitEvent,
+} from '../workspaces/command-input';
 import { Kernel } from '../../kernel';
-import { Modal } from '../modal/modal';
 import { ICON_GLYPHS } from '../common/icon';
+import { ModalService } from '../../services/modal-service';
+import cn from 'classnames';
+import { DisposableGroup } from '../../base/disposable';
+import './home-page.css';
 
 export class HomePage extends HTMLElement {
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private tabModel = dependencies.resolve<TabModel>('TabModel');
+  private kernel = dependencies.resolve<Kernel>('Kernel');
+  private modalService = dependencies.resolve<ModalService>('ModalService');
   private recentContainer: HTMLUListElement;
-  private commandInput: HTMLElement;
+  private commandInput: CommandInputElement;
   private selectedIndex: number = -1;
   private workspaces: Workspace[] = [];
-  private newWorkspaceId: string | null = null;
-
+  private disposables = new DisposableGroup();
 
   connectedCallback() {
     render(this.template, this);
@@ -25,55 +32,88 @@ export class HomePage extends HTMLElement {
     this.recentContainer = this.querySelector(
       '.recent-workspaces'
     ) as HTMLUListElement;
-
     this.commandInput = this.querySelector(
       'command-input'
-    ) as HTMLElement;
-    
+    ) as CommandInputElement;
+
     this.updateWorkspaces();
-    this.workspaceModel.subscribe(this.updateWorkspaces.bind(this));
-    
-    this.commandInput.addEventListener('change', () => {
-      this.selectedIndex = -1;
-      this.updateWorkspaces();
-    });
-    this.commandInput.addEventListener('keydown', (e: KeyboardEvent) => this.handleKeyDown(e));
-    this.commandInput.addEventListener('blur', () => {
-      this.selectedIndex = -1;
-      this.updateWorkspaces();
-    });
+    this.disposables.add(
+      this.workspaceModel.subscribe(() => this.updateWorkspaces())
+    );
   }
 
-  updateWorkspaces() {
-    const filterValue = (this.commandInput as any).value?.toLowerCase() || '';
-    
-    // Get all actual workspaces
-    this.workspaces = this.workspaceModel.all()
-      .filter(workspace => workspace.title.toLowerCase().includes(filterValue))
-      // Sort by lastModifiedAt (most recent first)
-      .sort((a, b) => (b.lastModifiedAt || 0) - (a.lastModifiedAt || 0));
+  disconnectedCallback() {
+    this.disposables.dispose();
+  }
 
-    render(this.workspaceTemplate, this.recentContainer);
+  get template() {
+    return html`
+      <command-input
+        @submit=${this.handleCommandSubmit.bind(this)}
+        @input=${this.handleCommandInput.bind(this)}
+        @keydown=${this.handleKeyDown.bind(this)}
+        @blur=${this.handleCommandBlur.bind(this)}
+      ></command-input>
+      <ul class="recent-workspaces"></ul>
+    `;
+  }
+
+  handleCommandInput(e: InputEvent) {
+    this.selectedIndex = -1;
+    const target = e.target as CommandInputElement;
+    this.updateWorkspaces(target.value);
+  }
+
+  handleCommandBlur() {
+    this.selectedIndex = -1;
+    this.updateWorkspaces();
+  }
+
+  updateWorkspaces(filterQuery?: string) {
+    this.workspaces = this.workspaceModel
+      .all()
+      .filter((workspace) =>
+        workspace.title.toLowerCase().includes(filterQuery || '')
+      )
+      // Sort by modified (most recent first)
+      .sort((a, b) => (b.modified || 0) - (a.modified || 0));
+
+    render(
+      this.workspaces.map(this.workspaceTemplate.bind(this)),
+      this.recentContainer
+    );
+  }
+
+  handleClickDelete(e: PointerEvent, workspaceId: Workspace['id']) {
+    e.preventDefault();
+    e.stopPropagation();
+    // Fixes bug where hitting enter opens more modals
+    // TODO: Move this to a modal visibility trigger, register it once and reveal
+    // If status is open, it doesn't open
+    if (e.pointerId > 0) this.createDeleteModal(workspaceId);
   }
 
   handleKeyDown(e: KeyboardEvent) {
+    // TODO: Refactor with new keyboard shortcut service
     const len = this.workspaces.length;
     if (len === 0) return;
 
     switch (e.key) {
       case 'ArrowUp':
         e.preventDefault();
-        this.selectedIndex = this.selectedIndex <= 0 ? 
-          len - 1 : // cycle to end
-          this.selectedIndex - 1;
+        this.selectedIndex =
+          this.selectedIndex <= 0
+            ? len - 1 // cycle to end
+            : this.selectedIndex - 1;
         this.updateWorkspaces();
         break;
       case 'Tab': // same as ArrowDown
       case 'ArrowDown':
         e.preventDefault();
-        this.selectedIndex = this.selectedIndex >= len - 1 ? 
-          0 : // cycle to beginning
-          this.selectedIndex + 1;
+        this.selectedIndex =
+          this.selectedIndex >= len - 1
+            ? 0 // cycle to beginning
+            : this.selectedIndex + 1;
         this.updateWorkspaces();
         break;
       case 'Enter':
@@ -107,138 +147,76 @@ export class HomePage extends HTMLElement {
       return;
     }
 
-    await this.createWorkspaceWithCommand(e.value);
-  }
-
-  private async createWorkspaceWithCommand(command: string) {
-    // Temporarily disable the command input
-    if (this.commandInput) {
-      (this.commandInput as any).disabled = true;
-    }
-    
+    this.commandInput.disabled = true;
     try {
-      // Create the workspace
       const workspace = this.workspaceModel.create();
-      
-      // Mark it as new and being created
-      this.newWorkspaceId = workspace.id;
-      this.updateWorkspaces();
-      
-      // Activate the workspace and handle the command
-      await this.workspaceModel.activate(workspace.id);
-      const kernel = dependencies.resolve<Kernel>('Kernel');
-      await kernel.handleInput(workspace.id, { text: command });
-      
+      this.kernel.handleInput(workspace.id, e.input);
       this.tabModel.create(workspace.id);
-      this.updateWorkspaces();
-      
-      // Clear the new workspace highlight after a delay
-      setTimeout(() => {
-        this.newWorkspaceId = null;
-        this.updateWorkspaces();
-      }, 3000); // Remove glow effect after 3 seconds
     } finally {
-      // Re-enable the command input
-      if (this.commandInput) {
-        (this.commandInput as any).disabled = false;
-      }
+      this.commandInput.disabled = false;
     }
   }
 
-  private formatTimestamp(timestamp: number): string {
-    if (!timestamp) return 'Unknown';
-    
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) {
-      // Today - show time
-      return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-    } else if (diffDays === 1) {
-      return 'Yesterday';
-    } else if (diffDays < 7) {
-      return `${diffDays} days ago`;
-    } else {
-      return date.toLocaleDateString();
-    }
-  }
+  private workspaceTemplate(workspace: Workspace, index: number) {
+    const className = cn('workspace', {
+      selected: index === this.selectedIndex,
+    });
 
-  private get workspaceTemplate() {
+    const modifiedString = !workspace.accessed
+      ? 'Creating new workspace...'
+      : `Last modified: ${formatTimestamp(workspace.modified)}`;
+
     return html`
-      ${this.workspaces.map((workspace, index) => html`
-        <li 
-          class="workspace ${index === this.selectedIndex ? 'selected' : ''} ${workspace.id === this.newWorkspaceId ? 'new-workspace' : ''}"
-          @click=${() => this.openWorkspace(workspace.id)}>
-          <div class="workspace-title">${workspace.title}</div>
-          <div class="workspace-metadata">
-            ${!workspace.lastOpenedAt ? 
-              html`<span class="last-modified">Creating new workspace...</span>` : 
-              workspace.lastModifiedAt ? 
-                html`<span class="last-modified">Last modified: ${this.formatTimestamp(workspace.lastModifiedAt)}</span>` : 
-                ''}
-          </div>
-          <button 
-            class="delete-button" 
-            @click=${(e: Event) => this.handleDeleteClick(e, workspace.id)}
-            title="Delete workspace">
-            <un-icon src="${ICON_GLYPHS.delete}" size="medium"></un-icon>
-          </button>
-        </li>
-      `)}
+      <li class=${className} @click=${() => this.openWorkspace(workspace.id)}>
+        <div class="workspace-title">${workspace.title}</div>
+        <div class="workspace-metadata">
+          <span class="last-modified">${modifiedString}</span>
+        </div>
+        <button
+          class="delete-button"
+          @click=${(e: PointerEvent) => this.handleClickDelete(e, workspace.id)}
+          title="Delete workspace"
+        >
+          <un-icon src="${ICON_GLYPHS.delete}" size="medium"></un-icon>
+        </button>
+      </li>
     `;
   }
 
-  private handleDeleteClick(e: Event, workspaceId: string) {
-    // Prevent the click from bubbling up to the workspace item
-    e.stopPropagation();
-    
+  private createDeleteModal(workspaceId: string) {
     // Create confirmation modal
-    const modal = Modal.create({ title: 'Delete Workspace' });
-    
+    const modal = this.modalService.create({ title: 'Delete Workspace' });
+
     // Add confirmation content
     const content = document.createElement('div');
     content.classList.add('delete-confirmation');
-    
+
     const message = document.createElement('p');
-    message.textContent = 'Are you sure you want to delete this workspace? This action cannot be undone.';
+    message.textContent =
+      'Are you sure you want to delete this workspace? This action cannot be undone.';
     content.appendChild(message);
-    
+
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container');
-    
+
     const cancelButton = document.createElement('button');
     cancelButton.classList.add('cancel-button');
     cancelButton.textContent = 'Cancel';
     cancelButton.onclick = () => modal.close();
-    
+
     const deleteButton = document.createElement('button');
     deleteButton.classList.add('delete-confirm-button');
     deleteButton.textContent = 'Delete';
     deleteButton.onclick = () => {
-      // Close the tab first if it exists
-      if (this.tabModel.has(workspaceId)) {
-        this.tabModel.close(workspaceId);
-      }
-      
-      // Then delete the workspace
       this.workspaceModel.delete(workspaceId);
       modal.close();
     };
-    
+
     buttonContainer.appendChild(cancelButton);
     buttonContainer.appendChild(deleteButton);
     content.appendChild(buttonContainer);
-    
-    modal.contents.appendChild(content);
-  }
 
-  get template() {
-    return html`
-      <command-input @submit=${this.handleCommandSubmit.bind(this)}></command-input>
-      <ul class="recent-workspaces"></ul>
-    `;
+    modal.contents.appendChild(content);
   }
 }
 

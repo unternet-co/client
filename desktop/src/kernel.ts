@@ -4,27 +4,41 @@ import { dependencies } from './base/dependencies';
 
 export interface KernelInit {
   model: LanguageModel;
+  workspaceModel: WorkspaceModel;
 }
 
 export class Kernel {
   interpreter: Interpreter;
-  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  workspaceModel: WorkspaceModel;
 
-  constructor({ model }: KernelInit) {
+  constructor({ model, workspaceModel }: KernelInit) {
     this.interpreter = new Interpreter(model);
+    this.workspaceModel = workspaceModel;
   }
 
   async handleInput(workspaceId: Workspace['id'], input: InteractionInput) {
-    // Update the lastModifiedAt timestamp whenever a command is issued
-    this.workspaceModel.updateLastModified(workspaceId);
-    
+    this.workspaceModel.updateModified(workspaceId);
+
     const interaction = this.workspaceModel.createInteraction(
       workspaceId,
       input
     );
+
     const recentInteractions = this.workspaceModel.allInteractions(workspaceId);
     const output = await this.interpreter.generateOutput(recentInteractions);
-    console.log('in kernel', interaction);
-    this.workspaceModel.addOutput(interaction.id, output);
+
+    if (output.type === 'text') {
+      const outputIndex = this.workspaceModel.addOutput(interaction.id, {
+        type: output.type,
+        content: '',
+      });
+      let text = '';
+      for await (const chunk of output.textStream) {
+        text += chunk;
+        this.workspaceModel.updateOutput(interaction.id, outputIndex, {
+          content: text,
+        });
+      }
+    }
   }
 }
