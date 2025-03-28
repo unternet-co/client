@@ -15,19 +15,10 @@ export const ICON_MAP = {
   history: 'history',
 } as const;
 
-export const ICON_SIZES = {
-  small: '12px',
-  medium: '16px',
-  large: '24px',
-  xlarge: '32px',
-} as const;
-
-type IconSize = keyof typeof ICON_SIZES | string;
-
 export class IconElement extends HTMLElement {
   shadow: ShadowRoot;
   iconElement: SVGElement | null = null;
-  static observedAttributes = ['name', 'size'];
+  static observedAttributes = ['name'];
 
   constructor() {
     super();
@@ -36,16 +27,10 @@ export class IconElement extends HTMLElement {
 
   connectedCallback() {
     this.renderIcon();
-    attachStyles(this.shadow, this.styles);
-    this.updateIconSize();
   }
 
-  attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-    if (name === 'name') {
-      this.renderIcon();
-    } else if (name === 'size') {
-      this.updateIconSize();
-    }
+  attributeChangedCallback() {
+    this.renderIcon();
   }
 
   // Standard attributes for all icons
@@ -62,8 +47,9 @@ export class IconElement extends HTMLElement {
    * @param iconName The name of the icon to get, defaults to 'help-circle'
    * @returns SVG element for the icon
    */
-  private getIcon(iconName: string | null = 'help-circle'): SVGElement {
-    const mappedName = ICON_MAP[iconName as keyof typeof ICON_MAP] || iconName;
+  private getIcon(iconName: string | null): SVGElement {
+    const mappedName = ICON_MAP[iconName as keyof typeof ICON_MAP] || 'help-circle';
+    console.log(iconName, mappedName);
 
     // Convert kebab-case to PascalCase for Lucide icons
     const pascalCaseName = mappedName
@@ -80,30 +66,9 @@ export class IconElement extends HTMLElement {
     if (this.iconElement && this.shadow.contains(this.iconElement)) {
       this.shadow.removeChild(this.iconElement);
     }
-
     this.iconElement = this.getIcon(this.getAttribute('name'));
     appendEl(this.shadow, this.iconElement as unknown as HTMLElement);
-    this.updateIconSize();
-  }
-
-  private updateIconSize() {
-    if (!this.iconElement) return;
-
-    const size = this.getAttribute('size') as IconSize;
-    const sizeValue = this.getSizeValue(size);
-    this.style.width = sizeValue;
-    this.style.height = sizeValue;
-
-    // Also set the SVG size attributes
-    this.iconElement.setAttribute('width', sizeValue);
-    this.iconElement.setAttribute('height', sizeValue);
-  }
-
-  private getSizeValue(size: IconSize | null): string {
-    if (!size) return ICON_SIZES.medium;
-    return (
-      ICON_SIZES[size as keyof typeof ICON_SIZES] || size || ICON_SIZES.medium
-    );
+    attachStyles(this.shadow, this.styles);
   }
 
   get styles() {
@@ -111,6 +76,7 @@ export class IconElement extends HTMLElement {
       :host {
         display: inline-block;
         color: inherit;
+        width: 16px;
       }
 
       :host(.icon-button) {
