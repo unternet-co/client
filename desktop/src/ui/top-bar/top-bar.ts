@@ -1,6 +1,5 @@
 import { appendEl, createEl } from '../../utils/dom';
 import { render, html } from 'lit';
-import { ICON_GLYPHS } from '../common/icon';
 import { Tab, TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
 import { WorkspaceModel } from '../../models/workspaces';
@@ -100,7 +99,7 @@ export class TopBar extends HTMLElement {
 
   iconFor(tabId: Tab['id']) {
     if (tabId === 'home') {
-      return html`<un-icon src=${ICON_GLYPHS.home}></un-icon>`;
+      return html`<un-icon name="home"></un-icon>`;
     }
     return null;
   }
@@ -147,7 +146,7 @@ export class TopBar extends HTMLElement {
 
     const settingsButtonTemplate = html`
       <button class="settings-button" @click=${() => this.openSettings()}>
-        <un-icon src=${ICON_GLYPHS.settings}></un-icon>
+        <un-icon name="settings"></un-icon>
       </button>
     `;
 
