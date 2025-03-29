@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - test/**   # <-- Adding this temporarily
 permissions:
   contents: write
 jobs:
