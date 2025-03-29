@@ -10,7 +10,7 @@ jobs:
   version:
     name: Version and Tag
     runs-on: ubuntu-latest
-
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,7 +62,7 @@ jobs:
 
           echo "Commiting changes"
           git add .
-          git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]" --no-verify
+          git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
           git tag -a $TAG_NAME -m "chore(release): ${TAG_NAME}"
           git push --follow-tags
         env:
