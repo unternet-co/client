@@ -1,4 +1,4 @@
-import { Message } from '../shared-types.js';
+import { Message } from "../shared-types.js";
 
 export interface Interaction {
   input: InteractionInput;
@@ -10,7 +10,7 @@ export interface InteractionInput {
 }
 
 export interface TextOutput {
-  type: 'text';
+  type: "text";
   content: string;
 }
 
@@ -21,17 +21,17 @@ export function interactionsToMessages(interactions: Interaction[]): Message[] {
 
   for (let interaction of interactions) {
     messages.push({
-      role: 'user',
+      role: "user",
       content: interaction.input.text,
     });
 
     if (!interaction.outputs) continue;
 
     for (let output of interaction.outputs) {
-      if (output.type === 'text') {
+      if (output.type === "text") {
         const textOutput = output as InteractionOutput;
         messages.push({
-          role: 'assistant',
+          role: "assistant",
           content: textOutput.content,
         });
       }
@@ -50,7 +50,7 @@ export function createInteraction(input: InteractionInput): Interaction {
 
 export function createTextOutput(text: string): InteractionOutput {
   return {
-    type: 'text',
+    type: "text",
     content: text,
   };
 }

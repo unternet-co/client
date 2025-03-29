@@ -4,17 +4,17 @@ class MessageScroll extends HTMLElement {
 
   constructor() {
     super();
-    const shadow = this.attachShadow({ mode: 'open' });
+    const shadow = this.attachShadow({ mode: "open" });
 
-    const container = document.createElement('div');
-    container.classList.add('container');
+    const container = document.createElement("div");
+    container.classList.add("container");
     shadow.appendChild(container);
 
-    this.#slot = document.createElement('slot');
-    this.#slot.part = 'slot';
+    this.#slot = document.createElement("slot");
+    this.#slot.part = "slot";
     container.appendChild(this.#slot);
 
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = /*css*/ `
       .container {
         height: 100%;
@@ -41,7 +41,7 @@ class MessageScroll extends HTMLElement {
     // Log the scroll position
     // (Timeout is here so we don't take into account scroll event
     // as element becomes visible again)
-    this.#slot.addEventListener('scroll', () => {
+    this.#slot.addEventListener("scroll", () => {
       setTimeout(() => {
         this.#lastScrollTop = this.#slot.scrollTop;
       }, 100);
@@ -59,4 +59,4 @@ class MessageScroll extends HTMLElement {
   }
 }
 
-customElements.define('message-scroll', MessageScroll);
+customElements.define("message-scroll", MessageScroll);

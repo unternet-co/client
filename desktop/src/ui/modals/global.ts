@@ -1,1 +1,1 @@
-import './settings-modal';
+import "./settings-modal";

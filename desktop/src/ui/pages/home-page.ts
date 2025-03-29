@@ -1,24 +1,24 @@
-import { html, render } from 'lit';
-import { formatTimestamp } from '../../utils';
-import { Workspace, WorkspaceModel } from '../../models/workspaces';
-import { TabModel } from '../../models/tabs';
-import { dependencies } from '../../base/dependencies';
+import { html, render } from "lit";
+import { formatTimestamp } from "../../utils";
+import { Workspace, WorkspaceModel } from "../../models/workspaces";
+import { TabModel } from "../../models/tabs";
+import { dependencies } from "../../base/dependencies";
 import {
   CommandInputElement,
   CommandSubmitEvent,
-} from '../workspaces/command-input';
-import { Kernel } from '../../kernel';
-import { ModalService } from '../../services/modal-service';
-import cn from 'classnames';
-import { DisposableGroup } from '../../base/disposable';
-import './home-page.css';
+} from "../workspaces/command-input";
+import { Kernel } from "../../kernel";
+import { ModalService } from "../../services/modal-service";
+import cn from "classnames";
+import { DisposableGroup } from "../../base/disposable";
+import "./home-page.css";
 
 export class HomePage extends HTMLElement {
   private workspaceModel =
-    dependencies.resolve<WorkspaceModel>('WorkspaceModel');
-  private tabModel = dependencies.resolve<TabModel>('TabModel');
-  private kernel = dependencies.resolve<Kernel>('Kernel');
-  private modalService = dependencies.resolve<ModalService>('ModalService');
+    dependencies.resolve<WorkspaceModel>("WorkspaceModel");
+  private tabModel = dependencies.resolve<TabModel>("TabModel");
+  private kernel = dependencies.resolve<Kernel>("Kernel");
+  private modalService = dependencies.resolve<ModalService>("ModalService");
   private recentContainer: HTMLUListElement;
   private commandInput: CommandInputElement;
   private selectedIndex: number = -1;
@@ -29,15 +29,15 @@ export class HomePage extends HTMLElement {
     render(this.template, this);
 
     this.recentContainer = this.querySelector(
-      '.recent-workspaces'
+      ".recent-workspaces",
     ) as HTMLUListElement;
     this.commandInput = this.querySelector(
-      'command-input'
+      "command-input",
     ) as CommandInputElement;
 
     this.updateWorkspaces();
     this.disposables.add(
-      this.workspaceModel.subscribe(() => this.updateWorkspaces())
+      this.workspaceModel.subscribe(() => this.updateWorkspaces()),
     );
   }
 
@@ -72,18 +72,18 @@ export class HomePage extends HTMLElement {
     this.workspaces = this.workspaceModel
       .all()
       .filter((workspace) =>
-        workspace.title.toLowerCase().includes(filterQuery || '')
+        workspace.title.toLowerCase().includes(filterQuery || ""),
       )
       // Sort by modified (most recent first)
       .sort((a, b) => (b.modified || 0) - (a.modified || 0));
 
     render(
       this.workspaces.map(this.workspaceTemplate.bind(this)),
-      this.recentContainer
+      this.recentContainer,
     );
   }
 
-  handleClickDelete(e: PointerEvent, workspaceId: Workspace['id']) {
+  handleClickDelete(e: PointerEvent, workspaceId: Workspace["id"]) {
     e.preventDefault();
     e.stopPropagation();
     // Fixes bug where hitting enter opens more modals
@@ -98,7 +98,7 @@ export class HomePage extends HTMLElement {
     if (len === 0) return;
 
     switch (e.key) {
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
         this.selectedIndex =
           this.selectedIndex <= 0
@@ -106,8 +106,8 @@ export class HomePage extends HTMLElement {
             : this.selectedIndex - 1;
         this.updateWorkspaces();
         break;
-      case 'Tab': // same as ArrowDown
-      case 'ArrowDown':
+      case "Tab": // same as ArrowDown
+      case "ArrowDown":
         e.preventDefault();
         this.selectedIndex =
           this.selectedIndex >= len - 1
@@ -115,13 +115,13 @@ export class HomePage extends HTMLElement {
             : this.selectedIndex + 1;
         this.updateWorkspaces();
         break;
-      case 'Enter':
+      case "Enter":
         if (this.selectedIndex >= 0) {
           this.openWorkspace(this.workspaces[this.selectedIndex].id);
           return;
         }
         break;
-      case 'Escape':
+      case "Escape":
         if (this.selectedIndex > -1) {
           this.selectedIndex = -1;
           e.preventDefault();
@@ -157,12 +157,12 @@ export class HomePage extends HTMLElement {
   }
 
   private workspaceTemplate(workspace: Workspace, index: number) {
-    const className = cn('workspace', {
+    const className = cn("workspace", {
       selected: index === this.selectedIndex,
     });
 
     const modifiedString = !workspace.accessed
-      ? 'Creating new workspace...'
+      ? "Creating new workspace..."
       : `Last modified: ${formatTimestamp(workspace.modified)}`;
 
     return html`
@@ -184,28 +184,28 @@ export class HomePage extends HTMLElement {
 
   private createDeleteModal(workspaceId: string) {
     // Create confirmation modal
-    const modal = this.modalService.create({ title: 'Delete Workspace' });
+    const modal = this.modalService.create({ title: "Delete Workspace" });
 
     // Add confirmation content
-    const content = document.createElement('div');
-    content.classList.add('delete-confirmation');
+    const content = document.createElement("div");
+    content.classList.add("delete-confirmation");
 
-    const message = document.createElement('p');
+    const message = document.createElement("p");
     message.textContent =
-      'Are you sure you want to delete this workspace? This action cannot be undone.';
+      "Are you sure you want to delete this workspace? This action cannot be undone.";
     content.appendChild(message);
 
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('button-container');
+    const buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
 
-    const cancelButton = document.createElement('button');
-    cancelButton.classList.add('cancel-button');
-    cancelButton.textContent = 'Cancel';
+    const cancelButton = document.createElement("button");
+    cancelButton.classList.add("cancel-button");
+    cancelButton.textContent = "Cancel";
     cancelButton.onclick = () => modal.close();
 
-    const deleteButton = document.createElement('button');
-    deleteButton.classList.add('delete-confirm-button');
-    deleteButton.textContent = 'Delete';
+    const deleteButton = document.createElement("button");
+    deleteButton.classList.add("delete-confirm-button");
+    deleteButton.textContent = "Delete";
     deleteButton.onclick = () => {
       this.workspaceModel.delete(workspaceId);
       modal.close();
@@ -219,4 +219,4 @@ export class HomePage extends HTMLElement {
   }
 }
 
-customElements.define('home-page', HomePage);
+customElements.define("home-page", HomePage);

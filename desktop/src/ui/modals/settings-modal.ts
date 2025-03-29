@@ -1,6 +1,6 @@
-import { html, render } from 'lit';
-import './settings-modal.css';
-import { ModalElement } from './modal';
+import { html, render } from "lit";
+import "./settings-modal.css";
+import { ModalElement } from "./modal";
 
 export class SettingsModal extends ModalElement {
   connectedCallback() {
@@ -27,4 +27,4 @@ export class SettingsModal extends ModalElement {
   }
 }
 
-customElements.define('settings-modal', SettingsModal);
+customElements.define("settings-modal", SettingsModal);

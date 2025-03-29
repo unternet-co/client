@@ -1,4 +1,4 @@
-import { type LanguageModel } from 'ai';
+import { type LanguageModel } from "ai";
 import {
   Interpreter,
   Interaction,
@@ -7,7 +7,7 @@ import {
   InteractionInput,
   ResourceMap,
   createInteraction,
-} from '../../src/index';
+} from "../../src/index";
 
 interface KernelInit {
   model: LanguageModel;

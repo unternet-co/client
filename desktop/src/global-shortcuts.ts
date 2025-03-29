@@ -1,31 +1,31 @@
-import { dependencies } from './base/dependencies';
-import { TabModel } from './models/tabs';
-import { ModalService } from './services/modal-service';
-import { ShortcutService } from './services/shortcut-service';
+import { dependencies } from "./base/dependencies";
+import { TabModel } from "./models/tabs";
+import { ModalService } from "./services/modal-service";
+import { ShortcutService } from "./services/shortcut-service";
 
 export function registerGlobalShortcuts() {
   const shortcutService =
-    dependencies.resolve<ShortcutService>('ShortcutService');
-  const tabModel = dependencies.resolve<TabModel>('TabModel');
-  const modalService = dependencies.resolve<ModalService>('ModalService');
+    dependencies.resolve<ShortcutService>("ShortcutService");
+  const tabModel = dependencies.resolve<TabModel>("TabModel");
+  const modalService = dependencies.resolve<ModalService>("ModalService");
 
-  shortcutService.register('Meta+W', () => {
+  shortcutService.register("Meta+W", () => {
     if (tabModel.activeTab) {
       tabModel.close(tabModel.activeTab.id);
     }
   });
 
-  shortcutService.register('Meta+T', () => {
+  shortcutService.register("Meta+T", () => {
     if (tabModel.activeTab) {
       tabModel.create();
     }
   });
 
-  shortcutService.register('Meta+Shift+]', () => {
+  shortcutService.register("Meta+Shift+]", () => {
     tabModel.activateNext();
   });
 
-  shortcutService.register('Meta+Shift+[', () => {
+  shortcutService.register("Meta+Shift+[", () => {
     tabModel.activatePrev();
   });
 
@@ -40,11 +40,11 @@ export function registerGlobalShortcuts() {
   }
 
   // Ctrl+, or Meta+, to open settings
-  shortcutService.register('Meta+,', () => {
-    modalService.open('settings');
+  shortcutService.register("Meta+,", () => {
+    modalService.open("settings");
   });
 
-  shortcutService.register('Ctrl+,', () => {
-    modalService.open('settings');
+  shortcutService.register("Ctrl+,", () => {
+    modalService.open("settings");
   });
 }

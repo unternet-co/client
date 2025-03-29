@@ -1,19 +1,19 @@
-import { html, render } from 'lit';
-import { ModalDefinition, ModalService } from '../../services/modal-service';
-import { dependencies } from '../../base/dependencies';
-import { ShortcutService } from '../../services/shortcut-service';
-import { createEl } from '../../utils/dom';
-import './modal.css';
+import { html, render } from "lit";
+import { ModalDefinition, ModalService } from "../../services/modal-service";
+import { dependencies } from "../../base/dependencies";
+import { ShortcutService } from "../../services/shortcut-service";
+import { createEl } from "../../utils/dom";
+import "./modal.css";
 
 export class Modal {
   id: string;
   title: string;
-  contents = createEl('div', { className: 'modal-contents' });
+  contents = createEl("div", { className: "modal-contents" });
   private root: HTMLElement;
   private elementName?: string;
   private shortcutService =
-    dependencies.resolve<ShortcutService>('ShortcutService');
-  private modalService = dependencies.resolve<ModalService>('ModalService');
+    dependencies.resolve<ShortcutService>("ShortcutService");
+  private modalService = dependencies.resolve<ModalService>("ModalService");
   private closeCallback = () => this.modalService.close(this.id);
 
   constructor(key: string, definition: ModalDefinition) {
@@ -23,14 +23,14 @@ export class Modal {
   }
 
   open(stackPosition: number) {
-    this.root = createEl('div', {
-      className: 'modal-overlay',
+    this.root = createEl("div", {
+      className: "modal-overlay",
       style: { zIndex: 300 + stackPosition },
     });
 
     if (this.elementName) {
       const contentsComponent = document.createElement(this.elementName);
-      contentsComponent.addEventListener('close', this.closeCallback);
+      contentsComponent.addEventListener("close", this.closeCallback);
       this.contents.appendChild(contentsComponent);
     }
 
@@ -48,12 +48,12 @@ export class Modal {
       if (event.target === this.root) this.closeCallback();
     };
 
-    this.shortcutService.register('Escape', this.closeCallback);
+    this.shortcutService.register("Escape", this.closeCallback);
   }
 
   close() {
     this.root.remove();
-    this.shortcutService.deregister('Escape', this.closeCallback);
+    this.shortcutService.deregister("Escape", this.closeCallback);
   }
 
   get template() {
@@ -66,6 +66,6 @@ export class Modal {
 
 export class ModalElement extends HTMLElement {
   close() {
-    this.dispatchEvent(new Event('close'));
+    this.dispatchEvent(new Event("close"));
   }
 }

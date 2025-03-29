@@ -9,7 +9,7 @@ export function encodeActionUri({
   resourceUri,
   actionId,
 }: UriComponents) {
-  let uriString = '';
+  let uriString = "";
   // uriString += `${protocol}__`;
   // uriString += resourceUri;
   // uriString += `__${actionId}`;
@@ -21,12 +21,12 @@ export function encodeActionUri({
 }
 
 export function decodeActionUri(encodedActionURI: string): UriComponents {
-  let [protocol, ...rest] = encodedActionURI.split(':');
-  let [resourceUri, actionId] = rest.join(':').split('#');
+  let [protocol, ...rest] = encodedActionURI.split(":");
+  let [resourceUri, actionId] = rest.join(":").split("#");
 
   // This is a URL protocol, not a resource protocol, so it's part of the
   // resource URI
-  if (resourceUri.startsWith('//')) {
+  if (resourceUri.startsWith("//")) {
     resourceUri = `${protocol}:${resourceUri}`;
     protocol = undefined;
   }

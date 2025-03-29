@@ -1,4 +1,4 @@
-import { Interaction as KernelInteraction } from '@unternet/kernel';
+import { Interaction as KernelInteraction } from "@unternet/kernel";
 
 export interface Interaction extends KernelInteraction {
   id: string;
@@ -8,4 +8,4 @@ export interface Interaction extends KernelInteraction {
 export {
   type InteractionInput,
   type InteractionOutput,
-} from '@unternet/kernel';
+} from "@unternet/kernel";

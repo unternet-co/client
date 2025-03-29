@@ -35,20 +35,28 @@ command-input {
 .recent-workspaces::before,
 .recent-workspaces::after {
   flex-shrink: 0;
-  content: '';
+  content: "";
   position: sticky;
   display: block;
 }
 
 .recent-workspaces::before {
-  background: linear-gradient(to bottom, var(--color-neutral-5) 0%, transparent 100%);
+  background: linear-gradient(
+    to bottom,
+    var(--color-neutral-5) 0%,
+    transparent 100%
+  );
   top: 0;
   z-index: 10;
   height: 10px;
 }
 
 .recent-workspaces::after {
-  background: linear-gradient(to top, var(--color-neutral-5) 0%, transparent 100%);
+  background: linear-gradient(
+    to top,
+    var(--color-neutral-5) 0%,
+    transparent 100%
+  );
   bottom: 0;
   z-index: 10;
   height: 30px;
@@ -92,7 +100,9 @@ command-input {
   border: none;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s ease, color 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease;
   padding: var(--space-2);
   border-radius: var(--rounded-sm);
   display: flex;
@@ -153,7 +163,8 @@ command-input {
   gap: var(--space-3);
 }
 
-.cancel-button, .delete-confirm-button {
+.cancel-button,
+.delete-confirm-button {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--rounded-sm);
   font-size: var(--text-sm);

@@ -1,26 +1,26 @@
-import { css, html, render } from 'lit';
-import { DisposableGroup } from '../../base/disposable';
-import { attachStyles } from '../../utils/dom';
-import '../common/icon';
+import { css, html, render } from "lit";
+import { DisposableGroup } from "../../base/disposable";
+import { attachStyles } from "../../utils/dom";
+import "../common/icon";
 
 export class TabSelectEvent extends Event {
   constructor() {
-    super('select');
+    super("select");
   }
 }
 
 export class TabCloseEvent extends Event {
   constructor() {
-    super('close');
+    super("close");
   }
 }
 
-export class TabRenameEvent extends CustomEvent<{value: string}> {
+export class TabRenameEvent extends CustomEvent<{ value: string }> {
   constructor(value: string) {
-    super('rename', {
+    super("rename", {
       detail: { value },
       bubbles: true,
-      composed: true
+      composed: true,
     });
   }
 }
@@ -31,17 +31,17 @@ export class TabHandleElement extends HTMLElement {
   isEditing: boolean = false;
   disposables = new DisposableGroup();
 
-  static observedAttributes = ['static', 'active'];
+  static observedAttributes = ["static", "active"];
 
   connectedCallback() {
-    this.shadow = this.attachShadow({ mode: 'open' });
+    this.shadow = this.attachShadow({ mode: "open" });
     attachStyles(this.shadow, this.styles.toString());
 
-    this.isStatic = typeof this.getAttribute('static') === 'string';
+    this.isStatic = typeof this.getAttribute("static") === "string";
     render(this.template, this.shadow);
 
-    this.disposables.attachListener(this, 'click', (e: MouseEvent) => {
-      const isSelected = this.hasAttribute('active');
+    this.disposables.attachListener(this, "click", (e: MouseEvent) => {
+      const isSelected = this.hasAttribute("active");
       if (isSelected && !this.isStatic && !this.isEditing) {
         e.stopPropagation();
         this.editName();
@@ -54,7 +54,7 @@ export class TabHandleElement extends HTMLElement {
   editName() {
     this.isEditing = true;
     render(this.template, this.shadow);
-    const span = this.shadow.querySelector('[contenteditable]') as HTMLElement;
+    const span = this.shadow.querySelector("[contenteditable]") as HTMLElement;
     if (span) {
       span.focus();
       // Create a range to select all text
@@ -80,27 +80,27 @@ export class TabHandleElement extends HTMLElement {
   handleBlur(e: FocusEvent) {
     try {
       const span = e.target as HTMLElement;
-      const newText = span.textContent?.trim() || '';
+      const newText = span.textContent?.trim() || "";
       if (newText) {
         this.dispatchEvent(new TabRenameEvent(newText));
       }
       this.finishEditing();
     } catch (err) {
-      console.error('Error in blur handler:', err);
+      console.error("Error in blur handler:", err);
       this.finishEditing();
     }
   }
 
   handleKeyDown(e: KeyboardEvent) {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       const span = e.target as HTMLElement;
-      const newText = span.textContent?.trim() || '';
+      const newText = span.textContent?.trim() || "";
       if (newText) {
         this.dispatchEvent(new TabRenameEvent(newText));
       }
       this.finishEditing();
       e.preventDefault();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       this.finishEditing();
       e.preventDefault();
     }
@@ -120,7 +120,8 @@ export class TabHandleElement extends HTMLElement {
               @blur=${this.handleBlur.bind(this)}
               @keydown=${this.handleKeyDown.bind(this)}
               @click=${(e: MouseEvent) => e.stopPropagation()}
-            >${this.innerText || ''}</span>`
+              >${this.innerText || ""}</span
+            >`
           : html`<slot></slot>`}
       </span>
       ${!this.isStatic
@@ -157,7 +158,7 @@ export class TabHandleElement extends HTMLElement {
       :host([active]) {
         background: var(--color-neutral-0);
       }
-      
+
       :host([active]:not([static])) .inner {
         cursor: text;
       }
@@ -194,11 +195,12 @@ export class TabHandleElement extends HTMLElement {
         transition: opacity linear 0.1s;
       }
 
-      :host([active]) un-icon, :host(:hover) un-icon {
+      :host([active]) un-icon,
+      :host(:hover) un-icon {
         opacity: 1;
       }
     `;
   }
 }
 
-customElements.define('tab-handle', TabHandleElement);
+customElements.define("tab-handle", TabHandleElement);
