@@ -1,4 +1,6 @@
 {
+  "name": "@unternet/client-kernel",
+  "version": "0.1.5",
   "dependencies": {
     "@unternet/kernel": "file:.."
   },

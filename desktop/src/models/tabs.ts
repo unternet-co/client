@@ -1,10 +1,10 @@
-import { Disposable } from '../base/disposable';
-import { Notifier } from '../base/notifier';
-import { KeyStoreService } from '../services/keystore-service';
-import { Workspace, WorkspaceModel } from './workspaces';
+import { Disposable } from "../base/disposable";
+import { Notifier } from "../base/notifier";
+import { KeyStoreService } from "../services/keystore-service";
+import { Workspace, WorkspaceModel, WorkspaceNotification } from "./workspaces";
 
 export interface Tab {
-  type: 'page' | 'workspace';
+  type: "page" | "workspace";
   id: string;
 }
 
@@ -14,12 +14,13 @@ export interface TabStoreData {
 }
 
 export const initTabStoreData: TabStoreData = {
-  activeTabId: 'home',
+  activeTabId: "home",
   tabs: [
     {
-      type: 'page',
-      id: 'home',
+      type: "page",
+      id: "home",
     },
+    // Settings is now a standalone button, not a tab
   ],
 };
 
@@ -34,19 +35,26 @@ export class TabModel extends Disposable {
   private workspaceModel: WorkspaceModel;
   private notifier = new Notifier<TabChangeNotification>();
   readonly subscribe = this.notifier.subscribe;
-  private activeTabId: Tab['id'];
+  private activeTabId: Tab["id"];
 
   constructor(
     store: KeyStoreService<TabStoreData>,
-    workspaceModel: WorkspaceModel
+    workspaceModel: WorkspaceModel,
   ) {
     super();
     this.store = store;
     this.workspaceModel = workspaceModel;
     this.loadTabs();
+    this.workspaceModel.subscribe(this.onWorkspaces.bind(this));
   }
 
-  get(id: Tab['id']) {
+  onWorkspaces(notification?: WorkspaceNotification) {
+    if (notification?.type === "delete" && this.has(notification.workspaceId)) {
+      this.close(notification.workspaceId);
+    }
+  }
+
+  get(id: Tab["id"]) {
     return this.tabs.find((tab: Tab) => tab.id === id);
   }
 
@@ -56,7 +64,7 @@ export class TabModel extends Disposable {
     const tabData = this.store.get();
 
     for (const tab of tabData.tabs) {
-      if (tab.type === 'workspace' && tab.id) {
+      if (tab.type === "workspace" && tab.id) {
         await this.workspaceModel.activate(tab.id);
       }
     }
@@ -70,13 +78,13 @@ export class TabModel extends Disposable {
     return this.tabs;
   }
 
-  activate(id: Tab['id']) {
+  activate(id: Tab["id"]) {
     this.activeTabId = id;
     this.store.update({ activeTabId: id });
     this.notifier.notify({ activeTab: this.activeTab });
   }
 
-  has(id: Tab['id']) {
+  has(id: Tab["id"]) {
     return !!this.tabs.find((tab) => tab.id === id);
   }
 
@@ -94,7 +102,7 @@ export class TabModel extends Disposable {
     }
   }
 
-  getTitle(id: Tab['id']) {
+  getTitle(id: Tab["id"]) {
     return this.workspaceModel.get(id)?.title;
   }
 
@@ -104,7 +112,7 @@ export class TabModel extends Disposable {
     }
   }
 
-  create(id?: Workspace['id']) {
+  create(id?: Workspace["id"]) {
     let workspace: Workspace;
 
     if (id) {
@@ -115,7 +123,7 @@ export class TabModel extends Disposable {
     }
 
     const tab = {
-      type: 'workspace',
+      type: "workspace",
       id: workspace.id,
     } as Tab;
 
@@ -133,8 +141,7 @@ export class TabModel extends Disposable {
     });
   }
 
-  // TODO: Make this add to history, not delete
-  close(id: Tab['id']) {
+  close(id: Tab["id"]) {
     const index = this.tabs.findIndex((x) => x.id === id);
     if (index === -1) return;
 
@@ -142,7 +149,7 @@ export class TabModel extends Disposable {
     const wasActive = this.activeTabId === id;
     this.tabs.splice(index, 1);
 
-    if (tab.type === 'workspace') {
+    if (tab.type === "workspace") {
       this.workspaceModel.deactivate(id);
     }
 

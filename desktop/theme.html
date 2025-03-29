@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,14 +7,16 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover"
     />
     <title>Theme</title>
-    <link rel="stylesheet" href="./global.css" />
+    <link rel="stylesheet" href="src/ui/common/styles/global.css" />
+    <script type="module" src="src/ui/common/icon.ts"></script>
     <style>
       body {
         overflow: auto;
         background: var(--color-page-alt);
-        display: unset;
         padding: var(--space-8);
+        gap: var(--space-8);
       }
+
       .swatch {
         margin: var(--space-2);
         font-size: var(--text-xs);
@@ -27,153 +29,191 @@
         border-radius: 50%;
         border: 1px solid var(--color-text-faded);
       }
+
+      .theme-block {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-8);
+      }
+
+      .icon-grid,
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+        gap: 1rem;
+      }
+
+      .icon-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+      }
+
+      .icon-name {
+        margin-top: 0.5rem;
+        font-size: 12px;
+      }
     </style>
   </head>
   <body class="theme-block">
     <h1>Theme</h1>
     <div class="theme-block">
       <h2>Color Palette</h2>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-0);
-          color: var(--color-text);
-        "
-      >
-        Neutral 0
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-5);
-          color: var(--color-text);
-        "
-      >
-        Neutral 5
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-10);
-          color: var(--color-text);
-        "
-      >
-        Neutral 10
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-15);
-          color: var(--color-text);
-        "
-      >
-        Neutral 15
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-20);
-          color: var(--color-text);
-        "
-      >
-        Neutral 20
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-30);
-          color: var(--color-text);
-        "
-      >
-        Neutral 30
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-40);
-          color: var(--color-text);
-        "
-      >
-        Neutral 40
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-50);
-          color: var(--color-page);
-        "
-      >
-        Neutral 50
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-60);
-          color: var(--color-page);
-        "
-      >
-        Neutral 60
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-70);
-          color: var(--color-page);
-        "
-      >
-        Neutral 70
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-80);
-          color: var(--color-page);
-        "
-      >
-        Neutral 80
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-90);
-          color: var(--color-page);
-        "
-      >
-        Neutral 90
-      </div>
-      <div
-        class="swatch"
-        style="
-          background-color: var(--color-neutral-100);
-          color: var(--color-page);
-        "
-      >
-        Neutral 100
-      </div>
-      <br />
-      <div
-        class="swatch"
-        style="background-color: var(--color-action); color: var(--color-page)"
-      >
-        Action
-      </div>
-      <div
-        class="swatch"
-        style="background-color: var(--color-success); color: var(--color-page)"
-      >
-        Success
-      </div>
-      <div
-        class="swatch"
-        style="background-color: var(--color-warning); color: var(--color-text)"
-      >
-        Warning
-      </div>
-      <div
-        class="swatch"
-        style="background-color: var(--color-error); color: var(--color-page)"
-      >
-        Error
+      <div class="swatches">
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-0);
+            color: var(--color-text);
+          "
+        >
+          Neutral 0
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-5);
+            color: var(--color-text);
+          "
+        >
+          Neutral 5
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-10);
+            color: var(--color-text);
+          "
+        >
+          Neutral 10
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-15);
+            color: var(--color-text);
+          "
+        >
+          Neutral 15
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-20);
+            color: var(--color-text);
+          "
+        >
+          Neutral 20
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-30);
+            color: var(--color-text);
+          "
+        >
+          Neutral 30
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-40);
+            color: var(--color-text);
+          "
+        >
+          Neutral 40
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-50);
+            color: var(--color-page);
+          "
+        >
+          Neutral 50
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-60);
+            color: var(--color-page);
+          "
+        >
+          Neutral 60
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-70);
+            color: var(--color-page);
+          "
+        >
+          Neutral 70
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-80);
+            color: var(--color-page);
+          "
+        >
+          Neutral 80
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-90);
+            color: var(--color-page);
+          "
+        >
+          Neutral 90
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-neutral-100);
+            color: var(--color-page);
+          "
+        >
+          Neutral 100
+        </div>
+        <br />
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-action);
+            color: var(--color-page);
+          "
+        >
+          Action
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-success);
+            color: var(--color-page);
+          "
+        >
+          Success
+        </div>
+        <div
+          class="swatch"
+          style="
+            background-color: var(--color-warning);
+            color: var(--color-text);
+          "
+        >
+          Warning
+        </div>
+        <div
+          class="swatch"
+          style="background-color: var(--color-error); color: var(--color-page)"
+        >
+          Error
+        </div>
       </div>
     </div>
     <div class="theme-block">
@@ -297,5 +337,43 @@ return "Hello, World!";
         </div>
       </div>
     </div>
+    <div class="theme-block">
+      <h2>Common Icons</h2>
+      <div class="icon-grid" id="icon-grid">
+        <!-- Icons will be dynamically generated here -->
+      </div>
+    </div>
+
+    <script type="module">
+      import { ICON_MAP } from "./src/ui/common/icon.ts";
+
+      // Function to generate icon grid
+      function generateIconGrid() {
+        const iconGrid = document.getElementById("icon-grid");
+
+        // Build HTML for all icons from ICON_MAP
+        let iconsHtml = Object.entries(ICON_MAP)
+          .map(
+            ([key, value]) => `
+          <div class="icon-item" title="${key}${key !== value ? ` (${value})` : ""}">
+            <un-icon name="${key}"></un-icon>
+          </div>
+        `,
+          )
+          .join("");
+
+        // Set the HTML content
+        iconGrid.innerHTML = iconsHtml;
+      }
+
+      // Generate the icon grid when the DOM is loaded
+      document.addEventListener("DOMContentLoaded", generateIconGrid);
+      if (
+        document.readyState === "complete" ||
+        document.readyState === "interactive"
+      ) {
+        setTimeout(generateIconGrid, 1);
+      }
+    </script>
   </body>
 </html>

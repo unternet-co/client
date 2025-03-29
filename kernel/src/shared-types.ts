@@ -3,7 +3,7 @@ import type {
   CoreUserMessage,
   CoreAssistantMessage,
   CoreToolMessage,
-} from 'ai';
+} from "ai";
 
 export type Message =
   | CoreSystemMessage
@@ -13,13 +13,13 @@ export type Message =
 
 export interface JSONSchemaDefinition {
   type:
-    | 'object'
-    | 'string'
-    | 'number'
-    | 'integer'
-    | 'array'
-    | 'boolean'
-    | 'null';
+    | "object"
+    | "string"
+    | "number"
+    | "integer"
+    | "array"
+    | "boolean"
+    | "null";
   description?: string;
   properties?: {
     [key: string]: JSONSchemaDefinition;

@@ -1,76 +1,56 @@
-import { Message } from '../shared-types.js';
+import { Message } from "../shared-types.js";
 
-export class Interaction {
+export interface Interaction {
   input: InteractionInput;
   outputs: InteractionOutput[];
-
-  static createWithInput(input: InteractionInput): Interaction {
-    return {
-      input,
-      outputs: [],
-    };
-  }
-
-  static createTextOutput(text: string): InteractionTextOutput {
-    return {
-      type: 'text',
-      content: text,
-    };
-  }
-
-  static toMessages(interactions: Interaction[]): Message[] {
-    let messages: Message[] = [];
-
-    for (let interaction of interactions) {
-      messages.push({
-        role: 'user',
-        content: interaction.input.text,
-      });
-
-      if (!interaction.outputs) continue;
-
-      for (let output of interaction.outputs) {
-        if (output.type === 'text') {
-          const textOutput = output as InteractionTextOutput;
-          messages.push({
-            role: 'assistant',
-            content: textOutput.content,
-          });
-        }
-      }
-    }
-
-    return messages;
-  }
 }
-
-/* Input data structure */
 
 export interface InteractionInput {
   text: string;
 }
 
-/* Output data structures */
-
-export interface InteractionBaseOutput {
-  type: string;
-}
-
-export interface InteractionTextOutput extends InteractionBaseOutput {
-  type: 'text';
+export interface TextOutput {
+  type: "text";
   content: string;
 }
 
-export interface InteractionProposalOutput extends InteractionBaseOutput {
-  type: 'actionproposal';
+export type InteractionOutput = TextOutput;
+
+export function interactionsToMessages(interactions: Interaction[]): Message[] {
+  let messages: Message[] = [];
+
+  for (let interaction of interactions) {
+    messages.push({
+      role: "user",
+      content: interaction.input.text,
+    });
+
+    if (!interaction.outputs) continue;
+
+    for (let output of interaction.outputs) {
+      if (output.type === "text") {
+        const textOutput = output as InteractionOutput;
+        messages.push({
+          role: "assistant",
+          content: textOutput.content,
+        });
+      }
+    }
+  }
+
+  return messages;
 }
 
-export interface InteractionProcessOutput extends InteractionBaseOutput {
-  type: 'process';
-  processId: string | number;
+export function createInteraction(input: InteractionInput): Interaction {
+  return {
+    input,
+    outputs: [],
+  };
 }
 
-export type InteractionOutput =
-  | InteractionTextOutput
-  | InteractionProposalOutput
-  | InteractionProcessOutput;
+export function createTextOutput(text: string): InteractionOutput {
+  return {
+    type: "text",
+    content: text,
+  };
+}

@@ -4,7 +4,7 @@ export function appendEl(parent: Node, child: HTMLElement) {
 }
 
 export function clearNode(el: HTMLElement) {
-  el.innerHTML = '';
+  el.innerHTML = "";
 }
 
 export function attachStyles(shadow: ShadowRoot, styles: string) {
@@ -13,16 +13,16 @@ export function attachStyles(shadow: ShadowRoot, styles: string) {
   shadow.adoptedStyleSheets = [sheet];
 }
 
-export function createEl(
+export function createEl<T extends HTMLElement = HTMLElement>(
   name: string,
   properties: Record<string, any> = {},
   ...children: (string | Node)[]
-): HTMLElement {
-  const element = document.createElement(name);
+): T {
+  const element = document.createElement(name) as T;
   if (properties) Object.assign(element, properties);
 
   children.forEach((child) => {
-    if (typeof child === 'string') {
+    if (typeof child === "string") {
       element.appendChild(document.createTextNode(child));
     } else if (child instanceof Node) {
       element.appendChild(child);
@@ -36,7 +36,7 @@ export function createFragment(...children: (string | Node)[]) {
   const fragment = document.createDocumentFragment();
 
   children.forEach((child) => {
-    if (typeof child === 'string') {
+    if (typeof child === "string") {
       fragment.appendChild(document.createTextNode(child));
     } else if (child instanceof Node) {
       fragment.appendChild(child);

@@ -1,6 +1,13 @@
-import { generateText, type LanguageModel } from 'ai';
-import { Interaction, type InteractionOutput } from './interactions.js';
-import { Resource, ResourceMap } from './resources.js';
+import { LanguageModel, streamText } from "ai";
+import { Interaction, interactionsToMessages } from "./interactions.js";
+
+type InterpreterResult = TextResult;
+
+interface TextResult {
+  type: "text";
+  text: Promise<string>;
+  textStream: AsyncIterable<string>;
+}
 
 export class Interpreter {
   model: LanguageModel;
@@ -11,16 +18,22 @@ export class Interpreter {
 
   async generateOutput(
     interactions: Array<Interaction>,
-    resources?: ResourceMap
-  ): Promise<InteractionOutput> {
-    const tools = Resource.toTools(resources);
-
-    const outputs = await generateText({
+  ): Promise<InterpreterResult> {
+    const output = streamText({
       model: this.model,
-      messages: Interaction.toMessages(interactions),
-      tools: tools,
+      messages: interactionsToMessages(interactions),
     });
 
-    return Interaction.createTextOutput(outputs.text);
+    return createTextResult({
+      text: output.text,
+      textStream: output.textStream,
+    });
   }
+}
+
+function createTextResult(init: Omit<TextResult, "type">): TextResult {
+  return {
+    type: "text",
+    ...init,
+  };
 }

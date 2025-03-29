@@ -1,7 +1,7 @@
 {
-  "name": "unternet-client",
+  "name": "@unternet/client",
+  "version": "0.3.1",
   "description": "Unternet Client",
-  "version": "0.2.0",
   "author": {
     "name": "Rupert Manfredi",
     "email": "rupert@unternet.co"
@@ -12,8 +12,8 @@
   ],
   "main": "desktop/dist/main.js",
   "build": {
-    "appId": "com.electron.unternet-client",
-    "productName": "Unternet Client",
+    "appId": "co.unternet.client",
+    "productName": "unternet-client",
     "files": [
       "desktop/dist/**/*"
     ],
@@ -50,6 +50,9 @@
       ],
       "category": "Development"
     },
+    "deb": {
+      "artifactName": "${productName}-${version}-${arch}.deb"
+    },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
@@ -68,15 +71,19 @@
     "package:win": "electron-builder --win",
     "package:linux": "electron-builder --linux",
     "app:dir": "rm -rf dist && electron-builder --dir",
-    "app:dist": "rm -rf dist && electron-builder"
+    "app:dist": "rm -rf dist && electron-builder",
+    "sync-version": "cd desktop && npm version $npm_package_version && cd ../kernel && npm version $npm_package_version",
+    "prepare": "husky"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
     "electron-builder": "^25.1.8",
     "electron-notarize": "^1.2.2",
+    "husky": "^9.1.7",
     "rollup": "^4.34.9"
   },
   "dependencies": {
+    "classnames": "^2.5.1",
     "electron-log": "^5.3.2",
     "electron-updater": "^6.3.9"
   }

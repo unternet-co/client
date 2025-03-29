@@ -96,7 +96,13 @@ interaction-history .interaction-output {
   background: var(--color-page);
 }
 
-/******/
+interaction-history .thinking-letter {
+  color: var(--color-neutral-50);
+}
+
+interaction-history .thinking-letter.active {
+  color: var(--color-neutral-100);
+}
 
 /* interaction-history {
   overflow-y: scroll;
