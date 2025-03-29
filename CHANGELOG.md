@@ -1,7 +1,9 @@
 ## 0.3.0
+
 - Merge branch 'main' into feat/tagging
 
 ## 0.2.0
+
 - fix todos
 
 ## Changes prior to changelog introduction

@@ -15,7 +15,7 @@ export class Disposable {
   static createEventListener(
     target: EventTarget,
     type: string,
-    listener: EventListener
+    listener: EventListener,
   ) {
     target.addEventListener(type, listener);
     return new Disposable(() => target.removeEventListener(type, listener));
@@ -37,7 +37,7 @@ export class DisposableGroup {
   attachListener(
     target: EventTarget,
     type: string,
-    listener: (e: any) => void
+    listener: (e: any) => void,
   ) {
     this.add(Disposable.createEventListener(target, type, listener));
   }

@@ -1,7 +1,7 @@
 // import { html, render } from 'lit';
 // import { Resource } from '@unternet/kernel';
 // import './resource-picker';
-import './resource-bar.css';
+import "./resource-bar.css";
 
 // export class ResourceBar extends HTMLElement {
 //   set resources(resources: Resource[]) {

@@ -1,11 +1,11 @@
-import { appendEl, createEl } from '../../utils/dom';
-import { render, html } from 'lit';
-import { Tab, TabModel } from '../../models/tabs';
-import { dependencies } from '../../base/dependencies';
-import { WorkspaceModel } from '../../models/workspaces';
-import './tab-handle';
-import './top-bar.css';
-import { ModalService } from '../../services/modal-service';
+import { appendEl, createEl } from "../../utils/dom";
+import { render, html } from "lit";
+import { Tab, TabModel } from "../../models/tabs";
+import { dependencies } from "../../base/dependencies";
+import { WorkspaceModel } from "../../models/workspaces";
+import "./tab-handle";
+import "./top-bar.css";
+import { ModalService } from "../../services/modal-service";
 
 // Define electronAPI type for TypeScript
 declare global {
@@ -32,8 +32,8 @@ declare global {
 }
 
 export class TopBar extends HTMLElement {
-  tabModel = dependencies.resolve<TabModel>('TabModel');
-  modalService = dependencies.resolve<ModalService>('ModalService');
+  tabModel = dependencies.resolve<TabModel>("TabModel");
+  modalService = dependencies.resolve<ModalService>("ModalService");
   staticTabsContainer: HTMLElement;
   workspaceTabsContainer: HTMLElement;
   settingsButtonContainer: HTMLElement;
@@ -43,26 +43,26 @@ export class TopBar extends HTMLElement {
     // Container for static tabs (like home)
     this.staticTabsContainer = appendEl(
       this,
-      createEl('div', { className: 'static-tab-list' })
+      createEl("div", { className: "static-tab-list" }),
     );
     const scrollContainer = appendEl(
       this,
-      createEl('div', { className: 'workspace-tabs-scroll-container' })
+      createEl("div", { className: "workspace-tabs-scroll-container" }),
     );
     this.workspaceTabsContainer = appendEl(
       scrollContainer,
-      createEl('div', { className: 'workspace-tab-list' })
+      createEl("div", { className: "workspace-tab-list" }),
     );
     this.settingsButtonContainer = appendEl(
       this,
-      createEl('div', { className: 'settings-button-container' })
+      createEl("div", { className: "settings-button-container" }),
     );
 
     this.tabModel.subscribe(this.updateTabs.bind(this));
     this.updateTabs();
 
-    const isMac = window.electronAPI?.platform === 'darwin';
-    this.classList.toggle('mac', isMac);
+    const isMac = window.electronAPI?.platform === "darwin";
+    this.classList.toggle("mac", isMac);
     this.initializeWindowStateListeners();
   }
 
@@ -80,7 +80,7 @@ export class TopBar extends HTMLElement {
           this.toggleFullscreenClass(isFullscreen);
         })
         .catch((err) => {
-          console.error('[TopBar] Error checking fullscreen state:', err);
+          console.error("[TopBar] Error checking fullscreen state:", err);
         });
 
       window.electronAPI.onWindowStateChange((isFullscreen) => {
@@ -91,14 +91,14 @@ export class TopBar extends HTMLElement {
 
   private toggleFullscreenClass(isFullscreen: boolean): void {
     if (isFullscreen) {
-      this.classList.add('fullscreen');
+      this.classList.add("fullscreen");
     } else {
-      this.classList.remove('fullscreen');
+      this.classList.remove("fullscreen");
     }
   }
 
-  iconFor(tabId: Tab['id']) {
-    if (tabId === 'home') {
+  iconFor(tabId: Tab["id"]) {
+    if (tabId === "home") {
       return html`<un-icon name="home"></un-icon>`;
     }
     return null;
@@ -112,13 +112,13 @@ export class TopBar extends HTMLElement {
   }
 
   openSettings() {
-    this.modalService.open('settings');
+    this.modalService.open("settings");
   }
 
   handleRename(tab: Tab, e: CustomEvent) {
-    if (tab.type === 'workspace') {
+    if (tab.type === "workspace") {
       const workspaceModel =
-        dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+        dependencies.resolve<WorkspaceModel>("WorkspaceModel");
       workspaceModel.setTitle(tab.id, e.detail.value);
       this.updateTabs();
     }
@@ -126,19 +126,19 @@ export class TopBar extends HTMLElement {
 
   updateTabs() {
     const tabs = this.tabModel.all();
-    const staticTabs = tabs.filter((tab) => tab.type === 'page');
-    const workspaceTabs = tabs.filter((tab) => tab.type === 'workspace');
+    const staticTabs = tabs.filter((tab) => tab.type === "page");
+    const workspaceTabs = tabs.filter((tab) => tab.type === "workspace");
 
     const tabTemplate = (tab: Tab) => html`
       <tab-handle
-        ?static=${tab.type === 'page'}
+        ?static=${tab.type === "page"}
         ?active=${this.tabModel.activeTab?.id === tab.id}
         @select=${() => this.handleSelect(tab)}
         @close=${() => this.tabModel.close(tab.id)}
         @rename=${(e: CustomEvent) => this.handleRename(tab, e)}
         id=${`tab-${tab.id}`}
       >
-        ${tab.type === 'page'
+        ${tab.type === "page"
           ? this.iconFor(tab.id)
           : this.tabModel.getTitle(tab.id)}
       </tab-handle>
@@ -160,17 +160,17 @@ export class TopBar extends HTMLElement {
   private scrollActiveTabIntoView(): void {
     setTimeout(() => {
       const activeTab = this.tabModel.activeTab;
-      if (activeTab && activeTab.type === 'workspace') {
+      if (activeTab && activeTab.type === "workspace") {
         const tabElement = this.querySelector(`#tab-${activeTab.id}`);
         const scrollContainer = this.querySelector(
-          '.workspace-tabs-scroll-container'
+          ".workspace-tabs-scroll-container",
         );
 
         if (tabElement && scrollContainer) {
           tabElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'nearest',
+            behavior: "smooth",
+            block: "nearest",
+            inline: "nearest",
           });
         }
       }
@@ -178,4 +178,4 @@ export class TopBar extends HTMLElement {
   }
 }
 
-customElements.define('top-bar', TopBar);
+customElements.define("top-bar", TopBar);

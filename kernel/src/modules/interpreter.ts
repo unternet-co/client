@@ -1,10 +1,10 @@
-import { LanguageModel, streamText } from 'ai';
-import { Interaction, interactionsToMessages } from './interactions.js';
+import { LanguageModel, streamText } from "ai";
+import { Interaction, interactionsToMessages } from "./interactions.js";
 
 type InterpreterResult = TextResult;
 
 interface TextResult {
-  type: 'text';
+  type: "text";
   text: Promise<string>;
   textStream: AsyncIterable<string>;
 }
@@ -17,7 +17,7 @@ export class Interpreter {
   }
 
   async generateOutput(
-    interactions: Array<Interaction>
+    interactions: Array<Interaction>,
   ): Promise<InterpreterResult> {
     const output = streamText({
       model: this.model,
@@ -31,9 +31,9 @@ export class Interpreter {
   }
 }
 
-function createTextResult(init: Omit<TextResult, 'type'>): TextResult {
+function createTextResult(init: Omit<TextResult, "type">): TextResult {
   return {
-    type: 'text',
+    type: "text",
     ...init,
   };
 }

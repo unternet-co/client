@@ -39,8 +39,8 @@
   --rounded: 4px;
 
   /* --font-sans: 'iA Writer Quattro', 'iA Writer Quattro S', system-ui, sans-serif; */
-  --font-sans: ui-sans-serif, system-ui, 'Roboto', sans-serif;
-  --font-mono: 'iA Writer Mono', monospace;
+  --font-sans: ui-sans-serif, system-ui, "Roboto", sans-serif;
+  --font-mono: "iA Writer Mono", monospace;
 
   /* Font size */
   --text-scale: 1.125;

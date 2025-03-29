@@ -1,6 +1,6 @@
-import { encodeActionUri } from '../uri-encoder.js';
-import { JSONSchemaDefinition } from '../shared-types.js';
-import { tool, ToolSet, jsonSchema } from 'ai';
+import { encodeActionUri } from "../uri-encoder.js";
+import { JSONSchemaDefinition } from "../shared-types.js";
+import { tool, ToolSet, jsonSchema } from "ai";
 
 export interface ResourceIcon {
   src: string;

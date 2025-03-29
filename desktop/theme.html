@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -27,7 +27,7 @@
         line-height: 100px;
         text-align: center;
         border-radius: 50%;
-        border: 1px solid var(--color-text-faded);;
+        border: 1px solid var(--color-text-faded);
       }
 
       .theme-block {
@@ -42,7 +42,7 @@
         grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
         gap: 1rem;
       }
-      
+
       .icon-item {
         display: flex;
         flex-direction: column;
@@ -51,7 +51,7 @@
         border: 1px solid var(--color-border);
         border-radius: 8px;
       }
-      
+
       .icon-name {
         margin-top: 0.5rem;
         font-size: 12px;
@@ -183,19 +183,28 @@
         <br />
         <div
           class="swatch"
-          style="background-color: var(--color-action); color: var(--color-page)"
+          style="
+            background-color: var(--color-action);
+            color: var(--color-page);
+          "
         >
           Action
         </div>
         <div
           class="swatch"
-          style="background-color: var(--color-success); color: var(--color-page)"
+          style="
+            background-color: var(--color-success);
+            color: var(--color-page);
+          "
         >
           Success
         </div>
         <div
           class="swatch"
-          style="background-color: var(--color-warning); color: var(--color-text)"
+          style="
+            background-color: var(--color-warning);
+            color: var(--color-text);
+          "
         >
           Warning
         </div>
@@ -328,34 +337,41 @@ return "Hello, World!";
         </div>
       </div>
     </div>
-    <div class="theme-block">    
+    <div class="theme-block">
       <h2>Common Icons</h2>
       <div class="icon-grid" id="icon-grid">
         <!-- Icons will be dynamically generated here -->
       </div>
     </div>
-    
+
     <script type="module">
-      import { ICON_MAP } from './src/ui/common/icon.ts';
-      
+      import { ICON_MAP } from "./src/ui/common/icon.ts";
+
       // Function to generate icon grid
       function generateIconGrid() {
-        const iconGrid = document.getElementById('icon-grid');
-        
+        const iconGrid = document.getElementById("icon-grid");
+
         // Build HTML for all icons from ICON_MAP
-        let iconsHtml = Object.entries(ICON_MAP).map(([key, value]) => `
-          <div class="icon-item" title="${key}${key !== value ? ` (${value})` : ''}">
+        let iconsHtml = Object.entries(ICON_MAP)
+          .map(
+            ([key, value]) => `
+          <div class="icon-item" title="${key}${key !== value ? ` (${value})` : ""}">
             <un-icon name="${key}"></un-icon>
           </div>
-        `).join('');
-        
+        `,
+          )
+          .join("");
+
         // Set the HTML content
         iconGrid.innerHTML = iconsHtml;
       }
-      
+
       // Generate the icon grid when the DOM is loaded
-      document.addEventListener('DOMContentLoaded', generateIconGrid);
-      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      document.addEventListener("DOMContentLoaded", generateIconGrid);
+      if (
+        document.readyState === "complete" ||
+        document.readyState === "interactive"
+      ) {
         setTimeout(generateIconGrid, 1);
       }
     </script>

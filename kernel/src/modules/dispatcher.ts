@@ -9,7 +9,7 @@ export class Dispatcher {
 
   constructor(protocols?: ProtocolMap) {
     this.protocols = protocols || {};
-    if (!protocols) console.warn('No protocols provided to Dispatcher');
+    if (!protocols) console.warn("No protocols provided to Dispatcher");
   }
 
   addProtocol(protocol: Protocol) {
@@ -17,7 +17,7 @@ export class Dispatcher {
   }
 
   removeProtocol(protocol: Protocol | string) {
-    if (typeof protocol === 'string') {
+    if (typeof protocol === "string") {
       delete this.protocols[protocol];
     } else {
       delete this.protocols[protocol.scheme];

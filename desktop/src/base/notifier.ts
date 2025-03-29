@@ -1,4 +1,4 @@
-import { Disposable, IDisposable } from './disposable';
+import { Disposable, IDisposable } from "./disposable";
 
 export class Notifier<Notification = undefined> implements IDisposable {
   private subscribers: ((notification?: Notification) => void)[] = [];
@@ -11,7 +11,7 @@ export class Notifier<Notification = undefined> implements IDisposable {
 
   readonly subscribe = (subscriber: (notification?: Notification) => void) => {
     if (this.disposed) {
-      throw new Error('Emitter is disposed');
+      throw new Error("Emitter is disposed");
     }
 
     this.subscribers.push(subscriber);
@@ -27,7 +27,7 @@ export class Notifier<Notification = undefined> implements IDisposable {
 
   notify(notification?: Notification): void {
     if (this.disposed) {
-      throw new Error('Cannot notify, Notifier is disposed');
+      throw new Error("Cannot notify, Notifier is disposed");
     }
 
     for (const subscriber of this.subscribers) {
@@ -40,7 +40,7 @@ export class Notifier<Notification = undefined> implements IDisposable {
   }
 
   private removeSubscriber(
-    subscriber: (notification?: Notification) => void
+    subscriber: (notification?: Notification) => void,
   ): void {
     this.subscribers = this.subscribers.filter((l) => l !== subscriber);
   }

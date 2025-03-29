@@ -1,5 +1,5 @@
-import { ulid } from 'ulid';
-import { Modal } from '../ui/modals/modal';
+import { ulid } from "ulid";
+import { Modal } from "../ui/modals/modal";
 
 export interface ModalDefinition {
   title: string;
