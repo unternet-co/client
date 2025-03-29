@@ -77,11 +77,13 @@
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "cross-env": "^7.0.3",
     "electron-builder": "^25.1.8",
     "electron-notarize": "^1.2.2",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
     "rollup": "^4.34.9",
     "vite": "^6.2.2"
   },
