@@ -1,3 +1,6 @@
+## 0.3.3
+- Merge branch 'test/actions' of https://github.com/tripledoublev/unternet-operator into test/actions
+
 ## 0.3.2
 - sync package-lock.json
 
