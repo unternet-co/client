@@ -14,13 +14,19 @@
     "dev:desktop": "cd desktop && npm run dev",
     "package": "npm run package:desktop",
     "package:desktop": "cd desktop && npm run package",
-    "sync-version": "cd desktop && npm version $npm_package_version && cd ../kernel && npm version $npm_package_version"
+    "sync-version": "cd desktop && npm version $npm_package_version && cd ../kernel && npm version $npm_package_version",
+    "prepare": "husky"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
     "rollup": "^4.34.9",
     "vite": "^6.2.2"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
     "classnames": "^2.5.1",
