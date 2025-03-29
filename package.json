@@ -62,7 +62,7 @@
     "dev": "npm run dev:desktop",
     "build": "npm run build:kernel && npm run build:desktop",
     "build:kernel": "cd kernel && npm run build",
-    "build:desktop": "cd desktop && rm -rf dist && NODE_ENV=production npm run build",
+    "build:desktop": "cd desktop && npx rimraf dist && cross-env NODE_ENV=production npm run build",
     "dev:desktop": "NODE_ENV=development cd desktop && npm run dev",
     "package:desktop": "cd desktop && npm run package",
     "package:electron": "npm run package:all",
