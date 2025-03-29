@@ -1,3 +1,9 @@
+## 0.3.1
+
+- regen lockfile (#95)
+
+Co-authored-by: Vinay Raghu <vinay.raghu@whoop.com>
+
 ## 0.3.0
 
 - Merge branch 'main' into feat/tagging
