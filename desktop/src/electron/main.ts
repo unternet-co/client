@@ -4,6 +4,7 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 
 const isDev = process.env.NODE_ENV !== "production";
+const AUTOUPDATE_INTERVAL = 3_600_000; // 60 * 60 * 1000
 
 // Configure logging
 autoUpdater.logger = log;
@@ -60,7 +61,7 @@ function setupAutoUpdater() {
   // Check for updates every hour
   setInterval(() => {
     autoUpdater.checkForUpdates();
-  }, 60 * 60 * 1000);
+  }, AUTOUPDATE_INTERVAL);
   
   // Initial check
   autoUpdater.checkForUpdates();
