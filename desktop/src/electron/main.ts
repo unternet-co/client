@@ -57,9 +57,13 @@ function setupAutoUpdater() {
   autoUpdater.on('error', (error) => {
     log.error('Error in auto-updater:', error);
   });
+
+  // Store the interval ID so we can clear it if needed
+  let autoUpdateIntervalId: NodeJS.Timeout | null = null;
+
   
   // Check for updates every hour
-  setInterval(() => {
+  autoUpdateIntervalId = setInterval(() => {
     autoUpdater.checkForUpdates();
   }, AUTOUPDATE_INTERVAL);
   
