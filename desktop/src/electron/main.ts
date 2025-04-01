@@ -4,10 +4,11 @@ import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 
 const isDev = process.env.NODE_ENV !== "production";
+const AUTOUPDATE_INTERVAL = 3_600_000; // 60 * 60 * 1000
 
 // Configure logging
 autoUpdater.logger = log;
-(autoUpdater.logger as any).transports.file.level = 'info';
+(autoUpdater.logger as any).transports.file.level = isDev ? 'debug' : 'info';
 
 function formatReleaseNotes(notes: string | { note: string }[] | undefined): string {
   if (typeof notes === 'string') return notes;
@@ -56,11 +57,15 @@ function setupAutoUpdater() {
   autoUpdater.on('error', (error) => {
     log.error('Error in auto-updater:', error);
   });
+
+  // Store the interval ID so we can clear it if needed
+  let autoUpdateIntervalId: NodeJS.Timeout | null = null;
+
   
   // Check for updates every hour
-  setInterval(() => {
+  autoUpdateIntervalId = setInterval(() => {
     autoUpdater.checkForUpdates();
-  }, 60 * 60 * 1000);
+  }, AUTOUPDATE_INTERVAL);
   
   // Initial check
   autoUpdater.checkForUpdates();

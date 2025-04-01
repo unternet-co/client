@@ -1,11 +1,11 @@
 {
   "name": "@unternet/client-desktop",
-  "version": "0.3.3",
+  "version": "0.3.1",
   "homepage": "https://unternet.co",
   "license": "ISC",
   "main": "dist/main.js",
   "scripts": {
-    "build": "vite build && tsc",
+    "build": "vite build",
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
     "dev:electron": "tsc && electron .",
     "dev:web": "vite"
