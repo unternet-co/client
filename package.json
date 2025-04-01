@@ -60,7 +60,7 @@
   },
   "scripts": {
     "build": "npm run build:kernel && npm run build:desktop",
-    "build:desktop": "cd desktop && npx rimraf dist && cross-env NODE_ENV=production npm run build",
+    "build:desktop": "cd desktop && rimraf dist && cross-env NODE_ENV=production npm run build",
     "build:kernel": "cd kernel && npm run build",
     "clean": "rimraf desktop/dist && rimraf kernel/dist && rm -rf dist",
     "dev": "npm run dev:desktop",
