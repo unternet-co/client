@@ -7,7 +7,7 @@ const isDev = process.env.NODE_ENV !== "production";
 
 // Configure logging
 autoUpdater.logger = log;
-(autoUpdater.logger as any).transports.file.level = 'info';
+(autoUpdater.logger as any).transports.file.level = isDev ? 'debug' : 'info';
 
 function formatReleaseNotes(notes: string | { note: string }[] | undefined): string {
   if (typeof notes === 'string') return notes;
