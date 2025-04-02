@@ -5,6 +5,7 @@
     "@unternet/kernel": "file:.."
   },
   "devDependencies": {
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "tsx": "^4.19.3"
   }
 }

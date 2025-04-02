@@ -1,52 +1,25 @@
-import { type LanguageModel } from "ai";
-import {
-  Interpreter,
-  Interaction,
-  Dispatcher,
-  Resource,
-  InteractionInput,
-  ResourceMap,
-  createInteraction,
-} from "../../src/index";
+import { type LanguageModel } from 'ai';
+import { Interpreter, Resource, InteractionInput } from '../../src/index';
 
 interface KernelInit {
   model: LanguageModel;
-  resources?: Resource[];
+  resources?: Array<Resource>;
 }
 
 export class Kernel {
   interpreter: Interpreter;
-  dispatcher: Dispatcher;
-  interactions: Interaction[] = [];
-  resources = new ResourceMap();
 
   constructor({ model, resources }: KernelInit) {
-    this.interpreter = new Interpreter(model);
-    this.dispatcher = new Dispatcher();
-    if (resources) {
-      for (const resource of resources) this.resources.add(resource);
-    }
-  }
-
-  addInteraction(interaction: Interaction) {
-    this.interactions.push(interaction);
-    return this.interactions.length - 1;
+    this.interpreter = new Interpreter({ model, resources });
   }
 
   async handleInput(input: InteractionInput) {
-    const interaction = createInteraction(input);
-    const interactionId = this.addInteraction(interaction);
+    const interaction = { input };
 
     // Get output from the interpreter
-    const output = await this.interpreter.generateOutput(this.interactions);
+    const output = await this.interpreter.generateOutput([interaction]);
 
-    // // Add the output to the interaction
-    // this.interactions[interactionIndex].outputs.push(output);
-
-    // if (output.complete) return;
-    // if (output.type === 'action') {
-    // // Do something with the action, add the action's output, then continue
-    // }
+    console.log(output);
   }
 }
 
