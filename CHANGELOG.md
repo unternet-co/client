@@ -1,3 +1,9 @@
+## 0.3.2
+
+- Merge pull request #5 from tripledoublev/feat/build-pipeline
+
+Update dependencies and migrate to @electron/notarize
+
 ## 0.3.1
 
 - regen lockfile (#95)
