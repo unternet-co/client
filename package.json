@@ -77,10 +77,10 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@electron/notarize": "^3.0.1",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron-builder": "^26.0.12",
-    "electron-notarize": "^1.2.2",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
@@ -92,6 +92,7 @@
     "classnames": "^2.5.1",
     "electron-log": "^5.3.2",
     "electron-updater": "^6.3.9",
+    "glob": "^11.0.1",
     "lit-markdown": "^1.3.2"
   },
   "lint-staged": {
