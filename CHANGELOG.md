@@ -1,3 +1,7 @@
+## 0.4.0
+
+- merge latest, regen lockfile
+
 ## 0.3.1
 
 - regen lockfile (#95)
