@@ -5,7 +5,7 @@
   "license": "ISC",
   "main": "dist/main.js",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsc",
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
     "dev:electron": "tsc && electron .",
     "dev:web": "vite"
