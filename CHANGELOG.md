@@ -1,3 +1,9 @@
+## 0.3.4
+
+- Merge pull request #7 from tripledoublev/feat/build-pipeline
+
+Update build script to include TypeScript compilation in the build pr…
+
 ## 0.3.3
 
 - Merge pull request #6 from tripledoublev/feat/build-pipeline
