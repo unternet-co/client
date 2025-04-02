@@ -4,34 +4,13 @@ on:
   push:
     branches:
       - main
-      - feat/tagging # TODO: Remove after merging
 permissions:
   contents: write
 jobs:
-  build:
-    name: Build
+  version:
+    name: Version and Tag
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-  release:
-    name: Version, Tag, Release
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/tagging'
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,6 +21,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+
+      - name: Clean npm cache
+        run: npm cache clean --force
 
       - name: Install dependencies
         run: npm ci
@@ -88,11 +70,50 @@ jobs:
           git push --follow-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload release with .dmg
-        uses: softprops/action-gh-release@v2
+
+  package:
+    name: Build and Release
+    needs: version
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Install dependencies (Ubuntu)
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt-get install -y libarchive-tools
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
-          tag_name: ${{ steps.bump_version.outputs.tag_name }}
-          files: |
-            dist/*.dmg
+          submodules: true
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and release (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: true
+          mac_certs: ${{ secrets.mac_certs }}
+          mac_certs_password: ${{ secrets.mac_certs_password }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.apple_id }}
+          APPLE_ID_PASS: ${{ secrets.apple_id_pass }}
+          APPLE_TEAM_ID: ${{ secrets.apple_team_id }}
+
+      - name: Build and release (Windows/Linux)
+        if: matrix.os != 'macos-latest'
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: true
