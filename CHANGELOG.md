@@ -1,3 +1,9 @@
+## 0.3.3
+
+- Merge pull request #6 from tripledoublev/feat/build-pipeline
+
+Fix import path for @electron/notarize in notarize.ts
+
 ## 0.3.2
 
 - Merge pull request #5 from tripledoublev/feat/build-pipeline
