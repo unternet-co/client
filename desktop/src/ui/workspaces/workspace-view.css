@@ -15,10 +15,31 @@ workspace-view .workspace-content {
 
 .command-bar {
   border-top: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: var(--space-4);
+}
+
+.command-bar__content {
+  align-items: center;
+  display: flex;
+  margin: 0 auto;
+  max-width: 580px;
+}
+
+.command-bar__upload {
+  line-height: 0;
+  margin-left: var(--space-2);
+
+  & input {
+    display: none;
+  }
+
+  & label {
+    color: var(--color-neutral-70);
+    cursor: pointer;
+    display: block;
+    line-height: 0;
+    padding: var(--space-2);
+  }
 }
 
 /* resource-bar,
