@@ -182,8 +182,6 @@ export class WorkspaceModel {
       throw new Error(`Couldn't find output with index '${outputIndex}'.`);
     }
 
-    const output = interaction.outputs[outputIndex];
-
     interaction.outputs[outputIndex] = {
       ...interaction.outputs[outputIndex],
       content,
