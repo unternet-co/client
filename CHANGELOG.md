@@ -1,3 +1,7 @@
+## 0.6.0
+
+- 0.5.6
+
 ## 0.3.2
 
 - fix/remove-db-service
