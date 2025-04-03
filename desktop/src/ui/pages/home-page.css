@@ -43,7 +43,7 @@ command-input {
 .recent-workspaces::before {
   background: linear-gradient(
     to bottom,
-    var(--color-neutral-50) 0%,
+    var(--color-bg-page) 0%,
     transparent 100%
   );
   top: 0;
@@ -54,7 +54,7 @@ command-input {
 .recent-workspaces::after {
   background: linear-gradient(
     to top,
-    var(--color-neutral-50) 0%,
+    var(--color-bg-page) 0%,
     transparent 100%
   );
   bottom: 0;
@@ -95,7 +95,7 @@ command-input {
   right: var(--space-6);
   top: 50%;
   transform: translateY(-50%);
-  background: var(--color-neutral-200);
+  background: var(--color-action-1000);
   border: none;
   cursor: pointer;
   opacity: 0;
@@ -110,7 +110,11 @@ command-input {
 }
 
 .delete-button un-icon {
-  color: red;
+  color: var(--color-action-0);
+}
+
+.delete-button:hover {
+  background: var(--color-error-500);
 }
 
 .workspace:hover .delete-button {
