@@ -1,3 +1,9 @@
+## 0.3.2
+
+- fix/remove-db-service
+
+This file is unused.
+
 ## 0.3.1
 
 - regen lockfile (#95)
