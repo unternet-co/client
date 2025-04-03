@@ -21,25 +21,6 @@ home-page {
   flex-grow: 1;
 }
 
-.new-workspace-button {
-  background: var(--color-action-800);
-  color: var(--color-neutral-0);
-  border: none;
-  padding: 6px var(--space-4);
-  border-radius: var(--rounded);
-  cursor: pointer;
-  font-size: var(--text-sm);
-  transition: background-color 0.2s ease;
-}
-
-.new-workspace-button:hover {
-  background: var(--color-action-700);
-}
-
-.new-workspace-button:active {
-  background: var(--color-action-900);
-}
-
 .recent-workspaces {
   position: relative;
   flex-shrink: 1;
@@ -122,26 +103,8 @@ home-page {
   right: var(--space-6);
   top: 50%;
   transform: translateY(-50%);
-  background: var(--color-action-1000);
-  border: none;
-  cursor: pointer;
   opacity: 0;
-  transition:
-    opacity 0.2s ease,
-    color 0.2s ease;
-  padding: var(--space-2);
-  border-radius: var(--rounded-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.delete-button un-icon {
-  color: var(--color-action-0);
-}
-
-.delete-button:hover {
-  background: var(--color-error-500);
+  transition: opacity 0.2s ease;
 }
 
 .workspace:hover .delete-button {

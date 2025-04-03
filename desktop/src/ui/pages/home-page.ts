@@ -3,17 +3,16 @@ import { formatTimestamp } from '../../utils';
 import { Workspace, WorkspaceModel } from '../../models/workspaces';
 import { TabModel } from '../../models/tabs';
 import { dependencies } from '../../base/dependencies';
-import { Kernel } from '../../kernel';
 import { ModalService } from '../../services/modal-service';
 import cn from 'classnames';
 import { DisposableGroup } from '../../base/disposable';
 import './home-page.css';
+import '../common/button';
 
 export class HomePage extends HTMLElement {
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private tabModel = dependencies.resolve<TabModel>('TabModel');
-  private kernel = dependencies.resolve<Kernel>('Kernel');
   private modalService = dependencies.resolve<ModalService>('ModalService');
   private recentContainer: HTMLUListElement;
   private filterInput: HTMLInputElement;
@@ -52,12 +51,10 @@ export class HomePage extends HTMLElement {
             @blur=${this.handleFilterBlur.bind(this)}
           />
         </div>
-        <button
-          class="new-workspace-button"
-          @click=${this.handleCreateWorkspace.bind(this)}
-        >
+        <un-button @click=${this.handleCreateWorkspace.bind(this)}>
+          <un-icon name="plus"></un-icon>
           New Workspace
-        </button>
+        </un-button>
       </div>
       <ul class="recent-workspaces"></ul>
     `;
@@ -181,13 +178,14 @@ export class HomePage extends HTMLElement {
         <div class="workspace-metadata">
           <span class="last-modified">${modifiedString}</span>
         </div>
-        <button
+        <un-button
+          type="secondary"
           class="delete-button"
           @click=${(e: PointerEvent) => this.handleClickDelete(e, workspace.id)}
           title="Delete workspace"
         >
           <un-icon name="delete"></un-icon>
-        </button>
+        </un-button>
       </li>
     `;
   }

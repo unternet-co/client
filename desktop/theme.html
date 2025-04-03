@@ -9,12 +9,30 @@
     <title>Theme</title>
     <link rel="stylesheet" href="src/ui/common/styles/global.css" />
     <script type="module" src="src/ui/common/icon.ts"></script>
+    <script type="module" src="src/ui/common/button.ts"></script>
     <style>
       body {
         overflow: auto;
         background: var(--color-bg-content);
         padding: var(--space-8);
         gap: var(--space-8);
+      }
+
+      .button-showcase {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+      }
+
+      .button-group {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+      }
+
+      .button-group h4 {
+        min-width: 100px;
+        margin: 0;
       }
 
       .swatch {
@@ -177,9 +195,6 @@ return "Hello, World!";
     <div class="theme-block">
       <h2>Elements</h2>
       <div>
-        <h3>Buttons</h3>
-        <button>Test</button>
-        <button disabled>Test</button>
         <a href="#">Link</a>
       </div>
       <div>
@@ -211,6 +226,45 @@ return "Hello, World!";
         </div>
       </div>
     </div>
+    <div class="theme-block">
+      <h2>Buttons</h2>
+      <div class="button-showcase">
+        <div class="button-group">
+          <h4>Primary</h4>
+          <un-button type="primary" text="Primary Button"></un-button>
+          <un-button type="primary" text="Disabled" disabled="true"></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Secondary</h4>
+          <un-button type="secondary" text="Secondary Button"></un-button>
+          <un-button
+            type="secondary"
+            text="Disabled"
+            disabled="true"
+          ></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Danger</h4>
+          <un-button type="negative" text="Negative Button"></un-button>
+          <un-button
+            type="negative"
+            text="Disabled"
+            disabled="true"
+          ></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Outline</h4>
+          <un-button type="outline" text="Outline Button"></un-button>
+          <un-button type="outline" text="Disabled" disabled="true"></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Ghost</h4>
+          <un-button type="ghost" text="Ghost Button"></un-button>
+          <un-button type="ghost" text="Disabled" disabled="true"></un-button>
+        </div>
+      </div>
+    </div>
+
     <div class="theme-block">
       <h2>Common Icons</h2>
       <div class="icon-grid" id="icon-grid">
