@@ -24,9 +24,6 @@ jobs:
         with:
           submodules: true
 
-      - name: Pull latest changes
-        run: git pull origin ${{ github.ref_name }} && git fetch --tags
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
