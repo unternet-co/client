@@ -1,6 +1,6 @@
 import { css, html, render } from 'lit';
-import { DisposableGroup } from '../../base/disposable';
-import { attachStyles } from '../../utils/dom';
+import { DisposableGroup } from '../../common/disposable';
+import { attachStyles } from '../../common/utils/dom';
 import '../common/icon';
 
 export class TabSelectEvent extends Event {

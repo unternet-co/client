@@ -1,21 +1,21 @@
-import { CommandSubmitEvent } from "./command-input";
-import "./command-input";
-import "./interaction-history";
-import "./workspace-view.css";
-import "./resource-bar";
-import { html, render } from "lit";
-import { Workspace } from "../../models/workspaces";
-import { Kernel } from "../../kernel";
-import { dependencies } from "../../base/dependencies";
+import { CommandSubmitEvent } from './command-input';
+import './command-input';
+import './interaction-history';
+import './workspace-view.css';
+import './resource-bar';
+import { html, render } from 'lit';
+import { Workspace } from '../../core/workspaces';
+import { Kernel } from '../../ai/kernel';
+import { dependencies } from '../../common/dependencies';
 
 export class WorkspaceView extends HTMLElement {
-  workspaceId: Workspace["id"];
-  kernel = dependencies.resolve<Kernel>("Kernel");
-  static observedAttributes = ["for"];
+  workspaceId: Workspace['id'];
+  kernel = dependencies.resolve<Kernel>('Kernel');
+  static observedAttributes = ['for'];
 
   // TODO: Implement dependency injection with decorators
   connectedCallback() {
-    this.workspaceId = this.getAttribute("for") || "";
+    this.workspaceId = this.getAttribute('for') || '';
     render(this.template, this);
   }
 
@@ -38,4 +38,4 @@ export class WorkspaceView extends HTMLElement {
   }
 }
 
-customElements.define("workspace-view", WorkspaceView);
+customElements.define('workspace-view', WorkspaceView);

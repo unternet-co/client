@@ -1,11 +1,16 @@
 import { html, render } from 'lit';
-import { formatTimestamp } from '../../utils';
-import { Workspace, WorkspaceModel } from '../../models/workspaces';
-import { TabModel } from '../../models/tabs';
-import { dependencies } from '../../base/dependencies';
-import { ModalService } from '../../services/modal-service';
+import { formatTimestamp } from '../../common/utils/index';
+import { Workspace, WorkspaceModel } from '../../core/workspaces';
+import { TabModel } from '../../core/tabs';
+import { dependencies } from '../../common/dependencies';
+import {
+  CommandInputElement,
+  CommandSubmitEvent,
+} from '../workspaces/command-input';
+import { Kernel } from '../../ai/kernel';
+import { ModalService } from '../../modals/modal-service';
 import cn from 'classnames';
-import { DisposableGroup } from '../../base/disposable';
+import { DisposableGroup } from '../../common/disposable';
 import './home-page.css';
 import '../common/button';
 import '../common/input';
@@ -14,6 +19,7 @@ export class HomePage extends HTMLElement {
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private tabModel = dependencies.resolve<TabModel>('TabModel');
+  private kernel = dependencies.resolve<Kernel>('Kernel');
   private modalService = dependencies.resolve<ModalService>('ModalService');
   private recentContainer: HTMLUListElement;
   private filterInput: HTMLInputElement;

@@ -1,21 +1,19 @@
-import { initTabStoreData, TabModel, TabStoreData } from './models/tabs';
-import { Interaction } from './models/interactions';
-import { Workspace, WorkspaceModel } from './models/workspaces';
-import { dependencies } from './base/dependencies';
-import { DatabaseService } from './services/database-service';
-import { KeyStoreService } from './services/keystore-service';
-import { ShortcutService } from './services/shortcut-service';
-import { Kernel } from './kernel';
-import { createModel } from './ext/llm';
-import { appendEl, createEl } from './utils/dom';
-import { registerGlobalShortcuts } from './global-shortcuts';
-import { ModalService } from './services/modal-service';
+import { initTabStoreData, TabModel, TabStoreData } from './core/tabs';
+import { Interaction } from './core/interactions';
+import { Workspace, WorkspaceModel } from './core/workspaces';
+import { dependencies } from './common/dependencies';
+import { DatabaseService } from './storage/database-service';
+import { KeyStoreService } from './storage/keystore-service';
+import { ShortcutService } from './shortcuts/shortcut-service';
+import { appendEl, createEl } from './common/utils/dom';
+import { registerGlobalShortcuts } from './shortcuts/global-shortcuts';
+import { ModalService } from './modals/modal-service';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
-import './ui/modals/global';
+import './ui/modals/settings-modal';
 import './ui/app-root';
-import { ConfigData, ConfigModel, initConfig } from './models/config';
+import { ConfigData, ConfigModel, initConfig } from './core/config';
 
 /* Initialize databases & stores */
 
@@ -39,7 +37,7 @@ const configModel = new ConfigModel(configStore);
 
 /* Initialize kernel & LLMs */
 
-const kernel = new Kernel({ model: createModel(), workspaceModel });
+// const kernel = new Kernel({ model: createModel(), workspaceModel });
 
 /* Initialize services */
 
@@ -51,7 +49,7 @@ const modalService = new ModalService();
 dependencies.registerSingleton('WorkspaceModel', workspaceModel);
 dependencies.registerSingleton('TabModel', tabModel);
 dependencies.registerSingleton('ConfigModel', configModel);
-dependencies.registerSingleton('Kernel', kernel);
+// dependencies.registerSingleton('Kernel', kernel);
 dependencies.registerSingleton('ShortcutService', shortcutService);
 dependencies.registerSingleton('ModalService', modalService);
 
