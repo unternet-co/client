@@ -151,12 +151,9 @@ export class TabHandleElement extends HTMLElement {
         font-size: var(--text-sm);
       }
 
-      :host(:hover) {
-        background: var(--color-neutral-50);
-      }
-
+      :host(:hover),
       :host([active]) {
-        background: var(--color-neutral-0);
+        background: var(--color-bg-content);
       }
 
       :host([active]:not([static])) .inner {
@@ -198,6 +195,10 @@ export class TabHandleElement extends HTMLElement {
       :host([active]) un-icon,
       :host(:hover) un-icon {
         opacity: 1;
+      }
+
+      un-icon:hover {
+        background: var(--color-bg-page);
       }
     `;
   }

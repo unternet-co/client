@@ -84,7 +84,7 @@ top-bar .settings-button {
 }
 
 top-bar .settings-button:hover {
-  background-color: var(--color-neutral-20, rgba(0, 0, 0, 0.05));
+  background-color: var(--color-neutral-200);
 }
 
 top-bar .settings-button un-icon {
