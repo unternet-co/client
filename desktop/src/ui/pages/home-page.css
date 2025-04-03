@@ -35,7 +35,7 @@ command-input {
 .recent-workspaces::before,
 .recent-workspaces::after {
   flex-shrink: 0;
-  content: "";
+  content: '';
   position: sticky;
   display: block;
 }
@@ -43,7 +43,7 @@ command-input {
 .recent-workspaces::before {
   background: linear-gradient(
     to bottom,
-    var(--color-neutral-5) 0%,
+    var(--color-neutral-50) 0%,
     transparent 100%
   );
   top: 0;
@@ -54,7 +54,7 @@ command-input {
 .recent-workspaces::after {
   background: linear-gradient(
     to top,
-    var(--color-neutral-5) 0%,
+    var(--color-neutral-50) 0%,
     transparent 100%
   );
   bottom: 0;
@@ -66,14 +66,13 @@ command-input {
   cursor: pointer;
   background: var(--color-neutral-0);
   padding: var(--space-5) var(--space-6);
-  /* transition: all 0.3s ease; */
   border-radius: var(--rounded);
   border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   font-size: var(--text-lg);
-  position: relative; /* For absolute positioning of delete button */
+  position: relative;
 }
 
 .workspace-metadata {
@@ -86,7 +85,7 @@ command-input {
 
 .recent-workspaces .workspace:hover,
 .recent-workspaces .workspace.selected {
-  background: var(--color-action);
+  background: var(--color-action-800);
   color: var(--color-neutral-0);
 }
 
@@ -96,7 +95,7 @@ command-input {
   right: var(--space-6);
   top: 50%;
   transform: translateY(-50%);
-  background: var(--color-neutral-20);
+  background: var(--color-neutral-200);
   border: none;
   cursor: pointer;
   opacity: 0;
@@ -121,21 +120,21 @@ command-input {
 /* Pulsing border animation for newly created and pending workspaces */
 @keyframes pulseBorder {
   0% {
-    border-color: var(--color-action, #0078d4);
+    border-color: var(--color-action-800);
   }
   50% {
     border-color: rgba(0, 120, 212, 0.6);
   }
   100% {
-    border-color: var(--color-action, #0078d4);
+    border-color: var(--color-action-800);
   }
 }
 
 .recent-workspaces .new-workspace {
   position: relative;
-  color: var(--color-action);
-  background: var(--color-neutral-15, #f5f5f5);
-  border: 1px solid var(--color-action, #0078d4);
+  color: var(--color-action-800);
+  background: var(--color-neutral-150);
+  border: 1px solid var(--color-action-800);
   animation: pulseBorder 1.5s ease-in-out infinite;
 }
 
@@ -154,7 +153,7 @@ command-input {
 
 .delete-confirmation p {
   margin: 0;
-  color: var(--color-neutral-90);
+  color: var(--color-neutral-900);
 }
 
 .button-container {
@@ -173,19 +172,19 @@ command-input {
 }
 
 .cancel-button {
-  background-color: var(--color-neutral-20);
-  color: var(--color-neutral-90);
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-900);
 }
 
 .delete-confirm-button {
-  background-color: var(--color-error);
-  color: white;
+  background-color: var(--color-error-500);
+  color: var(--color-error-0);
 }
 
 .cancel-button:hover {
-  background-color: var(--color-neutral-30);
+  background-color: var(--color-neutral-300);
 }
 
 .delete-confirm-button:hover {
-  background-color: var(--color-error-dark, #c42b1c);
+  background-color: var(--color-error-600);
 }

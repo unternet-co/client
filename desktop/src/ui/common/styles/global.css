@@ -1,65 +1,30 @@
 @import url(./reset.css);
+@import url(./theme.css);
 
 :root {
-  /* Colors */
-  --color-neutral-0: #ffffff;
-  --color-neutral-5: #f4f5f6;
-  --color-neutral-10: #e4e5e7;
-  --color-neutral-15: #dbdcde;
-  --color-neutral-20: #cccdd0;
-  --color-neutral-30: #b4b5b8;
-  --color-neutral-40: #9c9da0;
-  --color-neutral-50: #858588;
-  --color-neutral-60: #6e6e71;
-  --color-neutral-70: #565759;
-  --color-neutral-80: #3f3f41;
-  --color-neutral-90: #28282a;
-  --color-neutral-100: #111112;
-
-  --color-action: #0f2fe4;
-  --color-error: #df4815;
-  --color-warning: #ffed68;
-  --color-success: #58bb1f;
-
   /* Spacing */
-  --space-base: 4px;
-  --space-1: calc(var(--space-base) * 0.5);
-  --space-2: calc(var(--space-base) * 1);
-  --space-3: calc(var(--space-base) * 1.5);
-  --space-4: calc(var(--space-base) * 2);
-  --space-5: calc(var(--space-base) * 3);
-  --space-6: calc(var(--space-base) * 4);
-  --space-7: calc(var(--space-base) * 6);
-  --space-8: calc(var(--space-base) * 8);
-  --space-9: calc(var(--space-base) * 10);
-  --space-10: calc(var(--space-base) * 12);
+  --space-1: calc(var(--spacing) * 0.5);
+  --space-2: calc(var(--spacing) * 1);
+  --space-3: calc(var(--spacing) * 1.5);
+  --space-4: calc(var(--spacing) * 2);
+  --space-5: calc(var(--spacing) * 3);
+  --space-6: calc(var(--spacing) * 4);
+  --space-7: calc(var(--spacing) * 6);
+  --space-8: calc(var(--spacing) * 8);
+  --space-9: calc(var(--spacing) * 10);
+  --space-10: calc(var(--spacing) * 12);
 
   /* Border radius */
   --rounded-sm: 2px;
   --rounded: 4px;
 
   /* --font-sans: 'iA Writer Quattro', 'iA Writer Quattro S', system-ui, sans-serif; */
-  --font-sans: ui-sans-serif, system-ui, "Roboto", sans-serif;
-  --font-mono: "iA Writer Mono", monospace;
+  --font-sans: ui-sans-serif, system-ui, 'Roboto', sans-serif;
+  --font-mono: 'iA Writer Mono', monospace;
 
   /* Font size */
   --text-scale: 1.125;
-  --text-3xl: calc(var(--text-2xl) * var(--text-scale));
-  --text-2xl: calc(var(--text-xl) * var(--text-scale));
-  --text-xl: calc(var(--text-lg) * var(--text-scale));
-  --text-lg: calc(var(--text-base) * var(--text-scale));
-  --text-base: 13px;
-  --text-sm: calc(var(--text-base) / var(--text-scale));
-  --text-xs: calc(var(--text-sm) / var(--text-scale));
-
-  /* Theme */
-
-  --color-page: var(--color-neutral-0);
-  --color-page-alt: var(--color-neutral-5);
-  --color-text: var(--color-neutral-90);
-  --color-text-faded: var(--color-neutral-60);
-  --color-border: #d8d8d8;
-  --color-input: var(--color-neutral-15);
+  --text-base: 14px;
 }
 
 * {
@@ -71,7 +36,7 @@ a {
 }
 
 a:hover {
-  color: var(--color-action);
+  color: var(--color-action-800);
 }
 
 html,
@@ -89,7 +54,7 @@ body,
 input,
 textarea,
 input {
-  color: var(--color-text);
+  color: var(--color-text-default);
   font-family: var(--font-sans);
   font-size: var(--text-base);
 
@@ -103,8 +68,8 @@ input {
 }
 
 body {
-  background: var(--color-page);
-  color: var(--color-text);
+  background: var(--color-bg-page);
+  color: var(--color-text-default);
   -webkit-overflow-scrolling: touch;
   display: flex;
   flex-direction: column;
@@ -196,7 +161,7 @@ input.error {
 }
 
 .prose blockquote {
-  border-left: 2px groove var(--color-text-faded);
+  border-left: 2px groove var(--color-text-muted);
   padding-left: var(--space-6);
   padding-top: var(--space-3);
   padding-bottom: var(--space-3);
@@ -225,18 +190,18 @@ input.error {
 .prose pre code {
   background: none;
   padding: 0;
-  color: var(--color-text);
+  color: var(--color-text-default);
 }
 
 .prose hr {
   border: none;
-  border-bottom: 1px solid var(--color-page);
-  border-top: 1px solid var(--color-neutral-20);
+  border-bottom: 1px solid var(--color-bg-page);
+  border-top: 1px solid var(--color-neutral-200);
   margin: var(--space-9) 0;
 }
 
 .prose mark {
-  background: var(--color-warning);
+  background: var(--color-highlight-300);
   padding: 0.2em 0.4em;
   border-radius: 3px;
 }
@@ -249,8 +214,8 @@ input.error {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   padding: 0.2em 0.4em;
-  background: var(--color-page);
-  border: 1px solid var(--color-neutral-40);
+  background: var(--color-bg-container);
+  border: 1px solid var(--color-border-default);
   border-bottom-width: 2px;
   border-radius: 4px;
 }

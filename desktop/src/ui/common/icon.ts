@@ -1,28 +1,28 @@
-import { attachStyles, appendEl } from "../../utils/dom";
-import { createElement, icons } from "lucide";
+import { attachStyles, appendEl } from '../../utils/dom';
+import { createElement, icons } from 'lucide';
 
 export const ICON_MAP = {
-  close: "x",
-  home: "home",
-  plus: "plus",
-  toolbox: "shapes",
-  settings: "settings-2",
-  check: "check",
-  dropdown: "chevron-down",
-  enter: "corner-down-left",
-  handle: "grip-horizontal",
-  delete: "trash",
-  history: "history",
+  close: 'x',
+  home: 'home',
+  plus: 'plus',
+  toolbox: 'shapes',
+  settings: 'settings-2',
+  check: 'check',
+  dropdown: 'chevron-down',
+  enter: 'corner-down-left',
+  handle: 'grip-horizontal',
+  delete: 'trash',
+  history: 'history',
 } as const;
 
 export class IconElement extends HTMLElement {
   shadow: ShadowRoot;
   iconElement: SVGElement | null = null;
-  static observedAttributes = ["name"];
+  static observedAttributes = ['name'];
 
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: "open" });
+    this.shadow = this.attachShadow({ mode: 'open' });
   }
 
   connectedCallback() {
@@ -35,11 +35,11 @@ export class IconElement extends HTMLElement {
 
   // Standard attributes for all icons
   private readonly iconAttributes = {
-    stroke: "currentColor",
-    "stroke-width": "1.5",
-    "stroke-linecap": "round",
-    "stroke-linejoin": "round",
-    fill: "none",
+    stroke: 'currentColor',
+    'stroke-width': '1.5',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+    fill: 'none',
   };
 
   /**
@@ -49,14 +49,14 @@ export class IconElement extends HTMLElement {
    */
   private getIcon(iconName: string | null): SVGElement {
     const mappedName =
-      ICON_MAP[iconName as keyof typeof ICON_MAP] || "help-circle";
+      ICON_MAP[iconName as keyof typeof ICON_MAP] || 'help-circle';
     console.log(iconName, mappedName);
 
     // Convert kebab-case to PascalCase for Lucide icons
     const pascalCaseName = mappedName
-      .split("-")
+      .split('-')
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join("");
+      .join('');
 
     const iconData =
       icons[pascalCaseName as keyof typeof icons] || icons.HelpCircle;
@@ -67,7 +67,7 @@ export class IconElement extends HTMLElement {
     if (this.iconElement && this.shadow.contains(this.iconElement)) {
       this.shadow.removeChild(this.iconElement);
     }
-    this.iconElement = this.getIcon(this.getAttribute("name"));
+    this.iconElement = this.getIcon(this.getAttribute('name'));
     appendEl(this.shadow, this.iconElement as unknown as HTMLElement);
     attachStyles(this.shadow, this.styles);
   }
@@ -85,7 +85,7 @@ export class IconElement extends HTMLElement {
       }
 
       :host(.icon-button:hover) {
-        background: var(--color-neutral-10);
+        background: var(--color-bg-container);
       }
 
       svg {
@@ -97,4 +97,4 @@ export class IconElement extends HTMLElement {
   }
 }
 
-customElements.define("un-icon", IconElement);
+customElements.define('un-icon', IconElement);
