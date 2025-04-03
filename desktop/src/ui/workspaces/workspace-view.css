@@ -7,7 +7,7 @@ workspace-view {
 
 workspace-view .workspace-content {
   flex-grow: 1;
-  background: #e9e9e9;
+  background: var(--color-page-alt);
   display: flex;
   justify-content: center;
   overflow: hidden;
