@@ -1,12 +1,12 @@
-import { Notifier } from "../base/notifier";
+import { Notifier } from '../base/notifier';
 import {
   Interaction,
   InteractionInput,
   InteractionOutput,
-} from "./interactions";
-import { DatabaseService } from "../services/database-service";
-import { ulid } from "ulid";
-import { DisposableGroup } from "../base/disposable";
+} from './interactions';
+import { DatabaseService } from '../services/database-service';
+import { ulid } from 'ulid';
+import { DisposableGroup } from '../base/disposable';
 
 export interface Workspace {
   id: string;
@@ -17,20 +17,20 @@ export interface Workspace {
 }
 
 export interface WorkspaceNotification {
-  workspaceId: Workspace["id"];
-  type?: "delete";
+  workspaceId: Workspace['id'];
+  type?: 'delete';
 }
 
 export class WorkspaceModel {
-  readonly workspaces = new Map<Workspace["id"], Workspace>();
-  private interactions = new Map<Workspace["id"], Interaction[]>();
+  readonly workspaces = new Map<Workspace['id'], Workspace>();
+  private interactions = new Map<Workspace['id'], Interaction[]>();
   private notifier = new Notifier<WorkspaceNotification>();
   readonly subscribe = this.notifier.subscribe;
   private disposables = new DisposableGroup();
 
   constructor(
     public workspaceDatabase: DatabaseService<string, Workspace>,
-    public interactionDatabase: DatabaseService<string, Interaction>,
+    public interactionDatabase: DatabaseService<string, Interaction>
   ) {
     this.workspaceDatabase = workspaceDatabase;
     this.interactionDatabase = interactionDatabase;
@@ -38,8 +38,8 @@ export class WorkspaceModel {
   }
 
   subscribeToWorkspace(
-    workspaceId: Workspace["id"],
-    subscriber: (notification: WorkspaceNotification) => void,
+    workspaceId: Workspace['id'],
+    subscriber: (notification: WorkspaceNotification) => void
   ) {
     function workspaceSubscriber(notification?: WorkspaceNotification) {
       if (notification && notification.workspaceId === workspaceId) {
@@ -68,11 +68,11 @@ export class WorkspaceModel {
     return workspaces;
   }
 
-  get(id: Workspace["id"]): Workspace | undefined {
+  get(id: Workspace['id']): Workspace | undefined {
     return this.workspaces.get(id);
   }
 
-  setTitle(id: Workspace["id"], title: string) {
+  setTitle(id: Workspace['id'], title: string) {
     const workspace = this.workspaces.get(id);
     if (workspace) {
       workspace.title = title;
@@ -81,7 +81,7 @@ export class WorkspaceModel {
     }
   }
 
-  async activate(id: Workspace["id"]): Promise<void> {
+  async activate(id: Workspace['id']): Promise<void> {
     const workspace = this.workspaces.get(id);
 
     if (workspace) {
@@ -102,7 +102,7 @@ export class WorkspaceModel {
     this.notifier.notify({ workspaceId: id });
   }
 
-  deactivate(id: Workspace["id"]): void {
+  deactivate(id: Workspace['id']): void {
     this.interactions.delete(id);
   }
 
@@ -110,7 +110,7 @@ export class WorkspaceModel {
     const now = Date.now();
     const workspace = {
       id: ulid(),
-      title: "New workspace",
+      title: 'New workspace',
       created: now,
       accessed: now,
       modified: now,
@@ -122,15 +122,15 @@ export class WorkspaceModel {
     return workspace;
   }
 
-  delete(id: Workspace["id"]) {
+  delete(id: Workspace['id']) {
     this.workspaces.delete(id);
     this.interactions.delete(id);
     this.workspaceDatabase.delete(id);
     this.interactionDatabase.deleteWhere({ workspaceId: id });
-    this.notifier.notify({ workspaceId: id, type: "delete" });
+    this.notifier.notify({ workspaceId: id, type: 'delete' });
   }
 
-  createInteraction(workspaceId: Workspace["id"], input: InteractionInput) {
+  createInteraction(workspaceId: Workspace['id'], input: InteractionInput) {
     const interaction = {
       id: ulid(),
       workspaceId,
@@ -149,12 +149,12 @@ export class WorkspaceModel {
   }
 
   addOutput(
-    interactionId: Interaction["id"],
-    output: InteractionOutput,
+    interactionId: Interaction['id'],
+    output: InteractionOutput
   ): number {
     const interaction = this.getInteraction(interactionId);
     if (!interaction) {
-      throw new Error("Interaction does not exist!");
+      throw new Error('Interaction does not exist!');
     }
 
     interaction.outputs.push(output);
@@ -167,10 +167,10 @@ export class WorkspaceModel {
     return outputIndex;
   }
 
-  updateOutput(
-    interactionId: Interaction["id"],
+  updateOutputContent(
+    interactionId: Interaction['id'],
     outputIndex: number,
-    update: Partial<InteractionOutput>,
+    content: string | any
   ) {
     const interaction = this.getInteraction(interactionId);
 
@@ -184,7 +184,7 @@ export class WorkspaceModel {
 
     interaction.outputs[outputIndex] = {
       ...interaction.outputs[outputIndex],
-      ...update,
+      content,
     };
 
     this.interactionDatabase.update(interaction.id, {
@@ -193,26 +193,26 @@ export class WorkspaceModel {
     this.notifier.notify({ workspaceId: interaction.workspaceId });
   }
 
-  getInteraction(id: Interaction["id"]): Interaction {
+  getInteraction(id: Interaction['id']): Interaction {
     let interaction: Interaction | null = null;
     for (const interactions of this.interactions.values()) {
       const possibleInteraction = interactions.find(
-        (x: Interaction) => x.id === id,
+        (x: Interaction) => x.id === id
       );
       if (possibleInteraction) {
         interaction = possibleInteraction;
         continue;
       }
     }
-    if (!interaction) throw new Error("No interaction with this ID!");
+    if (!interaction) throw new Error('No interaction with this ID!');
     return interaction;
   }
 
-  allInteractions(workspaceId: Workspace["id"]): Interaction[] {
+  allInteractions(workspaceId: Workspace['id']): Interaction[] {
     return this.interactions.get(workspaceId) || [];
   }
 
-  updateModified(id: Workspace["id"]): void {
+  updateModified(id: Workspace['id']): void {
     const workspace = this.workspaces.get(id);
     if (workspace) {
       workspace.modified = Date.now();

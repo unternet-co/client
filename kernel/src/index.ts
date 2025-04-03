@@ -1,5 +1,4 @@
-export { Interpreter } from "./modules/interpreter.js";
-export * from "./modules/interactions.js";
-export * from "./modules/dispatcher.js";
-export * from "./modules/resources.js";
-export { LanguageModel } from "ai";
+export { Interpreter } from './interpreter.js';
+export { Dispatcher } from './dispatcher.js';
+export * from './types.js';
+export { LanguageModel } from 'ai';

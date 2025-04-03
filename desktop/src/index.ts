@@ -1,38 +1,41 @@
-import { initTabStoreData, TabModel, TabStoreData } from "./models/tabs";
-import { Interaction } from "./models/interactions";
-import { Workspace, WorkspaceModel } from "./models/workspaces";
-import { dependencies } from "./base/dependencies";
-import { DatabaseService } from "./services/database-service";
-import { KeyStoreService } from "./services/keystore-service";
-import { ShortcutService } from "./services/shortcut-service";
-import { Kernel } from "./kernel";
-import { createModel } from "./ext/llm";
-import { appendEl, createEl } from "./utils/dom";
-import { registerGlobalShortcuts } from "./global-shortcuts";
-import { ModalService } from "./services/modal-service";
-import "./ui/common/styles/global.css";
-import "./ui/common/styles/reset.css";
-import "./ui/common/styles/markdown.css";
-import "./ui/modals/global";
-import "./ui/app-root";
+import { initTabStoreData, TabModel, TabStoreData } from './models/tabs';
+import { Interaction } from './models/interactions';
+import { Workspace, WorkspaceModel } from './models/workspaces';
+import { dependencies } from './base/dependencies';
+import { DatabaseService } from './services/database-service';
+import { KeyStoreService } from './services/keystore-service';
+import { ShortcutService } from './services/shortcut-service';
+import { Kernel } from './kernel';
+import { createModel } from './ext/llm';
+import { appendEl, createEl } from './utils/dom';
+import { registerGlobalShortcuts } from './global-shortcuts';
+import { ModalService } from './services/modal-service';
+import './ui/common/styles/global.css';
+import './ui/common/styles/reset.css';
+import './ui/common/styles/markdown.css';
+import './ui/modals/global';
+import './ui/app-root';
+import { ConfigData, ConfigModel, initConfig } from './models/config';
 
 /* Initialize databases & stores */
 
 const workspaceDatabaseService = new DatabaseService<string, Workspace>(
-  "workspaces",
+  'workspaces'
 );
 const interactionDatabaseService = new DatabaseService<string, Interaction>(
-  "interactions",
+  'interactions'
 );
-const tabKeyStore = new KeyStoreService<TabStoreData>("tabs", initTabStoreData);
+const tabKeyStore = new KeyStoreService<TabStoreData>('tabs', initTabStoreData);
+const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
 /* Initialize models */
 
 const workspaceModel = new WorkspaceModel(
   workspaceDatabaseService,
-  interactionDatabaseService,
+  interactionDatabaseService
 );
 const tabModel = new TabModel(tabKeyStore, workspaceModel);
+const configModel = new ConfigModel(configStore);
 
 /* Initialize kernel & LLMs */
 
@@ -45,17 +48,18 @@ const modalService = new ModalService();
 
 /* Register dependencies */
 
-dependencies.registerSingleton("WorkspaceModel", workspaceModel);
-dependencies.registerSingleton("TabModel", tabModel);
-dependencies.registerSingleton("Kernel", kernel);
-dependencies.registerSingleton("ShortcutService", shortcutService);
-dependencies.registerSingleton("ModalService", modalService);
+dependencies.registerSingleton('WorkspaceModel', workspaceModel);
+dependencies.registerSingleton('TabModel', tabModel);
+dependencies.registerSingleton('ConfigModel', configModel);
+dependencies.registerSingleton('Kernel', kernel);
+dependencies.registerSingleton('ShortcutService', shortcutService);
+dependencies.registerSingleton('ModalService', modalService);
 
 /* Register global modals */
 
-modalService.register("settings", {
-  title: "Settings",
-  element: "settings-modal",
+modalService.register('settings', {
+  title: 'Settings',
+  element: 'settings-modal',
 });
 
 /* Register keyboard shortcuts */
@@ -64,4 +68,4 @@ registerGlobalShortcuts();
 
 /* Initialize UI */
 
-appendEl(document.body, createEl("app-root"));
+appendEl(document.body, createEl('app-root'));
