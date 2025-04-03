@@ -1,4 +1,4 @@
-import { attachStyles, appendEl } from '../../utils/dom';
+import { attachStyles, appendEl } from '../../common/utils/dom';
 import { createElement, icons } from 'lucide';
 
 export const ICON_MAP = {

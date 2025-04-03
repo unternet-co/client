@@ -6,14 +6,10 @@ import {
   InterpreterResponse,
   Resource,
   TextResponse,
-} from './types.js';
-import {
-  createActionRecord,
-  createMessages,
-  decodeActionUri,
-} from './utils.js';
-import defaultPrompts, { InterpreterPrompts } from './prompts.js';
-import { ActionChoiceObject, actionChoiceSchema } from './schemas.js';
+} from './types';
+import { createActionRecord, createMessages, decodeActionUri } from './utils';
+import defaultPrompts, { InterpreterPrompts } from './prompts';
+import { ActionChoiceObject, actionChoiceSchema } from './schemas';
 
 interface InterpreterInit {
   model: LanguageModel;

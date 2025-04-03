@@ -1,3 +1,16 @@
 ## 0.3.0
 
--
+- {
+  "compilerOptions": {
+  "target": "ES2020",
+  "module": "commonjs",
+  "lib": ["ES2020", "DOM"],
+  "rootDir": "src",
+  "outDir": "dist",
+  "esModuleInterop": true,
+  "skipLibCheck": true,
+  "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/electron/**/*"],
+  "exclude": ["node_modules", "dist"]
+  }
