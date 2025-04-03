@@ -1,3 +1,7 @@
+## 0.5.0
+
+- test with 0.4.1
+
 ## 0.3.2
 
 - fix/remove-db-service
