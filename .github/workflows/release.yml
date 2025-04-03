@@ -17,6 +17,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch all tags
+        run: git fetch --tags
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
