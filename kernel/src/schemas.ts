@@ -48,7 +48,7 @@ function actionSchema(actionId: string, action: ActionDefinition) {
         schema.properties.args.properties
       );
     }
-    schema.properties.arguments.additionalProperties = false;
+    schema.properties.args.additionalProperties = false;
     schema.required.push('args');
   }
 

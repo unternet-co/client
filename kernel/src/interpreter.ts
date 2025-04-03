@@ -1,29 +1,105 @@
 import { LanguageModel, streamText, generateObject, jsonSchema } from 'ai';
 import {
   ActionDefinition,
+  ActionDirective,
   Interaction,
   InterpreterResponse,
   Resource,
-  Strategy,
-  StrategyCallbackOptions,
-  StringEnum,
+  TextResponse,
 } from './types.js';
 import {
-  createActions,
+  createActionRecord,
   createMessages,
-  createStrategyRecord,
   decodeActionUri,
 } from './utils.js';
-import { prompts } from './prompts.js';
-import { z } from 'zod';
+import defaultPrompts from './prompts.js';
 import { ActionChoiceObject, actionChoiceSchema } from './schemas.js';
 
-const textStrategy: Strategy = {
-  name: 'text',
-  description: `Respond with a straight text response. This is appropriate for simple queries that you can provide a definitive answer to, where no research or tool use is needed, or when the prompt is a creative one or a trivial & non-controversial question.`,
-  callback: function ({ interactions, model }): InterpreterResponse {
+interface InterpreterInit {
+  model: LanguageModel;
+  resources?: Array<Resource>;
+  prompts?: typeof defaultPrompts;
+}
+
+export class Interpreter {
+  model: LanguageModel;
+  actions: Record<string, ActionDefinition> = {};
+  prompts: typeof defaultPrompts;
+
+  constructor({ model, resources, prompts }: InterpreterInit) {
+    this.model = model;
+    this.actions = createActionRecord(resources || []);
+    this.prompts = { ...defaultPrompts, ...prompts };
+  }
+
+  /**
+   * Generates a response to the user's query, which can be either text or an action call.
+   * @param interactions An array of interactions
+   * @returns An InterpreterResponse object, of type 'text' or 'action'.
+   */
+  async generateResponse(
+    interactions: Array<Interaction>
+  ): Promise<InterpreterResponse> {
+    const textAction = { description: this.prompts.textActionDescription };
+    const directive = await this.createDirective(interactions, {
+      ...{ text: textAction },
+      ...this.actions,
+    });
+
+    if (directive.protocol === 'text') {
+      return this.createTextResponse(interactions);
+    } else {
+      return {
+        type: 'action',
+        directive,
+      };
+    }
+  }
+
+  /**
+   * Generates an action directive in response to the user's query. Does not handle text generation.
+   * @param interactions An array of interactions
+   * @returns An ActionDirective promise based on the interpreter's resources.
+   */
+  async generateDirective(
+    interactions: Array<Interaction>
+  ): Promise<ActionDirective> {
+    return this.createDirective(interactions, this.actions);
+  }
+
+  private async createDirective(
+    interactions: Array<Interaction>,
+    actions: Record<string, ActionDefinition>
+  ): Promise<ActionDirective> {
+    const output = await generateObject({
+      model: this.model,
+      messages: createMessages(
+        interactions,
+        this.prompts.chooseAction(actions)
+      ),
+      schema: actionChoiceSchema(actions),
+    });
+
+    const { functions } = output.object as ActionChoiceObject;
+    if (!functions || !functions[0].id) return null;
+
+    const fn = functions[0];
+    const { protocol, resourceId, actionId } = decodeActionUri(fn.id);
+
+    return {
+      protocol,
+      resourceId,
+      actionId,
+      args: fn.args,
+    };
+  }
+
+  private async createTextResponse(
+    interactions: Array<Interaction>
+  ): Promise<TextResponse> {
     const output = streamText({
-      model,
+      model: this.model,
+      system: this.prompts.system({ actions: this.actions }),
       messages: createMessages(interactions),
     });
 
@@ -32,83 +108,5 @@ const textStrategy: Strategy = {
       text: output.text,
       textStream: output.textStream,
     };
-  },
-};
-
-const actionStrategy: Strategy = {
-  name: 'function',
-  description: `Use this when you need additional information from one of the provided functions, or the user has asked you to perform an action not generate a response.`,
-  callback: async function ({ interactions, actions, model }) {
-    const output = await generateObject({
-      model,
-      messages: createMessages(interactions),
-      schema: actionChoiceSchema(actions),
-    });
-
-    const { functions } = output.object as ActionChoiceObject;
-
-    if (!functions || !functions[0].id) return null;
-
-    const { protocol, resourceUri, actionId } = decodeActionUri(
-      functions[0].id
-    );
-
-    return {
-      type: 'action',
-      uri: resourceUri,
-      protocol,
-      actionId,
-    };
-  },
-};
-
-interface InterpreterInit {
-  model: LanguageModel;
-  resources?: Array<Resource>;
-}
-
-export class Interpreter {
-  model: LanguageModel;
-  actions: Record<string, ActionDefinition> = {};
-
-  strategies: Record<string, Strategy> = createStrategyRecord(
-    textStrategy,
-    actionStrategy
-  );
-
-  constructor({ model, resources }: InterpreterInit) {
-    this.model = model;
-    this.actions = createActions(resources || []);
-  }
-
-  async generateOutput(
-    interactions: Array<Interaction>
-  ): Promise<InterpreterResponse | null> {
-    const strategy = await this.chooseStrategy(interactions);
-
-    console.log('Chose strategy', strategy);
-
-    if (strategy in this.strategies) {
-      return this.strategies[strategy].callback({
-        interactions,
-        actions: this.actions,
-        model: this.model,
-      });
-    }
-
-    return null;
-  }
-
-  private async chooseStrategy(interactions: Array<Interaction>) {
-    const prompt = prompts.chooseStrategy(this.actions, this.strategies);
-    const response = await generateObject({
-      model: this.model,
-      messages: createMessages(interactions, prompt),
-      schema: z.object({
-        strategy: z.enum(Object.keys(this.strategies) as StringEnum),
-      }),
-    });
-
-    return response.object.strategy;
   }
 }

@@ -1,24 +1,36 @@
 import dedent from 'dedent';
-import { ActionRecord, Strategy, StrategyRecord } from './types.js';
+import { ActionDefinition, ActionRecord } from './types.js';
 
-function strategyString(strategies: Record<string, Strategy>) {
-  const result: Record<string, string> = {};
-  for (const [key, strategy] of Object.entries(strategies)) {
-    result[key] = strategy.description;
-  }
-  return JSON.stringify(result);
-}
+const textActionDescription = `Respond to the user with text/markdown. For giving a direct response to the user, summarizing/adding context, or asking a question if additional information is needed to use a function.`;
 
-function chooseStrategy(actions: ActionRecord, strategies: StrategyRecord) {
+function chooseAction(actions: ActionRecord) {
   return dedent`
     In this environment you have access to a set of functions you can use to answer the user's question.
     Here are the functions available in JSONSchema format:
     ${JSON.stringify(actions)}
-    With the above available functions in mind, choose from one of the following strategies to use while handling the user's query:
-    ${strategyString(strategies)}
+    Choose a function and fill out the appropriate parameters.
   `;
 }
 
-export const prompts = {
-  chooseStrategy,
+interface SystemInit {
+  actions: Record<string, ActionDefinition>;
+}
+
+function system({ actions }: SystemInit) {
+  let prompt = '';
+
+  if (actions) {
+    prompt += dedent`
+      In this environment you have access to a set of functions you can use to answer the user's question.
+      Here are the functions available in JSONSchema format:
+      ${JSON.stringify(actions)}`;
+  }
+
+  return prompt;
+}
+
+export default {
+  textActionDescription,
+  chooseAction,
+  system,
 };

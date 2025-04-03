@@ -26,7 +26,13 @@ export interface TextOutput {
   content: string;
 }
 
-export type InteractionOutput = TextOutput;
+export interface ActionOutput {
+  type: 'action';
+  directive: ActionDirective;
+  content: any;
+}
+
+export type InteractionOutput = TextOutput | ActionOutput;
 
 export type InterpreterResponse = TextResponse | ActionResponse;
 
@@ -38,8 +44,13 @@ export interface TextResponse {
 
 export interface ActionResponse {
   type: 'action';
-  uri: string;
-  actionId: string;
+  directive: ActionDirective;
+}
+
+export interface ActionDirective {
+  protocol: string;
+  resourceId?: string;
+  actionId?: string;
   args?: Record<string, any>;
 }
 
@@ -55,26 +66,10 @@ export interface ActionDefinition {
   params_schema?: JSONSchemaDefinition;
 }
 
-export interface StrategyCallbackOptions {
-  interactions: Array<Interaction>;
-  actions: Record<string, ActionDefinition>;
-  model: LanguageModel;
-}
-
-export interface Strategy {
-  name: string;
-  description: string;
-  callback: (
-    options: StrategyCallbackOptions
-  ) => Promise<InterpreterResponse> | InterpreterResponse;
-}
-
-export type StrategyRecord = Record<string, Strategy>;
-
-export type ActionRecord = { [uri: string]: ActionDefinition };
+export type ActionRecord = { [id: string]: ActionDefinition };
 
 export interface Resource {
-  uri: string;
+  id?: string;
   protocol: string;
   name?: string;
   short_name?: string;
@@ -83,11 +78,14 @@ export interface Resource {
   actions?: Record<string, ActionDefinition>;
 }
 
+export type ProtocolHandler = (
+  directive: ActionDirective
+) => Promise<any> | any;
+
 export interface Protocol {
   scheme: string;
+  handler: ProtocolHandler;
 }
-
-export type ProtocolRecord = { [scheme: string]: Protocol };
 
 export type StringEnum = [string, ...string[]];
 

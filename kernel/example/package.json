@@ -1,8 +1,13 @@
 {
   "name": "@unternet/client-kernel",
   "version": "0.1.5",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
   "dependencies": {
-    "@unternet/kernel": "file:.."
+    "@unternet/kernel": "file:..",
+    "chalk": "^5.4.1",
+    "readline": "^1.3.0"
   },
   "devDependencies": {
     "dotenv": "^16.4.7",
