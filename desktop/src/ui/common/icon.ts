@@ -13,6 +13,7 @@ export const ICON_MAP = {
   handle: 'grip-horizontal',
   delete: 'trash',
   history: 'history',
+  refresh: 'refresh-cw',
 } as const;
 
 export class IconElement extends HTMLElement {
