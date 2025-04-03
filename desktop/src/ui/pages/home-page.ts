@@ -1,26 +1,22 @@
-import { html, render } from "lit";
-import { formatTimestamp } from "../../utils";
-import { Workspace, WorkspaceModel } from "../../models/workspaces";
-import { TabModel } from "../../models/tabs";
-import { dependencies } from "../../base/dependencies";
-import {
-  CommandInputElement,
-  CommandSubmitEvent,
-} from "../workspaces/command-input";
-import { Kernel } from "../../kernel";
-import { ModalService } from "../../services/modal-service";
-import cn from "classnames";
-import { DisposableGroup } from "../../base/disposable";
-import "./home-page.css";
+import { html, render } from 'lit';
+import { formatTimestamp } from '../../utils';
+import { Workspace, WorkspaceModel } from '../../models/workspaces';
+import { TabModel } from '../../models/tabs';
+import { dependencies } from '../../base/dependencies';
+import { Kernel } from '../../kernel';
+import { ModalService } from '../../services/modal-service';
+import cn from 'classnames';
+import { DisposableGroup } from '../../base/disposable';
+import './home-page.css';
 
 export class HomePage extends HTMLElement {
   private workspaceModel =
-    dependencies.resolve<WorkspaceModel>("WorkspaceModel");
-  private tabModel = dependencies.resolve<TabModel>("TabModel");
-  private kernel = dependencies.resolve<Kernel>("Kernel");
-  private modalService = dependencies.resolve<ModalService>("ModalService");
+    dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  private tabModel = dependencies.resolve<TabModel>('TabModel');
+  private kernel = dependencies.resolve<Kernel>('Kernel');
+  private modalService = dependencies.resolve<ModalService>('ModalService');
   private recentContainer: HTMLUListElement;
-  private commandInput: CommandInputElement;
+  private filterInput: HTMLInputElement;
   private selectedIndex: number = -1;
   private workspaces: Workspace[] = [];
   private disposables = new DisposableGroup();
@@ -29,15 +25,13 @@ export class HomePage extends HTMLElement {
     render(this.template, this);
 
     this.recentContainer = this.querySelector(
-      ".recent-workspaces",
+      '.recent-workspaces'
     ) as HTMLUListElement;
-    this.commandInput = this.querySelector(
-      "command-input",
-    ) as CommandInputElement;
+    this.filterInput = this.querySelector('.filter-input') as HTMLInputElement;
 
     this.updateWorkspaces();
     this.disposables.add(
-      this.workspaceModel.subscribe(() => this.updateWorkspaces()),
+      this.workspaceModel.subscribe(() => this.updateWorkspaces())
     );
   }
 
@@ -47,43 +41,66 @@ export class HomePage extends HTMLElement {
 
   get template() {
     return html`
-      <command-input
-        @submit=${this.handleCommandSubmit.bind(this)}
-        @input=${this.handleCommandInput.bind(this)}
-        @keydown=${this.handleKeyDown.bind(this)}
-        @blur=${this.handleCommandBlur.bind(this)}
-      ></command-input>
+      <div class="home-header">
+        <div class="search-container">
+          <input
+            type="search"
+            class="filter-input"
+            placeholder="Filter workspaces..."
+            @input=${this.handleFilterInput.bind(this)}
+            @keydown=${this.handleKeyDown.bind(this)}
+            @blur=${this.handleFilterBlur.bind(this)}
+          />
+        </div>
+        <button
+          class="new-workspace-button"
+          @click=${this.handleCreateWorkspace.bind(this)}
+        >
+          New Workspace
+        </button>
+      </div>
       <ul class="recent-workspaces"></ul>
     `;
   }
 
-  handleCommandInput(e: InputEvent) {
+  handleFilterInput(e: InputEvent) {
     this.selectedIndex = -1;
-    const target = e.target as CommandInputElement;
+    const target = e.target as HTMLInputElement;
     this.updateWorkspaces(target.value);
   }
 
-  handleCommandBlur() {
+  handleFilterBlur() {
     this.selectedIndex = -1;
-    this.updateWorkspaces();
+    this.updateWorkspaces(this.filterInput?.value || '');
   }
 
   updateWorkspaces(filterQuery?: string) {
     this.workspaces = this.workspaceModel
       .all()
       .filter((workspace) =>
-        workspace.title.toLowerCase().includes(filterQuery || ""),
+        workspace.title
+          .toLowerCase()
+          .includes((filterQuery || '').toLowerCase())
       )
       // Sort by modified (most recent first)
       .sort((a, b) => (b.modified || 0) - (a.modified || 0));
 
-    render(
-      this.workspaces.map(this.workspaceTemplate.bind(this)),
-      this.recentContainer,
-    );
+    if (this.workspaces.length === 0) {
+      render(
+        html`<li class="no-workspaces-message">
+          No workspaces found matching "${this.filterInput?.value}"
+        </li>`,
+        this.recentContainer
+      );
+    } else {
+      render(
+        this.workspaces.map(this.workspaceTemplate.bind(this)),
+        this.recentContainer
+      );
+    }
   }
 
-  handleClickDelete(e: PointerEvent, workspaceId: Workspace["id"]) {
+  handleClickDelete(e: PointerEvent, workspaceId: Workspace['id']) {
     e.preventDefault();
     e.stopPropagation();
     // Fixes bug where hitting enter opens more modals
@@ -98,34 +115,38 @@ export class HomePage extends HTMLElement {
     if (len === 0) return;
 
     switch (e.key) {
-      case "ArrowUp":
+      case 'ArrowUp':
         e.preventDefault();
         this.selectedIndex =
           this.selectedIndex <= 0
             ? len - 1 // cycle to end
             : this.selectedIndex - 1;
-        this.updateWorkspaces();
+        this.updateWorkspaces(this.filterInput.value);
         break;
-      case "Tab": // same as ArrowDown
-      case "ArrowDown":
+      case 'Tab': // same as ArrowDown
+      case 'ArrowDown':
         e.preventDefault();
         this.selectedIndex =
           this.selectedIndex >= len - 1
             ? 0 // cycle to beginning
             : this.selectedIndex + 1;
-        this.updateWorkspaces();
+        this.updateWorkspaces(this.filterInput.value);
         break;
-      case "Enter":
+      case 'Enter':
         if (this.selectedIndex >= 0) {
           this.openWorkspace(this.workspaces[this.selectedIndex].id);
           return;
         }
         break;
-      case "Escape":
+      case 'Escape':
         if (this.selectedIndex > -1) {
           this.selectedIndex = -1;
           e.preventDefault();
-          this.updateWorkspaces();
+          this.updateWorkspaces(this.filterInput.value);
+        } else {
+          // Clear the filter input when Escape is pressed and no workspace is selected
+          this.filterInput.value = '';
+          this.updateWorkspaces('');
         }
         break;
     }
@@ -140,29 +161,18 @@ export class HomePage extends HTMLElement {
     }
   }
 
-  async handleCommandSubmit(e: CommandSubmitEvent) {
-    if (this.selectedIndex >= 0) {
-      this.openWorkspace(this.workspaces[this.selectedIndex].id);
-      return;
-    }
-
-    this.commandInput.disabled = true;
-    try {
-      const workspace = this.workspaceModel.create();
-      this.kernel.handleInput(workspace.id, e.input);
-      this.tabModel.create(workspace.id);
-    } finally {
-      this.commandInput.disabled = false;
-    }
+  handleCreateWorkspace() {
+    const workspace = this.workspaceModel.create();
+    this.tabModel.create(workspace.id);
   }
 
   private workspaceTemplate(workspace: Workspace, index: number) {
-    const className = cn("workspace", {
+    const className = cn('workspace', {
       selected: index === this.selectedIndex,
     });
 
     const modifiedString = !workspace.accessed
-      ? "Creating new workspace..."
+      ? 'Creating new workspace...'
       : `Last modified: ${formatTimestamp(workspace.modified)}`;
 
     return html`
@@ -184,28 +194,28 @@ export class HomePage extends HTMLElement {
 
   private createDeleteModal(workspaceId: string) {
     // Create confirmation modal
-    const modal = this.modalService.create({ title: "Delete Workspace" });
+    const modal = this.modalService.create({ title: 'Delete Workspace' });
 
     // Add confirmation content
-    const content = document.createElement("div");
-    content.classList.add("delete-confirmation");
+    const content = document.createElement('div');
+    content.classList.add('delete-confirmation');
 
-    const message = document.createElement("p");
+    const message = document.createElement('p');
     message.textContent =
-      "Are you sure you want to delete this workspace? This action cannot be undone.";
+      'Are you sure you want to delete this workspace? This action cannot be undone.';
     content.appendChild(message);
 
-    const buttonContainer = document.createElement("div");
-    buttonContainer.classList.add("button-container");
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
 
-    const cancelButton = document.createElement("button");
-    cancelButton.classList.add("cancel-button");
-    cancelButton.textContent = "Cancel";
+    const cancelButton = document.createElement('button');
+    cancelButton.classList.add('cancel-button');
+    cancelButton.textContent = 'Cancel';
     cancelButton.onclick = () => modal.close();
 
-    const deleteButton = document.createElement("button");
-    deleteButton.classList.add("delete-confirm-button");
-    deleteButton.textContent = "Delete";
+    const deleteButton = document.createElement('button');
+    deleteButton.classList.add('delete-confirm-button');
+    deleteButton.textContent = 'Delete';
     deleteButton.onclick = () => {
       this.workspaceModel.delete(workspaceId);
       modal.close();
@@ -219,4 +229,4 @@ export class HomePage extends HTMLElement {
   }
 }
 
-customElements.define("home-page", HomePage);
+customElements.define('home-page', HomePage);
