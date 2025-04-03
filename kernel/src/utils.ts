@@ -2,6 +2,7 @@ import {
   ActionOutput,
   ActionRecord,
   Interaction,
+  InteractionInput,
   InteractionOutput,
   Message,
   Protocol,
@@ -9,6 +10,20 @@ import {
   Resource,
   TextOutput,
 } from './types.js';
+
+export function createInteraction(
+  input: InteractionInput | string
+): Interaction {
+  if (typeof input === 'string') {
+    const text = input;
+    input = { text };
+  }
+
+  return {
+    input,
+    outputs: [],
+  };
+}
 
 export function createProtocolHandlers(protocols: Protocol[]) {
   const handlers: Record<string, ProtocolHandler> = {};

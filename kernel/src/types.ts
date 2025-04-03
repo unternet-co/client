@@ -14,7 +14,7 @@ export type Message =
 
 export interface Interaction {
   input: InteractionInput;
-  outputs?: InteractionOutput[];
+  outputs: InteractionOutput[];
 }
 
 export interface InteractionInput {

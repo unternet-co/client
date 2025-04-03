@@ -6,6 +6,7 @@ import 'dotenv/config';
 import { ActionOutput, Interaction, Interpreter } from '../../src';
 import { Dispatcher } from '../../dist';
 import { protocols } from './protocols';
+import { createInteraction } from '../../src/utils';
 
 const model = openai('gpt-4-turbo');
 const interpreter = new Interpreter({ model, resources });
@@ -23,7 +24,7 @@ async function handleInput(userInput: string) {
     return;
   }
 
-  const interaction: Interaction = { input: { text: userInput } };
+  const interaction: Interaction = createInteraction(userInput);
   interactions.push(interaction);
 
   try {
