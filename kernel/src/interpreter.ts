@@ -12,19 +12,19 @@ import {
   createMessages,
   decodeActionUri,
 } from './utils.js';
-import defaultPrompts from './prompts.js';
+import defaultPrompts, { InterpreterPrompts } from './prompts.js';
 import { ActionChoiceObject, actionChoiceSchema } from './schemas.js';
 
 interface InterpreterInit {
   model: LanguageModel;
   resources?: Array<Resource>;
-  prompts?: typeof defaultPrompts;
+  prompts?: InterpreterPrompts;
 }
 
 export class Interpreter {
   model: LanguageModel;
   actions: Record<string, ActionDefinition> = {};
-  prompts: typeof defaultPrompts;
+  prompts: InterpreterPrompts;
 
   constructor({ model, resources, prompts }: InterpreterInit) {
     this.model = model;

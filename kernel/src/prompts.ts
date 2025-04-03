@@ -29,8 +29,12 @@ function system({ actions }: SystemInit) {
   return prompt;
 }
 
-export default {
+const prompts = {
   textActionDescription,
   chooseAction,
   system,
 };
+
+export type InterpreterPrompts = typeof prompts;
+
+export default prompts;
