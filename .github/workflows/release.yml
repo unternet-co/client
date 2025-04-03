@@ -17,8 +17,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch all tags
-        run: git fetch --tags
+      - name: Pull latest changes
+        run: git pull origin ${{ github.ref_name }} && git fetch --tags
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
