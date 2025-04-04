@@ -6,6 +6,8 @@ import type {
   LanguageModel,
 } from 'ai';
 
+/* Messages */
+
 export type Message =
   | CoreSystemMessage
   | CoreUserMessage
@@ -17,8 +19,17 @@ export interface Interaction {
   outputs: InteractionOutput[];
 }
 
+/* Interactions */
+
 export interface InteractionInput {
-  text: string;
+  text?: string;
+  files?: FileInput[];
+}
+
+export interface FileInput {
+  data: Uint8Array;
+  filename?: string;
+  mimeType?: string;
 }
 
 export interface TextOutput {
@@ -34,13 +45,19 @@ export interface ActionOutput {
 
 export type InteractionOutput = TextOutput | ActionOutput;
 
+/* Interpreter */
+
 export type InterpreterResponse = TextResponse | ActionResponse;
+
+/* Interpreter – Text */
 
 export interface TextResponse {
   type: 'text';
   text: Promise<string>;
   textStream: AsyncIterable<string>;
 }
+
+/* Interpreter – Actions */
 
 export interface ActionResponse {
   type: 'action';
@@ -78,6 +95,8 @@ export interface Resource {
   actions?: Record<string, ActionDefinition>;
 }
 
+/* Protocol */
+
 export type ProtocolHandler = (
   directive: ActionDirective
 ) => Promise<any> | any;
@@ -87,7 +106,7 @@ export interface Protocol {
   handler: ProtocolHandler;
 }
 
-export type StringEnum = [string, ...string[]];
+/* JSON Schema */
 
 export interface JSONSchemaDefinition {
   type:
@@ -105,3 +124,7 @@ export interface JSONSchemaDefinition {
   required?: string[];
   additionalProperties?: boolean;
 }
+
+/* Misc */
+
+export type StringEnum = [string, ...string[]];

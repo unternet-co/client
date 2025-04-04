@@ -1,12 +1,14 @@
 import { openai } from '@ai-sdk/openai';
 import readline from 'readline';
-import resources from './resources';
 import chalk from 'chalk';
 import 'dotenv/config';
+
 import { ActionOutput, Interaction, Interpreter } from '../../src';
 import { Dispatcher } from '../../dist';
 import { protocols } from './protocols';
 import { createInteraction } from '../../src/utils';
+import { fileInteraction } from './fs';
+import resources from './resources';
 
 const model = openai('gpt-4-turbo');
 const interpreter = new Interpreter({ model, resources });
@@ -24,7 +26,12 @@ async function handleInput(userInput: string) {
     return;
   }
 
-  const interaction: Interaction = createInteraction(userInput);
+  let interaction: Interaction = createInteraction(userInput);
+
+  if (userInput.startsWith('/file ')) {
+    interaction = fileInteraction(userInput);
+  }
+
   interactions.push(interaction);
 
   try {

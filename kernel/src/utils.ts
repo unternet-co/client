@@ -1,3 +1,4 @@
+import { FilePart, ImagePart, TextPart } from 'ai';
 import {
   ActionOutput,
   ActionRecord,
@@ -60,10 +61,41 @@ export function createMessages(
   let messages: Message[] = [];
 
   for (let interaction of interactions) {
-    messages.push({
-      role: 'user',
-      content: interaction.input.text,
-    });
+    if (interaction.input.text)
+      messages.push({
+        role: 'user',
+        content: interaction.input.text,
+      });
+
+    if (interaction.input.files?.length) {
+      const parts: Array<TextPart | ImagePart | FilePart> =
+        interaction.input.files.map((file) => {
+          if (file.mimeType.startsWith('text/'))
+            return {
+              type: 'text',
+              text: new TextDecoder().decode(file.data),
+            };
+
+          if (file.mimeType.startsWith('image/'))
+            return {
+              type: 'image',
+              image: file.data,
+              mimeType: file.mimeType,
+            };
+
+          return {
+            type: 'file',
+            data: file.data,
+            filename: file.filename,
+            mimeType: file.mimeType,
+          };
+        });
+
+      messages.push({
+        role: 'user',
+        content: parts,
+      });
+    }
 
     if (!interaction.outputs) continue;
 
