@@ -126,6 +126,12 @@
         margin-top: 0.5rem;
         font-size: 12px;
       }
+
+      .app-icons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+      }
     </style>
   </head>
   <body class="theme-block">
@@ -134,6 +140,40 @@
       <h2>Color Palette</h2>
       <div id="color-swatches"></div>
     </div>
+
+    <div class="theme-block">
+      <h2>App Icons</h2>
+      <div class="app-icons">
+        <div class="icon-item">
+          <img
+            src="src/electron/app-icons/client-icon-macOS.png"
+            alt="macOS Icon"
+            width="128"
+            height="128"
+          />
+          <p>macOS Icon (1x)</p>
+        </div>
+        <div class="icon-item">
+          <img
+            src="src/electron/app-icons/client-icon-macOS@2x.png"
+            alt="macOS Icon 2x"
+            width="128"
+            height="128"
+          />
+          <p>macOS Icon (2x)</p>
+        </div>
+        <div class="icon-item">
+          <img
+            src="src/electron/app-icons/client-icon-windows.ico"
+            alt="Windows Icon"
+            width="128"
+            height="128"
+          />
+          <p>Windows Icon</p>
+        </div>
+      </div>
+    </div>
+
     <div class="theme-block">
       <h2>Typography</h2>
       <div>
