@@ -50,7 +50,6 @@ export class IconElement extends HTMLElement {
   private getIcon(iconName: string | null): SVGElement {
     const mappedName =
       ICON_MAP[iconName as keyof typeof ICON_MAP] || 'help-circle';
-    console.log(iconName, mappedName);
 
     // Convert kebab-case to PascalCase for Lucide icons
     const pascalCaseName = mappedName
