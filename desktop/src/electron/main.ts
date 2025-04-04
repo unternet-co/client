@@ -1,17 +1,9 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import path from 'path';
-import { fileURLToPath } from 'url';
 const isDev = process.env.NODE_ENV !== 'production';
-
-function currentDir() {
-  const __filename = fileURLToPath(import.meta.url);
-  return path.dirname(__filename);
-}
 
 function createWindow() {
   /* Create the browser window. */
-
-  console.log(path.join(currentDir(), 'preload.js'));
 
   const win = new BrowserWindow({
     width: 770,
@@ -22,7 +14,7 @@ function createWindow() {
       webviewTag: true,
       nodeIntegration: false, // is default value after Electron v5
       contextIsolation: true, // protect against prototype pollution
-      preload: './preload.js',
+      preload: path.join(__dirname, 'preload.js'),
     },
     // frame: false,
     // only hide the title bar on macOS

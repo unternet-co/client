@@ -4,11 +4,10 @@
   "homepage": "https://unternet.co",
   "license": "ISC",
   "main": "dist/electron/main.js",
-  "type": "module",
   "scripts": {
     "build": "npm run build:web && npm run build:electron",
     "build:web": "vite build",
-    "build:electron": "tsc",
+    "build:electron": "tsc --project tsconfig.node.json",
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
     "dev:electron": "npm run build:electron && electron .",
     "dev:web": "vite"
