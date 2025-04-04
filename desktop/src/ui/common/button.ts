@@ -175,7 +175,8 @@ export class ButtonElement extends HTMLElement {
         box-shadow: none;
       }
 
-      .button--outline:hover:not(:disabled) {
+      .button--outline:hover:not(:disabled),
+      .button--outline:focus:not(:disabled) {
         background-color: transparent;
       }
 
