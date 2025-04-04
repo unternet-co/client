@@ -9,6 +9,11 @@
     <title>Theme</title>
     <link rel="stylesheet" href="src/ui/common/styles/global.css" />
     <script type="module" src="src/ui/common/icon.ts"></script>
+    <script type="module" src="src/ui/common/select.ts"></script>
+    <script type="module" src="src/ui/common/input.ts"></script>
+    <script type="module" src="src/ui/common/textarea.ts"></script>
+    <script type="module" src="src/ui/common/checkbox.ts"></script>
+    <script type="module" src="src/ui/common/radio.ts"></script>
     <script type="module" src="src/ui/common/button.ts"></script>
     <style>
       body {
@@ -16,6 +21,26 @@
         background: var(--color-bg-content);
         padding: var(--space-8);
         gap: var(--space-8);
+      }
+
+      .form-showcase {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-8);
+        max-width: 400px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+
+      .form-group h4 {
+        margin: 0;
+        color: var(--color-text-muted);
+        font-size: var(--text-sm);
+        font-weight: 500;
       }
 
       .button-showcase {
@@ -199,30 +224,63 @@ return "Hello, World!";
       </div>
       <div>
         <h3>Inputs</h3>
-        <div>
-          <label for="example-text-input">Text input</label>
-          <input id="example-text-input" type="text" />
-        </div>
-        <div>
-          <label for="example-text-input">Text input with error</label>
-          <input id="example-text-input" class="error" type="text" />
-          <div class="error-text">
-            <p>Here is some error text</p>
+
+        <div class="form-showcase">
+          <div class="form-group">
+            <h4>Search Input</h4>
+            <un-input type="search" placeholder="Enter some text"></un-input>
+            <un-input type="search" value="Disabled input" disabled></un-input>
+            <h4>Text Input</h4>
+            <un-input type="text" placeholder="Enter some text"></un-input>
+            <un-input type="text" value="Disabled input" disabled></un-input>
           </div>
-        </div>
-        <div>
-          <label for="example-checkbox">Checkbox</label>
-          <input id="example-checkbox" type="checkbox" />
-        </div>
-        <div>
-          <label for="example-radio">Radio</label>
-          <input id="example-radio" type="radio" />
-        </div>
-        <div>
-          <label for="example-select">Select</label>
-          <select id="example-select">
-            <option>default</option>
-          </select>
+
+          <div class="form-group">
+            <h4>Select</h4>
+            <un-select placeholder="Choose an option">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+              <option value="3" disabled>Option 3 (disabled)</option>
+            </un-select>
+            <un-select disabled>
+              <option value="1">Disabled select</option>
+            </un-select>
+          </div>
+
+          <div class="form-group">
+            <h4>Textarea</h4>
+            <un-textarea
+              placeholder="Enter multiple lines of text"
+              rows="3"
+            ></un-textarea>
+            <un-textarea value="Disabled textarea" disabled></un-textarea>
+          </div>
+
+          <div class="form-group">
+            <h4>Checkbox</h4>
+            <un-checkbox label="Unchecked checkbox"></un-checkbox>
+            <un-checkbox label="Checked checkbox" checked></un-checkbox>
+            <un-checkbox label="Disabled checkbox" disabled></un-checkbox>
+          </div>
+
+          <div class="form-group">
+            <h4>Radio</h4>
+            <un-radio-group value="1">
+              <un-radio
+                name="radio-demo"
+                value="1"
+                label="Option 1"
+                checked
+              ></un-radio>
+              <un-radio name="radio-demo" value="2" label="Option 2"></un-radio>
+              <un-radio
+                name="radio-demo"
+                value="3"
+                label="Option 3 (disabled)"
+                disabled
+              ></un-radio>
+            </un-radio-group>
+          </div>
         </div>
       </div>
     </div>
@@ -237,6 +295,9 @@ return "Hello, World!";
         <div class="button-group">
           <h4>Secondary</h4>
           <un-button type="secondary" text="Secondary Button"></un-button>
+          <un-button type="secondary">
+            <un-icon name="delete"></un-icon><span>With Icon</span>
+          </un-button>
           <un-button
             type="secondary"
             text="Disabled"

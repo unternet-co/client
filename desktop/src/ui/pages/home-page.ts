@@ -8,6 +8,7 @@ import cn from 'classnames';
 import { DisposableGroup } from '../../base/disposable';
 import './home-page.css';
 import '../common/button';
+import '../common/input';
 
 export class HomePage extends HTMLElement {
   private workspaceModel =
@@ -42,7 +43,7 @@ export class HomePage extends HTMLElement {
     return html`
       <div class="home-header">
         <div class="search-container">
-          <input
+          <un-input
             type="search"
             class="filter-input"
             placeholder="Filter workspaces..."

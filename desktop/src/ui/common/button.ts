@@ -125,7 +125,6 @@ export class ButtonElement extends HTMLElement {
         justify-content: center;
         gap: var(--space-2);
         line-height: 1;
-        min-height: 32px;
         transition:
           background-color 0.2s,
           opacity 0.2s;
