@@ -1,6 +1,7 @@
-import { html, render } from "lit";
-import "./settings-modal.css";
-import { ModalElement } from "./modal";
+import { html, render } from 'lit';
+import './settings-modal.css';
+import { ModalElement } from './modal';
+import '../common/button';
 
 export class SettingsModal extends ModalElement {
   connectedCallback() {
@@ -18,13 +19,15 @@ export class SettingsModal extends ModalElement {
           <!-- TODO: Add settings -->
         </div>
         <div class="setting-group">
-          <button id="save-settings" @click=${() => this.saveSettings()}>
-            Update settings
-          </button>
+          <un-button
+            type="primary"
+            text="Save Settings"
+            @click=${() => this.saveSettings()}
+          ></un-button>
         </div>
       </div>
     `;
   }
 }
 
-customElements.define("settings-modal", SettingsModal);
+customElements.define('settings-modal', SettingsModal);

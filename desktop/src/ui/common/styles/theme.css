@@ -1,0 +1,369 @@
+:root {
+  /******************************************************* 
+  Raw Colors
+  *******************************************************/
+
+  --color-grey-0: oklch(99.2% 0.003 264.5);
+  --color-grey-50: oklch(95.8% 0.003 264.5);
+  --color-grey-100: oklch(91.2% 0.0029 264.5);
+  --color-grey-200: oklch(85.5% 0.0029 264.5);
+  --color-grey-300: oklch(76.4% 0.004 271.36);
+  --color-grey-400: oklch(64.7% 0.005 271.3);
+  --color-grey-500: oklch(54.9% 0.005 271.3);
+  --color-grey-600: oklch(47.5% 0.005 271.3);
+  --color-grey-700: oklch(40.2% 0.005 271.3);
+  --color-grey-800: oklch(36.1% 0.007 274.8);
+  --color-grey-900: oklch(30% 0.006 258.4);
+  --color-grey-950: oklch(25.6% 0.007 258.4);
+  --color-grey-1000: oklch(22.2% 0.008 264.4);
+
+  --color-blue-0: oklch(97.5% 0.012 259.8);
+  --color-blue-50: oklch(91.7% 0.04 263.7);
+  --color-blue-100: oklch(84.7% 0.075 264);
+  --color-blue-200: oklch(76.7% 0.118 264.2);
+  --color-blue-300: oklch(72.5% 0.142 264.1);
+  --color-blue-400: oklch(65.4% 0.183 264.6);
+  --color-blue-500: oklch(58.4% 0.226 264.3);
+  --color-blue-600: oklch(54.2% 0.254 264.2);
+  --color-blue-700: oklch(49.2% 0.286 264.3);
+  --color-blue-800: oklch(45.2% 0.313 264.1);
+  --color-blue-900: oklch(40% 0.275 264.1);
+  --color-blue-950: oklch(30.5% 0.21 264.1);
+  --color-blue-1000: oklch(21.7% 0.121 263.8);
+
+  --color-purple-0: oklch(97.2% 0.012 301.3);
+  --color-purple-50: oklch(92.7% 0.035 302.1);
+  --color-purple-100: oklch(88.2% 0.057 302.3);
+  --color-purple-200: oklch(81.8% 0.095 302.4);
+  --color-purple-300: oklch(77.1% 0.14 301.7);
+  --color-purple-400: oklch(72.1% 0.175 302);
+  --color-purple-500: oklch(64.2% 0.198 302.3);
+  --color-purple-600: oklch(60% 0.23 302);
+  --color-purple-700: oklch(54.9% 0.246 302.5);
+  --color-purple-800: oklch(49.6% 0.258 302.4);
+  --color-purple-900: oklch(42.9% 0.221 302.5);
+  --color-purple-950: oklch(33.3% 0.175 302.6);
+  --color-purple-1000: oklch(27.1% 0.139 301.9);
+
+  --color-yellow-0: oklch(98.6% 0.02 97.5);
+  --color-yellow-50: oklch(97.2% 0.056 98.7);
+  --color-yellow-100: oklch(95.1% 0.08 97.7);
+  --color-yellow-200: oklch(93.2% 0.116 96.4);
+  --color-yellow-300: oklch(91.4% 0.136 95.4);
+  --color-yellow-400: oklch(88.9% 0.158 94.4);
+  --color-yellow-500: oklch(85.8% 0.176 92.4);
+  --color-yellow-600: oklch(79.7% 0.163 88.7);
+  --color-yellow-700: oklch(73.2% 0.15 86.6);
+  --color-yellow-800: oklch(65.9% 0.135 84.8);
+  --color-yellow-900: oklch(55.1% 0.114 81.4);
+  --color-yellow-950: oklch(41.6% 0.084 82.1);
+  --color-yellow-1000: oklch(32.2% 0.065 79.2);
+
+  --color-red-0: oklch(97.2% 0.013 35.7);
+  --color-red-50: oklch(92.6% 0.035 35.3);
+  --color-red-100: oklch(88.2% 0.057 37.2);
+  --color-red-200: oklch(82.8% 0.085 37);
+  --color-red-300: oklch(77.9% 0.112 36.6);
+  --color-red-400: oklch(71.2% 0.148 36.6);
+  --color-red-500: oklch(63.1% 0.197 36.8);
+  --color-red-600: oklch(56.5% 0.19 36.7);
+  --color-red-700: oklch(53% 0.179 36.6);
+  --color-red-800: oklch(48.1% 0.162 36.8);
+  --color-red-900: oklch(40.3% 0.137 36.3);
+  --color-red-950: oklch(31.3% 0.106 36.5);
+  --color-red-1000: oklch(23.4% 0.079 36.5);
+
+  --color-green-0: oklch(97.1% 0.012 153.7);
+  --color-green-50: oklch(92.7% 0.035 153.2);
+  --color-green-100: oklch(88.2% 0.058 153.6);
+  --color-green-200: oklch(82.7% 0.084 153.3);
+  --color-green-300: oklch(77.9% 0.112 153.1);
+  --color-green-400: oklch(71.2% 0.147 153.2);
+  --color-green-500: oklch(61.3% 0.157 153.1);
+  --color-green-600: oklch(56.7% 0.145 153.1);
+  --color-green-700: oklch(52.9% 0.135 153.3);
+  --color-green-800: oklch(48.1% 0.124 153);
+  --color-green-900: oklch(39.7% 0.102 153.2);
+  --color-green-950: oklch(30.9% 0.08 152.8);
+  --color-green-1000: oklch(23.6% 0.06 153.5);
+
+  /******************************************************* 
+  Brand Colors
+  *******************************************************/
+
+  --color-neutral-0: var(--color-grey-0);
+  --color-neutral-50: var(--color-grey-50);
+  --color-neutral-100: var(--color-grey-100);
+  --color-neutral-200: var(--color-grey-200);
+  --color-neutral-300: var(--color-grey-300);
+  --color-neutral-400: var(--color-grey-400);
+  --color-neutral-500: var(--color-grey-500);
+  --color-neutral-600: var(--color-grey-600);
+  --color-neutral-700: var(--color-grey-700);
+  --color-neutral-800: var(--color-grey-800);
+  --color-neutral-900: var(--color-grey-900);
+  --color-neutral-950: var(--color-grey-950);
+  --color-neutral-1000: var(--color-grey-1000);
+
+  --color-action-0: var(--color-blue-0);
+  --color-action-50: var(--color-blue-50);
+  --color-action-100: var(--color-blue-100);
+  --color-action-200: var(--color-blue-200);
+  --color-action-300: var(--color-blue-300);
+  --color-action-400: var(--color-blue-400);
+  --color-action-500: var(--color-blue-500);
+  --color-action-600: var(--color-blue-600);
+  --color-action-700: var(--color-blue-700);
+  --color-action-800: var(--color-blue-800);
+  --color-action-900: var(--color-blue-900);
+  --color-action-950: var(--color-blue-950);
+  --color-action-1000: var(--color-blue-1000);
+
+  --color-reaction-0: var(--color-purple-0);
+  --color-reaction-50: var(--color-purple-50);
+  --color-reaction-100: var(--color-purple-100);
+  --color-reaction-200: var(--color-purple-200);
+  --color-reaction-300: var(--color-purple-300);
+  --color-reaction-400: var(--color-purple-400);
+  --color-reaction-500: var(--color-purple-500);
+  --color-reaction-600: var(--color-purple-600);
+  --color-reaction-700: var(--color-purple-700);
+  --color-reaction-800: var(--color-purple-800);
+  --color-reaction-900: var(--color-purple-900);
+  --color-reaction-950: var(--color-purple-950);
+  --color-reaction-1000: var(--color-purple-1000);
+
+  /******************************************************* 
+  Utility Colors
+  *******************************************************/
+
+  --color-success-0: var(--color-green-0);
+  --color-success-50: var(--color-green-50);
+  --color-success-100: var(--color-green-100);
+  --color-success-200: var(--color-green-200);
+  --color-success-300: var(--color-green-300);
+  --color-success-400: var(--color-green-400);
+  --color-success-500: var(--color-green-500);
+  --color-success-600: var(--color-green-600);
+  --color-success-700: var(--color-green-700);
+  --color-success-800: var(--color-green-800);
+  --color-success-900: var(--color-green-900);
+  --color-success-950: var(--color-green-950);
+  --color-success-1000: var(--color-green-1000);
+
+  --color-error-0: var(--color-red-0);
+  --color-error-50: var(--color-red-50);
+  --color-error-100: var(--color-red-100);
+  --color-error-200: var(--color-red-200);
+  --color-error-300: var(--color-red-300);
+  --color-error-400: var(--color-red-400);
+  --color-error-500: var(--color-red-500);
+  --color-error-600: var(--color-red-600);
+  --color-error-700: var(--color-red-700);
+  --color-error-800: var(--color-red-800);
+  --color-error-900: var(--color-red-900);
+  --color-error-950: var(--color-red-950);
+  --color-error-1000: var(--color-red-1000);
+
+  --color-highlight-0: var(--color-yellow-0);
+  --color-highlight-50: var(--color-yellow-50);
+  --color-highlight-100: var(--color-yellow-100);
+  --color-highlight-200: var(--color-yellow-200);
+  --color-highlight-300: var(--color-yellow-300);
+  --color-highlight-400: var(--color-yellow-400);
+  --color-highlight-500: var(--color-yellow-500);
+  --color-highlight-600: var(--color-yellow-600);
+  --color-highlight-700: var(--color-yellow-700);
+  --color-highlight-800: var(--color-yellow-800);
+  --color-highlight-900: var(--color-yellow-900);
+  --color-highlight-950: var(--color-yellow-950);
+  --color-highlight-1000: var(--color-yellow-1000);
+
+  /******************************************************* 
+  UI Color Aliases 
+  *******************************************************/
+
+  /* text */
+  --color-text-disabled: var(--color-neutral-400);
+  --color-text-muted: var(--color-neutral-600);
+  --color-text-default: var(--color-neutral-900);
+  --color-text-strong: var(--color-neutral-1000);
+  --color-text-link: var(--color-action-800);
+
+  /* background */
+  --color-bg-page: var(--color-neutral-100);
+  --color-bg-container: var(--color-neutral-50);
+  --color-bg-content: var(--color-neutral-0);
+  --color-bg-input: var(--color-bg-content);
+
+  /* borders */
+  --color-border-muted: var(--color-neutral-200);
+  --color-border-default: var(--color-neutral-300);
+  --color-border-strong: var(--color-neutral-500);
+  --color-border: var(--color-border-default);
+  --color-outline: color-mix(in srgb, var(--color-action-800) 75%, transparent);
+
+  /* header */
+  --color-header-bg: var(--color-neutral-1000);
+  --color-header-link: var(--color-neutral-300);
+  --color-header-link-active: var(--color-neutral-0);
+
+  /* Font size */
+  --text-scale: 1.2;
+  --text-base: 17px;
+  --text-interval: 1px;
+  --text-5xl: round(
+    calc(var(--text-4xl) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-4xl: round(
+    calc(var(--text-3xl) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-3xl: round(
+    calc(var(--text-2xl) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-2xl: round(
+    calc(var(--text-xl) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-xl: round(
+    calc(var(--text-lg) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-lg: round(
+    calc(var(--text-base) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-sm: round(
+    calc(var(--text-base) / var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-xs: round(
+    calc(var(--text-sm) / var(--text-scale)),
+    var(--text-interval)
+  );
+
+  /* Leading */
+  --leading-tight: 1.1;
+  --leading-base: 1.3;
+  --leading-loose: 1.5;
+  --leading: var(--leading-base);
+
+  /* Spacing */
+  --spacing: 4px;
+
+  /* Typography */
+  --font-sans: 'Source Sans 3', system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /******************************************************* 
+    Brand Colors
+    *******************************************************/
+
+    --color-neutral-0: var(--color-grey-1000);
+    --color-neutral-50: var(--color-grey-950);
+    --color-neutral-100: var(--color-grey-900);
+    --color-neutral-200: var(--color-grey-800);
+    --color-neutral-300: var(--color-grey-700);
+    --color-neutral-400: var(--color-grey-600);
+    --color-neutral-500: var(--color-grey-500);
+    --color-neutral-600: var(--color-grey-400);
+    --color-neutral-700: var(--color-grey-300);
+    --color-neutral-800: var(--color-grey-200);
+    --color-neutral-900: var(--color-grey-100);
+    --color-neutral-950: var(--color-grey-50);
+    --color-neutral-1000: var(--color-grey-0);
+
+    --color-action-0: var(--color-blue-1000);
+    --color-action-50: var(--color-blue-950);
+    --color-action-100: var(--color-blue-900);
+    --color-action-200: var(--color-blue-800);
+    --color-action-300: var(--color-blue-700);
+    --color-action-400: var(--color-blue-600);
+    --color-action-500: var(--color-blue-500);
+    --color-action-600: var(--color-blue-400);
+    --color-action-700: var(--color-blue-300);
+    --color-action-800: var(--color-blue-200);
+    --color-action-900: var(--color-blue-100);
+    --color-action-950: var(--color-blue-50);
+    --color-action-1000: var(--color-blue-0);
+
+    --color-reaction-0: var(--color-purple-1000);
+    --color-reaction-50: var(--color-purple-950);
+    --color-reaction-100: var(--color-purple-900);
+    --color-reaction-200: var(--color-purple-800);
+    --color-reaction-300: var(--color-purple-700);
+    --color-reaction-400: var(--color-purple-600);
+    --color-reaction-500: var(--color-purple-500);
+    --color-reaction-600: var(--color-purple-400);
+    --color-reaction-700: var(--color-purple-300);
+    --color-reaction-800: var(--color-purple-200);
+    --color-reaction-900: var(--color-purple-100);
+    --color-reaction-950: var(--color-purple-50);
+    --color-reaction-1000: var(--color-purple-0);
+
+    /******************************************************* 
+    Utility Colors
+    *******************************************************/
+
+    --color-success-0: var(--color-green-1000);
+    --color-success-50: var(--color-green-950);
+    --color-success-100: var(--color-green-900);
+    --color-success-200: var(--color-green-800);
+    --color-success-300: var(--color-green-700);
+    --color-success-400: var(--color-green-600);
+    --color-success-500: var(--color-green-500);
+    --color-success-600: var(--color-green-400);
+    --color-success-700: var(--color-green-300);
+    --color-success-800: var(--color-green-200);
+    --color-success-900: var(--color-green-100);
+    --color-success-950: var(--color-green-50);
+    --color-success-1000: var(--color-green-0);
+
+    --color-error-0: var(--color-red-1000);
+    --color-error-50: var(--color-red-950);
+    --color-error-100: var(--color-red-900);
+    --color-error-200: var(--color-red-800);
+    --color-error-300: var(--color-red-700);
+    --color-error-400: var(--color-red-600);
+    --color-error-500: var(--color-red-500);
+    --color-error-600: var(--color-red-400);
+    --color-error-700: var(--color-red-300);
+    --color-error-800: var(--color-red-200);
+    --color-error-900: var(--color-red-100);
+    --color-error-950: var(--color-red-50);
+    --color-error-1000: var(--color-red-0);
+
+    --color-highlight-0: var(--color-yellow-1000);
+    --color-highlight-50: var(--color-yellow-950);
+    --color-highlight-100: var(--color-yellow-900);
+    --color-highlight-200: var(--color-yellow-800);
+    --color-highlight-300: var(--color-yellow-700);
+    --color-highlight-400: var(--color-yellow-600);
+    --color-highlight-500: var(--color-yellow-500);
+    --color-highlight-600: var(--color-yellow-400);
+    --color-highlight-700: var(--color-yellow-300);
+    --color-highlight-800: var(--color-yellow-200);
+    --color-highlight-900: var(--color-yellow-100);
+    --color-highlight-950: var(--color-yellow-50);
+    --color-highlight-1000: var(--color-yellow-0);
+
+    /******************************************************* 
+    UI Color Aliases 
+    *******************************************************/
+
+    /* background */
+    --color-bg-page: var(--color-neutral-0);
+    --color-bg-container: var(--color-neutral-50);
+    --color-bg-content: var(--color-neutral-100);
+
+    /* header */
+    --color-header-bg: var(--color-neutral-50);
+    --color-header-link: var(--color-neutral-600);
+    --color-header-link-active: var(--color-neutral-1000);
+  }
+}
