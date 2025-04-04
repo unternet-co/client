@@ -201,6 +201,7 @@
   --color-border-default: var(--color-neutral-300);
   --color-border-strong: var(--color-neutral-500);
   --color-border: var(--color-border-default);
+  --color-outline: color-mix(in srgb, var(--color-action-800) 75%, transparent);
 
   /* header */
   --color-header-bg: var(--color-neutral-1000);
@@ -358,7 +359,7 @@
     /* background */
     --color-bg-page: var(--color-neutral-0);
     --color-bg-container: var(--color-neutral-50);
-    --color-bg-content: var(--color-neutral-0);
+    --color-bg-content: var(--color-neutral-100);
 
     /* header */
     --color-header-bg: var(--color-neutral-50);
