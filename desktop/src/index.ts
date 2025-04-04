@@ -8,12 +8,16 @@ import { ShortcutService } from './shortcuts/shortcut-service';
 import { appendEl, createEl } from './common/utils/dom';
 import { registerGlobalShortcuts } from './shortcuts/global-shortcuts';
 import { ModalService } from './modals/modal-service';
+import { ConfigData, ConfigModel, initConfig } from './core/config';
+import { Kernel } from './ai/kernel';
+import { OpenAIModelProvider } from './ai/providers/openai';
+import { OllamaModelProvider } from './ai/providers/ollama';
+import { AIModelService } from './ai/ai-models';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './ui/modals/settings-modal';
 import './ui/app-root';
-import { ConfigData, ConfigModel, initConfig } from './core/config';
 
 /* Initialize databases & stores */
 
@@ -32,25 +36,34 @@ const workspaceModel = new WorkspaceModel(
   workspaceDatabaseService,
   interactionDatabaseService
 );
+dependencies.registerSingleton('WorkspaceModel', workspaceModel);
+
 const tabModel = new TabModel(tabKeyStore, workspaceModel);
+dependencies.registerSingleton('TabModel', tabModel);
+
 const configModel = new ConfigModel(configStore);
+dependencies.registerSingleton('ConfigModel', configModel);
 
 /* Initialize kernel & LLMs */
 
-// const kernel = new Kernel({ model: createModel(), workspaceModel });
+const openAIModelProvider = new OpenAIModelProvider();
+const ollamaModelProvider = new OllamaModelProvider();
+const aiModelService = new AIModelService({
+  openai: openAIModelProvider,
+  ollama: ollamaModelProvider,
+  anthropic: null,
+});
+dependencies.registerSingleton('AIModelService', aiModelService);
 
-/* Initialize services */
+const kernel = new Kernel({ model: null, workspaceModel });
+dependencies.registerSingleton('Kernel', kernel);
+
+/* Initialize other services */
 
 const shortcutService = new ShortcutService();
-const modalService = new ModalService();
-
-/* Register dependencies */
-
-dependencies.registerSingleton('WorkspaceModel', workspaceModel);
-dependencies.registerSingleton('TabModel', tabModel);
-dependencies.registerSingleton('ConfigModel', configModel);
-// dependencies.registerSingleton('Kernel', kernel);
 dependencies.registerSingleton('ShortcutService', shortcutService);
+
+const modalService = new ModalService();
 dependencies.registerSingleton('ModalService', modalService);
 
 /* Register global modals */
