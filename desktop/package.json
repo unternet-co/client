@@ -5,7 +5,8 @@
   "license": "ISC",
   "main": "dist/main.js",
   "scripts": {
-    "build": "vite build && tsc",
+    "build": "npm run build:notarize && vite build && tsc",
+    "build:notarize": "tsc -p tsconfig.notarize.json",
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
     "dev:electron": "tsc && electron .",
     "dev:web": "vite"

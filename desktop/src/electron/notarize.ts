@@ -1,6 +1,6 @@
-const { notarize } = require('@electron/notarize');
+import type { AfterPackContext } from 'electron-builder';
 
-exports.default = async function notarizing(context) {
+export default async function notarizing(context: AfterPackContext) {
   const { electronPlatformName, appOutDir } = context;
 
   if (electronPlatformName !== 'darwin') return;
@@ -10,17 +10,19 @@ exports.default = async function notarizing(context) {
     !process.env.APPLE_ID_PASS ||
     !process.env.APPLE_TEAM_ID
   ) {
-    console.warn('Skipping notarization: missing Apple credentials');
+    console.warn('[notarize] Skipping: missing Apple credentials');
     return;
   }
 
   const appName = context.packager.appInfo.productFilename;
 
-  return await notarize({
-    appBundleId: 'com.electron.unternet-client',
+  // ✅ Dynamic import of ESM module from CJS environment
+  const { notarize } = await import('@electron/notarize');
+
+  return notarize({
     appPath: `${appOutDir}/${appName}.app`,
     appleId: process.env.APPLE_ID,
     appleIdPassword: process.env.APPLE_ID_PASS,
     teamId: process.env.APPLE_TEAM_ID,
   });
-};
+}
