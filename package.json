@@ -37,7 +37,7 @@
         "zip"
       ]
     },
-    "afterSign": "desktop/src/electron/notarize.ts",
+    "afterSign": "desktop/dist/notarize.js",
     "win": {
       "target": [
         "nsis"
