@@ -3,7 +3,7 @@ import path from 'path';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 
-const isDev = process.env.NODE_ENV !== "production";
+const isDev = !app.isPackaged;
 const AUTOUPDATE_INTERVAL = 3_600_000; // 60 * 60 * 1000
 
 // Configure logging
