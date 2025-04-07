@@ -55,7 +55,7 @@ export function fileInteractions(
 
       return {
         ...acc,
-        textParts: [...acc.textParts, p],
+        textParts: p.startsWith('--') ? acc.textParts : [...acc.textParts, p],
       };
     },
     {
@@ -123,11 +123,12 @@ export function folderInteractions(
             let data;
 
             try {
-              data = nodeFs.readFileSync(path);
+              if (f.isFile()) data = nodeFs.readFileSync(path);
             } catch (error) {
               console.error(chalk.red(error));
-              return acc;
             }
+
+            if (!data) return acc;
 
             return [
               ...acc,
@@ -145,7 +146,7 @@ export function folderInteractions(
 
       return {
         ...acc,
-        textParts: [...acc.textParts, p],
+        textParts: p.startsWith('--') ? acc.textParts : [...acc.textParts, p],
       };
     },
     {

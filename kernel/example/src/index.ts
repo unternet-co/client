@@ -37,10 +37,13 @@ const handleInput =
     } else if (lowerInput.startsWith('/folder ')) {
       interaction = folderInteractions(
         userInput,
-        { ignoreDotFiles: true, recursive: false },
+        {
+          ignoreDotFiles: !lowerInput.includes(' --dot-files '),
+          recursive: lowerInput.includes(' --recursive '),
+        },
         interaction
       );
-      console.log('📂', interaction.input);
+      // console.log('📂', interaction.input);
       if (!interaction.input.text) return promptUser(interaction);
     } else {
       interaction = interaction || createInteraction(userInput);
