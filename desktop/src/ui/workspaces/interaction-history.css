@@ -35,7 +35,7 @@ interaction-history .interaction-output {
   padding: var(--space-6) var(--space-7);
   border-radius: var(--rounded);
   border: 1px solid var(--color-border);
-  background: var(--color-page);
+  background: var(--color-bg-page);
 } */
 
 /******/
@@ -92,16 +92,16 @@ interaction-history .interaction-input {
 interaction-history .interaction-output {
   padding: var(--space-5) var(--space-6);
   border-radius: var(--rounded);
-  border: 1px solid var(--color-border);
-  background: var(--color-page);
+  border: 1px solid var(--color-border-muted);
+  background: var(--color-bg-content);
 }
 
 interaction-history .thinking-letter {
-  color: var(--color-neutral-50);
+  color: var(--color-neutral-500);
 }
 
 interaction-history .thinking-letter.active {
-  color: var(--color-neutral-100);
+  color: var(--color-neutral-1000);
 }
 
 /* interaction-history {
@@ -147,5 +147,5 @@ interaction-history .interaction-output {
   padding: var(--space-6) var(--space-7);
   border-radius: var(--rounded);
   border: 1px solid var(--color-border);
-  background: var(--color-page);
+  background: var(--color-bg-page);
 } */
