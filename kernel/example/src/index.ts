@@ -89,4 +89,14 @@ function promptUser(interaction?: Interaction) {
 }
 
 console.log(chalk.italic('Chat with the kernel! Type "exit" to quit.'));
+console.log('\nAdditional commands:');
+console.log(
+  '/file' + chalk.grey('s'),
+  '<path_to_file> <optional_msg_for_assistant>'
+);
+console.log(
+  '/folder' + chalk.grey('s'),
+  '<path_to_folder> <optional_msg_for_assistant>'
+);
+
 promptUser();
