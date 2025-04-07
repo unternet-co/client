@@ -1,3 +1,7 @@
+## 0.3.3
+
+- Add a cohesive theme
+
 ## 0.3.2
 
 - fix/remove-db-service
