@@ -1,6 +1,3 @@
-import * as nodeFs from 'node:fs';
-import untildify from 'untildify';
-
 import { ActionDirective, Protocol } from '../../src';
 
 const protocols: Protocol[] = [
