@@ -81,7 +81,7 @@ export class Interpreter {
     });
 
     const { functions } = output.object as ActionChoiceObject;
-    if (!functions || !functions[0].id) return null;
+    if (!functions || !functions[0]?.id) return null;
 
     const fn = functions[0];
     const { protocol, resourceId, actionId } = decodeActionUri(fn.id);
