@@ -12,20 +12,6 @@ const protocols: Protocol[] = [
       }
     },
   },
-  {
-    scheme: 'filesystem',
-    handler: (directive: ActionDirective) => {
-      if (directive.actionId === 'load_file') {
-        if (!directive.args?.path)
-          throw new Error('I require a path to a file');
-
-        // NOTE: Can we do promises here?
-        const buffer = nodeFs.readFileSync(untildify(directive.args.path));
-
-        return new Uint8Array(buffer);
-      }
-    },
-  },
 ];
 
 export { protocols };

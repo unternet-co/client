@@ -19,24 +19,6 @@ const resources: Resource[] = [
       },
     },
   },
-  {
-    protocol: 'filesystem',
-    actions: {
-      load_file: {
-        description: 'Loads a file from the local file system.',
-        params_schema: {
-          type: 'object',
-          properties: {
-            path: {
-              type: 'string',
-              description: 'File system path to a file.',
-            },
-          },
-          required: ['path'],
-        },
-      },
-    },
-  },
 ];
 
 export default resources;
