@@ -35,7 +35,7 @@ export function fileInteractions(
       ) {
         const resolvedPath = untildify(parsed);
         const filename = nodePath.basename(resolvedPath);
-        const mimeType = mime.lookup(filename) || undefined;
+        const mimeType = fileMimeType(filename);
 
         let data;
 
@@ -101,46 +101,11 @@ export function folderInteractions(
           parsed.startsWith('/'))
       ) {
         const resolvedPath = untildify(parsed);
-        const dirFiles = nodeFs.readdirSync(resolvedPath, {
-          withFileTypes: true,
-          recursive: opts.recursive ?? false,
-        });
-
-        const respFiles = dirFiles.reduce(
-          (
-            acc: Array<{
-              data: Uint8Array;
-              filename: string;
-              mimeType: string;
-            }>,
-            f
-          ) => {
-            if (opts.ignoreDotFiles && f.name.startsWith('.')) return acc;
-
-            const mimeType = mime.lookup(f.name) || undefined;
-            const path = nodePath.join(f.parentPath, f.name);
-
-            let data;
-
-            try {
-              if (f.isFile()) data = nodeFs.readFileSync(path);
-            } catch (error) {
-              console.error(chalk.red(error));
-            }
-
-            if (!data) return acc;
-
-            return [
-              ...acc,
-              { data: new Uint8Array(data), filename: f.name, mimeType },
-            ];
-          },
-          []
-        );
+        const dirFiles = readDir(resolvedPath, opts);
 
         return {
           ...acc,
-          files: [...acc.files, ...respFiles],
+          files: [...acc.files, ...dirFiles],
         };
       }
 
@@ -162,4 +127,63 @@ export function folderInteractions(
     },
     outputs: interaction?.outputs || [],
   };
+}
+
+function readDir(
+  path: string,
+  opts: {
+    ignoreDotFiles: boolean;
+    recursive: boolean;
+  }
+) {
+  const dirFiles = nodeFs.readdirSync(path, {
+    withFileTypes: true,
+    recursive: false,
+  });
+
+  return dirFiles.reduce(
+    (
+      acc: Array<{
+        data: Uint8Array;
+        filename: string;
+        mimeType: string;
+      }>,
+      f
+    ) => {
+      if (opts.ignoreDotFiles && f.name.startsWith('.')) return acc;
+
+      const mimeType = fileMimeType(f.name);
+      const childPath = nodePath.join(f.parentPath, f.name);
+
+      if (f.isDirectory() && opts.recursive) {
+        if (['.cargo', '.git', 'node_modules'].includes(f.name)) return acc;
+
+        const nested = readDir(childPath, opts);
+        return [...acc, ...nested];
+      }
+
+      let data;
+
+      try {
+        if (f.isFile()) data = nodeFs.readFileSync(childPath);
+      } catch (error) {
+        console.error(chalk.red(error));
+      }
+
+      if (!data) return acc;
+
+      return [
+        ...acc,
+        { data: new Uint8Array(data), filename: f.name, mimeType },
+      ];
+    },
+    []
+  );
+}
+
+/* COMMON */
+
+export function fileMimeType(name: string) {
+  if (name.endsWith('.ts')) return 'text/plain';
+  return mime.lookup(name) || undefined;
 }

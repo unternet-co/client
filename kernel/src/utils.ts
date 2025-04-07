@@ -2,6 +2,7 @@ import { FilePart, ImagePart, TextPart } from 'ai';
 import {
   ActionOutput,
   ActionRecord,
+  FileInput,
   Interaction,
   InteractionInput,
   InteractionOutput,
@@ -69,27 +70,7 @@ export function createMessages(
 
     if (interaction.input.files?.length) {
       const parts: Array<TextPart | ImagePart | FilePart> =
-        interaction.input.files.map((file) => {
-          if (file.mimeType.startsWith('text/'))
-            return {
-              type: 'text',
-              text: new TextDecoder().decode(file.data),
-            };
-
-          if (file.mimeType.startsWith('image/'))
-            return {
-              type: 'image',
-              image: file.data,
-              mimeType: file.mimeType,
-            };
-
-          return {
-            type: 'file',
-            data: file.data,
-            filename: file.filename,
-            mimeType: file.mimeType,
-          };
-        });
+        interaction.input.files.map(fileMessage);
 
       messages.push({
         role: 'user',
@@ -158,5 +139,27 @@ export function decodeActionUri(encodedActionURI: string): UriComponents {
     protocol,
     resourceId,
     actionId,
+  };
+}
+
+export function fileMessage(file: FileInput): TextPart | ImagePart | FilePart {
+  if (file.mimeType.startsWith('text/') || file.mimeType === 'application/json')
+    return {
+      type: 'text',
+      text: new TextDecoder().decode(file.data),
+    };
+
+  if (file.mimeType.startsWith('image/'))
+    return {
+      type: 'image',
+      image: file.data,
+      mimeType: file.mimeType,
+    };
+
+  return {
+    type: 'file',
+    data: file.data,
+    filename: file.filename,
+    mimeType: file.mimeType,
   };
 }
