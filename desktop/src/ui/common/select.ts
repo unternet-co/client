@@ -11,6 +11,7 @@ export class SelectElement extends HTMLElement {
   private select: HTMLSelectElement;
   private wrapper: HTMLDivElement;
   private icon: HTMLElement;
+  private mutationObserver: MutationObserver;
 
   static get styles() {
     return css`
@@ -84,6 +85,11 @@ export class SelectElement extends HTMLElement {
 
     this.wrapper.appendChild(this.select);
     this.wrapper.appendChild(this.icon);
+
+    // Create a mutation observer to watch for changes to child elements
+    this.mutationObserver = new MutationObserver(
+      this.handleMutations.bind(this)
+    );
   }
 
   static get observedAttributes() {
@@ -98,6 +104,16 @@ export class SelectElement extends HTMLElement {
 
     this.shadowRoot!.appendChild(this.wrapper);
     this.updateSelect();
+
+    // Start observing changes to child elements
+    this.mutationObserver.observe(this, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+
+    // Also listen for the custom optionsChanged event
+    this.addEventListener('optionsChanged', () => this.updateSelect());
   }
 
   attributeChangedCallback(
@@ -118,6 +134,11 @@ export class SelectElement extends HTMLElement {
         this.updateSelect();
         break;
     }
+  }
+
+  disconnectedCallback() {
+    // Stop observing when element is removed from the DOM
+    this.mutationObserver.disconnect();
   }
 
   get value(): string {
@@ -147,6 +168,33 @@ export class SelectElement extends HTMLElement {
         detail: { value: this.value },
       })
     );
+  }
+
+  private handleMutations(mutations: MutationRecord[]) {
+    // Check if any of the mutations are relevant to our options
+    const shouldUpdate = mutations.some((mutation) => {
+      // If options were added or removed
+      if (mutation.type === 'childList') {
+        return true;
+      }
+
+      // If option text or attributes changed
+      if (mutation.type === 'characterData' || mutation.type === 'attributes') {
+        const target = mutation.target as Node;
+        // Check if the mutation happened within an option element
+        return (
+          this.contains(target) ||
+          (target.parentNode && this.contains(target.parentNode))
+        );
+      }
+
+      return false;
+    });
+
+    if (shouldUpdate) {
+      console.log('Select options changed, updating select element');
+      this.updateSelect();
+    }
   }
 
   private updateSelect() {
