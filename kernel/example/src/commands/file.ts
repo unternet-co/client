@@ -5,16 +5,17 @@ import mime from 'mime-types';
 import parseShell from 'shell-quote/parse';
 import untildify from 'untildify';
 
-import { Interaction } from '../../src';
+import { Interaction } from '../../../src';
 
-/* File input */
-
-export function fileInteractions(
+/**
+ * Create or extend an interaction based on user input.
+ */
+export function interaction(
   userInput: string,
   interaction?: Interaction
 ): Interaction {
   const rawParts =
-    userInput.replace(/^\/files? /, '').match(/"[^"]+"|'[^']+'|\S+/g) ?? [];
+    userInput.replace(/^\/file /, '').match(/"[^"]+"|'[^']+'|\S+/g) ?? [];
 
   const { files, textParts } = rawParts.reduce(
     (
@@ -34,23 +35,43 @@ export function fileInteractions(
           parsed.startsWith('/'))
       ) {
         const resolvedPath = untildify(parsed);
-        const filename = nodePath.basename(resolvedPath);
-        const mimeType = fileMimeType(filename);
-
-        let data;
+        let files = acc.files;
+        let kind;
 
         try {
-          data = nodeFs.readFileSync(resolvedPath);
-        } catch (error) {
-          console.error(chalk.red(error));
+          const stats = nodeFs.lstatSync(resolvedPath);
+          kind = stats.isDirectory()
+            ? 'directory'
+            : stats.isFile()
+              ? 'file'
+              : undefined;
+        } catch (err) {
+          console.error(chalk.red(err));
         }
 
-        return {
-          ...acc,
-          files: data
-            ? [...acc.files, { data: new Uint8Array(data), filename, mimeType }]
-            : acc.files,
-        };
+        switch (kind) {
+          case 'directory':
+            const dirFiles = readDir(resolvedPath, {
+              ignoreDotFiles: true,
+              recursive: true,
+            });
+
+            files = [...files, ...dirFiles];
+            break;
+
+          case 'file':
+            const filename = nodePath.basename(resolvedPath);
+            const mimeType = fileMimeType(filename);
+            const data = nodeFs.readFileSync(resolvedPath);
+
+            files = [
+              ...files,
+              { data: new Uint8Array(data), filename, mimeType },
+            ];
+            break;
+        }
+
+        return { ...acc, files };
       }
 
       return {
@@ -73,61 +94,7 @@ export function fileInteractions(
   };
 }
 
-/* Folder input */
-
-export function folderInteractions(
-  userInput: string,
-  opts: { ignoreDotFiles: boolean; recursive: boolean },
-  interaction?: Interaction
-): Interaction {
-  const rawParts =
-    userInput.replace(/^\/folders? /, '').match(/"[^"]+"|'[^']+'|\S+/g) ?? [];
-
-  const { files, textParts } = rawParts.reduce(
-    (
-      acc: {
-        files: Array<{ data: Uint8Array; filename: string; mimeType: string }>;
-        textParts: string[];
-      },
-      p: string
-    ) => {
-      const parsed_ = parseShell(p);
-      const parsed = parsed_[0];
-
-      if (
-        typeof parsed === 'string' &&
-        (parsed.startsWith('./') ||
-          parsed.startsWith('~/') ||
-          parsed.startsWith('/'))
-      ) {
-        const resolvedPath = untildify(parsed);
-        const dirFiles = readDir(resolvedPath, opts);
-
-        return {
-          ...acc,
-          files: [...acc.files, ...dirFiles],
-        };
-      }
-
-      return {
-        ...acc,
-        textParts: p.startsWith('--') ? acc.textParts : [...acc.textParts, p],
-      };
-    },
-    {
-      files: [],
-      textParts: [],
-    }
-  );
-
-  return {
-    input: {
-      text: textParts.length ? textParts.join(' ') : interaction?.input?.text,
-      files: [...(interaction?.input?.files || []), ...files],
-    },
-    outputs: interaction?.outputs || [],
-  };
-}
+/* 🛠️ */
 
 function readDir(
   path: string,
@@ -138,7 +105,7 @@ function readDir(
 ) {
   const dirFiles = nodeFs.readdirSync(path, {
     withFileTypes: true,
-    recursive: false,
+    recursive: true,
   });
 
   return dirFiles.reduce(
@@ -180,8 +147,6 @@ function readDir(
     []
   );
 }
-
-/* COMMON */
 
 export function fileMimeType(name: string) {
   if (name.endsWith('.ts')) return 'text/plain';
