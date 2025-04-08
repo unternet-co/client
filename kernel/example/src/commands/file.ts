@@ -85,6 +85,14 @@ export function interaction(
     }
   );
 
+  // Print files added to stdout
+  if (files.length) console.log('');
+
+  files.forEach((file) => {
+    console.log(chalk.italic(`File added: '${file.filename}'`));
+  });
+
+  // Fin
   return {
     input: {
       text: textParts.length ? textParts.join(' ') : interaction?.input?.text,
