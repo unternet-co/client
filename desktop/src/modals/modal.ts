@@ -66,7 +66,7 @@ export class Modal {
           <un-icon name="close"></un-icon>
         </un-button>
       </div>
-      ${this.contents};
+      ${this.contents}
     </div>`;
   }
 }
