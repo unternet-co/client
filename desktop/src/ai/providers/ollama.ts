@@ -31,10 +31,13 @@ export class OllamaModelProvider implements AIModelProvider {
   async getAvailableModels({
     baseUrl,
   }: AIModelProviderConfig): Promise<AIModelDescriptor[]> {
+    if (!baseUrl) {
+      throw new Error('Ollama Base URL is missing or empty.');
+    }
     baseUrl = baseUrl || OLLAMA_BASE_URL;
 
     try {
-      const response = await fetch(`${baseUrl}/api/tags`, {
+      const response = await fetch(`${baseUrl}/tags`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       });
