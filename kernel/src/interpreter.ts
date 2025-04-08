@@ -26,6 +26,7 @@ export class Interpreter {
 
   constructor({ model, resources, prompts, hint }: InterpreterInit) {
     this.model = model;
+    this.hint = hint;
     this.actions = createActionRecord(resources || []);
     this.prompts = { ...defaultPrompts, ...prompts };
   }

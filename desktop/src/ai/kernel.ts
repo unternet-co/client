@@ -11,12 +11,11 @@ export class Kernel {
   interpreter: Interpreter | null;
   workspaceModel: WorkspaceModel;
 
-  constructor({ model, workspaceModel }: KernelInit) {
+  constructor({ workspaceModel }: KernelInit) {
     this.workspaceModel = workspaceModel;
-    this.updateLanguageModel(model);
   }
 
-  updateLanguageModel(llm: LanguageModel | null, hint?: string) {
+  initialize(llm: LanguageModel | null, hint?: string) {
     if (!llm) {
       this.initialized = false;
       this.interpreter = null;

@@ -25,7 +25,7 @@ export const initConfig: ConfigData = {
 };
 
 export interface ConfigNotification {
-  type: 'model';
+  type: 'model' | 'hint';
 }
 
 export class ConfigModel {
@@ -59,7 +59,8 @@ export class ConfigModel {
   updateGlobalHint(hint: string) {
     this.config.ai.globalHint = hint;
     this.store.set(this.config);
-    this.notifier.notify();
+    console.log(this.config);
+    this.notifier.notify({ type: 'hint' });
   }
 
   get() {

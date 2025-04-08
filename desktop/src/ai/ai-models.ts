@@ -13,9 +13,9 @@ export interface AIModelProvider {
 }
 
 export const AIModelProviderNames = {
-  openai: 'openai',
-  ollama: 'ollama',
-  anthropic: 'anthropic',
+  openai: 'OpenAI',
+  ollama: 'Ollama',
+  anthropic: 'Anthropic',
 };
 
 export type AIModelProviderName = keyof typeof AIModelProviderNames;

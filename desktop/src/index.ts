@@ -61,7 +61,7 @@ const aiModelService = new AIModelService({
 });
 dependencies.registerSingleton('AIModelService', aiModelService);
 
-const kernel = new Kernel({ model: null, workspaceModel });
+const kernel = new Kernel({ workspaceModel });
 dependencies.registerSingleton('Kernel', kernel);
 
 /* Initialize other services */
@@ -91,23 +91,24 @@ registerGlobalShortcuts();
 /* Cross-service processes */
 
 // TODO: Extract this into a new service
-async function updateKernelModel() {
+async function initializeKernel() {
   const config = configModel.get();
   const model = await aiModelService.getModel(
     config.ai.primaryModel.provider,
     config.ai.primaryModel.name,
     config.ai.providers[config.ai.primaryModel.provider]
   );
-  kernel.updateLanguageModel(model);
+  kernel.initialize(model, config.ai.globalHint);
 }
 
 configModel.subscribe(async (notification: ConfigNotification) => {
-  if (notification && notification.type === 'model') {
-    updateKernelModel();
+  if (!notification) return;
+  if (notification.type === 'model' || notification.type === 'hint') {
+    initializeKernel();
   }
 });
 
-updateKernelModel();
+initializeKernel();
 
 /* Initialize UI */
 

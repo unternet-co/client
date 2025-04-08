@@ -48,7 +48,6 @@ export class SettingsModal extends ModalElement {
   }
 
   private handleSubmit() {
-    console.log('hi');
     this.configModel.updateGlobalHint(this.globalHint);
     this.configModel.updateModelProvider(
       this.selectedProvider,
@@ -95,7 +94,12 @@ export class SettingsModal extends ModalElement {
           Customize how the models respond. These instructions will be sent with
           every command.
         </p>
-        <un-textarea value=${this.globalHint} rows="4"></un-textarea>
+        <un-textarea
+          value=${this.globalHint}
+          @change=${(event: CustomEvent) =>
+            (this.globalHint = event.detail.value)}
+          rows="4"
+        ></un-textarea>
       </div>
     `;
   }
@@ -111,8 +115,10 @@ export class SettingsModal extends ModalElement {
           value=${this.selectedProvider}
           @change=${this.handleProviderChange}
         >
-          ${Object.values(AIModelProviderNames).map((name) => {
-            return html`<option value="${name}">${name}</option>`;
+          ${Object.keys(AIModelProviderNames).map((key) => {
+            return html`<option value=${key}>
+              ${AIModelProviderNames[key]}
+            </option>`;
           })}
         </un-select>
       </div>

@@ -24,11 +24,11 @@ function system({ actions, hint }: SystemInit) {
     prompt += dedent`
       In this environment you have access to a set of functions you can use to answer the user's question.
       Here are the functions available in JSONSchema format:
-      ${JSON.stringify(actions)}\n`;
+      ${JSON.stringify(actions)}\n\n`;
   }
 
   if (hint) {
-    prompt += `${hint}\n`;
+    prompt += `User instructions & guidelines:\n${hint}\n\n`;
   }
 
   return prompt;
