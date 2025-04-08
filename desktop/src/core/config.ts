@@ -12,7 +12,7 @@ export interface ConfigData {
       [id: string]: AIModelProviderConfig;
     };
     primaryModel: AIModelDescriptor | null;
-    globalHint?: string;
+    globalHint: string;
   };
 }
 
