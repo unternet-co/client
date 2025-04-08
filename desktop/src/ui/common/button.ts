@@ -79,6 +79,7 @@ export class ButtonElement extends HTMLElement {
   }
 
   private handleClick(e: Event) {
+    e.stopPropagation();
     if (this.isDisabled) {
       e.preventDefault();
       return;

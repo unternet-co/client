@@ -8,7 +8,12 @@ import { ShortcutService } from './shortcuts/shortcut-service';
 import { appendEl, createEl } from './common/utils/dom';
 import { registerGlobalShortcuts } from './shortcuts/global-shortcuts';
 import { ModalService } from './modals/modal-service';
-import { ConfigData, ConfigModel, initConfig } from './core/config';
+import {
+  ConfigData,
+  ConfigModel,
+  ConfigNotification,
+  initConfig,
+} from './core/config';
 import { Kernel } from './ai/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
@@ -82,6 +87,27 @@ modalService.register('delete-workspace', {
 /* Register keyboard shortcuts */
 
 registerGlobalShortcuts();
+
+/* Cross-service processes */
+
+// TODO: Extract this into a new service
+async function updateKernelModel() {
+  const config = configModel.get();
+  const model = await aiModelService.getModel(
+    config.ai.primaryModel.provider,
+    config.ai.primaryModel.name,
+    config.ai.providers[config.ai.primaryModel.provider]
+  );
+  kernel.updateLanguageModel(model);
+}
+
+configModel.subscribe(async (notification: ConfigNotification) => {
+  if (notification && notification.type === 'model') {
+    updateKernelModel();
+  }
+});
+
+updateKernelModel();
 
 /* Initialize UI */
 

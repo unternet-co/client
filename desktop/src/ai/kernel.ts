@@ -16,12 +16,12 @@ export class Kernel {
     this.updateLanguageModel(model);
   }
 
-  updateLanguageModel(llm: LanguageModel | null) {
+  updateLanguageModel(llm: LanguageModel | null, hint?: string) {
     if (!llm) {
       this.initialized = false;
       this.interpreter = null;
     } else {
-      this.interpreter = new Interpreter({ model: llm });
+      this.interpreter = new Interpreter({ model: llm, hint });
       this.initialized = true;
     }
   }

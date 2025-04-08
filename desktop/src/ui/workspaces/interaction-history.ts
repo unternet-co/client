@@ -154,7 +154,7 @@ class InteractionHistory extends HTMLElement {
   outputTemplate(output: InteractionOutput) {
     let template: TemplateResult = html``;
     if (output.type === 'text') {
-      template = html`<markdown-text>${output.content}</markdown-text>>`;
+      template = html`<markdown-text>${output.content}</markdown-text>`;
     }
     return html`<div class="interaction-output" data-format="markdown">
       ${template}

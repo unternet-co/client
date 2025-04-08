@@ -24,9 +24,13 @@ export const initConfig: ConfigData = {
   },
 };
 
+export interface ConfigNotification {
+  type: 'model';
+}
+
 export class ConfigModel {
   private store: KeyStoreService<ConfigData>;
-  private notifier = new Notifier();
+  private notifier = new Notifier<ConfigNotification>();
   readonly subscribe = this.notifier.subscribe;
   private config: ConfigData;
 
@@ -40,14 +44,25 @@ export class ConfigModel {
     provider: AIModelProviderName,
     providerConfig: AIModelProviderConfig
   ) {
-    this.store.update((config) => {
-      config.ai.providers[provider] = providerConfig;
-    });
+    this.config.ai.providers[provider] = providerConfig;
+    this.store.set(this.config);
     this.notifier.notify();
   }
 
-  get(key?: keyof ConfigData) {
-    if (key) return this.config[key];
+  updatePrimaryModel(model: AIModelDescriptor) {
+    console.log('updaging model', model);
+    this.config.ai.primaryModel = model;
+    this.store.set(this.config);
+    this.notifier.notify({ type: 'model' });
+  }
+
+  updateGlobalHint(hint: string) {
+    this.config.ai.globalHint = hint;
+    this.store.set(this.config);
+    this.notifier.notify();
+  }
+
+  get() {
     return this.config;
   }
 }

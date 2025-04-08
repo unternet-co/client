@@ -12,11 +12,17 @@ export interface AIModelProvider {
   ): Promise<LanguageModel>;
 }
 
-export type AIModelProviderName = 'openai' | 'anthropic' | 'ollama';
+export const AIModelProviderNames = {
+  openai: 'openai',
+  ollama: 'ollama',
+  anthropic: 'anthropic',
+};
+
+export type AIModelProviderName = keyof typeof AIModelProviderNames;
 
 export interface AIModelDescriptor {
   name: string;
-  provider: string;
+  provider: AIModelProviderName;
   description?: string;
 }
 
