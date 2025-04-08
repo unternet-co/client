@@ -13,7 +13,6 @@ import {
 } from '../../src';
 import { Command } from './types';
 import { protocols } from './protocols';
-import { createInteraction } from '../../src/utils';
 import * as commands from './commands';
 import resources from './resources';
 
