@@ -19,23 +19,32 @@ export class OpenAIModelProvider implements AIModelProvider {
   async getAvailableModels(
     providerConfig: AIModelProviderConfig
   ): Promise<AIModelDescriptor[]> {
-    const client = new OpenAI({
-      apiKey: providerConfig.apiKey,
-    });
-
-    const { data: models } = await client.models.list();
-
-    function modelFilter(model: OpenAI.Models.Model) {
-      const shouldExclude = OPENAI_MODEL_EXCLUDE_PATTERNS.some((pattern) =>
-        model.id.toLowerCase().includes(pattern)
-      );
-      return !shouldExclude;
+    if (!providerConfig.apiKey) {
+      throw new Error('OpenAI API Key is missing or empty.');
     }
 
-    return models.filter(modelFilter).map((model) => ({
-      name: model.id,
-      provider: 'openai',
-    }));
+    try {
+      const client = new OpenAI({
+        apiKey: providerConfig.apiKey,
+        dangerouslyAllowBrowser: true,
+      });
+
+      const { data: models } = await client.models.list();
+
+      function modelFilter(model: OpenAI.Models.Model) {
+        const shouldExclude = OPENAI_MODEL_EXCLUDE_PATTERNS.some((pattern) =>
+          model.id.toLowerCase().includes(pattern)
+        );
+        return !shouldExclude;
+      }
+
+      return models.filter(modelFilter).map((model) => ({
+        name: model.id,
+        provider: 'openai',
+      }));
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getModel(

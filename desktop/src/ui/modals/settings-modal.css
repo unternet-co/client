@@ -1,0 +1,21 @@
+settings-modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.setting-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.setting-group .error {
+  color: var(--color-error-600);
+}
