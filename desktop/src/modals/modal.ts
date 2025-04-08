@@ -4,6 +4,8 @@ import { dependencies } from '../common/dependencies';
 import { ShortcutService } from '../shortcuts/shortcut-service';
 import { createEl } from '../common/utils/dom';
 import './modal.css';
+import '../ui/common/button';
+import '../ui/common/icon';
 import { ModalElement } from './modal-element';
 
 export type ModalSize = 'full' | 'auto';
@@ -41,14 +43,7 @@ export class Modal {
       this.contents.appendChild(contentsComponent);
     }
 
-    const template = html`
-      <div class="modal-container" data-size=${this.size}>
-        <div class="modal-header">${this.title}</div>
-        ${this.contents}
-      </div>
-    `;
-
-    render(template, this.root);
+    render(this.template, this.root);
     document.body.appendChild(this.root);
 
     this.root.onmousedown = (event) => {
@@ -65,7 +60,12 @@ export class Modal {
 
   get template() {
     return html`<div class="modal-container" data-size=${this.size}>
-      <div class="modal-header">${this.title}</div>
+      <div class="modal-header">
+        <span>${this.title}</span>
+        <un-button type="ghost" @click=${this.closeCallback}>
+          <un-icon name="close"></un-icon>
+        </un-button>
+      </div>
       ${this.contents};
     </div>`;
   }
