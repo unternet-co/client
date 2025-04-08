@@ -39,14 +39,16 @@ export class Interpreter {
    */
   async generateResponse(
     interactions: Array<Interaction>
-  ): Promise<InterpreterResponse> {
+  ): Promise<InterpreterResponse | null> {
     const textAction = { description: this.prompts.textActionDescription };
     const directive = await this.createDirective(interactions, {
       ...{ text: textAction },
       ...this.actions,
     });
 
-    if (directive.protocol === 'text') {
+    if (!directive) {
+      return null;
+    } else if (directive.protocol === 'text') {
       return this.createTextResponse(interactions);
     } else {
       return {
@@ -70,7 +72,7 @@ export class Interpreter {
   private async createDirective(
     interactions: Array<Interaction>,
     actions: Record<string, ActionDefinition>
-  ): Promise<ActionDirective> {
+  ): Promise<ActionDirective | null> {
     const output = await generateObject({
       model: this.model,
       messages: createMessages(
