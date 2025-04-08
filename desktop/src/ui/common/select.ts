@@ -37,6 +37,7 @@ export class SelectElement extends HTMLElement {
         line-height: 1.5;
         appearance: none;
         cursor: pointer;
+        box-sizing: border-box;
       }
 
       select:focus {

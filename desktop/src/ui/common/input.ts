@@ -28,6 +28,7 @@ export class InputElement extends HTMLElement {
         font-family: inherit;
         font-size: inherit;
         line-height: 1;
+        box-sizing: border-box;
       }
 
       input:focus {
