@@ -12,6 +12,7 @@ export interface ConfigData {
       [id: string]: AIModelProviderConfig;
     };
     primaryModel: AIModelDescriptor | null;
+    globalHint?: string;
   };
 }
 
@@ -19,6 +20,7 @@ export const initConfig: ConfigData = {
   ai: {
     providers: {},
     primaryModel: null,
+    globalHint: '',
   },
 };
 
@@ -39,7 +41,7 @@ export class ConfigModel {
     providerConfig: AIModelProviderConfig
   ) {
     this.store.update((config) => {
-      return (config.ai.providers[provider] = providerConfig);
+      config.ai.providers[provider] = providerConfig;
     });
     this.notifier.notify();
   }
