@@ -42,7 +42,7 @@ export class InputElement extends HTMLElement {
       }
 
       input::placeholder {
-        color: var(--color-text-subtle);
+        color: var(--color-text-disabled);
       }
 
       /* Type-specific styles */
