@@ -87,12 +87,29 @@ registerGlobalShortcuts();
 // TODO: Extract this into a new service
 async function initializeKernel() {
   const config = configModel.get();
-  const model = await aiModelService.getModel(
-    config.ai.primaryModel.provider,
-    config.ai.primaryModel.name,
-    config.ai.providers[config.ai.primaryModel.provider]
-  );
-  kernel.initialize(model, config.ai.globalHint);
+
+  // Check if primary model is defined
+  if (
+    !config.ai.primaryModel ||
+    !config.ai.primaryModel.provider ||
+    !config.ai.primaryModel.name
+  ) {
+    console.warn('Primary model not defined in config, opening settings modal');
+    modalService.open('settings');
+    return;
+  }
+
+  try {
+    const model = await aiModelService.getModel(
+      config.ai.primaryModel.provider,
+      config.ai.primaryModel.name,
+      config.ai.providers[config.ai.primaryModel.provider]
+    );
+    kernel.initialize(model, config.ai.globalHint);
+  } catch (error) {
+    console.error('Failed to initialize kernel with primary model:', error);
+    modalService.open('settings');
+  }
 }
 
 configModel.subscribe(async (notification: ConfigNotification) => {
