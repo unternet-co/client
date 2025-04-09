@@ -1,26 +1,51 @@
 import { Interpreter, InteractionInput, LanguageModel } from '@unternet/kernel';
 import { Workspace, WorkspaceModel } from '../core/workspaces';
+import { ConfigModel, ConfigNotification } from '../core/config';
+import { AIModelService } from './ai-models';
 
 export interface KernelInit {
   model?: LanguageModel;
   workspaceModel: WorkspaceModel;
+  configModel: ConfigModel;
+  aiModelService: AIModelService;
 }
 
 export class Kernel {
   initialized: boolean = false;
   interpreter: Interpreter | null;
   workspaceModel: WorkspaceModel;
+  configModel: ConfigModel;
+  aiModelService: AIModelService;
 
-  constructor({ workspaceModel }: KernelInit) {
+  constructor({ workspaceModel, configModel, aiModelService }: KernelInit) {
     this.workspaceModel = workspaceModel;
+    this.configModel = configModel;
+    this.aiModelService = aiModelService;
+    this.initialize();
+    this.configModel.subscribe(async (notification: ConfigNotification) => {
+      if (!notification) return;
+      if (notification.type === 'model' || notification.type === 'hint') {
+        this.initialize();
+      }
+    });
   }
 
-  initialize(llm: LanguageModel | null, hint?: string) {
-    if (!llm) {
+  async initialize() {
+    const config = this.configModel.get();
+
+    const model = await this.aiModelService.getModel(
+      config.ai.primaryModel.provider,
+      config.ai.primaryModel.name,
+      config.ai.providers[config.ai.primaryModel.provider]
+    );
+
+    const hint = config.ai.globalHint;
+
+    if (!model) {
       this.initialized = false;
       this.interpreter = null;
     } else {
-      this.interpreter = new Interpreter({ model: llm, hint });
+      this.interpreter = new Interpreter({ model, hint });
       this.initialized = true;
     }
   }

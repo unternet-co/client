@@ -56,11 +56,10 @@ const ollamaModelProvider = new OllamaModelProvider();
 const aiModelService = new AIModelService({
   openai: openAIModelProvider,
   ollama: ollamaModelProvider,
-  anthropic: null,
 });
 dependencies.registerSingleton('AIModelService', aiModelService);
 
-const kernel = new Kernel({ workspaceModel });
+const kernel = new Kernel({ workspaceModel, configModel, aiModelService });
 dependencies.registerSingleton('Kernel', kernel);
 
 /* Initialize other services */
@@ -82,45 +81,17 @@ modalService.register('settings', {
 
 registerGlobalShortcuts();
 
-/* Cross-service processes */
-
-// TODO: Extract this into a new service
-async function initializeKernel() {
-  const config = configModel.get();
-
-  // Check if primary model is defined
-  if (
-    !config.ai.primaryModel ||
-    !config.ai.primaryModel.provider ||
-    !config.ai.primaryModel.name
-  ) {
-    console.warn('Primary model not defined in config, opening settings modal');
-    modalService.open('settings');
-    return;
-  }
-
-  try {
-    const model = await aiModelService.getModel(
-      config.ai.primaryModel.provider,
-      config.ai.primaryModel.name,
-      config.ai.providers[config.ai.primaryModel.provider]
-    );
-    kernel.initialize(model, config.ai.globalHint);
-  } catch (error) {
-    console.error('Failed to initialize kernel with primary model:', error);
-    modalService.open('settings');
-  }
-}
-
-configModel.subscribe(async (notification: ConfigNotification) => {
-  if (!notification) return;
-  if (notification.type === 'model' || notification.type === 'hint') {
-    initializeKernel();
-  }
-});
-
-initializeKernel();
-
 /* Initialize UI */
+
+// Open settings if no model defined
+const config = configModel.get();
+if (
+  !config.ai.primaryModel ||
+  !config.ai.primaryModel.provider ||
+  !config.ai.primaryModel.name
+) {
+  console.warn('Primary model not defined in config, opening settings modal');
+  modalService.open('settings');
+}
 
 appendEl(document.body, createEl('app-root'));
