@@ -6,6 +6,7 @@
     "desktop"
   ],
   "scripts": {
+    "preinstall": "npm run build:kernel",
     "build": "npm run build:kernel && npm run build:desktop",
     "build:desktop": "cd desktop && npm run build",
     "build:kernel": "cd kernel && npm run build",
