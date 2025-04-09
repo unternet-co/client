@@ -52,7 +52,7 @@ export class HomePage extends HTMLElement {
             @input=${this.handleFilterInput.bind(this)}
             @keydown=${this.handleKeyDown.bind(this)}
             @blur=${this.handleFilterBlur.bind(this)}
-          />
+          ></un-input>
         </div>
         <un-button @click=${this.handleCreateWorkspace.bind(this)}>
           <un-icon name="plus"></un-icon>
@@ -85,7 +85,7 @@ export class HomePage extends HTMLElement {
       // Sort by modified (most recent first)
       .sort((a, b) => (b.modified || 0) - (a.modified || 0));
 
-    if (this.workspaces.length === 0) {
+    if (this.workspaces.length === 0 && filterQuery.length) {
       render(
         html`<li class="no-workspaces-message">
           No workspaces found matching "${this.filterInput?.value}"

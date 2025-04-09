@@ -65,6 +65,7 @@ export class SettingsModal extends ModalElement {
       this.selectedProviderConfig
     );
     this.configModel.updatePrimaryModel(this.selectedModel);
+    this.close();
   }
 
   private handleProviderChange = async (event: CustomEvent) => {
@@ -130,7 +131,7 @@ export class SettingsModal extends ModalElement {
   get globalHintTemplate() {
     return html`
       <div class="setting-group">
-        <h4>Global Hint</h3>
+        <h4>Global Hint</h4>
         <p>
           Customize how the models respond. These instructions will be sent with
           every command.

@@ -50,7 +50,6 @@ export class ConfigModel {
   }
 
   updatePrimaryModel(model: AIModelDescriptor) {
-    console.log('updaging model', model);
     this.config.ai.primaryModel = model;
     this.store.set(this.config);
     this.notifier.notify({ type: 'model' });
