@@ -15,7 +15,8 @@
     "appId": "co.unternet.client",
     "productName": "unternet-client",
     "files": [
-      "desktop/dist/**/*"
+      "desktop/dist/**/*",
+      "desktop/src/electron/app-icons/**/*"
     ],
     "directories": {
       "output": "release"
@@ -35,20 +36,23 @@
       "target": [
         "dmg",
         "zip"
-      ]
+      ],
+      "icon": "desktop/src/electron/app-icons/client-icon-macOS.png"
     },
     "afterSign": "desktop/dist/notarize.js",
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": "desktop/src/electron/app-icons/client-icon-windows.ico"
     },
     "linux": {
       "target": [
         "AppImage",
         "deb"
       ],
-      "category": "Development"
+      "category": "Development",
+      "icon": "desktop/src/electron/app-icons"
     },
     "deb": {
       "artifactName": "${productName}-${version}-${arch}.deb"
