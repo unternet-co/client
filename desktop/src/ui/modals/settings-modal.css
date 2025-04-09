@@ -1,2 +1,33 @@
-.settings-container {
+settings-modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.setting-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.model-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--rounded);
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-error-600);
+  background: var(--color-error-0);
+}
+
+.model-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }

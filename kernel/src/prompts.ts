@@ -13,17 +13,22 @@ function chooseAction(actions: ActionRecord) {
 }
 
 interface SystemInit {
-  actions: Record<string, ActionDefinition>;
+  actions?: Record<string, ActionDefinition>;
+  hint?: string;
 }
 
-function system({ actions }: SystemInit) {
+function system({ actions, hint }: SystemInit) {
   let prompt = '';
 
   if (actions) {
     prompt += dedent`
       In this environment you have access to a set of functions you can use to answer the user's question.
       Here are the functions available in JSONSchema format:
-      ${JSON.stringify(actions)}`;
+      ${JSON.stringify(actions)}\n\n`;
+  }
+
+  if (hint) {
+    prompt += `User instructions & guidelines:\n${hint}\n\n`;
   }
 
   return prompt;

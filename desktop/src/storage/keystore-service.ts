@@ -1,3 +1,5 @@
+import { produce } from 'immer';
+
 export class KeyStoreService<ValueType> {
   private _name: string;
   private _value: ValueType;
@@ -23,9 +25,13 @@ export class KeyStoreService<ValueType> {
     return JSON.parse(value) as ValueType;
   }
 
-  update(partialValue: Partial<ValueType>) {
+  update(updater: Partial<ValueType> | ((value: ValueType) => void)) {
     const currentValue = this.get();
-    this.set({ ...currentValue, ...partialValue });
+    if (typeof updater === 'function') {
+      this.set(produce(currentValue, updater));
+    } else {
+      this.set({ ...currentValue, ...updater });
+    }
   }
 
   set(value: ValueType) {

@@ -7,8 +7,8 @@ export class ShortcutService {
   private shortcuts: Map<string, Shortcut[]> = new Map();
 
   constructor() {
-    document.addEventListener("keydown", (e: KeyboardEvent) =>
-      this.handleKeydown(e),
+    document.addEventListener('keydown', (e: KeyboardEvent) =>
+      this.handleKeydown(e)
     );
   }
 
@@ -35,7 +35,7 @@ export class ShortcutService {
 
     const shortcutStack = this.shortcuts.get(normalizedKeys)!;
     const index = shortcutStack.findIndex(
-      (shortcut) => shortcut.callback === callback,
+      (shortcut) => shortcut.callback === callback
     );
 
     if (index === -1) {
@@ -63,19 +63,19 @@ export class ShortcutService {
 
   private getKeyCombination(e: KeyboardEvent): string {
     const keys: string[] = [];
-    if (e.ctrlKey) keys.push("Ctrl");
-    if (e.metaKey) keys.push("Meta");
-    if (e.altKey) keys.push("Alt");
-    if (e.shiftKey) keys.push("Shift");
+    if (e.ctrlKey) keys.push('Ctrl');
+    if (e.metaKey) keys.push('Meta');
+    if (e.altKey) keys.push('Alt');
+    if (e.shiftKey) keys.push('Shift');
     keys.push(e.key);
-    return this.normalizeKeys(keys.join("+"));
+    return this.normalizeKeys(keys.join('+'));
   }
 
   private normalizeKeys(keys: string): string {
     return keys
-      .split("+")
+      .split('+')
       .map((key) => key.trim().toUpperCase())
       .sort()
-      .join("+");
+      .join('+');
   }
 }

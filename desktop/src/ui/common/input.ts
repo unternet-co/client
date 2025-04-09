@@ -28,6 +28,7 @@ export class InputElement extends HTMLElement {
         font-family: inherit;
         font-size: inherit;
         line-height: 1;
+        box-sizing: border-box;
       }
 
       input:focus {
@@ -41,7 +42,7 @@ export class InputElement extends HTMLElement {
       }
 
       input::placeholder {
-        color: var(--color-text-subtle);
+        color: var(--color-text-disabled);
       }
 
       /* Type-specific styles */

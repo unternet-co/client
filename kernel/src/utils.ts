@@ -5,13 +5,12 @@ import {
   FileInput,
   Interaction,
   InteractionInput,
-  InteractionOutput,
   Message,
   Protocol,
   ProtocolHandler,
   Resource,
   TextOutput,
-} from './types.js';
+} from './types';
 
 export function createInteraction(
   input: InteractionInput | string

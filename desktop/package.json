@@ -3,11 +3,13 @@
   "version": "0.3.4",
   "homepage": "https://unternet.co",
   "license": "ISC",
-  "main": "dist/main.js",
+  "main": "dist/electron/main.js",
   "scripts": {
-    "build": "vite build",
+    "build": "npm run build:web && npm run build:electron",
+    "build:web": "vite build",
+    "build:electron": "tsc --project tsconfig.node.json",
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
-    "dev:electron": "tsc && electron .",
+    "dev:electron": "npm run build:electron && electron .",
     "dev:web": "vite"
   },
   "dependencies": {
@@ -16,9 +18,11 @@
     "@web-applets/sdk": "^0.2.6",
     "dexie": "^4.0.11",
     "electron-is-dev": "^3.0.1",
+    "immer": "^10.1.1",
     "lit": "^3.2.1",
-    "lit-markdown": "^1.3.2",
     "lucide": "^0.484.0",
+    "marked": "^15.0.7",
+    "openai": "^4.91.1",
     "ulid": "^2.4.0"
   },
   "devDependencies": {

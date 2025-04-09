@@ -1,5 +1,5 @@
 import { jsonSchema, Schema } from 'ai';
-import { ActionDefinition, ActionRecord } from './types.js';
+import { ActionDefinition } from './types';
 
 export interface ActionChoiceObject {
   functions: Array<{ id: string; args: any }>;

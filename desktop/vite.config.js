@@ -1,8 +1,10 @@
-import { defineConfig } from "vite";
-import path from "path";
+import { defineConfig } from 'vite';
+import path from 'path';
 
 export default defineConfig({
-  publicDir: "static",
-  envDir: path.resolve(__dirname, ".."),
-  envPrefix: "APP_",
+  envDir: path.resolve(__dirname, '..'),
+  envPrefix: 'APP_',
+  build: {
+    outDir: 'dist/www',
+  },
 });

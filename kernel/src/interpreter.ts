@@ -6,28 +6,27 @@ import {
   InterpreterResponse,
   Resource,
   TextResponse,
-} from './types.js';
-import {
-  createActionRecord,
-  createMessages,
-  decodeActionUri,
-} from './utils.js';
-import defaultPrompts, { InterpreterPrompts } from './prompts.js';
-import { ActionChoiceObject, actionChoiceSchema } from './schemas.js';
+} from './types';
+import { createActionRecord, createMessages, decodeActionUri } from './utils';
+import defaultPrompts, { InterpreterPrompts } from './prompts';
+import { ActionChoiceObject, actionChoiceSchema } from './schemas';
 
 interface InterpreterInit {
   model: LanguageModel;
   resources?: Array<Resource>;
   prompts?: InterpreterPrompts;
+  hint?: string;
 }
 
 export class Interpreter {
   model: LanguageModel;
   actions: Record<string, ActionDefinition> = {};
   prompts: InterpreterPrompts;
+  hint: string;
 
-  constructor({ model, resources, prompts }: InterpreterInit) {
+  constructor({ model, resources, prompts, hint }: InterpreterInit) {
     this.model = model;
+    this.hint = hint;
     this.actions = createActionRecord(resources || []);
     this.prompts = { ...defaultPrompts, ...prompts };
   }
@@ -79,6 +78,7 @@ export class Interpreter {
         interactions,
         this.prompts.chooseAction(actions)
       ),
+      system: this.prompts.system({ hint: this.hint }),
       schema: actionChoiceSchema(actions),
     });
 
@@ -101,7 +101,7 @@ export class Interpreter {
   ): Promise<TextResponse> {
     const output = streamText({
       model: this.model,
-      system: this.prompts.system({ actions: this.actions }),
+      system: this.prompts.system({ actions: this.actions, hint: this.hint }),
       messages: createMessages(interactions),
     });
 

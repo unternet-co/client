@@ -1,5 +1,5 @@
-import { Table } from "dexie";
-import { db } from "../ext/indexed-db";
+import { Table } from 'dexie';
+import { db } from './indexed-db';
 
 export type WhereConditions = { [key: string]: string | number };
 
@@ -31,7 +31,7 @@ export class DatabaseService<Id, T> {
           .where(condition)
           .equals(conditions[condition])
           .delete();
-      }),
+      })
     );
   }
 

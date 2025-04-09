@@ -1,21 +1,35 @@
 import { Interpreter, InteractionInput, LanguageModel } from '@unternet/kernel';
-import { Workspace, WorkspaceModel } from './models/workspaces';
+import { Workspace, WorkspaceModel } from '../core/workspaces';
 
 export interface KernelInit {
-  model: LanguageModel;
+  model?: LanguageModel;
   workspaceModel: WorkspaceModel;
 }
 
 export class Kernel {
-  interpreter: Interpreter;
+  initialized: boolean = false;
+  interpreter: Interpreter | null;
   workspaceModel: WorkspaceModel;
 
-  constructor({ model, workspaceModel }: KernelInit) {
-    this.interpreter = new Interpreter({ model });
+  constructor({ workspaceModel }: KernelInit) {
     this.workspaceModel = workspaceModel;
   }
 
+  initialize(llm: LanguageModel | null, hint?: string) {
+    if (!llm) {
+      this.initialized = false;
+      this.interpreter = null;
+    } else {
+      this.interpreter = new Interpreter({ model: llm, hint });
+      this.initialized = true;
+    }
+  }
+
   async handleInput(workspaceId: Workspace['id'], input: InteractionInput) {
+    if (!this.interpreter || !this.initialized) {
+      throw new Error('Tried to access kernel when not initialized.');
+    }
+
     this.workspaceModel.updateModified(workspaceId);
 
     const interaction = this.workspaceModel.createInteraction(

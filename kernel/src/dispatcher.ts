@@ -1,5 +1,5 @@
-import { ActionDirective, Protocol, ProtocolHandler } from './types.js';
-import { createProtocolHandlers } from './utils.js';
+import { ActionDirective, Protocol, ProtocolHandler } from './types';
+import { createProtocolHandlers } from './utils';
 
 export class Dispatcher {
   handlers: Record<string, ProtocolHandler> = {};
