@@ -3,6 +3,7 @@ import {
   AIModelDescriptor,
   AIModelProvider,
   AIModelProviderConfig,
+  ConfigValidationResult,
 } from '../ai-models';
 import { OpenAI } from 'openai';
 import { createOpenAI } from '@ai-sdk/openai';
@@ -55,5 +56,14 @@ export class OpenAIModelProvider implements AIModelProvider {
       apiKey: providerConfig.apiKey,
       compatibility: 'strict',
     })(modelId);
+  }
+
+  async validateConfig(
+    providerConfig: AIModelProviderConfig
+  ): Promise<ConfigValidationResult> {
+    if (!providerConfig.apiKey) {
+      return { valid: false, error: 'OpenAI API Key is required' };
+    }
+    return { valid: true };
   }
 }

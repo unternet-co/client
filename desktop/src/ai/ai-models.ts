@@ -2,6 +2,11 @@ import { LanguageModel } from '@unternet/kernel';
 import { OpenAIModelProvider } from './providers/openai';
 import { OllamaModelProvider } from './providers/ollama';
 
+export interface ConfigValidationResult {
+  valid: boolean;
+  error?: string;
+}
+
 export interface AIModelProvider {
   getAvailableModels(
     providerConfig: AIModelProviderConfig
@@ -10,6 +15,9 @@ export interface AIModelProvider {
     modelId: string,
     providerConfig: AIModelProviderConfig
   ): Promise<LanguageModel>;
+  validateConfig(
+    providerConfig: AIModelProviderConfig
+  ): Promise<ConfigValidationResult>;
 }
 
 export const AIModelProviderNames = {
@@ -59,5 +67,18 @@ export class AIModelService {
       throw new Error(`Provider name '${providerName}' not valid.`);
     }
     return this.providers[providerName].getModel(modelId, providerConfig);
+  }
+
+  async validateProviderConfig(
+    providerName: AIModelProviderName,
+    providerConfig: AIModelProviderConfig
+  ): Promise<ConfigValidationResult> {
+    if (!(providerName in this.providers)) {
+      return {
+        valid: false,
+        error: `Provider name '${providerName}' not valid.`,
+      };
+    }
+    return this.providers[providerName].validateConfig(providerConfig);
   }
 }
