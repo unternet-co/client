@@ -22,7 +22,6 @@ import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './ui/modals/settings-modal';
-import './ui/modals/delete-workspace-modal';
 import './ui/app-root';
 
 /* Initialize databases & stores */
@@ -77,11 +76,6 @@ dependencies.registerSingleton('ModalService', modalService);
 modalService.register('settings', {
   title: 'Settings',
   element: 'settings-modal',
-});
-
-modalService.register('delete-workspace', {
-  title: 'Delete Workspace',
-  element: 'delete-workspace-modal',
 });
 
 /* Register keyboard shortcuts */

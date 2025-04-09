@@ -103,9 +103,40 @@ export class HomePage extends HTMLElement {
   handleClickDelete(e: PointerEvent, workspaceId: Workspace['id']) {
     e.preventDefault();
     e.stopPropagation();
-    // Fixes bug where hitting enter opens more modals
-    // If status is open, it doesn't open
-    if (e.pointerId > 0) this.modalService.open('delete-workspace');
+
+    const workspace = this.workspaceModel.get(workspaceId);
+    if (!workspace) return;
+
+    const modal = this.modalService.create({
+      title: `Delete ${workspace.title}`,
+    });
+
+    const handleCancel = () => {
+      this.modalService.close(modal.id);
+    };
+
+    const handleDelete = () => {
+      this.workspaceModel.delete(workspaceId);
+      this.modalService.close(modal.id);
+    };
+
+    const container = document.createElement('div');
+    container.className = 'delete-confirmation';
+    modal.contents.appendChild(container);
+
+    render(
+      html`
+        <p>
+          Are you sure you want to delete <strong>${workspace.title}</strong>?
+          This action cannot be undone.
+        </p>
+        <div class="button-container">
+          <un-button type="secondary" @click=${handleCancel}>Cancel</un-button>
+          <un-button type="negative" @click=${handleDelete}>Delete</un-button>
+        </div>
+      `,
+      container
+    );
   }
 
   handleKeyDown(e: KeyboardEvent) {
