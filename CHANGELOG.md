@@ -1,3 +1,7 @@
+## 0.3.4
+
+- Add ability to attach files to interaction inputs & translate to ai message
+
 ## 0.3.3
 
 - Add a cohesive theme
