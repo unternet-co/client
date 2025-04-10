@@ -1,129 +1,50 @@
-import { css } from 'lit';
+import { LitElement, html, css } from 'lit';
+import { classMap } from 'lit/directives/class-map.js';
 
-export class TextAreaElement extends HTMLElement {
-  private textarea: HTMLTextAreaElement;
+export type TextAreaSize = 'small' | 'medium' | 'large';
+export type TextAreaVariant = 'default' | 'ghost' | 'flat';
 
-  static get styles() {
-    return css`
-      :host {
-        display: block;
-      }
+export class TextAreaElement extends LitElement {
+  value: string = '';
+  placeholder: string = '';
+  disabled: boolean = false;
+  readonly: boolean = false;
+  required: boolean = false;
+  minlength: number = -1;
+  maxlength: number = -1;
+  rows: number = 3;
+  size: TextAreaSize = 'medium';
+  variant: TextAreaVariant = 'default';
 
-      textarea {
-        width: 100%;
-        min-height: 100px;
-        padding: var(--space-3);
-        border: 1px solid var(--color-border);
-        border-radius: var(--rounded-sm);
-        background-color: var(--color-bg-input);
-        color: var(--color-text);
-        font-family: inherit;
-        font-size: inherit;
-        line-height: 1.5;
-        resize: vertical;
-        box-sizing: border-box;
-      }
-
-      textarea:focus {
-        outline: 2px solid var(--color-outline);
-        outline-offset: -1px;
-      }
-
-      textarea:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
-
-      textarea::placeholder {
-        color: var(--color-text-subtle);
-      }
-    `;
+  static get properties() {
+    return {
+      value: { type: String },
+      placeholder: { type: String },
+      disabled: { type: Boolean },
+      readonly: { type: Boolean },
+      required: { type: Boolean },
+      minlength: { type: Number },
+      maxlength: { type: Number },
+      rows: { type: Number },
+      size: { type: String },
+      variant: { type: String },
+    };
   }
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
-
-    this.textarea = document.createElement('textarea');
-    this.textarea.addEventListener('input', this.handleInput.bind(this));
-    this.textarea.addEventListener('change', this.handleChange.bind(this));
-  }
-
-  static get observedAttributes() {
-    return [
-      'value',
-      'placeholder',
-      'disabled',
-      'readonly',
-      'required',
-      'minlength',
-      'maxlength',
-      'rows',
-    ];
-  }
-
-  connectedCallback() {
-    // Add styles
-    const style = document.createElement('style');
-    style.textContent = TextAreaElement.styles.toString();
-    this.shadowRoot!.appendChild(style);
-
-    this.shadowRoot!.appendChild(this.textarea);
-    this.updateTextArea();
-  }
-
-  attributeChangedCallback(
-    name: string,
-    _: string | null,
-    newValue: string | null
-  ) {
-    if (!this.textarea) return;
-
-    switch (name) {
-      case 'value':
-        this.textarea.value = newValue || '';
-        break;
-      case 'placeholder':
-        this.textarea.placeholder = newValue || '';
-        break;
-      case 'disabled':
-        this.textarea.disabled = newValue !== null;
-        break;
-      case 'readonly':
-        this.textarea.readOnly = newValue !== null;
-        break;
-      case 'required':
-        this.textarea.required = newValue !== null;
-        break;
-      case 'minlength':
-        this.textarea.minLength = newValue ? parseInt(newValue, 10) : -1;
-        break;
-      case 'maxlength':
-        this.textarea.maxLength = newValue ? parseInt(newValue, 10) : -1;
-        break;
-      case 'rows':
-        this.textarea.rows = newValue ? parseInt(newValue, 10) : 3;
-        break;
-    }
-  }
-
-  get value(): string {
-    return this.getAttribute('value') || '';
-  }
-
-  set value(newValue: string) {
-    this.setAttribute('value', newValue);
+    this.size = 'medium';
+    this.variant = 'default';
   }
 
   private handleInput(e: Event) {
     const textarea = e.target as HTMLTextAreaElement;
     this.value = textarea.value;
-
     this.dispatchEvent(
       new CustomEvent('input', {
+        detail: { value: this.value },
         bubbles: true,
         composed: true,
-        detail: { value: this.value },
       })
     );
   }
@@ -131,36 +52,134 @@ export class TextAreaElement extends HTMLElement {
   private handleChange(e: Event) {
     const textarea = e.target as HTMLTextAreaElement;
     this.value = textarea.value;
-
     this.dispatchEvent(
       new CustomEvent('change', {
+        detail: { value: this.value },
         bubbles: true,
         composed: true,
-        detail: { value: this.value },
       })
     );
   }
 
-  private updateTextArea() {
-    this.textarea.value = this.value;
-    this.textarea.placeholder = this.getAttribute('placeholder') || '';
-    this.textarea.disabled = this.hasAttribute('disabled');
-    this.textarea.readOnly = this.hasAttribute('readonly');
-    this.textarea.required = this.hasAttribute('required');
-
-    const minLength = this.getAttribute('minlength');
-    if (minLength !== null) {
-      this.textarea.minLength = parseInt(minLength, 10);
+  focus() {
+    const textarea = this.shadowRoot?.querySelector('textarea');
+    if (textarea) {
+      textarea.focus();
     }
+  }
 
-    const maxLength = this.getAttribute('maxlength');
-    if (maxLength !== null) {
-      this.textarea.maxLength = parseInt(maxLength, 10);
+  blur() {
+    const textarea = this.shadowRoot?.querySelector('textarea');
+    if (textarea) {
+      textarea.blur();
     }
+  }
 
-    this.textarea.rows = this.hasAttribute('rows')
-      ? parseInt(this.getAttribute('rows')!, 10)
-      : 3;
+  select() {
+    const textarea = this.shadowRoot?.querySelector('textarea');
+    if (textarea) {
+      textarea.select();
+    }
+  }
+
+  render() {
+    const textareaClasses = {
+      textarea: true,
+      [`textarea--${this.size}`]: this.size !== 'medium',
+      [`textarea--${this.variant}`]: this.variant !== 'default',
+    };
+
+    return html`
+      <div
+        class="textarea-wrapper ${this.size !== 'medium'
+          ? `textarea-wrapper--${this.size}`
+          : ''}"
+      >
+        <textarea
+          class=${classMap(textareaClasses)}
+          .value=${this.value}
+          placeholder=${this.placeholder}
+          ?disabled=${this.disabled}
+          ?readonly=${this.readonly}
+          ?required=${this.required}
+          minlength=${this.minlength > 0 ? this.minlength : ''}
+          maxlength=${this.maxlength > 0 ? this.maxlength : ''}
+          rows=${this.rows}
+          @input=${this.handleInput}
+          @change=${this.handleChange}
+        ></textarea>
+      </div>
+    `;
+  }
+
+  static get styles() {
+    return css`
+      :host {
+        display: block;
+        position: relative;
+      }
+
+      .textarea-wrapper {
+        position: relative;
+        width: 100%;
+      }
+
+      .textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: var(--space-3);
+        border: 1px solid var(--input-border-color);
+        border-bottom-color: color-mix(
+          in srgb,
+          var(--input-border-color) 100%,
+          transparent 75%
+        );
+        border-radius: var(--rounded);
+        background-color: var(--input-bg-color);
+        color: var(--input-text-color);
+        font-family: inherit;
+        font-size: inherit;
+        line-height: 1.5;
+        resize: vertical;
+        box-sizing: border-box;
+        box-shadow: inset 0 1px 1px 0px
+          color-mix(in srgb, var(--color-grey-600) 15%, transparent 100%);
+      }
+
+      .textarea:focus {
+        outline: var(--outline);
+        outline-offset: var(--outline-offset-inputs);
+      }
+
+      .textarea:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .textarea::placeholder {
+        color: var(--input-placeholder-color);
+      }
+
+      .textarea--small {
+        min-height: 80px;
+        font-size: var(--text-sm);
+      }
+
+      .textarea--large {
+        min-height: 120px;
+      }
+
+      .textarea--ghost {
+        border-color: transparent;
+        background-color: transparent;
+      }
+
+      .textarea--flat {
+        border-color: transparent;
+        mix-blend-mode: multiply;
+        background-color: var(--input-bg-color-flat);
+      }
+    `;
   }
 }
 
