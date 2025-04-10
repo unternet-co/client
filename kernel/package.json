@@ -15,12 +15,8 @@
     "run:example": "cd example && npx tsx src/index.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.0.10",
-    "@web-applets/sdk": "^0.1.5",
-    "ai": "^4.0.20",
+    "ai": "^4.3.4",
     "dedent": "^1.5.3",
-    "ollama-ai-provider": "^1.2.0",
-    "openai": "^4.76.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {
