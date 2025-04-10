@@ -73,7 +73,6 @@ top-bar .settings-button-container {
 top-bar .settings-button {
   background-color: transparent;
   border: none;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;

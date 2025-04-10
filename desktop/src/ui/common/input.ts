@@ -81,7 +81,6 @@ export class InputElement extends HTMLElement {
         border: none;
         background: none;
         color: var(--color-text-default);
-        cursor: pointer;
         opacity: 0.6;
         transition: opacity 0.2s ease;
       }
