@@ -198,7 +198,6 @@
   --color-bg-page: var(--color-neutral-100);
   --color-bg-container: var(--color-neutral-50);
   --color-bg-content: var(--color-neutral-0);
-  --color-bg-input: var(--color-bg-content);
 
   /* borders */
   --color-border-muted: var(--color-neutral-200);
@@ -261,9 +260,19 @@
   --font-sans: 'Source Sans 3', system-ui, sans-serif;
 
   /* Outline */
-  --color-outline: var(--color-action-500);
-  --outline: 2px solid var(--color-outline);
+  --outline-color: var(--color-action-500);
+  --outline: 2px solid var(--outline-color);
   --outline-offset: 1px;
+  --outline-offset-inputs: -1px;
+
+  /* Input */
+  --input-bg-color: var(--color-neutral-0);
+  --input-bg-color-flat: var(--color-neutral-100);
+  --input-border-color: var(--color-neutral-300);
+  --input-border-color-flat: var(--color-neutral-200);
+  --input-border-color-error: var(--color-error-500);
+  --input-text-color: var(--color-neutral-1000);
+  --input-placeholder-color: var(--color-neutral-600);
 }
 
 @media (prefers-color-scheme: dark) {
