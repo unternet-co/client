@@ -11,7 +11,6 @@ export class CheckboxElement extends HTMLElement {
         display: flex;
         align-items: center;
         gap: var(--space-3);
-        cursor: pointer;
       }
 
       .checkbox-wrapper:has(input:disabled) {
@@ -27,7 +26,6 @@ export class CheckboxElement extends HTMLElement {
         border: 1px solid var(--color-border-strong);
         border-radius: var(--rounded-sm);
         background-color: var(--color-bg-input);
-        cursor: pointer;
         display: grid;
         place-content: center;
       }

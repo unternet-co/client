@@ -44,6 +44,12 @@
         font-weight: 500;
       }
 
+      .theme-block {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-8);
+      }
+
       .button-showcase {
         display: flex;
         flex-direction: column;
@@ -57,7 +63,8 @@
       }
 
       .button-group h4 {
-        min-width: 100px;
+        font-weight: 500;
+        min-width: 200px;
         margin: 0;
       }
 
@@ -98,7 +105,16 @@
       }
 
       .color-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
         margin-bottom: var(--space-6);
+      }
+
+      .color-group > div {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
       }
 
       .color-group h3 {
@@ -117,9 +133,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 1rem;
-        border: 1px solid var(--color-border);
-        border-radius: 8px;
+        padding: var(--space-3);
       }
 
       .icon-name {
@@ -327,6 +341,7 @@ return "Hello, World!";
     </div>
     <div class="theme-block">
       <h2>Buttons</h2>
+      <h3>Button Types</h3>
       <div class="button-showcase">
         <div class="button-group">
           <h4>Primary</h4>
@@ -336,9 +351,6 @@ return "Hello, World!";
         <div class="button-group">
           <h4>Secondary</h4>
           <un-button type="secondary" text="Secondary Button"></un-button>
-          <un-button type="secondary">
-            <un-icon name="delete"></un-icon><span>With Icon</span>
-          </un-button>
           <un-button
             type="secondary"
             text="Disabled"
@@ -346,7 +358,7 @@ return "Hello, World!";
           ></un-button>
         </div>
         <div class="button-group">
-          <h4>Danger</h4>
+          <h4>Negative</h4>
           <un-button type="negative" text="Negative Button"></un-button>
           <un-button
             type="negative"
@@ -363,6 +375,145 @@ return "Hello, World!";
           <h4>Ghost</h4>
           <un-button type="ghost" text="Ghost Button"></un-button>
           <un-button type="ghost" text="Disabled" disabled="true"></un-button>
+        </div>
+      </div>
+
+      <h3>Button Sizes</h3>
+      <div class="button-showcase">
+        <div class="button-group">
+          <h4>Small</h4>
+          <un-button
+            type="primary"
+            size="small"
+            text="Small Button"
+          ></un-button>
+          <un-button
+            type="secondary"
+            size="small"
+            text="Small Button"
+          ></un-button>
+          <un-button
+            type="outline"
+            size="small"
+            text="Small Button"
+          ></un-button>
+          <un-button type="ghost" size="small" text="Small Button"></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Medium</h4>
+          <un-button type="primary" text="Medium Button"></un-button>
+          <un-button type="secondary" text="Medium Button"></un-button>
+          <un-button type="outline" text="Medium Button"></un-button>
+          <un-button type="ghost" text="Medium Button"></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Large</h4>
+          <un-button
+            type="primary"
+            size="large"
+            text="Large Button"
+          ></un-button>
+          <un-button
+            type="secondary"
+            size="large"
+            text="Large Button"
+          ></un-button>
+          <un-button
+            type="outline"
+            size="large"
+            text="Large Button"
+          ></un-button>
+          <un-button type="ghost" size="large" text="Large Button"></un-button>
+        </div>
+      </div>
+
+      <h3>Loading State</h3>
+      <div class="button-showcase">
+        <div class="button-group">
+          <h4>Loading</h4>
+          <un-button type="primary" text="Loading" loading></un-button>
+          <un-button type="secondary" text="Loading" loading></un-button>
+          <un-button type="negative" text="Loading" loading></un-button>
+          <un-button type="outline" text="Loading" loading></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Sizes</h4>
+          <un-button
+            type="primary"
+            size="small"
+            text="Small"
+            loading
+          ></un-button>
+          <un-button type="primary" text="Medium" loading></un-button>
+          <un-button
+            type="primary"
+            size="large"
+            text="Large"
+            loading
+          ></un-button>
+        </div>
+      </div>
+
+      <h3>Buttons with Icons</h3>
+      <div class="button-showcase">
+        <div class="button-group">
+          <h4>Icon Start</h4>
+          <un-button type="primary" text="Add" icon="plus"></un-button>
+          <un-button type="secondary" text="Search" icon="search"></un-button>
+          <un-button type="outline" text="Settings" icon="settings"></un-button>
+          <un-button type="ghost" text="Delete" icon="delete"></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Icon End</h4>
+          <un-button
+            type="primary"
+            text="Next"
+            icon="right"
+            icon-position="end"
+          ></un-button>
+          <un-button
+            type="secondary"
+            text="Download"
+            icon="download"
+            icon-position="end"
+          ></un-button>
+          <un-button
+            type="outline"
+            text="External"
+            icon="external"
+            icon-position="end"
+          ></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Sizes with Icons</h4>
+          <un-button
+            type="primary"
+            text="Small"
+            size="small"
+            icon="plus"
+          ></un-button>
+          <un-button type="primary" text="Medium" icon="plus"></un-button>
+          <un-button
+            type="primary"
+            text="Large"
+            size="large"
+            icon="plus"
+          ></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Loading with Icons</h4>
+          <un-button
+            type="primary"
+            text="Loading"
+            icon="refresh"
+            loading
+          ></un-button>
+          <un-button
+            type="secondary"
+            text="Loading"
+            icon="upload"
+            loading
+          ></un-button>
         </div>
       </div>
     </div>

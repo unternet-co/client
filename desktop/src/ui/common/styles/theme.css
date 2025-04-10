@@ -205,7 +205,6 @@
   --color-border-default: var(--color-neutral-300);
   --color-border-strong: var(--color-neutral-500);
   --color-border: var(--color-border-default);
-  --color-outline: color-mix(in srgb, var(--color-action-800) 75%, transparent);
 
   /* header */
   --color-header-bg: var(--color-neutral-1000);
@@ -260,6 +259,11 @@
 
   /* Typography */
   --font-sans: 'Source Sans 3', system-ui, sans-serif;
+
+  /* Outline */
+  --color-outline: var(--color-action-500);
+  --outline: 2px solid var(--color-outline);
+  --outline-offset: 1px;
 }
 
 @media (prefers-color-scheme: dark) {
