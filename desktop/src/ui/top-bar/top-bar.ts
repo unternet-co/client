@@ -1,8 +1,8 @@
 import { appendEl, createEl } from '../../common/utils/dom';
 import { render, html } from 'lit';
-import { Tab, TabModel } from '../../core/tabs';
+import { Tab, TabModel } from '../../tabs';
 import { dependencies } from '../../common/dependencies';
-import { WorkspaceModel } from '../../core/workspaces';
+import { WorkspaceModel } from '../../workspaces';
 import './tab-handle';
 import './top-bar.css';
 import { ModalService } from '../../modals/modal-service';

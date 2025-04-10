@@ -1,7 +1,7 @@
 import { html, render, TemplateResult } from 'lit';
-import { InteractionOutput } from '../../core/interactions';
+import { InteractionOutput } from '../../ai/interactions';
 import { appendEl, createEl } from '../../common/utils/dom';
-import { Workspace, WorkspaceModel } from '../../core/workspaces';
+import { Workspace, WorkspaceModel } from '../../workspaces';
 import { dependencies } from '../../common/dependencies';
 import '../common/scroll-container';
 import '../common/markdown-text';
@@ -155,6 +155,8 @@ class InteractionHistory extends HTMLElement {
     let template: TemplateResult = html``;
     if (output.type === 'text') {
       template = html`<markdown-text>${output.content}</markdown-text>`;
+    } else if (output.type === 'action') {
+      template = html`ACTION: ${JSON.stringify(output.content)}`;
     }
     return html`<div class="interaction-output" data-format="markdown">
       ${template}

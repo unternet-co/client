@@ -1,6 +1,6 @@
 import { Dexie, Table } from 'dexie';
-import { Workspace } from '../core/workspaces';
-import { Interaction } from '../core/interactions';
+import { Workspace } from '../workspaces';
+import { Interaction } from '../ai/interactions';
 
 export class IndexedDB extends Dexie {
   workspaces!: Table<Workspace, string>;

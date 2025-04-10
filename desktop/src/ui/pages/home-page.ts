@@ -1,7 +1,7 @@
 import { html, render } from 'lit';
 import { formatTimestamp } from '../../common/utils/index';
-import { Workspace, WorkspaceModel } from '../../core/workspaces';
-import { TabModel } from '../../core/tabs';
+import { Workspace, WorkspaceModel } from '../../workspaces';
+import { TabModel } from '../../tabs';
 import { dependencies } from '../../common/dependencies';
 import { Kernel } from '../../ai/kernel';
 import { ModalService } from '../../modals/modal-service';

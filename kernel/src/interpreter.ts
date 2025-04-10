@@ -39,7 +39,16 @@ export class Interpreter {
   async generateResponse(
     interactions: Array<Interaction>
   ): Promise<InterpreterResponse | null> {
+    // If there are no actions, respond with text
+    if (!Object.keys(this.actions).length) {
+      return this.createTextResponse(interactions);
+    }
+
+    console.log('All good!');
+    console.log(interactions);
+    // An action we're adding on-the-fly to allow for text as an option
     const textAction = { description: this.prompts.textActionDescription };
+    console.log('About to generate a directive');
     const directive = await this.createDirective(interactions, {
       ...{ text: textAction },
       ...this.actions,
@@ -72,6 +81,9 @@ export class Interpreter {
     interactions: Array<Interaction>,
     actions: Record<string, ActionDefinition>
   ): Promise<ActionDirective | null> {
+    console.log(
+      createMessages(interactions, this.prompts.chooseAction(actions))
+    );
     const output = await generateObject({
       model: this.model,
       messages: createMessages(

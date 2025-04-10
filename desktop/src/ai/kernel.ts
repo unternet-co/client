@@ -1,27 +1,52 @@
-import { Interpreter, InteractionInput, LanguageModel } from '@unternet/kernel';
-import { Workspace, WorkspaceModel } from '../core/workspaces';
-import { ConfigModel, ConfigNotification } from '../core/config';
+import {
+  Interpreter,
+  InteractionInput,
+  LanguageModel,
+  ActionResponse,
+  TextResponse,
+  ActionOutput,
+  Dispatcher,
+  Protocol,
+} from '@unternet/kernel';
+import { Workspace, WorkspaceModel } from '../workspaces';
+import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
+import { ResourceManager } from '../processes/resources';
+import { Interaction } from './interactions';
 
 export interface KernelInit {
   model?: LanguageModel;
   workspaceModel: WorkspaceModel;
   configModel: ConfigModel;
   aiModelService: AIModelService;
+  resourceManager: ResourceManager;
+  protocols: Array<Protocol>;
 }
 
 export class Kernel {
   initialized: boolean = false;
-  interpreter: Interpreter | null;
+  interpreter?: Interpreter | null;
+  dispatcher: Dispatcher;
   workspaceModel: WorkspaceModel;
   configModel: ConfigModel;
+  resourceManager: ResourceManager;
   aiModelService: AIModelService;
 
-  constructor({ workspaceModel, configModel, aiModelService }: KernelInit) {
+  constructor({
+    workspaceModel,
+    configModel,
+    aiModelService,
+    resourceManager,
+    protocols,
+  }: KernelInit) {
     this.workspaceModel = workspaceModel;
     this.configModel = configModel;
     this.aiModelService = aiModelService;
+    this.resourceManager = resourceManager;
+    this.dispatcher = new Dispatcher(protocols);
+
     this.initialize();
+
     this.configModel.subscribe(async (notification: ConfigNotification) => {
       if (!notification) return;
       if (notification.type === 'model' || notification.type === 'hint') {
@@ -40,12 +65,13 @@ export class Kernel {
     );
 
     const hint = config.ai.globalHint;
+    const resources = this.resourceManager.resources;
 
     if (!model) {
       this.initialized = false;
       this.interpreter = null;
     } else {
-      this.interpreter = new Interpreter({ model, hint });
+      this.interpreter = new Interpreter({ model, hint, resources });
       this.initialized = true;
     }
   }
@@ -63,22 +89,49 @@ export class Kernel {
     );
 
     const recentInteractions = this.workspaceModel.allInteractions(workspaceId);
-    const output = await this.interpreter.generateResponse(recentInteractions);
+    const response =
+      await this.interpreter.generateResponse(recentInteractions);
 
-    if (output.type === 'text') {
-      const outputIndex = this.workspaceModel.addOutput(interaction.id, {
-        type: output.type,
-        content: '',
-      });
-      let text = '';
-      for await (const chunk of output.textStream) {
-        text += chunk;
-        this.workspaceModel.updateOutputContent(
-          interaction.id,
-          outputIndex,
-          text
-        );
-      }
+    switch (response.type) {
+      case 'text':
+        await this.handleTextResponse(interaction, response);
+        break;
+      case 'action':
+        await this.handleActionResponse(interaction, response);
+        break;
+      default:
+        throw new Error('Action type not recognized!');
     }
+  }
+
+  async handleTextResponse(interaction: Interaction, response: TextResponse) {
+    const outputIndex = this.workspaceModel.addOutput(interaction.id, {
+      type: response.type,
+      content: '',
+    });
+    let text = '';
+    for await (const chunk of response.textStream) {
+      text += chunk;
+      this.workspaceModel.updateOutputContent(
+        interaction.id,
+        outputIndex,
+        text
+      );
+    }
+  }
+
+  async handleActionResponse(
+    interaction: Interaction,
+    response: ActionResponse
+  ) {
+    console.log('it an action');
+    const output: ActionOutput = {
+      type: 'action',
+      directive: response.directive,
+      content: {},
+    };
+
+    output.content = await this.dispatcher.dispatch(response.directive);
+    this.workspaceModel.addOutput(interaction.id, output);
   }
 }

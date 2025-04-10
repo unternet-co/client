@@ -1,4 +1,4 @@
-import { InteractionInput } from '../../core/interactions';
+import { InteractionInput } from '../../ai/interactions';
 import { DisposableGroup } from '../../common/disposable';
 import { attachStyles, appendEl, createEl } from '../../common/utils/dom';
 

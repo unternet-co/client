@@ -122,7 +122,7 @@ export function encodeActionUri({
   // <protocol>:<resource_uri>#<action_id>
   let uriString = '';
   if (protocol) uriString += `${protocol}:`;
-  uriString += resourceId;
+  if (resourceId) uriString += encodeURIComponent(resourceId);
   if (actionId) uriString += `#${actionId}`;
   return uriString;
 }
@@ -131,7 +131,11 @@ export function decodeActionUri(encodedActionURI: string): UriComponents {
   let [protocol, ...rest] = encodedActionURI.split(':');
   let [resourceId, actionId] = rest.join(':').split('#');
 
-  if (!resourceId || resourceId === 'undefined') resourceId = undefined;
+  if (!resourceId || resourceId === 'undefined') {
+    resourceId = undefined;
+  } else {
+    resourceId = decodeURIComponent(resourceId);
+  }
   if (!actionId || actionId === 'undefined') actionId = undefined;
 
   return {

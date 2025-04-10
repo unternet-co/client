@@ -1,5 +1,5 @@
 import { dependencies } from '../common/dependencies';
-import { TabModel } from '../core/tabs';
+import { TabModel } from '../tabs';
 import { ModalService } from '../modals/modal-service';
 import { ShortcutService } from './shortcut-service';
 
