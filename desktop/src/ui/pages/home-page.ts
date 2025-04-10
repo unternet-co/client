@@ -84,10 +84,12 @@ export class HomePage extends HTMLElement {
       // Sort by modified (most recent first)
       .sort((a, b) => (b.modified || 0) - (a.modified || 0));
 
-    if (this.workspaces.length === 0 && filterQuery.length) {
+    if (this.workspaces.length === 0) {
       render(
         html`<li class="no-workspaces-message">
-          No workspaces found matching "${this.filterInput?.value}"
+          ${filterQuery?.length
+            ? `No workspaces found matching "${filterQuery}"`
+            : `You haven't created any workspaces yet.`}
         </li>`,
         this.recentContainer
       );
