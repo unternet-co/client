@@ -53,8 +53,11 @@ export class HomePage extends HTMLElement {
             @blur=${this.handleFilterBlur.bind(this)}
           ></un-input>
         </div>
-        <un-button @click=${this.handleCreateWorkspace.bind(this)}>
-          <un-icon name="plus"></un-icon>
+        <un-button
+          size="large"
+          icon="plus"
+          @click=${this.handleCreateWorkspace.bind(this)}
+        >
           New Workspace
         </un-button>
       </div>
@@ -213,12 +216,12 @@ export class HomePage extends HTMLElement {
           <span class="last-modified">${modifiedString}</span>
         </div>
         <un-button
-          type="secondary"
+          type="negative"
           class="delete-button"
+          icon="delete"
           @click=${(e: PointerEvent) => this.handleClickDelete(e, workspace.id)}
           title="Delete workspace"
         >
-          <un-icon name="delete"></un-icon>
         </un-button>
       </li>
     `;

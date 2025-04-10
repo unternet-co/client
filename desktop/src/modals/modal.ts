@@ -62,8 +62,7 @@ export class Modal {
     return html`<div class="modal-container" data-size=${this.size}>
       <div class="modal-header">
         <span>${this.title}</span>
-        <un-button type="ghost" @click=${this.closeCallback}>
-          <un-icon name="close"></un-icon>
+        <un-button icon="close" type="ghost" @click=${this.closeCallback}>
         </un-button>
       </div>
       ${this.contents}

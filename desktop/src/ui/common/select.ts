@@ -37,7 +37,6 @@ export class SelectElement extends HTMLElement {
         font-size: inherit;
         line-height: 1.5;
         appearance: none;
-        cursor: pointer;
         box-sizing: border-box;
       }
 
