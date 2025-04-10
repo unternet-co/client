@@ -120,7 +120,6 @@ export class ButtonElement extends HTMLElement {
         padding: var(--space-4);
         border: none;
         border-radius: var(--rounded-sm);
-        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;

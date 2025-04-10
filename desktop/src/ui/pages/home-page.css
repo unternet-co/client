@@ -69,7 +69,6 @@ home-page {
 }
 
 .recent-workspaces .workspace {
-  cursor: pointer;
   background: var(--color-neutral-0);
   padding: var(--space-5) var(--space-6);
   border-radius: var(--rounded);
@@ -159,7 +158,6 @@ home-page {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--rounded-sm);
   font-size: var(--text-sm);
-  cursor: pointer;
   border: none;
 }
 
