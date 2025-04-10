@@ -65,7 +65,7 @@ export class Kernel {
     const recentInteractions = this.workspaceModel.allInteractions(workspaceId);
     const output = await this.interpreter.generateResponse(recentInteractions);
 
-    if (output.type === 'text') {
+    if (output?.type === 'text') {
       const outputIndex = this.workspaceModel.addOutput(interaction.id, {
         type: output.type,
         content: '',
@@ -79,6 +79,8 @@ export class Kernel {
           text
         );
       }
+    } else {
+      // NOTE: Should probably handle the `null` case
     }
   }
 }

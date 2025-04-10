@@ -83,7 +83,13 @@ export class Interpreter {
     });
 
     const { functions } = output.object as ActionChoiceObject;
-    if (!functions || !functions[0]?.id) return null;
+    if (!functions || !functions[0]?.id) {
+      // Ollama (qwen2.5-coder) returns an object with a `text` property
+      if ('text' in (output.object as any)) return { protocol: 'text' };
+
+      // Object generation is most likely not supported by the model used
+      return null;
+    }
 
     const fn = functions[0];
     const { protocol, resourceId, actionId } = decodeActionUri(fn.id);
