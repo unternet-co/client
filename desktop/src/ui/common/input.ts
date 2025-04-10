@@ -191,7 +191,7 @@ export class InputElement extends LitElement {
         border-bottom-color: color-mix(
           in srgb,
           var(--input-border-color) 100%,
-          transparent 75%
+          transparent 25%
         );
         background-color: var(--input-bg-color);
         color: var(--input-text-color);

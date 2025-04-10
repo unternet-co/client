@@ -132,7 +132,7 @@ export class TextAreaElement extends LitElement {
         border-bottom-color: color-mix(
           in srgb,
           var(--input-border-color) 100%,
-          transparent 75%
+          transparent 25%
         );
         border-radius: var(--rounded);
         background-color: var(--input-bg-color);
