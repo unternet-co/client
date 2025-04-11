@@ -63,6 +63,14 @@ export class ButtonElement extends LitElement {
     );
   }
 
+  /**
+   * This is needed for proper focus management in modals and keyboard navigation
+   */
+  focus() {
+    const button = this.shadowRoot?.querySelector('button');
+    button?.focus();
+  }
+
   render() {
     const buttonClasses = {
       button: true,
