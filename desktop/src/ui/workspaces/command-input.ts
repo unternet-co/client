@@ -1,126 +1,123 @@
+import { LitElement, html, css } from 'lit';
 import { InteractionInput } from '../../ai/interactions';
-import { DisposableGroup } from '../../common/disposable';
-import { attachStyles, appendEl, createEl } from '../../common/utils/dom';
+import '../common/input';
+import '../common/button';
 
-export class CommandSubmitEvent extends Event {
-  public input: InteractionInput;
-
+export class CommandSubmitEvent extends CustomEvent<{
+  input: InteractionInput;
+}> {
   constructor(value: string) {
-    super('submit');
-    this.input = { text: value };
+    super('submit', {
+      detail: { input: { text: value } },
+      bubbles: true,
+      composed: true,
+    });
   }
 }
 
-export class CommandInputElement extends HTMLElement {
-  private input = createEl<HTMLInputElement>('input');
-  private shadow: ShadowRoot;
-  private disposables = new DisposableGroup();
-  private _disabled = false;
+export class CommandInputElement extends LitElement {
+  static properties = {
+    value: { type: String, reflect: true },
+    disabled: { type: Boolean, reflect: true },
+    placeholder: { type: String },
+  };
+
+  value: string = '';
+  disabled: boolean = false;
+  placeholder: string = 'Search or type a command...';
 
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-    attachStyles(this.shadow, this.styles);
   }
 
-  connectedCallback() {
-    this.input = appendEl(this.shadow, createEl('input')) as HTMLInputElement;
-    this.input.focus();
-    this.input.placeholder = 'Search or type a command...';
-    this.attachEventListeners();
+  firstUpdated() {
+    this.focus();
+  }
 
-    if (this.hasAttribute('disabled')) {
-      this._disabled = true;
+  focus() {
+    const input = this.shadowRoot?.querySelector('un-input');
+    if (input) {
+      (input as any).focus();
     }
   }
 
-  private attachEventListeners() {
-    this.disposables.attachListener(
-      this.input,
-      'keydown',
-      this.handleKeyDown.bind(this)
-    );
-
-    this.disposables.attachListener(this.input, 'input', (e: Event) => {
-      e.stopPropagation();
-      this.dispatchEvent(new Event('input'));
-    });
-
-    this.disposables.attachListener(this.input, 'blur', (e: Event) => {
-      e.stopPropagation();
-      this.dispatchEvent(new Event('blur'));
-    });
-  }
-
-  handleKeyDown(e: KeyboardEvent) {
+  private handleKeyDown(e: KeyboardEvent) {
     if (this.disabled) return;
 
     if (e.key === 'Enter') {
-      this.dispatchEvent(new CommandSubmitEvent(this.input.value));
-      this.input.value = '';
+      e.preventDefault();
+      if (this.value && this.value.trim()) {
+        this.handleSubmit();
+      }
     }
   }
 
-  get value(): string {
-    return this.input?.value ?? '';
+  private handleSubmit() {
+    if (this.disabled || !this.value || !this.value.trim()) return;
+
+    this.dispatchEvent(new CommandSubmitEvent(this.value));
+    this.value = '';
   }
 
-  get disabled(): boolean {
-    return this._disabled;
-  }
-
-  set disabled(value: boolean) {
-    if (this._disabled === value) return;
-
-    if (value) {
-      this.setAttribute('disabled', '');
-    } else {
-      this.removeAttribute('disabled');
+  private handleInput(e: CustomEvent) {
+    if (e.detail && e.detail.value !== undefined) {
+      this.value = e.detail.value;
     }
   }
 
-  static get observedAttributes() {
-    return ['disabled'];
+  render() {
+    return html`
+      <div class="command-input-wrapper">
+        <un-input
+          .value=${this.value || ''}
+          variant="ghost"
+          size="large"
+          ?disabled=${this.disabled}
+          placeholder=${this.placeholder}
+          @keydown=${this.handleKeyDown}
+          @input=${this.handleInput}
+        ></un-input>
+        <un-button
+          class="submit-button"
+          size="small"
+          type="ghost"
+          icon="enter"
+          @click=${this.handleSubmit}
+        ></un-button>
+      </div>
+    `;
   }
 
-  attributeChangedCallback(name: string, _: any, newValue: string | null) {
-    if (name === 'disabled') {
-      this._disabled = newValue !== null;
-    }
-  }
-
-  disconnectedCallback() {
-    this.disposables.dispose();
-  }
-
-  private readonly styles = /*css*/ `
+  static styles = css`
     :host {
       width: 100%;
       display: flex;
       justify-content: center;
     }
 
-    input {
+    .command-input-wrapper {
       width: 100%;
       max-width: 560px;
-      color: var(--color-text-default);
-      border: 1px solid var(--color-border);
-      padding: 6px var(--space-4);
-      background: var(--color-bg-input);
-      border-radius: var(--rounded);
-      outline: none;
-      transition: all 0.2s ease;
+      position: relative;
+      background-color: color-mix(
+        in srgb,
+        var(--color-bg-container) 100%,
+        transparent 25%
+      );
+      backdrop-filter: blur(16px);
+      border-radius: var(--rounded-lg);
+      border-top: 1px solid var(--color-neutral-0);
     }
 
-    input:focus {
-      text-align: left;
-      background: var(--color-bg-input);
-      border: 1px solid var(--color-border);
+    un-input {
+      width: 100%;
     }
 
-    input:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .submit-button {
+      position: absolute;
+      right: var(--space-2);
+      top: 50%;
+      transform: translateY(-50%);
     }
   `;
 }

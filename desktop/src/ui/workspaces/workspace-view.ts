@@ -22,7 +22,7 @@ export class WorkspaceView extends HTMLElement {
 
   async handleCommandSubmit(e: CommandSubmitEvent) {
     try {
-      await this.kernel.handleInput(this.workspaceId, e.input);
+      await this.kernel.handleInput(this.workspaceId, e.detail.input);
     } catch (error) {
       console.error('Error handling command input:', error);
 
@@ -39,7 +39,7 @@ export class WorkspaceView extends HTMLElement {
           dependencies.resolve<WorkspaceModel>('WorkspaceModel');
         const interaction = workspaceModel.createInteraction(
           this.workspaceId,
-          e.input
+          e.detail.input
         );
 
         workspaceModel.addOutput(interaction.id, {
@@ -57,7 +57,7 @@ export class WorkspaceView extends HTMLElement {
       </div>
       <div class="command-bar">
         <command-input
-          @submit=${this.handleCommandSubmit.bind(this)}
+          @submit=${(e) => this.handleCommandSubmit(e)}
         ></command-input>
       </div>
       <resource-bar for=${this.workspaceId}></resource-bar>

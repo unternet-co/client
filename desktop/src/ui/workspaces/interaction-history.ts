@@ -143,9 +143,12 @@ class InteractionHistory extends HTMLElement {
     const templates: TemplateResult[] = [];
 
     for (let i = interactions.length - 1; i >= 0; i--) {
+      // Add null checks to prevent errors when input is undefined
+      const inputText = interactions[i]?.input?.text || '';
+
       templates.push(html`
         <div class="interaction">
-          <div class="interaction-input">${interactions[i].input.text}</div>
+          <div class="interaction-input">${inputText}</div>
           ${interactions[i].outputs.map((output) =>
             this.outputTemplate(output)
           )}

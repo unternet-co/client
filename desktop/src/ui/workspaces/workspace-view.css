@@ -14,10 +14,9 @@ workspace-view .workspace-content {
 }
 
 .command-bar {
-  background: var(--color-bg-page);
-  border-top: 1px solid var(--color-border-muted);
+  /* border-top: 1px solid var(--color-border-muted); */
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: var(--space-5);
+  padding: var(--space-6);
 }
