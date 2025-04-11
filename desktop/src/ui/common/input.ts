@@ -199,8 +199,7 @@ export class InputElement extends LitElement {
         font-size: inherit;
         line-height: var(--input-height);
         box-sizing: border-box;
-        box-shadow: inset 0 1px 1px 0px
-          color-mix(in srgb, var(--color-grey-600) 15%, transparent 100%);
+        box-shadow: var(--input-shadows);
       }
 
       .input:focus {
@@ -245,7 +244,6 @@ export class InputElement extends LitElement {
       .input--flat {
         border-color: transparent;
         box-shadow: none;
-        mix-blend-mode: multiply;
         background-color: var(--input-bg-color-flat);
       }
 

@@ -156,8 +156,7 @@ export class SelectElement extends LitElement {
         line-height: var(--select-height);
         appearance: none;
         box-sizing: border-box;
-        box-shadow: inset 0 -1px 1px 0px
-          color-mix(in oklch, var(--color-grey-600) 10%, transparent 100%);
+        box-shadow: var(--button-shadows);
       }
 
       .select:focus {

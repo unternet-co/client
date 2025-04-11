@@ -149,11 +149,7 @@ export class ButtonElement extends LitElement {
         transition: all 50ms;
         background-color: var(--button-color);
         color: var(--button-text-color);
-        box-shadow:
-          inset 0 1px 1px 0px
-            color-mix(in srgb, var(--color-grey-0) 25%, transparent 100%),
-          inset 0 -1px 1px 0px
-            color-mix(in srgb, var(--color-grey-1000) 25%, transparent 100%);
+        box-shadow: var(--button-shadows);
       }
 
       .button:hover,
