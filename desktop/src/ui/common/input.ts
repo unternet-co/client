@@ -4,6 +4,7 @@ import './icon';
 
 export type InputSize = 'small' | 'medium' | 'large';
 export type InputVariant = 'default' | 'ghost' | 'flat';
+export type IconPosition = 'start' | 'end';
 
 export class InputElement extends LitElement {
   value: string = '';
@@ -22,6 +23,9 @@ export class InputElement extends LitElement {
   autocomplete: string = '';
   size: InputSize = 'medium';
   variant: InputVariant = 'default';
+  loading: boolean = false;
+  icon?: string;
+  iconPosition: IconPosition = 'end';
 
   static get properties() {
     return {
@@ -41,6 +45,9 @@ export class InputElement extends LitElement {
       autocomplete: { type: String },
       size: { type: String },
       variant: { type: String },
+      loading: { type: Boolean },
+      icon: { type: String },
+      iconPosition: { type: String, attribute: 'icon-position' },
     };
   }
 
@@ -48,16 +55,37 @@ export class InputElement extends LitElement {
     super();
     this.size = 'medium';
     this.variant = 'default';
+    this.loading = false;
+    this.icon = undefined;
+    this.iconPosition = 'end';
   }
 
   private handleInput(e: Event) {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
+
+    // Dispatch a custom event with the new value
+    this.dispatchEvent(
+      new CustomEvent('input', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   private handleChange(e: Event) {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
+
+    // Dispatch a custom event with the new value
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   private handleClear() {
@@ -111,20 +139,29 @@ export class InputElement extends LitElement {
       input: true,
       [`input--${this.size}`]: this.size !== 'medium',
       [`input--${this.variant}`]: this.variant !== 'default',
+      loading: this.loading,
     };
 
     return html`
       <div
         class="input-wrapper ${this.size !== 'medium'
           ? `input-wrapper--${this.size}`
-          : ''}"
+          : ''} ${this.icon ? `has-icon icon-${this.iconPosition}` : ''}"
       >
+        ${this.icon && this.iconPosition === 'start'
+          ? html`<un-icon
+              class="input-icon input-icon-start"
+              name=${this.loading ? 'loading' : this.icon}
+              size=${this.size}
+              ?spin=${this.loading}
+            ></un-icon>`
+          : ''}
         <input
           class=${classMap(inputClasses)}
           .value=${this.value}
           type=${this.type}
           placeholder=${this.placeholder}
-          ?disabled=${this.disabled}
+          ?disabled=${this.disabled || this.loading}
           ?readonly=${this.readonly}
           ?required=${this.required}
           minlength=${this.minlength > 0 ? this.minlength : ''}
@@ -137,8 +174,17 @@ export class InputElement extends LitElement {
           autocomplete=${this.autocomplete}
           @input=${this.handleInput}
           @change=${this.handleChange}
+          aria-busy=${this.loading ? 'true' : 'false'}
         />
-        ${showClearButton
+        ${this.icon && this.iconPosition === 'end'
+          ? html`<un-icon
+              class="input-icon input-icon-end"
+              name=${this.loading ? 'loading' : this.icon}
+              size=${this.size}
+              ?spin=${this.loading}
+            ></un-icon>`
+          : ''}
+        ${showClearButton && !this.loading
           ? html`
               <un-button
                 class="clear-button"
@@ -150,6 +196,14 @@ export class InputElement extends LitElement {
               >
               </un-button>
             `
+          : ''}
+        ${this.loading && !this.icon
+          ? html`<un-icon
+              class="loading-icon"
+              name="loading"
+              spin
+              size=${this.size}
+            ></un-icon>`
           : ''}
       </div>
     `;
@@ -244,6 +298,41 @@ export class InputElement extends LitElement {
       .input[type='search']::-webkit-search-results-button,
       .input[type='search']::-webkit-search-results-decoration {
         -webkit-appearance: none;
+      }
+
+      /* Icon positioning */
+      .has-icon.icon-start .input {
+        padding-left: calc(var(--space-4) * 2 + 16px);
+      }
+
+      .has-icon.icon-end .input {
+        padding-right: calc(var(--space-4) * 2 + 16px);
+      }
+
+      .input-icon,
+      .loading-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-text-default);
+        pointer-events: none;
+      }
+
+      .input-icon-start {
+        left: var(--space-4);
+      }
+
+      .input-icon-end {
+        right: var(--space-4);
+      }
+
+      .loading-icon {
+        right: var(--space-4);
+      }
+
+      /* Adjust clear button position when there's an end icon */
+      .has-icon.icon-end .clear-button {
+        right: calc(var(--space-4) * 2 + 16px);
       }
 
       .input-wrapper--small .clear-button {
