@@ -56,12 +56,6 @@ export class Modal {
     ) as HTMLElement;
     this.root.addEventListener('keydown', this.handleKeyDown);
     this.modalContainer.focus();
-    setTimeout(() => {
-      const focusableElements = this.getFocusableElements();
-      if (focusableElements.length > 0) {
-        focusableElements[0].focus();
-      }
-    }, 0);
 
     this.root.onmousedown = (event) => {
       if (event.target === this.root) this.closeCallback();
