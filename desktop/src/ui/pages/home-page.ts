@@ -218,6 +218,9 @@ export class HomePage extends HTMLElement {
         e.preventDefault();
         this.openWorkspace(workspaceId);
         break;
+      case 'Delete':
+        this.handleClickDelete(e as unknown as PointerEvent, workspaceId);
+        break;
     }
   }
 

@@ -48,21 +48,6 @@ export class ButtonElement extends LitElement {
     this.title = '';
   }
 
-  handleClick(e: Event) {
-    if (this.disabled || this.loading) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
-    this.dispatchEvent(
-      new CustomEvent('click', {
-        bubbles: true,
-        composed: true,
-      })
-    );
-  }
-
   /**
    * This is needed for proper focus management in modals and keyboard navigation
    */
@@ -89,7 +74,6 @@ export class ButtonElement extends LitElement {
         title=${this.title}
         aria-busy=${this.loading ? 'true' : 'false'}
         aria-disabled=${this.disabled ? 'true' : 'false'}
-        @click=${this.handleClick}
       >
         ${this.icon && this.iconPosition === 'start'
           ? html`

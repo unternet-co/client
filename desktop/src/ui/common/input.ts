@@ -53,25 +53,11 @@ export class InputElement extends LitElement {
   private handleInput(e: Event) {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
-    this.dispatchEvent(
-      new CustomEvent('input', {
-        detail: { value: this.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
   }
 
   private handleChange(e: Event) {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: this.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
   }
 
   private handleClear() {

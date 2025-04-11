@@ -41,13 +41,6 @@ export class SelectElement extends LitElement {
   private handleChange(e: Event) {
     const select = e.target as HTMLSelectElement;
     this.value = select.value;
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: this.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
   }
 
   focus() {

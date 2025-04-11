@@ -19,12 +19,10 @@ export class RadioElement extends HTMLElement {
   }
 
   connectedCallback() {
-    // Add styles
     const style = document.createElement('style');
     style.textContent = RadioElement.styles.toString();
     this.shadowRoot!.appendChild(style);
 
-    // Add slot for label content
     const slot = document.createElement('slot');
     slot.textContent = this.getAttribute('label') || '';
     this.label.appendChild(slot);
@@ -88,14 +86,6 @@ export class RadioElement extends HTMLElement {
   private handleChange(e: Event) {
     const input = e.target as HTMLInputElement;
     this.checked = input.checked;
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: { checked: this.checked, value: this.value },
-      })
-    );
   }
 
   private updateRadio() {
