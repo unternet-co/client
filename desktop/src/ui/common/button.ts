@@ -22,6 +22,7 @@ export class ButtonElement extends LitElement {
   disabled: boolean;
   loading: boolean;
   title: string;
+  private buttonElement: HTMLButtonElement | null = null;
 
   static get properties() {
     return {
@@ -48,12 +49,35 @@ export class ButtonElement extends LitElement {
     this.title = '';
   }
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  firstUpdated() {
+    this.buttonElement = this.shadowRoot?.querySelector('button') || null;
+  }
+
+  /**
+   * For keyboard accessibility, fire a click when enter is pressed
+   */
+  private handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' && !this.disabled && !this.loading) {
+      e.preventDefault();
+      this.buttonElement?.click();
+    }
+  };
+
   /**
    * This is needed for proper focus management in modals and keyboard navigation
    */
   focus() {
-    const button = this.shadowRoot?.querySelector('button');
-    button?.focus();
+    this.buttonElement?.focus();
   }
 
   render() {
