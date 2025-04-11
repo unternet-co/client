@@ -152,8 +152,9 @@ export class SettingsModal extends ModalElement {
     // Model select
     const providerSelection = html`
       <div class="setting-row">
-        <label>Provider</label>
+        <un-label for="provider" text="Provider"></un-label>
         <un-select
+          id="provider"
           value=${this.selectedProvider}
           @change=${this.handleProviderChange}
         >
@@ -171,8 +172,13 @@ export class SettingsModal extends ModalElement {
     if (this.selectedProvider === 'ollama') {
       const ollamaDetails = html`
         <div class="setting-row">
-          <label>Base URL</label>
+          <un-label
+            for="base-url"
+            text="Base URL"
+            hint="The URL where your Ollama server is running"
+          ></un-label>
           <un-input
+            id="base-url"
             type="url"
             value=${this.selectedProviderConfig.baseUrl}
             @change=${(e: CustomEvent) => {
@@ -187,8 +193,9 @@ export class SettingsModal extends ModalElement {
     } else {
       const hostedModelDetails = html`
         <div class="setting-row">
-          <label>API Key</label>
+          <un-label for="api-key" text="API Key" variant="required"></un-label>
           <un-input
+            id="api-key"
             type="password"
             value=${this.selectedProviderConfig.apiKey}
             @change=${(e: CustomEvent) => {
@@ -204,8 +211,9 @@ export class SettingsModal extends ModalElement {
 
     const modelSelection = html`
       <div class="setting-row">
-        <label>Model</label>
+        <un-label for="model" text="Model"></un-label>
         <un-select
+          id="model"
           value=${this.selectedModel?.name}
           @change=${(event: CustomEvent) => {
             this.selectedModel = this.availableModels.find(

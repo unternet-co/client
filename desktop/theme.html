@@ -16,6 +16,7 @@
     <script type="module" src="src/ui/common/checkbox.ts"></script>
     <script type="module" src="src/ui/common/radio.ts"></script>
     <script type="module" src="src/ui/common/button.ts"></script>
+    <script type="module" src="src/ui/common/label.ts"></script>
     <style>
       body {
         overflow: auto;
@@ -278,20 +279,29 @@ return "Hello, World!";
         <a href="#">Link</a>
       </div>
       <div>
-        <h3>Inputs</h3>
+        <h3>Labels & Inputs</h3>
 
         <div class="form-showcase">
           <div class="form-group">
-            <h4>Search Input</h4>
+            <un-label
+              for="search-input"
+              text="Search Input"
+              size="small"
+              variant="required"
+            ></un-label>
             <un-input type="search" placeholder="Enter some text"></un-input>
             <un-input type="search" value="Disabled input" disabled></un-input>
-            <h4>Text Input</h4>
+            <un-label for="text-input" text="Text Input"></un-label>
             <un-input type="text" placeholder="Enter some text"></un-input>
             <un-input type="text" value="Disabled input" disabled></un-input>
           </div>
 
           <div class="form-group">
-            <h4>Input Sizes</h4>
+            <un-label
+              for="input-sizes"
+              text="Input Sizes"
+              variant="optional"
+            ></un-label>
             <un-input
               type="text"
               size="small"
@@ -309,7 +319,7 @@ return "Hello, World!";
           </div>
 
           <div class="form-group">
-            <h4>Input Variants</h4>
+            <un-label for="input-variants" text="Input Variants"></un-label>
             <un-input type="text" placeholder="Default variant"></un-input>
             <un-input
               type="text"
