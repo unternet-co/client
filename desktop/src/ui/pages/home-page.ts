@@ -7,6 +7,7 @@ import { Kernel } from '../../ai/kernel';
 import { ModalService } from '../../modals/modal-service';
 import cn from 'classnames';
 import { DisposableGroup } from '../../common/disposable';
+import { ShortcutService } from '../../shortcuts/shortcut-service';
 import './home-page.css';
 import '../common/button';
 import '../common/input';
@@ -16,6 +17,8 @@ export class HomePage extends HTMLElement {
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private tabModel = dependencies.resolve<TabModel>('TabModel');
   private modalService = dependencies.resolve<ModalService>('ModalService');
+  private shortcutService =
+    dependencies.resolve<ShortcutService>('ShortcutService');
   private recentContainer: HTMLUListElement;
   private filterInput: HTMLInputElement;
   private selectedIndex: number = -1;
@@ -34,10 +37,14 @@ export class HomePage extends HTMLElement {
     this.disposables.add(
       this.workspaceModel.subscribe(() => this.updateWorkspaces())
     );
+
+    // Register keyboard shortcuts
+    this.registerShortcuts();
   }
 
   disconnectedCallback() {
     this.disposables.dispose();
+    this.deregisterShortcuts();
   }
 
   get template() {
@@ -47,9 +54,10 @@ export class HomePage extends HTMLElement {
           <un-input
             type="search"
             class="filter-input"
+            variant="flat"
+            size="large"
             placeholder="Filter workspaces..."
             @input=${this.handleFilterInput.bind(this)}
-            @keydown=${this.handleKeyDown.bind(this)}
             @blur=${this.handleFilterBlur.bind(this)}
           ></un-input>
         </div>
@@ -143,45 +151,70 @@ export class HomePage extends HTMLElement {
     );
   }
 
-  handleKeyDown(e: KeyboardEvent) {
-    // TODO: Refactor with new keyboard shortcut service
+  private registerShortcuts() {
+    this.shortcutService.register('ArrowUp', this.handleArrowUp.bind(this));
+    this.shortcutService.register('ArrowDown', this.handleArrowDown.bind(this));
+    this.shortcutService.register('Enter', this.handleEnter.bind(this));
+    this.shortcutService.register('Escape', this.handleEscape.bind(this));
+  }
+
+  private deregisterShortcuts() {
+    this.shortcutService.deregister('ArrowUp', this.handleArrowUp.bind(this));
+    this.shortcutService.deregister(
+      'ArrowDown',
+      this.handleArrowDown.bind(this)
+    );
+    this.shortcutService.deregister('Enter', this.handleEnter.bind(this));
+    this.shortcutService.deregister('Escape', this.handleEscape.bind(this));
+  }
+
+  private handleArrowUp(e: KeyboardEvent) {
     const len = this.workspaces.length;
     if (len === 0) return;
 
+    e.preventDefault();
+    this.selectedIndex =
+      this.selectedIndex <= 0
+        ? len - 1 // cycle to end
+        : this.selectedIndex - 1;
+    this.updateWorkspaces(this.filterInput.value);
+  }
+
+  private handleArrowDown(e: KeyboardEvent) {
+    const len = this.workspaces.length;
+    if (len === 0) return;
+
+    e.preventDefault();
+    this.selectedIndex =
+      this.selectedIndex >= len - 1
+        ? 0 // cycle to beginning
+        : this.selectedIndex + 1;
+    this.updateWorkspaces(this.filterInput.value);
+  }
+
+  private handleEnter(e: KeyboardEvent) {
+    if (this.selectedIndex >= 0 && this.workspaces.length > 0) {
+      this.openWorkspace(this.workspaces[this.selectedIndex].id);
+    }
+  }
+
+  private handleEscape(e: KeyboardEvent) {
+    if (this.selectedIndex > -1) {
+      this.selectedIndex = -1;
+      e.preventDefault();
+      this.updateWorkspaces(this.filterInput.value);
+    } else {
+      this.filterInput.value = '';
+      this.updateWorkspaces('');
+    }
+  }
+
+  handleWorkspaceKeyDown(e: KeyboardEvent, workspaceId: string) {
     switch (e.key) {
-      case 'ArrowUp':
-        e.preventDefault();
-        this.selectedIndex =
-          this.selectedIndex <= 0
-            ? len - 1 // cycle to end
-            : this.selectedIndex - 1;
-        this.updateWorkspaces(this.filterInput.value);
-        break;
-      case 'Tab': // same as ArrowDown
-      case 'ArrowDown':
-        e.preventDefault();
-        this.selectedIndex =
-          this.selectedIndex >= len - 1
-            ? 0 // cycle to beginning
-            : this.selectedIndex + 1;
-        this.updateWorkspaces(this.filterInput.value);
-        break;
       case 'Enter':
-        if (this.selectedIndex >= 0) {
-          this.openWorkspace(this.workspaces[this.selectedIndex].id);
-          return;
-        }
-        break;
-      case 'Escape':
-        if (this.selectedIndex > -1) {
-          this.selectedIndex = -1;
-          e.preventDefault();
-          this.updateWorkspaces(this.filterInput.value);
-        } else {
-          // Clear the filter input when Escape is pressed and no workspace is selected
-          this.filterInput.value = '';
-          this.updateWorkspaces('');
-        }
+      case ' ':
+        e.preventDefault();
+        this.openWorkspace(workspaceId);
         break;
     }
   }
@@ -210,7 +243,15 @@ export class HomePage extends HTMLElement {
       : `Last modified: ${formatTimestamp(workspace.modified)}`;
 
     return html`
-      <li class=${className} @click=${() => this.openWorkspace(workspace.id)}>
+      <li
+        class=${className}
+        tabindex="0"
+        @click=${() => this.openWorkspace(workspace.id)}
+        @keydown=${(e: KeyboardEvent) =>
+          this.handleWorkspaceKeyDown(e, workspace.id)}
+        role="button"
+        aria-label="Open workspace: ${workspace.title}"
+      >
         <div class="workspace-title">${workspace.title}</div>
         <div class="workspace-metadata">
           <span class="last-modified">${modifiedString}</span>
