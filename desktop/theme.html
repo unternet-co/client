@@ -365,6 +365,53 @@ return "Hello, World!";
             <un-select disabled>
               <option value="1">Disabled select</option>
             </un-select>
+            <un-select loading>
+              <option value="1">Loading select</option>
+              <option value="2">Option 2</option>
+            </un-select>
+
+            <h5>With Icons</h5>
+            <un-select icon="search" placeholder="Search options">
+              <option value="1">Search option 1</option>
+              <option value="2">Search option 2</option>
+            </un-select>
+            <un-select
+              icon="history"
+              icon-position="start"
+              placeholder="History options"
+            >
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
+
+            <h5>Variants</h5>
+            <un-select variant="ghost" placeholder="Ghost variant">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
+            <un-select variant="flat" placeholder="Flat variant">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
+
+            <h5>Combined Variants with Icons</h5>
+            <un-select
+              variant="ghost"
+              icon="settings"
+              placeholder="Ghost with icon"
+            >
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
+            <un-select
+              variant="flat"
+              icon="history"
+              icon-position="start"
+              placeholder="Flat with icon"
+            >
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
           </div>
 
           <div class="form-group">

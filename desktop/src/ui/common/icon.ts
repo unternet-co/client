@@ -9,7 +9,7 @@ export const ICON_MAP = {
   toolbox: 'shapes',
   settings: 'settings-2',
   check: 'check',
-  dropdown: 'chevron-down',
+  dropdown: 'chevrons-up-down',
   enter: 'corner-down-left',
   handle: 'grip-horizontal',
   delete: 'trash',

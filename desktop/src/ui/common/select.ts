@@ -10,6 +10,7 @@ export interface SelectOption {
 
 export type SelectSize = 'small' | 'medium' | 'large';
 export type SelectVariant = 'default' | 'ghost' | 'flat';
+export type IconPosition = 'start' | 'end';
 
 export class SelectElement extends LitElement {
   value: string = '';
@@ -19,6 +20,9 @@ export class SelectElement extends LitElement {
   name: string = '';
   size: SelectSize = 'medium';
   variant: SelectVariant = 'default';
+  loading: boolean = false;
+  icon?: string;
+  iconPosition: IconPosition = 'end';
 
   static get properties() {
     return {
@@ -29,6 +33,9 @@ export class SelectElement extends LitElement {
       name: { type: String },
       size: { type: String },
       variant: { type: String },
+      loading: { type: Boolean },
+      icon: { type: String },
+      iconPosition: { type: String, attribute: 'icon-position' },
     };
   }
 
@@ -36,11 +43,22 @@ export class SelectElement extends LitElement {
     super();
     this.size = 'medium';
     this.variant = 'default';
+    this.loading = false;
+    this.icon = undefined;
+    this.iconPosition = 'end';
   }
 
   private handleChange(e: Event) {
     const select = e.target as HTMLSelectElement;
     this.value = select.value;
+
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   focus() {
@@ -70,12 +88,11 @@ export class SelectElement extends LitElement {
       select: true,
       [`select--${this.size}`]: this.size !== 'medium',
       [`select--${this.variant}`]: this.variant !== 'default',
+      loading: this.loading,
     };
 
-    // Create options elements
     const optionElements = [];
 
-    // Add placeholder if exists
     if (this.placeholder) {
       optionElements.push(html`
         <option value="" disabled ?selected=${!this.value}>
@@ -84,7 +101,6 @@ export class SelectElement extends LitElement {
       `);
     }
 
-    // Add options from slot
     this.options.forEach((opt) => {
       optionElements.push(html`
         <option
@@ -101,19 +117,41 @@ export class SelectElement extends LitElement {
       <div
         class="select-wrapper ${this.size !== 'medium'
           ? `select-wrapper--${this.size}`
-          : ''}"
+          : ''} ${this.icon ? `has-icon icon-${this.iconPosition}` : ''}"
       >
+        ${this.icon && this.iconPosition === 'start'
+          ? html`<un-icon
+              class="value-icon value-icon-start"
+              name=${this.icon}
+              size=${this.size}
+            ></un-icon>`
+          : ''}
         <select
           class=${classMap(selectClasses)}
           .value=${this.value}
-          ?disabled=${this.disabled}
+          ?disabled=${this.disabled || this.loading}
           ?required=${this.required}
           name=${this.name}
           @change=${this.handleChange}
+          aria-busy=${this.loading ? 'true' : 'false'}
         >
           ${optionElements}
         </select>
-        <un-icon name="dropdown"></un-icon>
+        ${this.icon && this.iconPosition === 'end'
+          ? html`<un-icon
+              class="value-icon value-icon-end"
+              name=${this.icon}
+              size=${this.size}
+            ></un-icon>`
+          : ''}
+        ${this.loading
+          ? html`<un-icon
+              class="dropdown-icon"
+              name="loading"
+              spin
+              size=${this.size}
+            ></un-icon>`
+          : html`<un-icon class="dropdown-icon" name="dropdown"></un-icon>`}
       </div>
     `;
   }
@@ -136,12 +174,6 @@ export class SelectElement extends LitElement {
         height: var(--select-height);
         padding: 0 var(--space-8) 0 var(--space-4);
         border-radius: var(--rounded);
-        border: 1px solid var(--input-border-color);
-        border-top-color: color-mix(
-          in srgb,
-          var(--input-border-color) 100%,
-          transparent 50%
-        );
         background-color: var(--input-bg-color);
         color: var(--input-text-color);
         font-family: inherit;
@@ -149,6 +181,12 @@ export class SelectElement extends LitElement {
         line-height: var(--select-height);
         appearance: none;
         box-sizing: border-box;
+        border: 1px solid var(--input-border-color);
+        border-top-color: color-mix(
+          in srgb,
+          var(--input-border-color) 100%,
+          transparent 50%
+        );
         box-shadow: var(--button-shadows);
       }
 
@@ -157,9 +195,14 @@ export class SelectElement extends LitElement {
         outline-offset: var(--outline-offset-inputs);
       }
 
-      .select:disabled {
+      .select:disabled,
+      .select.loading {
         opacity: 0.5;
         cursor: not-allowed;
+      }
+
+      .loading {
+        pointer-events: none;
       }
 
       .select option:disabled {
@@ -181,6 +224,10 @@ export class SelectElement extends LitElement {
         box-shadow: none;
       }
 
+      .select-wrapper:has(.select--ghost):hover un-icon.dropdown-icon {
+        opacity: 1;
+      }
+
       .select--flat {
         border-color: transparent;
         box-shadow: none;
@@ -188,13 +235,18 @@ export class SelectElement extends LitElement {
         background-color: var(--input-bg-color-flat);
       }
 
-      un-icon {
+      .select--flat + un-icon.dropdown-icon,
+      .select--flat ~ un-icon.dropdown-icon {
+        border-left-color: transparent;
+      }
+
+      un-icon.dropdown-icon {
         position: absolute;
         right: 1px;
         top: 50%;
         transform: translateY(-50%);
         pointer-events: none;
-        color: var(--input-placeholder-color);
+        color: var(--color-text-muted);
         border-left: 1px solid
           color-mix(in srgb, var(--input-border-color) 100%, transparent 50%);
         height: 100%;
@@ -202,6 +254,46 @@ export class SelectElement extends LitElement {
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      .select--ghost + un-icon.dropdown-icon,
+      .select--ghost ~ un-icon.dropdown-icon {
+        border: 1px solid var(--input-border-color);
+        border-top-color: color-mix(
+          in srgb,
+          var(--input-border-color) 100%,
+          transparent 50%
+        );
+        box-shadow: var(--button-shadows);
+        border-radius: var(--rounded);
+        height: 16px;
+        width: 16px;
+        right: var(--space-2);
+      }
+
+      un-icon.value-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--input-text-color);
+        z-index: 1;
+      }
+
+      un-icon.value-icon-start {
+        left: var(--space-4);
+      }
+
+      un-icon.value-icon-end {
+        right: calc(20px + var(--space-4));
+      }
+
+      .has-icon.icon-start select {
+        padding-left: calc(var(--space-4) + 16px);
+      }
+
+      .has-icon.icon-end select {
+        padding-right: calc(var(--space-8) + 16px);
       }
 
       select:disabled + un-icon {

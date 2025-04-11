@@ -221,6 +221,7 @@ export class SettingsModal extends ModalElement {
             );
             this.render();
           }}
+          ?loading=${this.isLoadingModels}
           placeholder="Select a model"
         >
           ${this.availableModels.map(
@@ -231,18 +232,10 @@ export class SettingsModal extends ModalElement {
         </un-select>
       </div>
     `;
-    if (!this.isLoadingModels && this.availableModels.length > 0) {
-      sections.push(modelSelection);
-    }
 
-    if (this.isLoadingModels) {
-      sections.push(
-        html`<div class="model-loading">
-          <un-icon name="loading" spin></un-icon>
-          <span>Loading models...</span>
-        </div>`
-      );
-    } else if (this.modelError) {
+    sections.push(modelSelection);
+
+    if (this.modelError) {
       sections.push(
         html`<div class="model-error">
           <un-icon name="error"></un-icon>
