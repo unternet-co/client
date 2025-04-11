@@ -142,8 +142,7 @@ export class TextAreaElement extends LitElement {
         line-height: 1.5;
         resize: vertical;
         box-sizing: border-box;
-        box-shadow: inset 0 1px 1px 0px
-          color-mix(in srgb, var(--color-grey-600) 15%, transparent 100%);
+        box-shadow: var(--input-shadows);
       }
 
       .textarea:focus {
