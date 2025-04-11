@@ -210,6 +210,8 @@ export class HomePage extends HTMLElement {
   }
 
   handleWorkspaceKeyDown(e: KeyboardEvent, workspaceId: string) {
+    const targetEl = e.target as HTMLElement;
+    if (!targetEl.classList.contains('workspace')) return;
     switch (e.key) {
       case 'Enter':
       case ' ':
