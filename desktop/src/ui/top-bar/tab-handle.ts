@@ -143,17 +143,23 @@ export class TabHandleElement extends HTMLElement {
         align-items: center;
         -webkit-app-region: no-drag;
         gap: var(--space-3);
-        border-left: 1px solid var(--color-border-muted);
-        border-right: 1px solid var(--color-border-muted);
+        border-left: 1px solid var(--color-border);
+        border-right: 1px solid var(--color-border);
+        margin-bottom: 1px;
         padding: 0 var(--space-6);
         padding-right: var(--space-4);
         margin-right: -1px; /* Remove double-borders */
         font-size: var(--text-sm);
       }
 
-      :host(:hover),
+      :host(:hover) {
+        background: var(--color-bg-container);
+      }
+
       :host([active]) {
-        background: var(--color-bg-content);
+        background: var(--color-bg-page);
+        border-color: transparent;
+        margin-bottom: 0;
       }
 
       :host([active]:not([static])) .inner {
