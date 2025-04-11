@@ -3,13 +3,11 @@ resource-bar {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: var(--space-4) 12px;
-  padding-top: var(--space-3);
-  background: var(--color-bg-page);
-}
-
-.blurred resource-bar {
-  background: var(--color-bg-page);
+  padding: 0 12px;
+  border-top: 1px solid var(--color-border-muted);
+  background: var(--color-neutral-150);
+  height: 30px;
+  box-shadow: var(--button-shadows);
 }
 
 ul.applets-list {
