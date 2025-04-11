@@ -21,12 +21,12 @@
   max-height: 85%;
   border: 1px solid var(--color-border);
   overflow: hidden;
+  outline: none;
 }
 
 .modal-header {
   position: sticky;
   top: 0;
-  /* background: var(--color-bg-container); */
   padding: var(--space-3) var(--space-4) var(--space-1) var(--space-6);
   display: flex;
   text-transform: uppercase;
