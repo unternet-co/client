@@ -6,7 +6,7 @@ home-page {
   width: 100%;
   height: 100%;
   gap: var(--space-4);
-  padding-top: var(--space-7);
+  padding-top: var(--space-8);
 }
 
 .home-header {
@@ -14,7 +14,6 @@ home-page {
   width: 100%;
   max-width: 80ch;
   gap: var(--space-4);
-  margin-bottom: var(--space-2);
   justify-content: space-between;
   align-items: stretch;
 }
@@ -25,12 +24,13 @@ home-page {
   flex-grow: 1;
   overflow-y: scroll;
   margin: 0;
-  padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 80ch;
+  /* Add space for workspace outline, otherwise cropped by scroll area */
+  max-width: calc(80ch + var(--space-4));
+  padding: 0 var(--space-2);
   gap: var(--space-4);
 }
 
@@ -78,6 +78,10 @@ home-page {
   gap: var(--space-1);
   font-size: var(--text-lg);
   position: relative;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    outline 0.2s ease;
 }
 
 .workspace-metadata {
@@ -88,10 +92,11 @@ home-page {
   font-size: var(--text-sm);
 }
 
-.recent-workspaces .workspace:hover,
-.recent-workspaces .workspace.selected {
-  background: var(--color-action-800);
-  color: var(--color-neutral-0);
+.workspace:focus,
+.workspace:hover,
+.workspace.selected {
+  outline: var(--outline);
+  outline-offset: var(--outline-offset);
 }
 
 /* Delete button styling */
@@ -104,7 +109,12 @@ home-page {
   transition: opacity 0.2s ease;
 }
 
-.workspace:hover .delete-button {
+.workspace:hover .delete-button,
+.workspace:focus .delete-button {
+  opacity: 1;
+}
+
+.delete-button:focus {
   opacity: 1;
 }
 
