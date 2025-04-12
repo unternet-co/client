@@ -71,7 +71,6 @@ export class CommandInputElement extends LitElement {
         <un-input
           .value=${this.value || ''}
           variant="ghost"
-          size="large"
           ?disabled=${this.disabled}
           placeholder=${this.placeholder}
           @keydown=${this.handleKeyDown}
@@ -96,28 +95,44 @@ export class CommandInputElement extends LitElement {
     }
 
     .command-input-wrapper {
+      outline: 1px solid var(--color-neutral-300);
       width: 100%;
-      max-width: 560px;
+      max-width: 72ch;
       position: relative;
       background-color: color-mix(
         in srgb,
         var(--color-bg-container) 100%,
-        transparent 25%
+        transparent 35%
       );
       backdrop-filter: blur(16px);
       border-radius: var(--rounded-lg);
-      border-top: 1px solid var(--color-neutral-0);
+      /* border-top: 1px solid var(--color-neutral-0); */
+    }
+
+    .command-input-wrapper:focus-within {
+      outline-color: var(--color-action-800);
     }
 
     un-input {
       width: 100%;
+      margin: 3px;
+    }
+
+    un-input::part(input) {
+      outline: none;
     }
 
     .submit-button {
       position: absolute;
-      right: var(--space-2);
-      top: 50%;
-      transform: translateY(-50%);
+      right: 6px;
+      top: 6px;
+    }
+
+    .submit-button::part(button) {
+      width: 18px;
+      height: 18px;
+      outline-width: 1px;
+      border-radius: var(--rounded);
     }
   `;
 }

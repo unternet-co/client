@@ -102,7 +102,7 @@ class InteractionHistory extends HTMLElement {
       currentLetterIndex = (currentLetterIndex + 1) % text.length;
       // Update the thinking text with the new active letter
       this.updateThinkingText(text, currentLetterIndex);
-    }, 200);
+    }, 100);
   }
 
   stopThinkingAnimation() {

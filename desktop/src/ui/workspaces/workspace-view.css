@@ -3,6 +3,7 @@ workspace-view {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow-y: scroll;
 }
 
 workspace-view .workspace-content {
@@ -10,13 +11,18 @@ workspace-view .workspace-content {
   background: var(--color-bg-page);
   display: flex;
   justify-content: center;
-  overflow: hidden;
 }
 
 .command-bar {
-  /* border-top: 1px solid var(--color-border-muted); */
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-6);
+  position: sticky;
+  bottom: 32px;
+}
+
+resource-bar {
+  position: sticky;
+  bottom: 0;
 }

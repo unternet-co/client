@@ -93,6 +93,7 @@ export class ButtonElement extends LitElement {
 
     return html`
       <button
+        part="button"
         class=${classMap(buttonClasses)}
         ?disabled=${this.disabled || this.loading}
         title=${this.title}

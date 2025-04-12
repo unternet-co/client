@@ -157,6 +157,7 @@ export class InputElement extends LitElement {
             ></un-icon>`
           : ''}
         <input
+          part="input"
           class=${classMap(inputClasses)}
           .value=${this.value}
           type=${this.type}

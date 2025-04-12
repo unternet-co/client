@@ -10,7 +10,8 @@ top-bar {
   box-shadow:
     inset 0 -1px 0 0 color-mix(in srgb, var(--color-neutral-0), transparent 15%),
     inset 0 -2px 2px 0
-      color-mix(in srgb, var(--color-neutral-300), transparent 50%);
+      color-mix(in srgb, var(--color-neutral-300), transparent 50%),
+    0px 8px 8px 5px color-mix(in srgb, var(--color-bg-page), transparent 0%);
 }
 
 /* Default padding for macOS traffic lights */
