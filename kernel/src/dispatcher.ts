@@ -1,4 +1,9 @@
-import { ActionResponse, Protocol, ProtocolHandler } from './types';
+import {
+  ActionDirective,
+  ActionResponse,
+  Protocol,
+  ProtocolHandler,
+} from './types';
 import { createProtocolHandlers } from './utils';
 
 export class Dispatcher {
@@ -21,15 +26,14 @@ export class Dispatcher {
     }
   }
 
-  async dispatch(response: ActionResponse) {
-    const protocol = this.handlers[response.protocol];
+  async dispatch(directive: ActionDirective) {
+    const protocol = this.handlers[directive.protocol];
 
     if (!protocol) {
       throw new Error(
-        `The provided protocol scheme '${response.protocol}' has not been registered.`
+        `The provided protocol scheme '${directive.protocol}' has not been registered.`
       );
     }
-    console.log('dispatching');
-    return this.handlers[response.protocol](response);
+    return this.handlers[directive.protocol](directive);
   }
 }

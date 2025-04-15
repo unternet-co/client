@@ -1,5 +1,5 @@
 import { jsonSchema, Schema } from 'ai';
-import { ActionDefinition } from './types';
+import { ActionDefinition, Strategy } from './types';
 
 export interface ActionChoiceObject {
   functions: Array<{ id: string; args: any }>;
@@ -55,20 +55,20 @@ function actionSchema(actionId: string, action: ActionDefinition) {
   return schema;
 }
 
-function responseMode(responseModes: Record<string, string>) {
-  return jsonSchema({
+function strategies(strategies: Record<string, Strategy>) {
+  return jsonSchema<{ strategy: string }>({
     type: 'object',
     properties: {
-      mode: {
+      strategy: {
         type: 'string',
-        enum: [...Object.keys(responseModes)],
+        enum: [...Object.keys(strategies)],
       },
     },
     additionalProperties: false,
-    required: ['mode'],
+    required: ['strategy'],
   });
 }
 
 export const schemas = {
-  responseMode,
+  strategies,
 };

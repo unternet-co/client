@@ -1,82 +1,137 @@
-import { LanguageModel, streamText, generateObject } from 'ai';
+import { LanguageModel, streamText, generateObject, generateText } from 'ai';
 import {
   ActionDefinition,
   ActionResponse,
   Interaction,
-  InteractionOutput,
-  InterpreterResponse,
   Resource,
+  Strategy,
   TextResponse,
 } from './types';
 import {
   createActionRecord,
   createMessages,
+  createUserMessage,
+  createAssistantMessage,
   decodeActionUri,
-  clone,
 } from './utils';
 import defaultPrompts, { InterpreterPrompts } from './prompts';
 import { ActionChoiceObject, actionChoiceSchema, schemas } from './schemas';
 
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 interface InterpreterInit {
   model: LanguageModel;
   resources?: Array<Resource>;
+  strategies?: Record<string, Strategy>;
   prompts?: InterpreterPrompts;
   hint?: string;
-  maxResponses?: number;
+}
+
+const defaultStrategies: Record<string, Strategy> = {};
+
+defaultStrategies.TEXT = {
+  description: `Respond directly to the user with text/markdown.`,
+  method: async function* (
+    interpreter: Interpreter,
+    interactions: Array<Interaction>
+  ) {
+    yield await interpreter.createTextResponse(interactions);
+    return;
+  },
+};
+
+defaultStrategies.RESEARCH = {
+  description: `Use one or more tools, then respond to the user based on the tool output. If you already have the required information from a prior tool call DO NOT use this, instead use TEXT (assume all prior information is still up-to-date). If you don't have the required information to use the tool, use TEXT to ask a follow-up question to clarify.`,
+  method: async function* (
+    interpreter: Interpreter,
+    interactions: Array<Interaction>
+  ) {
+    interactions = yield await interpreter.createActionResponse(interactions);
+    const response = await interpreter.createTextResponse(interactions);
+    yield response;
+    return;
+  },
+};
+
+interface GenerateOpts {
+  think: boolean;
 }
 
 export class Interpreter {
   model: LanguageModel;
-  actions: Record<string, ActionDefinition> = {};
+  actions: Record<string, ActionDefinition>;
   prompts: InterpreterPrompts;
+  strategies: Record<string, Strategy>;
   hint: string;
 
-  constructor({ model, resources, prompts, hint }: InterpreterInit) {
+  constructor({
+    model,
+    resources,
+    prompts,
+    hint,
+    strategies,
+  }: InterpreterInit) {
     this.model = model;
     this.hint = hint;
     this.actions = createActionRecord(resources || []);
     this.prompts = { ...defaultPrompts, ...prompts };
+    this.strategies = { ...defaultStrategies, ...strategies };
   }
 
   /**
-   * Generates a response to the user's query, which can be either text or an action call.
+   * Runs the interpretation loop with a given set of interactions, returning when complete.
+   * @param interactions An array of interactions
+   * @returns An async generator function that yields responses, and whose next() function takes an array of interactions
+   */
+  async *run(interactions: Array<Interaction>) {
+    if (!Object.keys(this.actions).length) {
+      yield this.createTextResponse(interactions);
+      return;
+    }
+
+    const strategy = await this.chooseStrategy(interactions);
+    if (strategy in this.strategies) {
+      const responses = this.strategies[strategy].method(this, interactions);
+
+      let response = await responses.next();
+      while (!response.done) {
+        const newInteractions = yield response.value;
+        response = await responses.next(newInteractions);
+      }
+      return;
+    }
+
+    throw new Error("Couldn't generate a valid response.");
+  }
+
+  /**
+   * Chooses a strategy to respond to the user's query
    * @param interactions An array of interactions
    * @returns An InterpreterResponse object, of type 'text' or 'action'.
    */
-  async createResponse(
-    interactions: Array<Interaction>
-  ): Promise<InterpreterResponse | null> {
-    // If there are no actions, respond with text
-    if (!Object.keys(this.actions).length) {
-      return this.createTextResponse(interactions);
-    }
+  async chooseStrategy(interactions: Array<Interaction>) {
+    const thought = await this.generateThought(
+      interactions,
+      this.prompts.chooseStrategy(this.strategies)
+    );
 
-    const responseMode = await this.chooseResponseMode(interactions);
-    console.log('RESPONSE MODE:', responseMode);
+    const messages = createMessages(interactions);
+    messages.push(createAssistantMessage(thought));
+    messages.push(
+      createUserMessage(this.prompts.chooseStrategy(this.strategies))
+    );
 
-    const previousOutput = interactions.at(-1).outputs.at(-1);
-
-    if (responseMode === 'TEXT') {
-      if (previousOutput && previousOutput.type === 'text') return null;
-      return this.createTextResponse(interactions);
-    }
-    if (responseMode === 'TOOL') return this.createActionResponse(interactions);
-    return null;
-  }
-
-  async chooseResponseMode(interactions: Array<Interaction>) {
     const output = await generateObject({
       model: this.model,
-      messages: createMessages(
-        interactions,
-        this.prompts.chooseResponseMode(this.prompts.responseModes)
-      ),
+      messages,
       system: this.prompts.system({ actions: this.actions, hint: this.hint }),
-      schema: schemas.responseMode(this.prompts.responseModes),
+      schema: schemas.strategies(this.strategies),
     });
 
-    const { mode } = output.object as { mode: string };
-    return mode;
+    const { strategy } = output.object;
+    return strategy;
   }
 
   async createTextResponse(
@@ -93,6 +148,20 @@ export class Interpreter {
       text: output.text,
       textStream: output.textStream,
     };
+  }
+
+  async generateThought(interactions: Array<Interaction>, prompt?: string) {
+    const messages = createMessages(interactions);
+    if (prompt) messages.push(createUserMessage(prompt));
+    messages.push(createUserMessage(this.prompts.think()));
+    const { text } = await generateText({
+      model: this.model,
+      system: this.prompts.system({ actions: this.actions, hint: this.hint }),
+      messages,
+    });
+
+    console.log('Thought', text);
+    return text;
   }
 
   /**
@@ -118,10 +187,12 @@ export class Interpreter {
 
     return {
       type: 'action',
-      protocol,
-      resourceId,
-      actionId,
-      args: fn.args,
+      directive: {
+        protocol,
+        resourceId,
+        actionId,
+        args: fn.args,
+      },
     };
   }
 }

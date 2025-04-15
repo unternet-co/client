@@ -1,20 +1,14 @@
 import dedent from 'dedent';
-import { ActionDefinition } from './types.js';
+import { ActionDefinition, Strategy } from './types.js';
 
-const responseModes = {
-  TEXT: 'Respond directly to the user with text/markdown.',
-  TOOL: 'Use one of the provided tools.',
-  DONE: 'Respond with this to complete your turn, and await further input from the user.',
-};
-
-function chooseResponseMode(responseModes: Record<string, string>) {
-  const possibleOutputs = Object.keys(responseModes)
+function chooseStrategy(strategies: Record<string, Strategy>) {
+  const possibleOutputs = Object.keys(strategies)
     .map((x) => `"${x}"`)
     .join(' or ');
   return dedent`
-    Choose from one of the following "response modes". This is not your actual response, but will determine the action you take next.
-    Possible response modes:
-    ${JSON.stringify(responseModes)}
+    Choose from one of the following strategies to use in order to best respond to the user's query. (This is not your actual response, but will determine the type of response you give).
+    Possible strategies:
+    ${JSON.stringify(strategies)}
     Respond with only one of the following strings: ${possibleOutputs}
   `;
 }
@@ -27,6 +21,10 @@ function chooseAction() {
   `;
 }
 
+function think() {
+  return dedent`\n\n---\n\nBefore you respond to the above, take a moment and think about your next step, and respond in a brief freeform text thought.`;
+}
+
 interface SystemInit {
   actions?: Record<string, ActionDefinition>;
   hint?: string;
@@ -36,7 +34,7 @@ interface SystemInit {
 function system({ actions, hint }: SystemInit) {
   let prompt = '';
 
-  prompt += `You are a helpful assistant. In responding to the user, you can use a tool or respond directly, or some combination of both. DO NOT repeat yourself or conduct repeating tool calls that perform the same action. You may need to ask for additional information or clarification before calling tools. Once you have responded to the user, you should stop responding.\n\ns`;
+  prompt += `You are a helpful assistant. In responding to the user, you can use a tool or respond directly, or some combination of both.\n\n`;
 
   if (actions) {
     prompt += dedent`
@@ -54,10 +52,10 @@ function system({ actions, hint }: SystemInit) {
 }
 
 const prompts = {
-  responseModes,
-  chooseResponseMode,
+  chooseStrategy,
   chooseAction,
   system,
+  think,
 };
 
 export type InterpreterPrompts = typeof prompts;

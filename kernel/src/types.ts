@@ -4,6 +4,7 @@ import type {
   CoreAssistantMessage,
   CoreToolMessage,
 } from 'ai';
+import { Interpreter } from './interpreter';
 
 /* Messages */
 
@@ -38,10 +39,7 @@ export interface TextOutput {
 
 export interface ActionOutput {
   type: 'action';
-  protocol: string;
-  resourceId?: string;
-  actionId?: string;
-  args?: Record<string, any>;
+  directive: ActionDirective;
   content: any;
 }
 
@@ -57,13 +55,20 @@ export interface TextResponse {
 
 export interface ActionResponse {
   type: 'action';
-  protocol: string;
-  resourceId?: string;
-  actionId?: string;
-  args?: Record<string, any>;
+  directive: ActionDirective;
 }
 
 export type InterpreterResponse = TextResponse | ActionResponse;
+
+export interface Strategy {
+  description: string;
+  method: (
+    interpreter: Interpreter,
+    interactions: Interaction[]
+  ) => AsyncGenerator<InterpreterResponse, any, Array<Interaction>>;
+}
+
+/* Resources */
 
 export interface ResourceIcon {
   src: string;
@@ -89,16 +94,25 @@ export interface Resource {
   actions?: Record<string, ActionDefinition>;
 }
 
-/* Protocol */
+/* Protocols */
 
-export type ProtocolHandler = (response: ActionResponse) => Promise<any> | any;
+export type ProtocolHandler = (
+  directive: ActionDirective
+) => Promise<any> | any;
 
 export interface Protocol {
   scheme: string;
   handler: ProtocolHandler;
 }
 
-/* JSON Schema */
+export interface ActionDirective {
+  protocol: string;
+  resourceId?: string;
+  actionId?: string;
+  args?: Record<string, any>;
+}
+
+/* Helpers */
 
 export interface JSONSchemaDefinition {
   type:
@@ -116,7 +130,5 @@ export interface JSONSchemaDefinition {
   required?: string[];
   additionalProperties?: boolean;
 }
-
-/* Misc */
 
 export type StringEnum = [string, ...string[]];

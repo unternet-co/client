@@ -67,17 +67,22 @@ const handleInput =
 
     // Interpret the interaction
     try {
-      for (let i = 0; i < 3; i++) {
-        const response = await interpreter.createResponse(interactions);
-        if (response === null) break;
-        switch (response?.type) {
+      const responses = interpreter.run(interactions);
+
+      let iteration = await responses.next();
+      while (!iteration.done) {
+        const response = iteration.value;
+        switch (response.type) {
           case 'text':
             await appendTextOutput(response, interaction!);
             break;
           case 'action':
-            await appendActionOutput(response as ActionResponse, interaction!);
+            await appendActionOutput(response, interaction!);
             break;
+          default:
+            console.error('Error: Unrecognized action type.');
         }
+        iteration = await responses.next(interactions);
       }
     } catch (error) {
       console.error(chalk.red('Error:', error));
@@ -114,13 +119,11 @@ async function appendActionOutput(
 ) {
   const output: ActionOutput = {
     type: 'action',
-    protocol: response.protocol,
-    resourceId: response.resourceId,
-    actionId: response.actionId,
+    directive: response.directive,
     content: {},
   };
 
-  output.content = await dispatcher.dispatch(response);
+  output.content = await dispatcher.dispatch(response.directive);
   console.log(output.content);
   interaction.outputs = [output];
   return output;

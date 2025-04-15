@@ -1,4 +1,10 @@
-import { FilePart, ImagePart, TextPart } from 'ai';
+import {
+  CoreAssistantMessage,
+  CoreUserMessage,
+  FilePart,
+  ImagePart,
+  TextPart,
+} from 'ai';
 import {
   ActionOutput,
   ActionRecord,
@@ -58,27 +64,35 @@ export function createActionRecord(resources: Resource[]): ActionRecord {
   return actions;
 }
 
+export function createUserMessage(content: string) {
+  return {
+    role: 'user',
+    content,
+  } as CoreUserMessage;
+}
+
+export function createAssistantMessage(content: string) {
+  return {
+    role: 'assistant',
+    content,
+  } as CoreAssistantMessage;
+}
+
 export function createMessages(
   interactions: Interaction[],
-  prompt?: string
+  ...prompts: string[] | undefined
 ): Message[] {
   let messages: Message[] = [];
 
   for (let interaction of interactions) {
     if (interaction.input.text)
-      messages.push({
-        role: 'user',
-        content: interaction.input.text,
-      });
+      messages.push(createUserMessage(interaction.input.text));
 
     if (interaction.input.files?.length) {
       const parts: Array<TextPart | ImagePart | FilePart> =
         interaction.input.files.map(fileMessage);
 
-      messages.push({
-        role: 'user',
-        content: parts,
-      });
+      messages.push(createUserMessage(parts));
     }
 
     if (!interaction.outputs) continue;
@@ -86,27 +100,28 @@ export function createMessages(
     for (let output of interaction.outputs) {
       if (output.type === 'text') {
         const textOutput = output as TextOutput;
-        messages.push({
-          role: 'assistant',
-          content: textOutput.content,
-        });
+        messages.push(createAssistantMessage(textOutput.content));
       } else if (output.type === 'action') {
+        console.log(output);
         const actionOutput = output as ActionOutput;
 
-        const actionUri = encodeActionUri(output);
-        messages.push({
-          role: 'assistant',
-          content: `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`,
-        });
+        const actionUri = encodeActionUri(output.directive);
+        messages.push(
+          createAssistantMessage(
+            `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`
+          )
+        );
       }
     }
   }
 
-  if (prompt) {
-    messages.push({
-      role: 'user',
-      content: prompt,
-    });
+  if (prompts) {
+    for (const prompt of prompts) {
+      messages.push({
+        role: 'user',
+        content: prompt,
+      });
+    }
   }
 
   return messages;
