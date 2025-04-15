@@ -11,7 +11,7 @@ import {
 import { Workspace, WorkspaceModel } from '../workspaces';
 import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
-import { ResourceManager } from '../processes/resources';
+import { ResourceModel } from '../processes/resources';
 import { Interaction } from './interactions';
 
 export interface KernelInit {
@@ -19,7 +19,7 @@ export interface KernelInit {
   workspaceModel: WorkspaceModel;
   configModel: ConfigModel;
   aiModelService: AIModelService;
-  resourceManager: ResourceManager;
+  resourceModel: ResourceModel;
   protocols: Array<Protocol>;
 }
 
@@ -29,20 +29,20 @@ export class Kernel {
   dispatcher: Dispatcher;
   workspaceModel: WorkspaceModel;
   configModel: ConfigModel;
-  resourceManager: ResourceManager;
+  resourceModel: ResourceModel;
   aiModelService: AIModelService;
 
   constructor({
     workspaceModel,
     configModel,
     aiModelService,
-    resourceManager,
+    resourceModel,
     protocols,
   }: KernelInit) {
     this.workspaceModel = workspaceModel;
     this.configModel = configModel;
     this.aiModelService = aiModelService;
-    this.resourceManager = resourceManager;
+    this.resourceModel = resourceModel;
     this.dispatcher = new Dispatcher(protocols);
 
     this.initialize();
@@ -65,7 +65,7 @@ export class Kernel {
     );
 
     const hint = config.ai.globalHint;
-    const resources = this.resourceManager.resources;
+    const resources = this.resourceModel.resources;
 
     if (!model) {
       this.initialized = false;

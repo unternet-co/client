@@ -6,11 +6,15 @@ import { dependencies } from '../../common/dependencies';
 import '../common/scroll-container';
 import '../common/markdown-text';
 import './interaction-history.css';
+import { ResourceModel } from '../../processes/resources';
+import { ActionOutput, TextOutput } from '@unternet/kernel';
 
 class InteractionHistory extends HTMLElement {
-  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
-  workspaceId: Workspace['id'];
-  interactionsContainer: HTMLElement;
+  private workspaceModel =
+    dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
+  private workspaceId: Workspace['id'];
+  private interactionsContainer: HTMLElement;
   private thinkingIndicator: HTMLDivElement | null = null;
   private thinkingAnimationInterval: number | null = null;
   private isThinking = false;
@@ -38,6 +42,7 @@ class InteractionHistory extends HTMLElement {
   handleWorkspaceNotification() {
     const interactions = this.workspaceModel.allInteractions(this.workspaceId);
     const currentInteractionCount = interactions.length;
+
     // If a new interaction was added, start the thinking animation
     if (currentInteractionCount > this.lastInteractionCount) {
       this.startThinkingAnimation();
@@ -152,14 +157,33 @@ class InteractionHistory extends HTMLElement {
   }
 
   outputTemplate(output: InteractionOutput) {
-    let template: TemplateResult = html``;
-    if (output.type === 'text') {
-      template = html`<markdown-text>${output.content}</markdown-text>`;
-    } else if (output.type === 'action') {
-      template = html`ACTION: ${JSON.stringify(output.content)}`;
+    switch (output.type) {
+      case 'text':
+        return this.textOutputTemplate(output);
+      case 'action':
+        return this.actionOutputTemplate(output);
     }
-    return html`<div class="interaction-output" data-format="markdown">
-      ${template}
+  }
+
+  textOutputTemplate(output: TextOutput) {
+    return html`<div class="interaction-output" data-type="text">
+      <markdown-text>${output.content}</markdown-text>
+    </div>`;
+  }
+
+  actionOutputTemplate(output: ActionOutput) {
+    const resource = this.resourceModel.find({
+      protocol: output.directive.protocol,
+      id: output.directive.resourceId,
+    });
+
+    let img = html``;
+    if (resource.icons && resource.icons[0] && resource.icons[0].src) {
+      img = html`<img src=${resource.icons[0].src} class="resource-icon" />`;
+    }
+    return html`<div class="interaction-output" data-type="action">
+      ${img}
+      <span class="notification-text">Used ${resource.name}</span>
     </div>`;
   }
 }

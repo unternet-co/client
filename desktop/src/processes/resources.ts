@@ -4,16 +4,38 @@ import { unternetResources } from '../unternet/unternet-resources';
 const initialResources: Array<Resource> = new Array();
 initialResources.push(...unternetResources);
 
-interface ResourceManagerInit {
+interface ResourceModelInit {
   initialResources: Array<Resource>;
 }
 
-class ResourceManager {
+interface ResourceDescriptor {
+  protocol?: string;
+  id?: string;
+}
+
+class ResourceModel {
   readonly resources: Array<Resource>;
 
-  constructor({ initialResources }: ResourceManagerInit) {
+  constructor({ initialResources }: ResourceModelInit) {
     this.resources = initialResources;
+  }
+
+  find(descriptor: ResourceDescriptor) {
+    let result: Resource;
+    if (descriptor.id) {
+      result = this.resources.find((x) => x.id == descriptor.id);
+    } else {
+      result = this.resources.find((x) => x.protocol === descriptor.protocol);
+    }
+
+    if (!result) {
+      throw new Error(
+        `No resource matches this descriptor: ${JSON.stringify(descriptor)}`
+      );
+    }
+
+    return result;
   }
 }
 
-export { ResourceManager, initialResources };
+export { ResourceModel, initialResources };

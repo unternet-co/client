@@ -18,7 +18,7 @@ import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
-import { ResourceManager, initialResources } from './processes/resources';
+import { ResourceModel, initialResources } from './processes/resources';
 import { unternetProtocols } from './unternet/unternet-protocols';
 
 /* Initialize databases & stores */
@@ -46,8 +46,8 @@ dependencies.registerSingleton('TabModel', tabModel);
 const configModel = new ConfigModel(configStore);
 dependencies.registerSingleton('ConfigModel', configModel);
 
-const resourceManager = new ResourceManager({ initialResources });
-dependencies.registerSingleton('ResourceManager', resourceManager);
+const resourceModel = new ResourceModel({ initialResources });
+dependencies.registerSingleton('ResourceModel', resourceModel);
 
 /* Initialize kernel & LLMs */
 
@@ -65,7 +65,7 @@ const kernel = new Kernel({
   workspaceModel,
   configModel,
   aiModelService,
-  resourceManager,
+  resourceModel,
   protocols,
 });
 dependencies.registerSingleton('Kernel', kernel);

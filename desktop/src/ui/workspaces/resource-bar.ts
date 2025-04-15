@@ -3,17 +3,17 @@ import { Resource } from '@unternet/kernel';
 // import './resource-picker';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
-import { ResourceManager } from '../../processes/resources';
+import { ResourceModel } from '../../processes/resources';
 
 export class ResourceBar extends HTMLElement {
-  resourceManager = dependencies.resolve<ResourceManager>('ResourceManager');
+  resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
 
   connectedCallback(): void {
     this.render();
   }
 
   render(): void {
-    const resources = this.resourceManager.resources;
+    const resources = this.resourceModel.resources;
 
     const resourceTemplate = resources.map((resource) => {
       return html`<li class="applet-item">
