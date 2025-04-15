@@ -25,7 +25,8 @@ const model = openai('gpt-4o');
 const interpreter = new Interpreter({
   model,
   resources,
-  logger: (type, content) => console.log(chalk.bgGray(`${type}: ${content}`)),
+  logger: (type, content) =>
+    console.log(chalk.bgGray(type.toUpperCase()), chalk.dim(content)),
 });
 const dispatcher = new Dispatcher(protocols);
 
@@ -128,8 +129,12 @@ async function appendActionOutput(
   };
 
   output.content = await dispatcher.dispatch(response.directive);
-  console.log(output.content);
-  interaction.outputs = [output];
+  console.log(
+    chalk.bgGray('ACTION'),
+    '\n',
+    chalk.dim(JSON.stringify(output.content, null, 2))
+  );
+  interaction.outputs.push(output);
   return output;
 }
 

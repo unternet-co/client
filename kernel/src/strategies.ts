@@ -20,9 +20,15 @@ defaultStrategies.RESEARCH = {
     interpreter: Interpreter,
     interactions: Array<Interaction>
   ) {
-    interactions = yield await interpreter.createActionResponse(interactions);
-    const response = await interpreter.createTextResponse(interactions);
-    yield response;
+    // Get all actions, then execute them
+    const actionResponses =
+      await interpreter.createActionResponses(interactions);
+    for (const response of actionResponses) {
+      interactions = yield response;
+    }
+
+    // Finally, respond with some text
+    yield await interpreter.createTextResponse(interactions);
     return;
   },
 };

@@ -17,6 +17,20 @@ const resources: Resource[] = [
           required: ['location'],
         },
       },
+      check_traffic: {
+        description:
+          'Checks traffic conditions en the route to a given location',
+        params_schema: {
+          type: 'object',
+          properties: {
+            destination: {
+              type: 'string',
+              description: 'A location search string, e.g. "London"',
+            },
+          },
+          required: ['destination'],
+        },
+      },
     },
   },
 ];

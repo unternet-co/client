@@ -83,7 +83,6 @@ export function createMessages(
   ...prompts: string[] | undefined
 ): Message[] {
   let messages: Message[] = [];
-
   for (let interaction of interactions) {
     if (interaction.input.text)
       messages.push(createUserMessage(interaction.input.text));
@@ -105,7 +104,6 @@ export function createMessages(
         const textOutput = output as TextOutput;
         messages.push(createAssistantMessage(textOutput.content));
       } else if (output.type === 'action') {
-        console.log(output);
         const actionOutput = output as ActionOutput;
 
         const actionUri = encodeActionUri(output.directive);

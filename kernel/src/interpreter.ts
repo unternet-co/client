@@ -16,7 +16,7 @@ import {
   decodeActionUri,
 } from './utils';
 import defaultPrompts, { InterpreterPrompts } from './prompts';
-import { ActionChoiceObject, actionChoiceSchema, schemas } from './schemas';
+import { actionChoiceSchema, schemas } from './schemas';
 import { defaultStrategies } from './strategies';
 
 type InterpreterLogger = (
@@ -30,7 +30,7 @@ interface InterpreterInit {
   strategies?: Record<string, Strategy>;
   prompts?: InterpreterPrompts;
   hint?: string;
-  logger: InterpreterLogger;
+  logger?: InterpreterLogger;
 }
 
 interface GenerateOpts<T = unknown> {
@@ -213,35 +213,39 @@ export class Interpreter {
     };
   }
 
+  async createActionResponse(
+    interactions: Array<Interaction>
+  ): Promise<ActionResponse> {
+    const responses = await this.createActionResponses(interactions);
+    return responses[0];
+  }
+
   /**
    * Generates an action directive in response to the user's query.
    * @param interactions An array of interactions
    * @returns An ActionResponse containing the action directive.
    */
-  async createActionResponse(
+  async createActionResponses(
     interactions: Array<Interaction>
-  ): Promise<ActionResponse> {
-    const output = await generateObject({
-      model: this.model,
-      messages: createMessages(interactions, this.prompts.chooseAction()),
+  ): Promise<ActionResponse[]> {
+    const { tools } = await this.generateObject({
+      interactions,
       system: this.prompts.system({ actions: this.actions, hint: this.hint }),
+      prompt: this.prompts.chooseAction(),
       schema: actionChoiceSchema(this.actions),
     });
 
-    const { functions } = output.object as ActionChoiceObject;
-    if (!functions || !functions[0]?.id) return null;
-
-    const fn = functions[0];
-    const { protocol, resourceId, actionId } = decodeActionUri(fn.id);
-
-    return {
-      type: 'action',
-      directive: {
-        protocol,
-        resourceId,
-        actionId,
-        args: fn.args,
-      },
-    };
+    return tools.map((tool) => {
+      const { protocol, resourceId, actionId } = decodeActionUri(tool.id);
+      return {
+        type: 'action',
+        directive: {
+          protocol,
+          resourceId,
+          actionId,
+          args: tool.args,
+        },
+      };
+    });
   }
 }

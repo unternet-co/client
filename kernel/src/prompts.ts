@@ -15,9 +15,9 @@ function chooseStrategy(strategies: Record<string, Strategy>) {
 
 function chooseAction() {
   return dedent`
-    Choose a tool from the given tool options that can help resolve the user's query, and fill out the appropriate parameters if any. Your response should take the form of a JSON object, e.g.:
-    {"id":"<action_id>","args":{...}}
-    Where the <action_id> should be replaced with the selected action's key, and "args" is an optional object that corresponds to the required params_schema if present.
+    Choose one or more tools from the given tool options that can help resolve the user's query, and fill out the appropriate parameters if any. Your response should take the form of a JSON object that adheres to this interface:
+    { tools: Array<{ id: string; args?: any; }> }
+    Where the "id" should be contain the selected action's key, and "args" is an optional object that corresponds to the required params_schema if present.
   `;
 }
 

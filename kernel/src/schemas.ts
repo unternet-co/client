@@ -2,16 +2,16 @@ import { jsonSchema, Schema } from 'ai';
 import { ActionDefinition, Strategy } from './types';
 
 export interface ActionChoiceObject {
-  functions: Array<{ id: string; args: any }>;
+  tools: Array<{ id: string; args?: any }>;
 }
 
 export function actionChoiceSchema(
   actions: Record<string, ActionDefinition>
-): Schema {
-  return jsonSchema({
+): Schema<ActionChoiceObject> {
+  return jsonSchema<ActionChoiceObject>({
     type: 'object',
     properties: {
-      functions: {
+      tools: {
         type: 'array',
         items: {
           anyOf: Object.entries(actions).map(([actionId, action]) =>
@@ -21,7 +21,7 @@ export function actionChoiceSchema(
         additionalProperties: false,
       },
     },
-    required: ['functions'],
+    required: ['tools'],
     additionalProperties: false,
   });
 }

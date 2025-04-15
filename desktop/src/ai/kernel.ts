@@ -88,19 +88,28 @@ export class Kernel {
       input
     );
 
-    const recentInteractions = this.workspaceModel.allInteractions(workspaceId);
-    const response =
-      await this.interpreter.generateResponse(recentInteractions);
+    const runner = this.interpreter.run(
+      this.workspaceModel.allInteractions(workspaceId)
+    );
 
-    switch (response.type) {
-      case 'text':
-        await this.handleTextResponse(interaction, response);
-        break;
-      case 'action':
-        await this.handleActionResponse(interaction, response);
-        break;
-      default:
-        throw new Error('Action type not recognized!');
+    let iteration = await runner.next();
+    while (!iteration.done) {
+      const response = iteration.value;
+      switch (response.type) {
+        case 'text':
+          console.log('handling text', response);
+          await this.handleTextResponse(interaction, response);
+          break;
+        case 'action':
+          await this.handleActionResponse(interaction, response);
+          break;
+        default:
+          throw new Error('Action type not recognized!');
+      }
+
+      iteration = await runner.next(
+        this.workspaceModel.allInteractions(workspaceId)
+      );
     }
   }
 
