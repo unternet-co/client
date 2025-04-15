@@ -19,5 +19,5 @@ workspace-view .workspace-content {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: var(--space-4);
+  padding-top: var(--space-5);
 }
