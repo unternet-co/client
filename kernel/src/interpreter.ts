@@ -75,14 +75,6 @@ export class Interpreter {
       schema: schemas.responseMode(this.prompts.responseModes),
     });
 
-    console.log({
-      messages: createMessages(
-        interactions,
-        this.prompts.chooseResponseMode(this.prompts.responseModes)
-      ),
-      system: this.prompts.system({ actions: this.actions, hint: this.hint }),
-    });
-
     const { mode } = output.object as { mode: string };
     return mode;
   }
