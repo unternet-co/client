@@ -93,9 +93,9 @@ export function createMessages(
       } else if (output.type === 'action') {
         const actionOutput = output as ActionOutput;
 
-        const actionUri = encodeActionUri(actionOutput.directive);
+        const actionUri = encodeActionUri(output);
         messages.push({
-          role: 'system',
+          role: 'assistant',
           content: `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`,
         });
       }
@@ -104,7 +104,7 @@ export function createMessages(
 
   if (prompt) {
     messages.push({
-      role: 'system',
+      role: 'user',
       content: prompt,
     });
   }

@@ -3,7 +3,6 @@ import type {
   CoreUserMessage,
   CoreAssistantMessage,
   CoreToolMessage,
-  LanguageModel,
 } from 'ai';
 
 /* Messages */
@@ -39,7 +38,10 @@ export interface TextOutput {
 
 export interface ActionOutput {
   type: 'action';
-  directive: ActionDirective;
+  protocol: string;
+  resourceId?: string;
+  actionId?: string;
+  args?: Record<string, any>;
   content: any;
 }
 
@@ -55,21 +57,13 @@ export interface TextResponse {
 
 export interface ActionResponse {
   type: 'action';
-  directive: ActionDirective;
-}
-
-export interface StopResponse {
-  type: 'stop';
-}
-
-export type InterpreterResponse = TextResponse | ActionResponse | StopResponse;
-
-export interface ActionDirective {
   protocol: string;
   resourceId?: string;
   actionId?: string;
   args?: Record<string, any>;
 }
+
+export type InterpreterResponse = TextResponse | ActionResponse;
 
 export interface ResourceIcon {
   src: string;
@@ -97,9 +91,7 @@ export interface Resource {
 
 /* Protocol */
 
-export type ProtocolHandler = (
-  directive: ActionDirective
-) => Promise<any> | any;
+export type ProtocolHandler = (response: ActionResponse) => Promise<any> | any;
 
 export interface Protocol {
   scheme: string;

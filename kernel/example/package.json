@@ -5,6 +5,7 @@
     "start": "tsx src/index.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^1.2.10",
     "@unternet/kernel": "file:..",
     "chalk": "^5.4.1",
     "mime-types": "^3.0.1",

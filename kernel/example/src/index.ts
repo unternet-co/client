@@ -1,4 +1,5 @@
 import { openai } from '@ai-sdk/openai';
+import { anthropic } from '@ai-sdk/anthropic';
 import readline from 'readline';
 import chalk from 'chalk';
 import 'dotenv/config';
@@ -11,7 +12,6 @@ import {
   Dispatcher,
   TextResponse,
   ActionResponse,
-  InterpreterResponse,
 } from '../../src';
 import { Command } from './types';
 import { protocols } from './protocols';
@@ -21,6 +21,7 @@ import resources from './resources';
 /* MODEL & KERNEL SETUP */
 
 const model = openai('gpt-4o');
+// const model = anthropic('claude-3-7-sonnet-20250219');
 const interpreter = new Interpreter({ model, resources });
 const dispatcher = new Dispatcher(protocols);
 
@@ -66,17 +67,18 @@ const handleInput =
 
     // Interpret the interaction
     try {
-      await interpreter.run(
-        interactions,
-        async (response: InterpreterResponse) => {
-          switch (response?.type) {
-            case 'text':
-              return await appendTextOutput(response, interaction!);
-            case 'action':
-              return await appendActionOutput(response, interaction!);
-          }
+      for (let i = 0; i < 3; i++) {
+        const response = await interpreter.createResponse(interactions);
+        if (response === null) break;
+        switch (response?.type) {
+          case 'text':
+            await appendTextOutput(response, interaction!);
+            break;
+          case 'action':
+            await appendActionOutput(response as ActionResponse, interaction!);
+            break;
         }
-      );
+      }
     } catch (error) {
       console.error(chalk.red('Error:', error));
       console.error(error);
@@ -112,11 +114,14 @@ async function appendActionOutput(
 ) {
   const output: ActionOutput = {
     type: 'action',
-    directive: response.directive,
+    protocol: response.protocol,
+    resourceId: response.resourceId,
+    actionId: response.actionId,
     content: {},
   };
 
-  output.content = await dispatcher.dispatch(response.directive);
+  output.content = await dispatcher.dispatch(response);
+  console.log(output.content);
   interaction.outputs = [output];
   return output;
 }

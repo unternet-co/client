@@ -54,3 +54,21 @@ function actionSchema(actionId: string, action: ActionDefinition) {
 
   return schema;
 }
+
+function responseMode(responseModes: Record<string, string>) {
+  return jsonSchema({
+    type: 'object',
+    properties: {
+      mode: {
+        type: 'string',
+        enum: [...Object.keys(responseModes)],
+      },
+    },
+    additionalProperties: false,
+    required: ['mode'],
+  });
+}
+
+export const schemas = {
+  responseMode,
+};

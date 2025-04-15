@@ -1,45 +1,61 @@
 import dedent from 'dedent';
-import { ActionDefinition, ActionRecord } from './types.js';
+import { ActionDefinition } from './types.js';
 
-export const responseModes = {
-  TEXT: 'Respond directly to the user with markdown.',
+const responseModes = {
+  TEXT: 'Respond directly to the user with text/markdown.',
   TOOL: 'Use one of the provided tools.',
-  STOP: 'Complete your response.',
+  DONE: 'Respond with this to complete your turn, and await further input from the user.',
 };
 
-function chooseAction(actions: ActionRecord) {
+function chooseResponseMode(responseModes: Record<string, string>) {
+  const possibleOutputs = Object.keys(responseModes)
+    .map((x) => `"${x}"`)
+    .join(' or ');
   return dedent`
-    In this environment you have access to a set of tools you can use to answer the user's question.
-    Here is an object representing the tools available:
-    ${JSON.stringify(actions, null, 2)}
-    Choose a tool and fill out the appropriate parameters (if any).
+    Choose from one of the following "response modes". This is not your actual response, but will determine the action you take next.
+    Possible response modes:
+    ${JSON.stringify(responseModes)}
+    Respond with only one of the following strings: ${possibleOutputs}
+  `;
+}
+
+function chooseAction() {
+  return dedent`
+    Choose a tool from the given tool options that can help resolve the user's query, and fill out the appropriate parameters if any. Your response should take the form of a JSON object, e.g.:
+    {"id":"<action_id>","args":{...}}
+    Where the <action_id> should be replaced with the selected action's key, and "args" is an optional object that corresponds to the required params_schema if present.
   `;
 }
 
 interface SystemInit {
   actions?: Record<string, ActionDefinition>;
   hint?: string;
+  num?: number;
 }
 
 function system({ actions, hint }: SystemInit) {
   let prompt = '';
 
+  prompt += `You are a helpful assistant. In responding to the user, you can use a tool or respond directly, or some combination of both. DO NOT repeat yourself or conduct repeating tool calls that perform the same action. You may need to ask for additional information or clarification before calling tools. Once you have responded to the user, you should stop responding.\n\ns`;
+
   if (actions) {
     prompt += dedent`
-      In this environment you have access to a set of tools you can use to answer the user's question.
+      TOOL USE INFORMATION:
+      In this environment you have access to a set of tools you can use.
       Here is an object representing the tools available:
-      ${JSON.stringify(actions)}\n\n`;
+      ${JSON.stringify(actions)} \n\n`;
   }
 
   if (hint) {
-    prompt += `User instructions & guidelines:\n${hint}\n\n`;
+    prompt += `USER INSTRUCTIONS & GUIDELINES: \n${hint} \n\n`;
   }
 
-  return prompt;
+  return prompt.trim();
 }
 
 const prompts = {
   responseModes,
+  chooseResponseMode,
   chooseAction,
   system,
 };
