@@ -92,7 +92,10 @@ export function createMessages(
       const parts: Array<TextPart | ImagePart | FilePart> =
         interaction.input.files.map(fileMessage);
 
-      messages.push(createUserMessage(parts));
+      messages.push({
+        role: 'user',
+        content: parts,
+      });
     }
 
     if (!interaction.outputs) continue;

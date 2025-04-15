@@ -22,7 +22,11 @@ import resources from './resources';
 
 const model = openai('gpt-4o');
 // const model = anthropic('claude-3-7-sonnet-20250219');
-const interpreter = new Interpreter({ model, resources });
+const interpreter = new Interpreter({
+  model,
+  resources,
+  logger: (type, content) => console.log(chalk.bgGray(`${type}: ${content}`)),
+});
 const dispatcher = new Dispatcher(protocols);
 
 /* CLI INPUT & OUTPUT MANAGEMENT */

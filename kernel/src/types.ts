@@ -6,6 +6,8 @@ import type {
 } from 'ai';
 import { Interpreter } from './interpreter';
 
+export { Schema } from 'ai';
+
 /* Messages */
 
 export type Message =

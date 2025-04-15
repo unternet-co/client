@@ -21,8 +21,14 @@ function chooseAction() {
   `;
 }
 
-function think() {
-  return dedent`\n\n---\n\nBefore you respond to the above, take a moment and think about your next step, and respond in a brief freeform text thought.`;
+function think(inputPrompt?: string) {
+  let prompt = '';
+  if (inputPrompt) {
+    prompt += `<UPCOMING_MESSAGE>${inputPrompt}</UPCOMING_MESSAGE>\n`;
+  }
+  prompt +=
+    'Before you respond to the above, take a moment and think about your next step, and respond in a brief freeform text thought.';
+  return prompt;
 }
 
 interface SystemInit {

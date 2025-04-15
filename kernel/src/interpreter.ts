@@ -3,6 +3,7 @@ import {
   ActionDefinition,
   ActionResponse,
   Interaction,
+  Schema,
   Resource,
   Strategy,
   TextResponse,
@@ -16,10 +17,12 @@ import {
 } from './utils';
 import defaultPrompts, { InterpreterPrompts } from './prompts';
 import { ActionChoiceObject, actionChoiceSchema, schemas } from './schemas';
+import { defaultStrategies } from './strategies';
 
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+type InterpreterLogger = (
+  type: 'thought' | 'action' | 'input' | 'text',
+  content: string
+) => void;
 
 interface InterpreterInit {
   model: LanguageModel;
@@ -27,36 +30,15 @@ interface InterpreterInit {
   strategies?: Record<string, Strategy>;
   prompts?: InterpreterPrompts;
   hint?: string;
+  logger: InterpreterLogger;
 }
 
-const defaultStrategies: Record<string, Strategy> = {};
-
-defaultStrategies.TEXT = {
-  description: `Respond directly to the user with text/markdown.`,
-  method: async function* (
-    interpreter: Interpreter,
-    interactions: Array<Interaction>
-  ) {
-    yield await interpreter.createTextResponse(interactions);
-    return;
-  },
-};
-
-defaultStrategies.RESEARCH = {
-  description: `Use one or more tools, then respond to the user based on the tool output. If you already have the required information from a prior tool call DO NOT use this, instead use TEXT (assume all prior information is still up-to-date). If you don't have the required information to use the tool, use TEXT to ask a follow-up question to clarify.`,
-  method: async function* (
-    interpreter: Interpreter,
-    interactions: Array<Interaction>
-  ) {
-    interactions = yield await interpreter.createActionResponse(interactions);
-    const response = await interpreter.createTextResponse(interactions);
-    yield response;
-    return;
-  },
-};
-
-interface GenerateOpts {
-  think: boolean;
+interface GenerateOpts<T = unknown> {
+  interactions: Interaction[];
+  prompt?: string;
+  schema?: Schema<T>;
+  system?: string;
+  think?: true;
 }
 
 export class Interpreter {
@@ -65,6 +47,7 @@ export class Interpreter {
   prompts: InterpreterPrompts;
   strategies: Record<string, Strategy>;
   hint: string;
+  logger: InterpreterLogger = () => {};
 
   constructor({
     model,
@@ -72,12 +55,14 @@ export class Interpreter {
     prompts,
     hint,
     strategies,
+    logger,
   }: InterpreterInit) {
     this.model = model;
     this.hint = hint;
     this.actions = createActionRecord(resources || []);
     this.prompts = { ...defaultPrompts, ...prompts };
     this.strategies = { ...defaultStrategies, ...strategies };
+    if (logger) this.logger = logger;
   }
 
   /**
@@ -112,56 +97,120 @@ export class Interpreter {
    * @returns An InterpreterResponse object, of type 'text' or 'action'.
    */
   async chooseStrategy(interactions: Array<Interaction>) {
-    const thought = await this.generateThought(
+    const { strategy } = await this.generateObject({
       interactions,
-      this.prompts.chooseStrategy(this.strategies)
-    );
+      prompt: this.prompts.chooseStrategy(this.strategies),
+      schema: schemas.strategies(this.strategies),
+      think: true,
+    });
 
+    return strategy;
+  }
+
+  /* === TEXT & OBJECT GENERATORS === */
+
+  async generateText({ interactions, system, prompt, think }: GenerateOpts) {
     const messages = createMessages(interactions);
-    messages.push(createAssistantMessage(thought));
-    messages.push(
-      createUserMessage(this.prompts.chooseStrategy(this.strategies))
-    );
+    if (think) {
+      const thought = await this.generateText({
+        interactions,
+        system,
+        prompt: this.prompts.think(prompt),
+      });
+      this.logger('thought', thought);
+      messages.push(createAssistantMessage(thought));
+    }
+    if (prompt) messages.push(createUserMessage(prompt));
+    if (prompt) messages.push(createUserMessage(prompt));
+
+    const output = await generateText({
+      model: this.model,
+      messages,
+      system:
+        system ||
+        this.prompts.system({ actions: this.actions, hint: this.hint }),
+    });
+
+    return output.text;
+  }
+
+  async streamText({ interactions, system, prompt, think }: GenerateOpts) {
+    // TODO: Put all this into createMessages
+    const messages = createMessages(interactions);
+    if (think) {
+      const thought = await this.generateText({
+        interactions,
+        system,
+        prompt: this.prompts.think(prompt),
+      });
+      this.logger('thought', thought);
+      messages.push(createAssistantMessage(thought));
+    }
+    if (prompt) messages.push(createUserMessage(prompt));
+    if (prompt) messages.push(createUserMessage(prompt));
+
+    const output = streamText({
+      model: this.model,
+      messages,
+      system:
+        system ||
+        this.prompts.system({ actions: this.actions, hint: this.hint }),
+    });
+
+    return {
+      text: output.text,
+      textStream: output.textStream,
+    };
+  }
+
+  async generateObject<T>({
+    interactions,
+    schema,
+    system,
+    prompt,
+    think,
+  }: GenerateOpts<T>) {
+    const messages = createMessages(interactions);
+    if (think) {
+      const thought = await this.generateText({
+        interactions,
+        system,
+        prompt: this.prompts.think(prompt),
+      });
+      this.logger('thought', thought);
+      messages.push(createAssistantMessage(thought));
+    }
+    if (prompt) messages.push(createUserMessage(prompt));
 
     const output = await generateObject({
       model: this.model,
       messages,
-      system: this.prompts.system({ actions: this.actions, hint: this.hint }),
-      schema: schemas.strategies(this.strategies),
+      system:
+        system ||
+        this.prompts.system({ actions: this.actions, hint: this.hint }),
+      schema,
     });
 
-    const { strategy } = output.object;
-    return strategy;
+    return output.object;
   }
 
+  /* === RESPONSES === */
+
+  /**
+   * Generates a simple streaming text response.
+   * @param interactions An array of interactions.
+   * @returns A TextResponse object, which can be used to get or stream the response text.
+   */
   async createTextResponse(
     interactions: Array<Interaction>
   ): Promise<TextResponse> {
-    const output = streamText({
-      model: this.model,
-      system: this.prompts.system({ actions: this.actions, hint: this.hint }),
-      messages: createMessages(interactions),
-    });
+    const output = await this.streamText({ interactions });
 
     return {
       type: 'text',
       text: output.text,
       textStream: output.textStream,
     };
-  }
-
-  async generateThought(interactions: Array<Interaction>, prompt?: string) {
-    const messages = createMessages(interactions);
-    if (prompt) messages.push(createUserMessage(prompt));
-    messages.push(createUserMessage(this.prompts.think()));
-    const { text } = await generateText({
-      model: this.model,
-      system: this.prompts.system({ actions: this.actions, hint: this.hint }),
-      messages,
-    });
-
-    console.log('Thought', text);
-    return text;
   }
 
   /**
