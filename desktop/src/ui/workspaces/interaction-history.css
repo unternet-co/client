@@ -10,16 +10,16 @@ interaction-history .inner {
 }
 
 interaction-history .inner::part(slot) {
-  gap: var(--space-6);
-  padding: var(--space-6) 0;
+  gap: var(--space-7);
+  padding: var(--space-8) 0;
 }
 
 interaction-history .interaction {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  gap: var(--space-4);
-  width: 580px;
+  width: 100%;
+  max-width: 640px;
 }
 
 /* Reversed, so first-child is the last child visually */
@@ -39,17 +39,20 @@ interaction-history .interaction-output {
 }
 
 interaction-history .interaction-input {
-  font-weight: 500;
-  padding: var(--space-1) var(--space-1);
-  border: none;
+  padding: var(--space-1) var(--space-4);
   align-self: flex-start;
   border-radius: var(--rounded);
-  /* border: 1px solid var(--color-border); */
-  /* background: var(--color-neutral-15); */
+  border: 1px solid var(--color-border-muted);
+  background: var(--color-neutral-100);
 }
 
+/* interaction-history .interaction-input {
+  font-weight: 500;
+  padding: var(--space-1) var(--space-4);
+} */
+
 interaction-history .interaction-output[data-type='text'] {
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-4) var(--space-4);
   border-radius: var(--rounded);
   border: 1px solid var(--color-border-muted);
   background: var(--color-bg-content);
@@ -58,16 +61,18 @@ interaction-history .interaction-output[data-type='text'] {
 interaction-history .interaction-output[data-type='action'] {
   display: flex;
   align-items: center;
+  padding: var(--space-2) var(--space-3);
   gap: var(--space-2);
 }
 
 interaction-history .interaction-output[data-type='action'] .resource-icon {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 interaction-history .interaction-output[data-type='action'] .notification-text {
-  font-size: var(--text-md);
+  color: var(--color-neutral-500);
+  font-size: 13px;
 }
 
 interaction-history .thinking-letter {

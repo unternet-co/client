@@ -5,6 +5,7 @@ resource-bar {
   gap: 12px;
   padding: var(--space-4) 12px;
   padding-top: var(--space-3);
+  background: var(--color-bg-page);
 }
 
 .blurred resource-bar {
