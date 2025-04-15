@@ -47,22 +47,22 @@ export type InteractionOutput = TextOutput | ActionOutput;
 
 /* Interpreter */
 
-export type InterpreterResponse = TextResponse | ActionResponse;
-
-/* Interpreter – Text */
-
 export interface TextResponse {
   type: 'text';
   text: Promise<string>;
   textStream: AsyncIterable<string>;
 }
 
-/* Interpreter – Actions */
-
 export interface ActionResponse {
   type: 'action';
   directive: ActionDirective;
 }
+
+export interface StopResponse {
+  type: 'stop';
+}
+
+export type InterpreterResponse = TextResponse | ActionResponse | StopResponse;
 
 export interface ActionDirective {
   protocol: string;

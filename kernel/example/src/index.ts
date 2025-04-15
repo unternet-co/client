@@ -6,10 +6,12 @@ import 'dotenv/config';
 import {
   ActionOutput,
   Interaction,
+  InteractionOutput,
   Interpreter,
   Dispatcher,
   TextResponse,
   ActionResponse,
+  InterpreterResponse,
 } from '../../src';
 import { Command } from './types';
 import { protocols } from './protocols';
@@ -18,7 +20,7 @@ import resources from './resources';
 
 /* MODEL & KERNEL SETUP */
 
-const model = openai('gpt-4-turbo');
+const model = openai('gpt-4o');
 const interpreter = new Interpreter({ model, resources });
 const dispatcher = new Dispatcher(protocols);
 
@@ -60,26 +62,21 @@ const handleInput =
 
     // Add interaction to stack
     interactions.push(interaction);
+    console.log(chalk.bold(`\nKernel`));
 
     // Interpret the interaction
     try {
-      console.log(chalk.bold(`\nKernel`));
-      const response = await interpreter.generateResponse(interactions);
-
-      switch (response?.type) {
-        case 'text':
-          await textResponse(response, interaction);
-          break;
-        case 'action':
-          await actionResponse(response, interaction);
-          break;
-        default:
-          console.log(
-            chalk.red(
-              'Sorry, failed to construct a response for this interaction.'
-            )
-          );
-      }
+      await interpreter.run(
+        interactions,
+        async (response: InterpreterResponse) => {
+          switch (response?.type) {
+            case 'text':
+              return await appendTextOutput(response, interaction!);
+            case 'action':
+              return await appendActionOutput(response, interaction!);
+          }
+        }
+      );
     } catch (error) {
       console.error(chalk.red('Error:', error));
       console.error(error);
@@ -109,7 +106,7 @@ function command(userInput: string): Command | null {
 /**
  * Manage an action response from the interpreter.
  */
-async function actionResponse(
+async function appendActionOutput(
   response: ActionResponse,
   interaction: Interaction
 ) {
@@ -120,14 +117,17 @@ async function actionResponse(
   };
 
   output.content = await dispatcher.dispatch(response.directive);
-  console.log(output);
   interaction.outputs = [output];
+  return output;
 }
 
 /**
  * Manage a text response from the interpreter.
  */
-async function textResponse(response: TextResponse, interaction: Interaction) {
+async function appendTextOutput(
+  response: TextResponse,
+  interaction: Interaction
+): Promise<InteractionOutput> {
   let totalText = '';
   for await (const part of response.textStream) {
     totalText += part;
@@ -140,6 +140,10 @@ async function textResponse(response: TextResponse, interaction: Interaction) {
       content: totalText,
     },
   ];
+  return {
+    type: 'text',
+    content: totalText,
+  };
 }
 
 /* PROMPTS */

@@ -26,6 +26,10 @@ export function createInteraction(
   };
 }
 
+export function clone(obj: Object) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 export function createProtocolHandlers(protocols: Protocol[]) {
   const handlers: Record<string, ProtocolHandler> = {};
   for (const protocol of protocols) {

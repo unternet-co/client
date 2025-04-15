@@ -1,14 +1,18 @@
 import dedent from 'dedent';
 import { ActionDefinition, ActionRecord } from './types.js';
 
-const textActionDescription = `Respond to the user with text/markdown. For giving a direct response to the user, summarizing/adding context, or asking a question if additional information is needed to use a function.`;
+export const responseModes = {
+  TEXT: 'Respond directly to the user with markdown.',
+  TOOL: 'Use one of the provided tools.',
+  STOP: 'Complete your response.',
+};
 
 function chooseAction(actions: ActionRecord) {
   return dedent`
-    In this environment you have access to a set of functions you can use to answer the user's question.
-    Here are the functions available in JSONSchema format:
-    ${JSON.stringify(actions)}
-    Choose a function and fill out the appropriate parameters.
+    In this environment you have access to a set of tools you can use to answer the user's question.
+    Here is an object representing the tools available:
+    ${JSON.stringify(actions, null, 2)}
+    Choose a tool and fill out the appropriate parameters (if any).
   `;
 }
 
@@ -22,8 +26,8 @@ function system({ actions, hint }: SystemInit) {
 
   if (actions) {
     prompt += dedent`
-      In this environment you have access to a set of functions you can use to answer the user's question.
-      Here are the functions available in JSONSchema format:
+      In this environment you have access to a set of tools you can use to answer the user's question.
+      Here is an object representing the tools available:
       ${JSON.stringify(actions)}\n\n`;
   }
 
@@ -35,7 +39,7 @@ function system({ actions, hint }: SystemInit) {
 }
 
 const prompts = {
-  textActionDescription,
+  responseModes,
   chooseAction,
   system,
 };

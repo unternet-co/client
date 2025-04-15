@@ -1,13 +1,20 @@
-import { LanguageModel, streamText, generateObject, jsonSchema } from 'ai';
+import { LanguageModel, streamText, generateObject } from 'ai';
 import {
   ActionDefinition,
   ActionDirective,
+  ActionResponse,
   Interaction,
+  InteractionOutput,
   InterpreterResponse,
   Resource,
   TextResponse,
 } from './types';
-import { createActionRecord, createMessages, decodeActionUri } from './utils';
+import {
+  createActionRecord,
+  createMessages,
+  decodeActionUri,
+  clone,
+} from './utils';
 import defaultPrompts, { InterpreterPrompts } from './prompts';
 import { ActionChoiceObject, actionChoiceSchema } from './schemas';
 
@@ -16,6 +23,12 @@ interface InterpreterInit {
   resources?: Array<Resource>;
   prompts?: InterpreterPrompts;
   hint?: string;
+  maxResponses?: number;
+}
+
+interface ExtendedActionsOpts {
+  text?: boolean;
+  stop?: boolean;
 }
 
 export class Interpreter {
@@ -23,12 +36,60 @@ export class Interpreter {
   actions: Record<string, ActionDefinition> = {};
   prompts: InterpreterPrompts;
   hint: string;
+  maxResponses = 3;
 
-  constructor({ model, resources, prompts, hint }: InterpreterInit) {
+  constructor({
+    model,
+    resources,
+    prompts,
+    hint,
+    maxResponses,
+  }: InterpreterInit) {
     this.model = model;
     this.hint = hint;
     this.actions = createActionRecord(resources || []);
     this.prompts = { ...defaultPrompts, ...prompts };
+    if (maxResponses) this.maxResponses = maxResponses;
+  }
+
+  async run(
+    interactions: Array<Interaction>,
+    callback: (
+      response: InterpreterResponse
+    ) => Promise<InteractionOutput | undefined>
+  ): Promise<void> {
+    interactions = clone(interactions);
+    if (!Object.keys(this.actions).length) {
+      const response = await this.createTextResponse(interactions);
+      callback(response);
+      return;
+    }
+
+    for (let i = 0; i < this.maxResponses; i++) {
+      const directive = await this._generateDirective(
+        interactions,
+        this.extendedActions()
+      );
+
+      let response: InterpreterResponse;
+      let output: InteractionOutput;
+      switch (directive.protocol) {
+        case 'complete':
+          await callback({ type: 'stop' });
+          return;
+        case 'text':
+          response = await this.createTextResponse(interactions);
+          output = clone(await callback(response));
+          if (output)
+            interactions[interactions.length - 1].outputs.push(output);
+          break;
+        default:
+          response = this.createActionResponse(interactions);
+          output = clone(await callback(response));
+          if (output)
+            interactions[interactions.length - 1].outputs.push(output);
+      }
+    }
   }
 
   /**
@@ -44,46 +105,39 @@ export class Interpreter {
       return this.createTextResponse(interactions);
     }
 
-    console.log('All good!');
-    console.log(interactions);
-    // An action we're adding on-the-fly to allow for text as an option
-    const textAction = { description: this.prompts.textActionDescription };
-    console.log('About to generate a directive');
-    const directive = await this.createDirective(interactions, {
-      ...{ text: textAction },
-      ...this.actions,
-    });
+    const directive = await this._generateDirective(
+      interactions,
+      this.extendedActions({ text: true })
+    );
 
     if (!directive) {
       return null;
     } else if (directive.protocol === 'text') {
       return this.createTextResponse(interactions);
     } else {
-      return {
-        type: 'action',
-        directive,
-      };
+      return this.createActionResponse(directive);
     }
   }
 
   /**
-   * Generates an action directive in response to the user's query. Does not handle text generation.
+   * Generates an action directive in response to the user's query. Does not handle text generation or stop directives, unless specifically included.
    * @param interactions An array of interactions
    * @returns An ActionDirective promise based on the interpreter's resources.
    */
   async generateDirective(
     interactions: Array<Interaction>
   ): Promise<ActionDirective> {
-    return this.createDirective(interactions, this.actions);
+    return this._generateDirective(interactions, this.actions);
   }
 
-  private async createDirective(
+  /**
+   * Same as above, but handles arbitrary actions, so we can add extended actions
+   * on the fly.
+   */
+  private async _generateDirective(
     interactions: Array<Interaction>,
     actions: Record<string, ActionDefinition>
   ): Promise<ActionDirective | null> {
-    console.log(
-      createMessages(interactions, this.prompts.chooseAction(actions))
-    );
     const output = await generateObject({
       model: this.model,
       messages: createMessages(
@@ -108,6 +162,20 @@ export class Interpreter {
     };
   }
 
+  // An action we're adding on-the-fly to allow for text as an option
+  extendedActions(
+    opts?: ExtendedActionsOpts
+  ): Record<string, ActionDefinition> {
+    const textAction = { description: this.prompts.textActionDescription };
+    const stopAction = { description: this.prompts.stopActionDescription };
+
+    const extendedActions = {};
+    if (!opts || opts.text) extendedActions['text'] = textAction;
+    if (!opts || opts.stop) extendedActions['stop'] = stopAction;
+
+    return { ...extendedActions, ...this.actions };
+  }
+
   private async createTextResponse(
     interactions: Array<Interaction>
   ): Promise<TextResponse> {
@@ -121,6 +189,13 @@ export class Interpreter {
       type: 'text',
       text: output.text,
       textStream: output.textStream,
+    };
+  }
+
+  createActionResponse(directive: ActionDirective): ActionResponse {
+    return {
+      type: 'action',
+      directive,
     };
   }
 }
