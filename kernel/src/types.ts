@@ -89,6 +89,9 @@ export type ProtocolHandler = (
   directive: ActionDirective
 ) => Promise<any> | any;
 
+/**
+ * An instruction of how an action should be consumed.
+ */
 export interface ActionDirective {
   protocol: string;
   resourceId?: string;
