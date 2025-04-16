@@ -47,7 +47,7 @@ describe('Utils', () => {
     });
 
     it('creates an ImagePart for an image file', async () => {
-      const imgPath = '../desktop/src/electron/app-icons/client-icon-macOS.png';
+      const imgPath = 'tests/fixtures/sample.png';
       const imgBuffer = await readFile(imgPath);
       const imgBytes = new Uint8Array(imgBuffer);
 
