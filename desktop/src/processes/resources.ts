@@ -2,7 +2,10 @@ import { Resource } from '@unternet/kernel';
 import { unternetResources } from '../unternet/resources';
 
 const initialResources: Array<Resource> = new Array();
-initialResources.push(...unternetResources);
+
+if (import.meta.env.APP_UNTERNET_API_KEY) {
+  initialResources.push(...unternetResources);
+}
 
 interface ResourceModelInit {
   initialResources: Array<Resource>;
