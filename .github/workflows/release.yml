@@ -2,78 +2,13 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - '*.*.*'
 permissions:
   contents: write
 jobs:
-  version:
-    name: Version and Tag
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-
-      - name: Clean npm cache
-        run: npm cache clean --force
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Detect semver bump
-        id: semver
-        run: |
-          BRANCH_NAME=${GITHUB_REF#refs/heads/}
-          if [[ "$BRANCH_NAME" =~ ^feat/|^feature/ ]]; then
-            VERSION_PART="minor"
-          elif [[ "$BRANCH_NAME" =~ ^major/|^breaking/ ]]; then
-            VERSION_PART="major"
-          else
-            VERSION_PART="patch"
-          fi
-          echo "bump=$VERSION_PART" >> $GITHUB_OUTPUT
-
-      - name: Bump version, update changelog and commit
-        id: bump_version
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"          
-
-          echo "Bumping version"
-          npm version ${{ steps.semver.outputs.bump }} --no-git-tag-version
-
-          echo "Syncing version across packages"
-          npm run sync-version
-          TAG_NAME=$(node -p "require('./package.json').version")
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-
-          echo "Generating Changelog"
-          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
-          NEW_ENTRY="## ${TAG_NAME}
-          - ${COMMIT_MESSAGE}
-
-          "
-          echo "$NEW_ENTRY$(cat CHANGELOG.md 2>/dev/null)" > CHANGELOG.md
-
-          echo "Commiting changes"
-          git add .
-          git commit -m "chore(release): bump version to ${TAG_NAME} [skip ci]"
-          git tag -a $TAG_NAME -m "chore(release): ${TAG_NAME}"
-          git push --follow-tags
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   package:
     name: Build and Release
-    needs: version
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
