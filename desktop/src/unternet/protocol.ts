@@ -3,7 +3,7 @@ import Unternet from '@unternet/sdk';
 
 class UnternetProtocol implements Protocol {
   readonly scheme = 'unternet';
-  connection = new Unternet({ isDev: true });
+  connection = new Unternet({ isDev: import.meta.env.DEV });
 
   async handler(directive: ActionDirective) {
     if (directive.actionId === 'search') {
