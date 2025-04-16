@@ -134,3 +134,9 @@ export interface JSONSchemaDefinition {
 }
 
 export type StringEnum = [string, ...string[]];
+
+export interface UriComponents {
+  protocol: string;
+  resourceId?: string;
+  actionId?: string;
+}
