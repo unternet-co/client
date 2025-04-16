@@ -4,11 +4,14 @@ import type {
   CoreAssistantMessage,
   CoreToolMessage,
 } from 'ai';
+
 import { Interpreter } from './interpreter';
+
+// 🚚
 
 export { Schema } from 'ai';
 
-/* Messages */
+// MESSAGES
 
 export type Message =
   | CoreSystemMessage
@@ -16,12 +19,12 @@ export type Message =
   | CoreAssistantMessage
   | CoreToolMessage;
 
+// INTERACTIONS
+
 export interface Interaction {
   input: InteractionInput;
   outputs: InteractionOutput[];
 }
-
-/* Interactions */
 
 export interface InteractionInput {
   text?: string;
@@ -34,10 +37,7 @@ export interface FileInput {
   mimeType?: string;
 }
 
-export interface TextOutput {
-  type: 'text';
-  content: string;
-}
+export type InteractionOutput = TextOutput | ActionOutput;
 
 export interface ActionOutput {
   type: 'action';
@@ -45,9 +45,14 @@ export interface ActionOutput {
   content: any;
 }
 
-export type InteractionOutput = TextOutput | ActionOutput;
+export interface TextOutput {
+  type: 'text';
+  content: string;
+}
 
-/* Interpreter */
+// INTERPRETER
+
+export type InterpreterResponse = TextResponse | ActionResponse;
 
 export interface TextResponse {
   type: 'text';
@@ -60,8 +65,6 @@ export interface ActionResponse {
   directive: ActionDirective;
 }
 
-export type InterpreterResponse = TextResponse | ActionResponse;
-
 export interface Strategy {
   description: string;
   method: (
@@ -70,22 +73,35 @@ export interface Strategy {
   ) => AsyncGenerator<InterpreterResponse, any, Array<Interaction>>;
 }
 
-/* Resources */
+// PROTOCOLS
 
-export interface ResourceIcon {
-  src: string;
-  purpose?: string;
-  sizes?: string;
-  type?: string;
+/**
+ * Protocols determine how an `ActionDirective` is executed.
+ * This goes hand in hand with `Resource`s.
+ * Each protocol has a unique `scheme`.
+ */
+export interface Protocol {
+  scheme: string;
+  handler: ProtocolHandler;
 }
 
-export interface ActionDefinition {
-  description?: string;
-  params_schema?: JSONSchemaDefinition;
+export type ProtocolHandler = (
+  directive: ActionDirective
+) => Promise<any> | any;
+
+export interface ActionDirective {
+  protocol: string;
+  resourceId?: string;
+  actionId?: string;
+  args?: Record<string, any>;
 }
 
-export type ActionRecord = { [id: string]: ActionDefinition };
+// RESOURCES
 
+/**
+ * A resource specifies how a `Protocol` could be consumed,
+ * along with some additional (optional) metadata.
+ */
 export interface Resource {
   id?: string;
   protocol: string;
@@ -96,25 +112,29 @@ export interface Resource {
   actions?: Record<string, ActionDefinition>;
 }
 
-/* Protocols */
-
-export type ProtocolHandler = (
-  directive: ActionDirective
-) => Promise<any> | any;
-
-export interface Protocol {
-  scheme: string;
-  handler: ProtocolHandler;
+export interface ResourceIcon {
+  src: string;
+  purpose?: string;
+  sizes?: string;
+  type?: string;
 }
 
-export interface ActionDirective {
-  protocol: string;
-  resourceId?: string;
-  actionId?: string;
-  args?: Record<string, any>;
+/**
+ * Describe an action as detailed as possible.
+ * An action is something the assistant can do
+ * based on interactions (inputs & previous outputs).
+ */
+export interface ActionDefinition {
+  description?: string;
+  params_schema?: JSONSchemaDefinition;
 }
 
-/* Helpers */
+/**
+ * Action dictionary, indexed by the action id.
+ */
+export type ActionRecord = { [id: string]: ActionDefinition };
+
+// HELPERS
 
 export interface JSONSchemaDefinition {
   type:
