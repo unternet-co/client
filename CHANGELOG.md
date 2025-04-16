@@ -1,3 +1,11 @@
+## 0.3.5
+
+- Add ability to search the web (#129)
+
+- Improve Kernel to support tool use, enabling multiple tools using strategies
+- Add web search using Unternet's API
+- Minor styling updates
+
 ## 0.3.4
 
 - Add ability to attach files to interaction inputs & translate to ai message
