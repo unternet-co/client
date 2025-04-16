@@ -1,9 +1,11 @@
 import { marked } from 'marked';
+import { attachStyles } from '../../common/utils';
 
 class MarkdownText extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
+    const shadow = this.attachShadow({ mode: 'open' });
+    attachStyles(shadow, this.styles);
   }
 
   connectedCallback() {
@@ -13,7 +15,8 @@ class MarkdownText extends HTMLElement {
 
   async render() {
     const content = this.innerHTML;
-    const renderedContent = await marked(content);
+    const strippedContent = content.replace(/<!--[\s\S]*?-->/g, '');
+    const renderedContent = await marked(strippedContent);
     this.shadowRoot.innerHTML = renderedContent;
   }
 
@@ -24,6 +27,18 @@ class MarkdownText extends HTMLElement {
       childList: true,
       subtree: true,
     });
+  }
+
+  get styles() {
+    return /*css*/ `
+      p:first-child {
+        margin-top: 0;
+      }
+
+      p:last-child {
+        margin-bottom: 0;
+      }
+    `;
   }
 }
 

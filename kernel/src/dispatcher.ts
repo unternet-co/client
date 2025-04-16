@@ -1,9 +1,4 @@
-import {
-  ActionDirective,
-  ActionResponse,
-  Protocol,
-  ProtocolHandler,
-} from './types';
+import { ActionDirective, Protocol, ProtocolHandler } from './types';
 import { createProtocolHandlers } from './utils';
 
 export class Dispatcher {
@@ -15,7 +10,7 @@ export class Dispatcher {
   }
 
   addProtocol(protocol: Protocol) {
-    this.handlers[protocol.scheme] = protocol.handler;
+    this.handlers[protocol.scheme] = protocol.handler.bind(protocol);
   }
 
   removeProtocol(protocol: Protocol | string) {

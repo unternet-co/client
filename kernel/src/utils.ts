@@ -12,9 +12,9 @@ import {
   Interaction,
   InteractionInput,
   Message,
+  Resource,
   Protocol,
   ProtocolHandler,
-  Resource,
   TextOutput,
 } from './types';
 
@@ -39,7 +39,7 @@ export function clone(obj: Object) {
 export function createProtocolHandlers(protocols: Protocol[]) {
   const handlers: Record<string, ProtocolHandler> = {};
   for (const protocol of protocols) {
-    handlers[protocol.scheme] = protocol.handler;
+    handlers[protocol.scheme] = protocol.handler.bind(protocol);
   }
   return handlers;
 }

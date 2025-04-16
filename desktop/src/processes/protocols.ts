@@ -1,3 +1,3 @@
-import { unternetProtocols } from '../unternet/unternet-protocols';
+import { unternetProtocol } from '../unternet/protocol';
 
-export const protocols = [...unternetProtocols];
+export const protocols = [unternetProtocol];

@@ -15,7 +15,6 @@ export class HomePage extends HTMLElement {
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private tabModel = dependencies.resolve<TabModel>('TabModel');
-  private kernel = dependencies.resolve<Kernel>('Kernel');
   private modalService = dependencies.resolve<ModalService>('ModalService');
   private recentContainer: HTMLUListElement;
   private filterInput: HTMLInputElement;

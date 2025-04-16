@@ -19,7 +19,7 @@ import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
 import { ResourceModel, initialResources } from './processes/resources';
-import { unternetProtocols } from './unternet/unternet-protocols';
+import { protocols } from './processes/protocols';
 
 /* Initialize databases & stores */
 
@@ -58,8 +58,6 @@ const aiModelService = new AIModelService({
   ollama: ollamaModelProvider,
 });
 dependencies.registerSingleton('AIModelService', aiModelService);
-
-const protocols = [...unternetProtocols];
 
 const kernel = new Kernel({
   workspaceModel,

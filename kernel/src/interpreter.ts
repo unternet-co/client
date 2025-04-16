@@ -80,9 +80,11 @@ export class Interpreter {
     if (strategy in this.strategies) {
       const responses = this.strategies[strategy].method(this, interactions);
 
+      console.log(interactions);
       let response = await responses.next();
       while (!response.done) {
         const newInteractions = yield response.value;
+        console.log(newInteractions);
         response = await responses.next(newInteractions);
       }
       return;

@@ -98,14 +98,14 @@ export interface Resource {
 
 /* Protocols */
 
-export type ProtocolHandler = (
-  directive: ActionDirective
-) => Promise<any> | any;
-
 export interface Protocol {
   scheme: string;
   handler: ProtocolHandler;
 }
+
+export type ProtocolHandler = (
+  directive: ActionDirective
+) => any | Promise<any>;
 
 export interface ActionDirective {
   protocol: string;

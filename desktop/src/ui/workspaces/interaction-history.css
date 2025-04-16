@@ -58,6 +58,10 @@ interaction-history .interaction-output[data-type='text'] {
   background: var(--color-bg-content);
 }
 
+interaction-history .interaction-output[data-type='text'] p {
+  margin: 0;
+}
+
 interaction-history .interaction-output[data-type='action'] {
   display: flex;
   align-items: center;

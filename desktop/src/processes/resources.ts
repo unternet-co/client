@@ -1,5 +1,5 @@
 import { Resource } from '@unternet/kernel';
-import { unternetResources } from '../unternet/unternet-resources';
+import { unternetResources } from '../unternet/resources';
 
 const initialResources: Array<Resource> = new Array();
 initialResources.push(...unternetResources);
