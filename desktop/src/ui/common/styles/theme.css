@@ -3,11 +3,13 @@
   Raw Colors
   *******************************************************/
 
-  --color-grey-0: oklch(99.2% 0.003 264.5);
-  --color-grey-50: oklch(95.8% 0.003 264.5);
-  --color-grey-100: oklch(91.2% 0.0029 264.5);
-  --color-grey-200: oklch(85.5% 0.0029 264.5);
-  --color-grey-300: oklch(76.4% 0.004 271.36);
+  --color-grey-0: oklch(99.2% 0.003 286.35);
+  /* TODO: The next two colors are in a different scheme */
+  --color-grey-50: oklch(97% 0.0027 286.35);
+  --color-grey-100: oklch(94% 0.0027 286.35);
+
+  --color-grey-200: oklch(88% 0.0027 286.35);
+  --color-grey-300: oklch(83% 0.0027 286.35);
   --color-grey-400: oklch(64.7% 0.005 271.3);
   --color-grey-500: oklch(54.9% 0.005 271.3);
   --color-grey-600: oklch(47.5% 0.005 271.3);

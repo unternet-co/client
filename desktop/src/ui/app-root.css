@@ -11,7 +11,7 @@ app-root {
 
 .contents {
   overflow: hidden;
-  background: var(--color-page-alt);
+  background: var(--color-neutral-50);
   flex-grow: 1;
 }
 

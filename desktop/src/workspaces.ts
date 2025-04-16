@@ -1,12 +1,12 @@
-import { Notifier } from '../common/notifier';
+import { Notifier } from './common/notifier';
 import {
   Interaction,
   InteractionInput,
   InteractionOutput,
-} from './interactions';
-import { DatabaseService } from '../storage/database-service';
+} from './ai/interactions';
+import { DatabaseService } from './storage/database-service';
 import { ulid } from 'ulid';
-import { DisposableGroup } from '../common/disposable';
+import { DisposableGroup } from './common/disposable';
 
 export interface Workspace {
   id: string;

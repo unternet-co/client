@@ -1,7 +1,7 @@
 import { html, render } from 'lit';
 import { formatTimestamp } from '../../common/utils/index';
-import { Workspace, WorkspaceModel } from '../../core/workspaces';
-import { TabModel } from '../../core/tabs';
+import { Workspace, WorkspaceModel } from '../../workspaces';
+import { TabModel } from '../../tabs';
 import { dependencies } from '../../common/dependencies';
 import { Kernel } from '../../ai/kernel';
 import { ModalService } from '../../modals/modal-service';
@@ -15,7 +15,6 @@ export class HomePage extends HTMLElement {
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private tabModel = dependencies.resolve<TabModel>('TabModel');
-  private kernel = dependencies.resolve<Kernel>('Kernel');
   private modalService = dependencies.resolve<ModalService>('ModalService');
   private recentContainer: HTMLUListElement;
   private filterInput: HTMLInputElement;

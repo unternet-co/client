@@ -4,7 +4,7 @@ import './interaction-history';
 import './workspace-view.css';
 import './resource-bar';
 import { html, render } from 'lit';
-import { Workspace, WorkspaceModel } from '../../core/workspaces';
+import { Workspace, WorkspaceModel } from '../../workspaces';
 import { Kernel } from '../../ai/kernel';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';

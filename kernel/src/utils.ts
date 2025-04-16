@@ -1,4 +1,10 @@
-import { FilePart, ImagePart, TextPart } from 'ai';
+import {
+  CoreAssistantMessage,
+  CoreUserMessage,
+  FilePart,
+  ImagePart,
+  TextPart,
+} from 'ai';
 import {
   ActionOutput,
   ActionRecord,
@@ -6,9 +12,9 @@ import {
   Interaction,
   InteractionInput,
   Message,
+  Resource,
   Protocol,
   ProtocolHandler,
-  Resource,
   TextOutput,
 } from './types';
 
@@ -26,10 +32,14 @@ export function createInteraction(
   };
 }
 
+export function clone(obj: Object) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 export function createProtocolHandlers(protocols: Protocol[]) {
   const handlers: Record<string, ProtocolHandler> = {};
   for (const protocol of protocols) {
-    handlers[protocol.scheme] = protocol.handler;
+    handlers[protocol.scheme] = protocol.handler.bind(protocol);
   }
   return handlers;
 }
@@ -54,18 +64,28 @@ export function createActionRecord(resources: Resource[]): ActionRecord {
   return actions;
 }
 
+export function createUserMessage(content: string) {
+  return {
+    role: 'user',
+    content,
+  } as CoreUserMessage;
+}
+
+export function createAssistantMessage(content: string) {
+  return {
+    role: 'assistant',
+    content,
+  } as CoreAssistantMessage;
+}
+
 export function createMessages(
   interactions: Interaction[],
-  prompt?: string
+  ...prompts: string[] | undefined
 ): Message[] {
   let messages: Message[] = [];
-
   for (let interaction of interactions) {
     if (interaction.input.text)
-      messages.push({
-        role: 'user',
-        content: interaction.input.text,
-      });
+      messages.push(createUserMessage(interaction.input.text));
 
     if (interaction.input.files?.length) {
       const parts: Array<TextPart | ImagePart | FilePart> =
@@ -82,27 +102,27 @@ export function createMessages(
     for (let output of interaction.outputs) {
       if (output.type === 'text') {
         const textOutput = output as TextOutput;
-        messages.push({
-          role: 'assistant',
-          content: textOutput.content,
-        });
+        messages.push(createAssistantMessage(textOutput.content));
       } else if (output.type === 'action') {
         const actionOutput = output as ActionOutput;
 
-        const actionUri = encodeActionUri(actionOutput.directive);
-        messages.push({
-          role: 'system',
-          content: `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`,
-        });
+        const actionUri = encodeActionUri(output.directive);
+        messages.push(
+          createAssistantMessage(
+            `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`
+          )
+        );
       }
     }
   }
 
-  if (prompt) {
-    messages.push({
-      role: 'system',
-      content: prompt,
-    });
+  if (prompts) {
+    for (const prompt of prompts) {
+      messages.push({
+        role: 'user',
+        content: prompt,
+      });
+    }
   }
 
   return messages;
@@ -122,7 +142,7 @@ export function encodeActionUri({
   // <protocol>:<resource_uri>#<action_id>
   let uriString = '';
   if (protocol) uriString += `${protocol}:`;
-  uriString += resourceId;
+  if (resourceId) uriString += encodeURIComponent(resourceId);
   if (actionId) uriString += `#${actionId}`;
   return uriString;
 }
@@ -131,7 +151,11 @@ export function decodeActionUri(encodedActionURI: string): UriComponents {
   let [protocol, ...rest] = encodedActionURI.split(':');
   let [resourceId, actionId] = rest.join(':').split('#');
 
-  if (!resourceId || resourceId === 'undefined') resourceId = undefined;
+  if (!resourceId || resourceId === 'undefined') {
+    resourceId = undefined;
+  } else {
+    resourceId = decodeURIComponent(resourceId);
+  }
   if (!actionId || actionId === 'undefined') actionId = undefined;
 
   return {

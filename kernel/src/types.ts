@@ -3,8 +3,10 @@ import type {
   CoreUserMessage,
   CoreAssistantMessage,
   CoreToolMessage,
-  LanguageModel,
 } from 'ai';
+import { Interpreter } from './interpreter';
+
+export { Schema } from 'ai';
 
 /* Messages */
 
@@ -47,29 +49,28 @@ export type InteractionOutput = TextOutput | ActionOutput;
 
 /* Interpreter */
 
-export type InterpreterResponse = TextResponse | ActionResponse;
-
-/* Interpreter – Text */
-
 export interface TextResponse {
   type: 'text';
   text: Promise<string>;
   textStream: AsyncIterable<string>;
 }
 
-/* Interpreter – Actions */
-
 export interface ActionResponse {
   type: 'action';
   directive: ActionDirective;
 }
 
-export interface ActionDirective {
-  protocol: string;
-  resourceId?: string;
-  actionId?: string;
-  args?: Record<string, any>;
+export type InterpreterResponse = TextResponse | ActionResponse;
+
+export interface Strategy {
+  description: string;
+  method: (
+    interpreter: Interpreter,
+    interactions: Interaction[]
+  ) => AsyncGenerator<InterpreterResponse, any, Array<Interaction>>;
 }
+
+/* Resources */
 
 export interface ResourceIcon {
   src: string;
@@ -95,18 +96,25 @@ export interface Resource {
   actions?: Record<string, ActionDefinition>;
 }
 
-/* Protocol */
-
-export type ProtocolHandler = (
-  directive: ActionDirective
-) => Promise<any> | any;
+/* Protocols */
 
 export interface Protocol {
   scheme: string;
   handler: ProtocolHandler;
 }
 
-/* JSON Schema */
+export type ProtocolHandler = (
+  directive: ActionDirective
+) => any | Promise<any>;
+
+export interface ActionDirective {
+  protocol: string;
+  resourceId?: string;
+  actionId?: string;
+  args?: Record<string, any>;
+}
+
+/* Helpers */
 
 export interface JSONSchemaDefinition {
   type:
@@ -124,7 +132,5 @@ export interface JSONSchemaDefinition {
   required?: string[];
   additionalProperties?: boolean;
 }
-
-/* Misc */
 
 export type StringEnum = [string, ...string[]];

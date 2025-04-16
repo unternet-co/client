@@ -1,28 +1,36 @@
-// import { html, render } from 'lit';
-// import { Resource } from '@unternet/kernel';
+import { html, render } from 'lit';
+import { Resource } from '@unternet/kernel';
 // import './resource-picker';
-import "./resource-bar.css";
+import './resource-bar.css';
+import { dependencies } from '../../common/dependencies';
+import { ResourceModel } from '../../processes/resources';
 
-// export class ResourceBar extends HTMLElement {
-//   set resources(resources: Resource[]) {
-//     const template = this.resources.map((resource) => {
-//       return html`<li class="applet-item">
-//         <img
-//           class="applet-icon"
-//           src=${(resource.icons && resource.icons[0].src) || ''}
-//         />
-//         <span class="applet-name">${resource.short_name ?? resource.name}</span>
-//       </li>`;
-//     });
-//   }
+export class ResourceBar extends HTMLElement {
+  resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
 
-//   connectedCallback(): void {
-//     render(this.template, this);
-//   }
+  connectedCallback(): void {
+    this.render();
+  }
 
-//   template() {
-//     return html`<ul class="resources-list"></ul>`;
-//   }
-// }
+  render(): void {
+    const resources = this.resourceModel.resources;
 
-// customElements.define('resource-bar', ResourceBar);
+    const resourceTemplate = resources.map((resource) => {
+      return html`<li class="applet-item">
+        <img
+          class="applet-icon"
+          src=${(resource.icons && resource.icons[0].src) || ''}
+        />
+        <span class="applet-name">${resource.short_name ?? resource.name}</span>
+      </li>`;
+    });
+
+    const template = html`<ul class="resources-list">
+      ${resourceTemplate}
+    </ul>`;
+
+    render(template, this);
+  }
+}
+
+customElements.define('resource-bar', ResourceBar);

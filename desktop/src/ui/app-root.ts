@@ -4,7 +4,7 @@ import './top-bar/top-bar';
 import './pages/home-page';
 import './workspaces/workspace-view';
 import './app-root.css';
-import { Tab, TabModel } from '../core/tabs';
+import { Tab, TabModel } from '../tabs';
 import { dependencies } from '../common/dependencies';
 
 export class AppRoot extends HTMLElement {

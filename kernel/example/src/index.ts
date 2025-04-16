@@ -1,4 +1,5 @@
 import { openai } from '@ai-sdk/openai';
+import { anthropic } from '@ai-sdk/anthropic';
 import readline from 'readline';
 import chalk from 'chalk';
 import 'dotenv/config';
@@ -6,6 +7,7 @@ import 'dotenv/config';
 import {
   ActionOutput,
   Interaction,
+  InteractionOutput,
   Interpreter,
   Dispatcher,
   TextResponse,
@@ -18,8 +20,14 @@ import resources from './resources';
 
 /* MODEL & KERNEL SETUP */
 
-const model = openai('gpt-4-turbo');
-const interpreter = new Interpreter({ model, resources });
+const model = openai('gpt-4o');
+// const model = anthropic('claude-3-7-sonnet-20250219');
+const interpreter = new Interpreter({
+  model,
+  resources,
+  logger: (type, content) =>
+    console.log(chalk.bgGray(type.toUpperCase()), chalk.dim(content)),
+});
 const dispatcher = new Dispatcher(protocols);
 
 /* CLI INPUT & OUTPUT MANAGEMENT */
@@ -60,25 +68,26 @@ const handleInput =
 
     // Add interaction to stack
     interactions.push(interaction);
+    console.log(chalk.bold(`\nKernel`));
 
     // Interpret the interaction
     try {
-      console.log(chalk.bold(`\nKernel`));
-      const response = await interpreter.generateResponse(interactions);
+      const responses = interpreter.run(interactions);
 
-      switch (response?.type) {
-        case 'text':
-          await textResponse(response, interaction);
-          break;
-        case 'action':
-          await actionResponse(response, interaction);
-          break;
-        default:
-          console.log(
-            chalk.red(
-              'Sorry, failed to construct a response for this interaction.'
-            )
-          );
+      let iteration = await responses.next();
+      while (!iteration.done) {
+        const response = iteration.value;
+        switch (response.type) {
+          case 'text':
+            await appendTextOutput(response, interaction!);
+            break;
+          case 'action':
+            await appendActionOutput(response, interaction!);
+            break;
+          default:
+            console.error('Error: Unrecognized action type.');
+        }
+        iteration = await responses.next(interactions);
       }
     } catch (error) {
       console.error(chalk.red('Error:', error));
@@ -109,7 +118,7 @@ function command(userInput: string): Command | null {
 /**
  * Manage an action response from the interpreter.
  */
-async function actionResponse(
+async function appendActionOutput(
   response: ActionResponse,
   interaction: Interaction
 ) {
@@ -120,14 +129,22 @@ async function actionResponse(
   };
 
   output.content = await dispatcher.dispatch(response.directive);
-  console.log(output);
-  interaction.outputs = [output];
+  console.log(
+    chalk.bgGray('ACTION'),
+    '\n',
+    chalk.dim(JSON.stringify(output.content, null, 2))
+  );
+  interaction.outputs.push(output);
+  return output;
 }
 
 /**
  * Manage a text response from the interpreter.
  */
-async function textResponse(response: TextResponse, interaction: Interaction) {
+async function appendTextOutput(
+  response: TextResponse,
+  interaction: Interaction
+): Promise<InteractionOutput> {
   let totalText = '';
   for await (const part of response.textStream) {
     totalText += part;
@@ -140,6 +157,10 @@ async function textResponse(response: TextResponse, interaction: Interaction) {
       content: totalText,
     },
   ];
+  return {
+    type: 'text',
+    content: totalText,
+  };
 }
 
 /* PROMPTS */

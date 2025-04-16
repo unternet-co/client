@@ -1,4 +1,4 @@
-import { InteractionInput } from '../../core/interactions';
+import { InteractionInput } from '../../ai/interactions';
 import { DisposableGroup } from '../../common/disposable';
 import { attachStyles, appendEl, createEl } from '../../common/utils/dom';
 
@@ -114,7 +114,7 @@ export class CommandInputElement extends HTMLElement {
 
     input:focus {
       text-align: left;
-      background: var(--color-bg-page);
+      background: var(--color-bg-input);
       border: 1px solid var(--color-border);
     }
 
