@@ -1,6 +1,6 @@
-import { LitElement, css } from 'lit';
+import { LitElement, html, css } from 'lit';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { marked } from 'marked';
-import { attachStyles } from '../../common/utils';
 
 export class MarkdownText extends LitElement {
   static properties = {
@@ -8,8 +8,8 @@ export class MarkdownText extends LitElement {
   };
 
   content = '';
-
-  private renderedContent = '';
+  private _renderedContent = '';
+  private _mutationObserver?: MutationObserver;
 
   static styles = css`
     :host {
@@ -54,6 +54,7 @@ export class MarkdownText extends LitElement {
 
     a {
       text-underline-offset: 0.2em;
+      color: var(--color-action-800);
     }
 
     blockquote {
@@ -101,6 +102,7 @@ export class MarkdownText extends LitElement {
       border-collapse: separate;
       border-spacing: 0;
       margin-bottom: 1.5em;
+      border: 1px solid var(--color-border-default);
     }
 
     th {
@@ -157,40 +159,44 @@ export class MarkdownText extends LitElement {
 
   constructor() {
     super();
-    const shadow = this.attachShadow({ mode: 'open' });
-    attachStyles(shadow, this.styles.toString());
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.render();
-  }
-
-  async render() {
-    const content = this.innerHTML;
-    const strippedContent = content.replace(/<!--[\s\S]*?-->/g, '');
-    const renderedContent = await marked(strippedContent);
-    this.shadowRoot.innerHTML = renderedContent;
-  }
-
-  observeSlotChanges() {
-    const observer = new MutationObserver(() => this.render());
-    observer.observe(this, {
-      characterData: true,
+    this._mutationObserver = new MutationObserver(() => this._renderMarkdown());
+    this._mutationObserver.observe(this, {
       childList: true,
       subtree: true,
+      characterData: true,
     });
+    this._renderMarkdown();
   }
 
-  get styles() {
-    return css`
-      p:first-child {
-        margin-top: 0;
-      }
+  disconnectedCallback() {
+    this._mutationObserver?.disconnect();
+    super.disconnectedCallback();
+  }
 
-      p:last-child {
-        margin-bottom: 0;
-      }
+  async updated(changedProps: Map<string, any>) {
+    if (changedProps.has('content')) {
+      this._renderMarkdown();
+    }
+  }
+
+  async _renderMarkdown() {
+    let source = this.content;
+    if (!source) {
+      // Use light DOM content if no 'content' property is set
+      source = this.innerHTML;
+    }
+    const strippedContent = (source || '').replace(/<!--[\s\S]*?-->/g, '');
+    this._renderedContent = await marked(strippedContent);
+    this.requestUpdate();
+  }
+
+  render() {
+    return html`
+      <div class="markdown-body">${unsafeHTML(this._renderedContent)}</div>
     `;
   }
 }
