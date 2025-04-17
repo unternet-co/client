@@ -105,12 +105,13 @@ export class CommandInputElement extends LitElement {
         transparent 35%
       );
       backdrop-filter: blur(16px);
-      border-radius: var(--rounded-lg);
+      border-radius: var(--rounded);
       /* border-top: 1px solid var(--color-neutral-0); */
     }
 
     .command-input-wrapper:focus-within {
       outline-color: var(--color-action-800);
+      background: var(--color-neutral-0);
     }
 
     un-input {

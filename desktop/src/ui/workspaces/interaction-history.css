@@ -17,20 +17,14 @@ interaction-history .interaction {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  gap: var(--space-8);
   width: 100%;
   max-width: 64ch;
+  gap: var(--space-4);
 }
 
 /* Reversed, so first-child is the last child visually */
 interaction-history .interaction:first-child {
   margin-bottom: 0;
-}
-
-interaction-history .interaction {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
 }
 
 interaction-history .interaction-input,
@@ -39,26 +33,25 @@ interaction-history .interaction-output {
 }
 
 interaction-history .interaction-input {
-  color: var(--color-text-muted);
-  padding: var(--space-3) var(--space-6);
+  padding: var(--space-1) var(--space-4);
   align-self: flex-start;
+  font-weight: 500;
+  background: var(--color-neutral-150);
+  border-radius: var(--rounded);
 }
 
-interaction-history .interaction-output {
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--rounded-lg);
+interaction-history .interaction-output[data-type='text'] {
+  padding: var(--space-3) var(--space-4);
+  min-height: 36px;
+  border-radius: var(--rounded);
   border: 1px solid var(--color-border-muted);
   background: var(--color-bg-content);
-}
-
-interaction-history .interaction-output[data-type='text'] p {
-  margin: 0;
 }
 
 interaction-history .interaction-output[data-type='action'] {
   display: flex;
   align-items: center;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   gap: var(--space-2);
 }
 
@@ -68,7 +61,7 @@ interaction-history .interaction-output[data-type='action'] .resource-icon {
 }
 
 interaction-history .interaction-output[data-type='action'] .notification-text {
-  color: var(--color-neutral-500);
+  color: var(--color-text-muted);
   font-size: 13px;
 }
 

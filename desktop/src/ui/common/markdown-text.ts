@@ -155,6 +155,13 @@ export class MarkdownText extends LitElement {
       text-decoration-style: dotted;
       cursor: help;
     }
+
+    p:first-child {
+      margin-top: 0;
+    }
+    p:last-child {
+      margin-bottom: 0;
+    }
   `;
 
   constructor() {
