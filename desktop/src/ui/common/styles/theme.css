@@ -205,7 +205,7 @@
   --color-bg-content: var(--color-neutral-0);
 
   /* borders */
-  --color-border-muted: var(--color-neutral-100);
+  --color-border-muted: var(--color-neutral-200);
   --color-border-default: var(--color-neutral-200);
   --color-border-strong: var(--color-neutral-300);
   --color-border: var(--color-border-default);
@@ -226,7 +226,7 @@
     var(--color-grey-500) 100%,
     transparent 100%
   );
-  --shadow: 0 12px 20px -16px var(--shadow-color);
+  --shadow: 0 5px 25px -16px var(--shadow-color);
   --shadow-inset: inset 0 1px 2px -1px var(--shadow-color-inset);
 
   /* highlight */
