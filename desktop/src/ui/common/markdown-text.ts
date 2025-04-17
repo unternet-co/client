@@ -1,5 +1,4 @@
-import { LitElement, html, css } from 'lit';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { LitElement, css } from 'lit';
 import { marked } from 'marked';
 import { attachStyles } from '../../common/utils';
 
@@ -159,12 +158,12 @@ export class MarkdownText extends LitElement {
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
-    attachStyles(shadow, this.styles);
+    attachStyles(shadow, this.styles.toString());
   }
 
   connectedCallback() {
     super.connectedCallback();
-    this.updateContent();
+    this.render();
   }
 
   async render() {
@@ -175,7 +174,7 @@ export class MarkdownText extends LitElement {
   }
 
   observeSlotChanges() {
-    const observer = new MutationObserver(() => this.updateContent());
+    const observer = new MutationObserver(() => this.render());
     observer.observe(this, {
       characterData: true,
       childList: true,
@@ -184,7 +183,7 @@ export class MarkdownText extends LitElement {
   }
 
   get styles() {
-    return /*css*/ `
+    return css`
       p:first-child {
         margin-top: 0;
       }
