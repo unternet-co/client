@@ -3,21 +3,23 @@
   Raw Colors
   *******************************************************/
 
-  --color-grey-0: oklch(99.1% 0.003 264.5);
-  --color-grey-50: oklch(95.8% 0.003 264.5);
-  --color-grey-100: oklch(91.3% 0.003 264.5);
-  --color-grey-150: oklch(88.3% 0.008 264.5);
-  --color-grey-200: oklch(84.1% 0.005 258.3);
-  --color-grey-300: oklch(76.7% 0.006 274.9);
-  --color-grey-400: oklch(65.3% 0.008 268.5);
-  --color-grey-500: oklch(55.9% 0.008 268.5);
-  --color-grey-600: oklch(46.8% 0.008 268.5);
-  --color-grey-700: oklch(39.5% 0.008 277);
-  --color-grey-800: oklch(35.3% 0.007 274.8);
-  --color-grey-850: oklch(33.3% 0.011 274.8);
-  --color-grey-900: oklch(29.3% 0.008 264.4);
-  --color-grey-950: oklch(26.1% 0.009 276.7);
-  --color-grey-1000: oklch(22.3% 0.008 274.6);
+  --color-grey-0: oklch(99.1% 0.004 271.4);
+  --color-gray-25: oklch(97.8% 0.007 260.7);
+  --color-grey-50: oklch(95.2% 0.008 271.3);
+  --color-grey-100: oklch(92.7% 0.007 260.7);
+  --color-grey-150: oklch(89.7% 0.009 264.5);
+  --color-grey-200: oklch(86.3% 0.012 264.5);
+  --color-grey-300: oklch(79.8% 0.009 264.5);
+  --color-grey-400: oklch(70.2% 0.009 264.5);
+  --color-grey-500: oklch(61% 0.011 267.3);
+  --color-grey-600: oklch(52% 0.012 261.8);
+  --color-grey-700: oklch(46.4% 0.012 267.3);
+  --color-grey-800: oklch(41.2% 0.013 261.8);
+  --color-grey-850: oklch(37.4% 0.013 261.7);
+  --color-grey-900: oklch(34.3% 0.012 258.4);
+  --color-grey-950: oklch(31.3% 0.015 264.3);
+  --color-grey-975: oklch(28% 0.014 261.7);
+  --color-grey-1000: oklch(25.5% 0.014 261.7);
 
   --color-blue-0: oklch(97.5% 0.012 259.8);
   --color-blue-50: oklch(93.2% 0.032 264.4);
@@ -94,6 +96,7 @@
   *******************************************************/
 
   --color-neutral-0: var(--color-grey-0);
+  --color-neutral-25: var(--color-gray-25);
   --color-neutral-50: var(--color-grey-50);
   --color-neutral-100: var(--color-grey-100);
   --color-neutral-150: var(--color-grey-150);
@@ -107,6 +110,7 @@
   --color-neutral-850: var(--color-grey-850);
   --color-neutral-900: var(--color-grey-900);
   --color-neutral-950: var(--color-grey-950);
+  --color-neutral-975: var(--color-grey-975);
   --color-neutral-1000: var(--color-grey-1000);
 
   --color-action-0: var(--color-blue-0);
@@ -190,19 +194,20 @@
   /* text */
   --color-text-disabled: var(--color-neutral-400);
   --color-text-muted: var(--color-neutral-600);
-  --color-text-default: var(--color-neutral-900);
+  --color-text-default: var(--color-neutral-850);
   --color-text-strong: var(--color-neutral-1000);
   --color-text-link: var(--color-action-800);
 
   /* background */
-  --color-bg-page: var(--color-neutral-100);
-  --color-bg-container: var(--color-neutral-50);
+  --color-bg-chrome: var(--color-neutral-100);
+  --color-bg-page: var(--color-neutral-50);
+  --color-bg-container: var(--color-neutral-25);
   --color-bg-content: var(--color-neutral-0);
 
   /* borders */
-  --color-border-muted: var(--color-neutral-200);
-  --color-border-default: var(--color-neutral-300);
-  --color-border-strong: var(--color-neutral-500);
+  --color-border-muted: var(--color-neutral-100);
+  --color-border-default: var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
   --color-border: var(--color-border-default);
 
   /* header */
@@ -211,22 +216,21 @@
   --color-header-link-active: var(--color-neutral-0);
 
   /* shadow */
-  --shadow-mix: 15%;
   --shadow-color: color-mix(
     in oklch,
-    var(--color-grey-1000) var(--shadow-mix),
-    transparent 100%
+    var(--color-grey-1000) 100%,
+    transparent 0%
   );
   --shadow-color-inset: color-mix(
-    in srgb,
-    var(--color-grey-600) 15%,
+    in oklch,
+    var(--color-grey-500) 100%,
     transparent 100%
   );
   --shadow: 0 4px 6px var(--shadow-color);
-  --shadow-inset: inset 0 1px 1px 0px var(--shadow-color-inset);
+  --shadow-inset: inset 0 1px 2px -1px var(--shadow-color-inset);
 
   /* highlight */
-  --glow-color: color-mix(in srgb, var(--color-grey-0) 100%, transparent 50%);
+  --glow-color: var(--color-grey-0);
 
   /* overlay */
   --color-overlay: color-mix(
@@ -308,13 +312,13 @@
 
   /* Button */
   --button-shadows:
-    inset 0 1px 1px 0px var(--glow-color),
-    inset 0 -1px 1px 0px var(--shadow-color);
+    inset 0 1px 2px -1px var(--glow-color),
+    inset 0 -1px 2px -2px var(--shadow-color);
 
   /* Input */
   --input-bg-color: var(--color-neutral-0);
-  --input-bg-color-flat: var(--color-neutral-200);
-  --input-border-color: var(--color-neutral-300);
+  --input-bg-color-flat: var(--color-neutral-100);
+  --input-border-color: var(--color-border-default);
   --input-border-color-flat: var(--color-bg-container);
   --input-border-color-error: var(--color-error-500);
   --input-text-color: var(--color-neutral-1000);
@@ -329,6 +333,7 @@
     *******************************************************/
 
     --color-neutral-0: var(--color-grey-1000);
+    --color-neutral-25: var(--color-grey-975);
     --color-neutral-50: var(--color-grey-950);
     --color-neutral-100: var(--color-grey-900);
     --color-neutral-150: var(--color-grey-850);
@@ -342,6 +347,7 @@
     --color-neutral-850: var(--color-grey-150);
     --color-neutral-900: var(--color-grey-100);
     --color-neutral-950: var(--color-grey-50);
+    --color-neutral-975: var(--color-grey-25);
     --color-neutral-1000: var(--color-grey-0);
 
     --color-action-0: var(--color-blue-1000);
@@ -423,9 +429,10 @@
     *******************************************************/
 
     /* background */
+    --color-bg-chrome: var(--color-neutral-100);
     --color-bg-page: var(--color-neutral-0);
-    --color-bg-container: var(--color-neutral-50);
-    --color-bg-content: var(--color-neutral-100);
+    --color-bg-container: var(--color-neutral-25);
+    --color-bg-content: var(--color-neutral-50);
 
     /* header */
     --color-header-bg: var(--color-neutral-50);

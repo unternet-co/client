@@ -4,9 +4,10 @@ top-bar {
   display: flex;
   flex-shrink: 0;
   -webkit-app-region: drag;
-  background: var(--color-neutral-200);
+  background: var(--color-bg-chrome);
   overflow: visible;
   position: relative;
+  border-bottom: 1px solid var(--color-border-default);
 }
 
 /* Default padding for macOS traffic lights */

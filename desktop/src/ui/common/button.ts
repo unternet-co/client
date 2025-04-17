@@ -155,7 +155,7 @@ export class ButtonElement extends LitElement {
         height: var(--button-height);
         line-height: var(--button-height);
         gap: var(--space-2);
-        transition: all 50ms;
+        transition: all 100ms;
         background-color: var(--button-color);
         color: var(--button-text-color);
         box-shadow: var(--button-shadows);
@@ -174,6 +174,7 @@ export class ButtonElement extends LitElement {
         cursor: not-allowed;
         pointer-events: none;
         opacity: 0.5;
+        box-shadow: none;
       }
 
       .button--secondary {
@@ -193,8 +194,13 @@ export class ButtonElement extends LitElement {
       .button--outline {
         --button-color: transparent;
         --button-text-color: currentColor;
-        border: 1px solid currentColor;
+        border: 1px solid
+          color-mix(in oklch, currentColor 85%, transparent 100%);
         box-shadow: none;
+      }
+
+      .button--outline:hover {
+        border-color: currentColor;
       }
 
       .button--ghost {
@@ -229,11 +235,6 @@ export class ButtonElement extends LitElement {
         pointer-events: none;
       }
 
-      .icon-container {
-        display: flex;
-        align-items: center;
-      }
-
       .button--small {
         --button-height: 18px;
         font-size: var(--text-sm);
@@ -241,6 +242,16 @@ export class ButtonElement extends LitElement {
 
       .button--large {
         --button-height: 28px;
+      }
+
+      .icon-container {
+        display: flex;
+        align-items: center;
+        opacity: 0.75;
+      }
+
+      .button:hover .icon-container {
+        opacity: 1;
       }
     `;
   }

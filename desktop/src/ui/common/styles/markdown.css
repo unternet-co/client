@@ -49,7 +49,7 @@
 [data-format='markdown'] pre {
   font-family: var(--font-mono);
   padding: 1.5em;
-  background: var(--color-bg-container);
+  background: var(--color-bg-page);
   border-radius: 6px;
   overflow-x: auto;
   margin-bottom: 1.5em;
@@ -65,7 +65,7 @@
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   padding: 0.2em 0.4em;
-  background: var(--color-neutral-15);
+  background: var(--color-bg-page);
   border-radius: 3px;
 }
 
