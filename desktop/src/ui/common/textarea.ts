@@ -21,6 +21,7 @@ export class TextAreaElement extends HTMLElement {
         font-size: inherit;
         line-height: 1.5;
         resize: vertical;
+        box-sizing: border-box;
       }
 
       textarea:focus {

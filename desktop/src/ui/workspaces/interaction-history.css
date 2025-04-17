@@ -1,48 +1,7 @@
-/* interaction-history {
-  overflow-y: scroll;
-  width: 100%;
-}
-
-interaction-history .inner {
-  padding: var(--space-5) 0 var(--space-8) 0;
-  margin: 0 auto;
-  flex-shrink: 0;
-  max-width: 560px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-interaction-history .interaction {
-  display: flex;
-  flex-direction: column;
-}
-
-interaction-history .interaction-input,
-interaction-history .interaction-output {
-  user-select: text;
-}
-
-interaction-history .interaction-input {
-  font-weight: 500;
-  padding: var(--space-5) var(--space-2);
-  border: none;
-  align-self: flex-start;
-}
-
-interaction-history .interaction-output {
-  padding: var(--space-6) var(--space-7);
-  border-radius: var(--rounded);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-page);
-} */
-
-/******/
-
 interaction-history {
   width: 100%;
   flex-grow: 1;
+  background: var(--color-neutral-50);
 }
 
 interaction-history .inner {
@@ -51,16 +10,16 @@ interaction-history .inner {
 }
 
 interaction-history .inner::part(slot) {
-  gap: var(--space-6);
-  padding: var(--space-6) 0;
+  gap: var(--space-8);
+  padding: var(--space-8) 0;
 }
 
 interaction-history .interaction {
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  gap: var(--space-4);
-  width: 580px;
+  width: 100%;
+  max-width: 640px;
 }
 
 /* Reversed, so first-child is the last child visually */
@@ -80,20 +39,44 @@ interaction-history .interaction-output {
 }
 
 interaction-history .interaction-input {
-  font-weight: 500;
-  padding: var(--space-1) var(--space-1);
-  border: none;
+  padding: var(--space-2) var(--space-4);
   align-self: flex-start;
   border-radius: var(--rounded);
-  /* border: 1px solid var(--color-border); */
-  /* background: var(--color-neutral-15); */
+  border: 1px solid var(--color-border-muted);
+  background: var(--color-neutral-100);
 }
 
-interaction-history .interaction-output {
-  padding: var(--space-5) var(--space-6);
+/* interaction-history .interaction-input {
+  font-weight: 500;
+  padding: var(--space-1) var(--space-4);
+} */
+
+interaction-history .interaction-output[data-type='text'] {
+  padding: var(--space-4) var(--space-4);
   border-radius: var(--rounded);
   border: 1px solid var(--color-border-muted);
   background: var(--color-bg-content);
+}
+
+interaction-history .interaction-output[data-type='text'] p {
+  margin: 0;
+}
+
+interaction-history .interaction-output[data-type='action'] {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  gap: var(--space-2);
+}
+
+interaction-history .interaction-output[data-type='action'] .resource-icon {
+  width: 14px;
+  height: 14px;
+}
+
+interaction-history .interaction-output[data-type='action'] .notification-text {
+  color: var(--color-neutral-500);
+  font-size: 13px;
 }
 
 interaction-history .thinking-letter {
@@ -103,49 +86,3 @@ interaction-history .thinking-letter {
 interaction-history .thinking-letter.active {
   color: var(--color-neutral-1000);
 }
-
-/* interaction-history {
-  overflow-y: scroll;
-  width: 100%;
-}
-
-interaction-history .inner {
-  padding: var(--space-5) 0 var(--space-8) 0;
-  margin: 0 auto;
-  flex-shrink: 0;
-  max-width: 560px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-  padding-bottom: 200px;
-}
-
-interaction-history .interaction {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  border-radius: var(--rounded);
-  border: 1px solid var(--color-border);
-  background: var(--color-neutral-15);
-  padding: 4px;
-}
-
-interaction-history .interaction-input,
-interaction-history .interaction-output {
-  user-select: text;
-}
-
-interaction-history .interaction-input {
-  font-weight: 500;
-  padding: var(--space-3) var(--space-4);
-  border: none;
-  align-self: flex-start;
-}
-
-interaction-history .interaction-output {
-  padding: var(--space-6) var(--space-7);
-  border-radius: var(--rounded);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-page);
-} */

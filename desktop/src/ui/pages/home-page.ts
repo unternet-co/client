@@ -1,11 +1,12 @@
 import { html, render } from 'lit';
-import { formatTimestamp } from '../../utils';
-import { Workspace, WorkspaceModel } from '../../models/workspaces';
-import { TabModel } from '../../models/tabs';
-import { dependencies } from '../../base/dependencies';
-import { ModalService } from '../../services/modal-service';
+import { formatTimestamp } from '../../common/utils/index';
+import { Workspace, WorkspaceModel } from '../../workspaces';
+import { TabModel } from '../../tabs';
+import { dependencies } from '../../common/dependencies';
+import { Kernel } from '../../ai/kernel';
+import { ModalService } from '../../modals/modal-service';
 import cn from 'classnames';
-import { DisposableGroup } from '../../base/disposable';
+import { DisposableGroup } from '../../common/disposable';
 import './home-page.css';
 import '../common/button';
 import '../common/input';
@@ -50,7 +51,7 @@ export class HomePage extends HTMLElement {
             @input=${this.handleFilterInput.bind(this)}
             @keydown=${this.handleKeyDown.bind(this)}
             @blur=${this.handleFilterBlur.bind(this)}
-          />
+          ></un-input>
         </div>
         <un-button @click=${this.handleCreateWorkspace.bind(this)}>
           <un-icon name="plus"></un-icon>
@@ -83,7 +84,7 @@ export class HomePage extends HTMLElement {
       // Sort by modified (most recent first)
       .sort((a, b) => (b.modified || 0) - (a.modified || 0));
 
-    if (this.workspaces.length === 0) {
+    if (this.workspaces.length === 0 && filterQuery.length) {
       render(
         html`<li class="no-workspaces-message">
           No workspaces found matching "${this.filterInput?.value}"
@@ -101,10 +102,40 @@ export class HomePage extends HTMLElement {
   handleClickDelete(e: PointerEvent, workspaceId: Workspace['id']) {
     e.preventDefault();
     e.stopPropagation();
-    // Fixes bug where hitting enter opens more modals
-    // TODO: Move this to a modal visibility trigger, register it once and reveal
-    // If status is open, it doesn't open
-    if (e.pointerId > 0) this.createDeleteModal(workspaceId);
+
+    const workspace = this.workspaceModel.get(workspaceId);
+    if (!workspace) return;
+
+    const modal = this.modalService.create({
+      title: `Delete ${workspace.title}`,
+    });
+
+    const handleCancel = () => {
+      this.modalService.close(modal.id);
+    };
+
+    const handleDelete = () => {
+      this.workspaceModel.delete(workspaceId);
+      this.modalService.close(modal.id);
+    };
+
+    const container = document.createElement('div');
+    container.className = 'delete-confirmation';
+    modal.contents.appendChild(container);
+
+    render(
+      html`
+        <p>
+          Are you sure you want to delete <strong>${workspace.title}</strong>?
+          This action cannot be undone.
+        </p>
+        <div class="button-container">
+          <un-button type="secondary" @click=${handleCancel}>Cancel</un-button>
+          <un-button type="negative" @click=${handleDelete}>Delete</un-button>
+        </div>
+      `,
+      container
+    );
   }
 
   handleKeyDown(e: KeyboardEvent) {
@@ -189,42 +220,6 @@ export class HomePage extends HTMLElement {
         </un-button>
       </li>
     `;
-  }
-
-  private createDeleteModal(workspaceId: string) {
-    // Create confirmation modal
-    const modal = this.modalService.create({ title: 'Delete Workspace' });
-
-    // Add confirmation content
-    const content = document.createElement('div');
-    content.classList.add('delete-confirmation');
-
-    const message = document.createElement('p');
-    message.textContent =
-      'Are you sure you want to delete this workspace? This action cannot be undone.';
-    content.appendChild(message);
-
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('button-container');
-
-    const cancelButton = document.createElement('button');
-    cancelButton.classList.add('cancel-button');
-    cancelButton.textContent = 'Cancel';
-    cancelButton.onclick = () => modal.close();
-
-    const deleteButton = document.createElement('button');
-    deleteButton.classList.add('delete-confirm-button');
-    deleteButton.textContent = 'Delete';
-    deleteButton.onclick = () => {
-      this.workspaceModel.delete(workspaceId);
-      modal.close();
-    };
-
-    buttonContainer.appendChild(cancelButton);
-    buttonContainer.appendChild(deleteButton);
-    content.appendChild(buttonContainer);
-
-    modal.contents.appendChild(content);
   }
 }
 

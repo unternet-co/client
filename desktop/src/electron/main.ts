@@ -86,8 +86,8 @@ function createWindow() {
     // vibrancy: 'under-window',
     webPreferences: {
       webviewTag: true,
-      nodeIntegration: false,
-      contextIsolation: true,
+      nodeIntegration: false, // is default value after Electron v5
+      contextIsolation: true, // protect against prototype pollution
       preload: path.join(__dirname, 'preload.js'),
     },
     // Set icon based on platform
@@ -155,7 +155,7 @@ function createWindow() {
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
   } else {
-    win.loadFile(path.join(__dirname, 'index.html'));
+    win.loadFile(path.join(__dirname, 'web', 'index.html'));
   }
 }
 

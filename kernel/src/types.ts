@@ -3,8 +3,12 @@ import type {
   CoreUserMessage,
   CoreAssistantMessage,
   CoreToolMessage,
-  LanguageModel,
 } from 'ai';
+import { Interpreter } from './interpreter';
+
+export { Schema } from 'ai';
+
+/* Messages */
 
 export type Message =
   | CoreSystemMessage
@@ -17,8 +21,17 @@ export interface Interaction {
   outputs: InteractionOutput[];
 }
 
+/* Interactions */
+
 export interface InteractionInput {
-  text: string;
+  text?: string;
+  files?: FileInput[];
+}
+
+export interface FileInput {
+  data: Uint8Array;
+  filename?: string;
+  mimeType?: string;
 }
 
 export interface TextOutput {
@@ -34,7 +47,7 @@ export interface ActionOutput {
 
 export type InteractionOutput = TextOutput | ActionOutput;
 
-export type InterpreterResponse = TextResponse | ActionResponse;
+/* Interpreter */
 
 export interface TextResponse {
   type: 'text';
@@ -47,12 +60,17 @@ export interface ActionResponse {
   directive: ActionDirective;
 }
 
-export interface ActionDirective {
-  protocol: string;
-  resourceId?: string;
-  actionId?: string;
-  args?: Record<string, any>;
+export type InterpreterResponse = TextResponse | ActionResponse;
+
+export interface Strategy {
+  description: string;
+  method: (
+    interpreter: Interpreter,
+    interactions: Interaction[]
+  ) => AsyncGenerator<InterpreterResponse, any, Array<Interaction>>;
 }
+
+/* Resources */
 
 export interface ResourceIcon {
   src: string;
@@ -78,16 +96,25 @@ export interface Resource {
   actions?: Record<string, ActionDefinition>;
 }
 
-export type ProtocolHandler = (
-  directive: ActionDirective
-) => Promise<any> | any;
+/* Protocols */
 
 export interface Protocol {
   scheme: string;
   handler: ProtocolHandler;
 }
 
-export type StringEnum = [string, ...string[]];
+export type ProtocolHandler = (
+  directive: ActionDirective
+) => any | Promise<any>;
+
+export interface ActionDirective {
+  protocol: string;
+  resourceId?: string;
+  actionId?: string;
+  args?: Record<string, any>;
+}
+
+/* Helpers */
 
 export interface JSONSchemaDefinition {
   type:
@@ -105,3 +132,5 @@ export interface JSONSchemaDefinition {
   required?: string[];
   additionalProperties?: boolean;
 }
+
+export type StringEnum = [string, ...string[]];

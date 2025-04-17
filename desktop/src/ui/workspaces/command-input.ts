@@ -1,6 +1,6 @@
-import { InteractionInput } from '../../models/interactions';
-import { DisposableGroup } from '../../base/disposable';
-import { attachStyles, appendEl, createEl } from '../../utils/dom';
+import { InteractionInput } from '../../ai/interactions';
+import { DisposableGroup } from '../../common/disposable';
+import { attachStyles, appendEl, createEl } from '../../common/utils/dom';
 
 export class CommandSubmitEvent extends Event {
   public input: InteractionInput;
@@ -114,7 +114,7 @@ export class CommandInputElement extends HTMLElement {
 
     input:focus {
       text-align: left;
-      background: var(--color-bg-page);
+      background: var(--color-bg-input);
       border: 1px solid var(--color-border);
     }
 

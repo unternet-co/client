@@ -1,6 +1,6 @@
 {
   "name": "@unternet/kernel",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "",
   "license": "ISC",
   "author": "",
@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "chokidar 'src/**/*' -c 'npm run build'",
-    "run:example": "cd example && tsx src/index.ts"
+    "run:example": "cd example && npx tsx src/index.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",

@@ -1,4 +1,4 @@
-import { attachStyles, appendEl } from '../../utils/dom';
+import { attachStyles, appendEl } from '../../common/utils/dom';
 import { createElement, icons } from 'lucide';
 
 export const ICON_MAP = {
@@ -13,12 +13,15 @@ export const ICON_MAP = {
   handle: 'grip-horizontal',
   delete: 'trash',
   history: 'history',
+  refresh: 'refresh-cw',
+  error: 'alert-triangle',
+  loading: 'loader',
 } as const;
 
 export class IconElement extends HTMLElement {
   shadow: ShadowRoot;
   iconElement: SVGElement | null = null;
-  static observedAttributes = ['name'];
+  static observedAttributes = ['name', 'spin'];
 
   constructor() {
     super();
@@ -68,6 +71,15 @@ export class IconElement extends HTMLElement {
     }
     this.iconElement = this.getIcon(this.getAttribute('name'));
     appendEl(this.shadow, this.iconElement as unknown as HTMLElement);
+
+    if (this.hasAttribute('spin')) {
+      this.iconElement.classList.add('spin');
+      const spinValue = this.getAttribute('spin');
+      if (spinValue && spinValue !== '') {
+        this.iconElement.style.setProperty('--spin-duration', spinValue);
+      }
+    }
+
     attachStyles(this.shadow, this.styles);
   }
 
@@ -91,6 +103,21 @@ export class IconElement extends HTMLElement {
         width: 100%;
         height: 100%;
         display: block;
+      }
+      
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      
+      .spin {
+        --spin-duration: 2s;
+        animation: spin var(--spin-duration) linear infinite;
+        transform-origin: center;
       }
     `;
   }

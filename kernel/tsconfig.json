@@ -1,12 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "declaration": true,
-    "outDir": "./dist",
-    "esModuleInterop": true,
-    "moduleResolution": "nodenext",
-    "module": "NodeNext"
+    "target": "ES2020", // Target a modern ES standard
+    "module": "ESNext", // Use ESNext to support both environments
+    "moduleResolution": "node", // Node resolution strategy is the most compatible
+    "declaration": true, // Generate .d.ts files for type declarations
+    "outDir": "./dist", // Output directory for compiled files
+    "esModuleInterop": true, // Enables compatibility between CommonJS and ES Modules
+    "allowSyntheticDefaultImports": true, // Allows default imports from modules without default exports
+    "sourceMap": true, // Generates source maps for easier debugging
+    "declarationMap": true, // Generates declaration maps for easier consumption of your types
+    "skipLibCheck": true, // Skip type checking of all declaration files
+    "forceConsistentCasingInFileNames": true // Enforces consistent casing in file imports
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/.test.ts", "dist"]
+  "include": ["src/**/*"], // Include all TypeScript files in the src directory
+  "exclude": ["node_modules", "dist"] // Exclude node_modules and the build output directory
 }

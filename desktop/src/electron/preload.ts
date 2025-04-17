@@ -1,29 +1,29 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer } from 'electron';
 
-contextBridge.exposeInMainWorld("system", {
-  fetch: (url) => ipcRenderer.invoke("fetch", url),
+contextBridge.exposeInMainWorld('system', {
+  fetch: (url) => ipcRenderer.invoke('fetch', url),
 });
 
 // Expose simplified electron API for window state
-contextBridge.exposeInMainWorld("electronAPI", {
+contextBridge.exposeInMainWorld('electronAPI', {
   platform: process.platform,
   onWindowStateChange: (callback) => {
     // Handle fullscreen event
-    ipcRenderer.on("window:enter-fullscreen", () => {
+    ipcRenderer.on('window:enter-fullscreen', () => {
       callback(true);
     });
 
     // Handle exit fullscreen event
-    ipcRenderer.on("window:leave-fullscreen", () => {
+    ipcRenderer.on('window:leave-fullscreen', () => {
       callback(false);
     });
   },
 
-  isFullScreen: () => ipcRenderer.invoke("isFullScreen"),
+  isFullScreen: () => ipcRenderer.invoke('isFullScreen'),
 
   // Cleanup method
   removeWindowStateListeners: () => {
-    ipcRenderer.removeAllListeners("window:enter-fullscreen");
-    ipcRenderer.removeAllListeners("window:leave-fullscreen");
+    ipcRenderer.removeAllListeners('window:enter-fullscreen');
+    ipcRenderer.removeAllListeners('window:leave-fullscreen');
   },
 });

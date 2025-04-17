@@ -1,5 +1,5 @@
-import { ActionDirective, Protocol, ProtocolHandler } from './types.js';
-import { createProtocolHandlers } from './utils.js';
+import { ActionDirective, Protocol, ProtocolHandler } from './types';
+import { createProtocolHandlers } from './utils';
 
 export class Dispatcher {
   handlers: Record<string, ProtocolHandler> = {};
@@ -10,7 +10,7 @@ export class Dispatcher {
   }
 
   addProtocol(protocol: Protocol) {
-    this.handlers[protocol.scheme] = protocol.handler;
+    this.handlers[protocol.scheme] = protocol.handler.bind(protocol);
   }
 
   removeProtocol(protocol: Protocol | string) {
@@ -21,15 +21,14 @@ export class Dispatcher {
     }
   }
 
-  async dispatch(action: ActionDirective) {
-    const protocol = this.handlers[action.protocol];
+  async dispatch(directive: ActionDirective) {
+    const protocol = this.handlers[directive.protocol];
 
     if (!protocol) {
       throw new Error(
-        `The provided protocol scheme '${action.protocol}' has not been registered.`
+        `The provided protocol scheme '${directive.protocol}' has not been registered.`
       );
     }
-
-    return this.handlers[action.protocol](action);
+    return this.handlers[directive.protocol](directive);
   }
 }

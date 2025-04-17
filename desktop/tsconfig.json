@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "node16",
-    "lib": ["ES2020", "DOM"],
-    "outDir": "dist",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true
+    "target": "ES2020", // Use a modern target
+    "module": "ESNext", // Use ESNext for interoperability
+    "moduleResolution": "node", // Node-compatible module resolution
+    "outDir": "./dist", // Output directory
+    "declaration": true, // Generate declarations
+    "esModuleInterop": true, // Better interop with commonJS
+    "allowSyntheticDefaultImports": true, // Allows default imports from commonJS modules
+    "sourceMap": true, // generates sourcemaps
+    "declarationMap": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/electron"]
+  "include": ["src/**/*", "vite-env.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

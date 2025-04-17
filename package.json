@@ -63,12 +63,14 @@
     }
   },
   "scripts": {
+    "preinstall": "npm run build:kernel",
     "build": "npm run build:kernel && npm run build:desktop",
     "build:desktop": "cd desktop && rimraf dist && cross-env NODE_ENV=production npm run build",
     "build:kernel": "cd kernel && npm run build",
     "clean": "rimraf desktop/dist && rimraf kernel/dist && rm -rf dist",
     "dev": "npm run dev:desktop",
-    "dev:desktop": "NODE_ENV=development cd desktop && npm run dev",
+    "dev:desktop": "cd desktop && npm run dev",
+    "package": "npm run package:desktop",
     "package:desktop": "cd desktop && npm run package",
     "package:electron": "npm run package:all",
     "package:all": "electron-builder -mwl",
