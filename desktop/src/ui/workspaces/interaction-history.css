@@ -18,7 +18,7 @@ interaction-history .interaction {
   flex-direction: column;
   margin: 0 auto;
   width: 100%;
-  max-width: 64ch;
+  max-width: 72ch;
   gap: var(--space-4);
 }
 
