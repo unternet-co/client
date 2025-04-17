@@ -84,9 +84,7 @@ export class WorkspaceView extends HTMLElement {
 
   get template() {
     return html`
-      <div class="workspace-content">
-        <interaction-history for=${this.workspaceId}></interaction-history>
-      </div>
+      <interaction-history for=${this.workspaceId}></interaction-history>
       <div class="command-bar">
         <command-input
           @submit=${(e) => this.handleCommandSubmit(e)}

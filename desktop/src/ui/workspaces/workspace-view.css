@@ -7,7 +7,6 @@ workspace-view {
 }
 
 workspace-view .workspace-content {
-  flex-grow: 1;
   background: var(--color-bg-page);
   display: flex;
   justify-content: center;
