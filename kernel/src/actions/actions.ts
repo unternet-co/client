@@ -1,9 +1,8 @@
 import { ActionRecord, Resource } from './resources';
 
 export interface ActionDirective {
-  protocol: string;
-  resourceId?: string;
-  actionId?: string;
+  uri: string;
+  actionId: string;
   args?: Record<string, any>;
 }
 
@@ -21,38 +20,28 @@ export function createActionRecord(resources: Resource[]): ActionRecord {
   return actions;
 }
 
-// interface UriComponents {
-//   uri,
-//   actionId?: string;
-// }
+interface UriComponents {
+  uri: string;
+  actionId: string;
+}
 
-// export function encodeActionUri({
-//   protocol,
-//   resourceId,
-//   actionId,
-// }: UriComponents) {
-//   // <protocol>:<resource_uri>#<action_id>
-//   let uriString = '';
-//   if (protocol) uriString += `${protocol}:`;
-//   if (resourceId) uriString += encodeURIComponent(resourceId);
-//   if (actionId) uriString += `#${actionId}`;
-//   return uriString;
-// }
+// Create a full tool ID that incorporates the resource
+// for use ONLY by the model
+export function encodeActionHandle({ uri, actionId }: UriComponents) {
+  // https://my-applet.example.com->action_id
+  if (actionId) uri += `->${actionId}`;
+  return uri;
+}
 
-// export function decodeActionUri(encodedActionURI: string): UriComponents {
-//   let [protocol, ...rest] = encodedActionURI.split(':');
-//   let [resourceId, actionId] = rest.join(':').split('#');
+export function decodeActionHandle(actionHandle: string): UriComponents {
+  let [uri, actionId] = actionHandle.split('->');
 
-//   if (!resourceId || resourceId === 'undefined') {
-//     resourceId = undefined;
-//   } else {
-//     resourceId = decodeURIComponent(resourceId);
-//   }
-//   if (!actionId || actionId === 'undefined') actionId = undefined;
+  if (!actionId || !uri) {
+    throw new Error('Invalid action URI.');
+  }
 
-//   return {
-//     protocol,
-//     resourceId,
-//     actionId,
-//   };
-// }
+  return {
+    uri,
+    actionId,
+  };
+}

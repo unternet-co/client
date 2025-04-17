@@ -11,7 +11,7 @@ import {
 import { Workspace, WorkspaceModel } from '../workspaces';
 import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
-import { ResourceModel } from '../processes/resources';
+import { ResourceModel } from '../protocols/resources';
 import { Interaction } from './interactions';
 
 export interface KernelInit {

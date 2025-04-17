@@ -11,7 +11,7 @@ import { defaultStrategies, Strategy } from './strategies';
 import {
   ActionDirective,
   createActionRecord,
-  decodeActionUri,
+  decodeActionHandle,
 } from '../actions/actions';
 import { ActionDefinition, Resource } from '../actions/resources';
 import { Interaction } from './interactions';
@@ -253,12 +253,11 @@ export class Interpreter {
     });
 
     return tools.map((tool) => {
-      const { protocol, resourceId, actionId } = decodeActionUri(tool.id);
+      const { uri, actionId } = decodeActionHandle(tool.id);
       return {
         type: 'action',
         directive: {
-          protocol,
-          resourceId,
+          uri,
           actionId,
           args: tool.args,
         },

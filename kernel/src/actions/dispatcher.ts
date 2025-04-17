@@ -22,13 +22,14 @@ export class Dispatcher {
   }
 
   async dispatch(directive: ActionDirective) {
-    const protocol = this.handlers[directive.protocol];
+    const { protocol } = new URL(directive.uri);
 
     if (!protocol) {
       throw new Error(
-        `The provided protocol scheme '${directive.protocol}' has not been registered.`
+        `The protocol handler for '${protocol}' has not been registered.`
       );
     }
-    return this.handlers[directive.protocol](directive);
+
+    return this.handlers[protocol](directive);
   }
 }

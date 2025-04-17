@@ -6,7 +6,7 @@ import { dependencies } from '../../common/dependencies';
 import '../common/scroll-container';
 import '../common/markdown-text';
 import './interaction-history.css';
-import { ResourceModel } from '../../processes/resources';
+import { ResourceModel } from '../../protocols/resources';
 import { ActionOutput, TextOutput } from '@unternet/kernel';
 
 class InteractionHistory extends HTMLElement {

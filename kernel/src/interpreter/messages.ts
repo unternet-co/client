@@ -12,7 +12,7 @@ import {
   Interaction,
   TextOutput,
 } from './interactions';
-import { encodeActionUri } from '../actions/actions';
+import { encodeActionHandle } from '../actions/actions';
 
 export type Message =
   | CoreSystemMessage
@@ -61,7 +61,7 @@ export function createMessages(
       } else if (output.type === 'action') {
         const actionOutput = output as ActionOutput;
 
-        const actionUri = encodeActionUri(output.directive);
+        const actionUri = encodeActionHandle(output.directive);
         messages.push(
           createAssistantMessage(
             `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`
