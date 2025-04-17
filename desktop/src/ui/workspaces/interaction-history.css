@@ -37,7 +37,6 @@ interaction-history .interaction-input {
   padding: 0 var(--space-2);
   align-self: flex-start;
   font-weight: 500;
-  font-size: 16px;
 }
 
 interaction-history .interaction-output[data-type='text'] {
