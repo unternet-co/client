@@ -3,21 +3,20 @@ workspace-view {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
 }
 
 workspace-view .workspace-content {
+  flex-grow: 1;
   background: var(--color-bg-page);
   display: flex;
   justify-content: center;
+  overflow: hidden;
 }
 
-.command-bar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4);
-  bottom: 30px;
-  background: var(--color-bg-chrome);
+.bottom-bar {
+  padding: 0 var(--space-4);
+  padding-top: var(--space-5);
+  background: var(--color-bg-page);
   border-top: 1px solid var(--color-border);
+  background: var(--color-bg-chrome);
 }

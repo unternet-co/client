@@ -3,8 +3,7 @@ resource-bar {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 12px;
-  background: var(--color-bg-chrome);
+  padding: var(--space-4) 0;
   /* border-top: 1px solid var(--color-border);
   box-shadow: var(--button-shadows); */
 }
