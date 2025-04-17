@@ -262,7 +262,7 @@ export class HomePage extends HTMLElement {
           <span class="last-modified">${modifiedString}</span>
         </div>
         <un-button
-          type="negative"
+          type="ghost"
           class="delete-button"
           icon="delete"
           @click=${(e: PointerEvent) => this.handleClickDelete(e, workspace.id)}

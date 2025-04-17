@@ -192,7 +192,7 @@
   *******************************************************/
 
   /* text */
-  --color-text-disabled: var(--color-neutral-500);
+  --color-text-disabled: var(--color-neutral-00);
   --color-text-muted: var(--color-neutral-700);
   --color-text-default: var(--color-neutral-900);
   --color-text-strong: var(--color-neutral-1000);
@@ -226,7 +226,7 @@
     var(--color-grey-500) 100%,
     transparent 100%
   );
-  --shadow: 0 4px 6px var(--shadow-color);
+  --shadow: 0 12px 20px -16px var(--shadow-color);
   --shadow-inset: inset 0 1px 2px -1px var(--shadow-color-inset);
 
   /* highlight */
@@ -235,8 +235,8 @@
   /* overlay */
   --color-overlay: color-mix(
     in oklch,
-    var(--color-neutral-0) 100%,
-    transparent 75%
+    var(--color-neutral-100) 100%,
+    transparent 50%
   );
 
   /* Font size */
