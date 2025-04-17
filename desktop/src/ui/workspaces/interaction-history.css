@@ -36,23 +36,23 @@ interaction-history .interaction-input {
   padding: var(--space-1) var(--space-3);
   align-self: flex-start;
   font-weight: 500;
-  background: var(--color-neutral-100);
-  border: 1px solid var(--color-border-muted);
-  border-radius: var(--rounded);
 }
 
-interaction-history .interaction-output[data-type='text'] {
-  padding: var(--space-5) var(--space-6);
-  min-height: 36px;
+interaction-history .interaction-output {
   border-radius: var(--rounded);
   border: 1px solid var(--color-border-muted);
   background: var(--color-bg-content);
 }
 
+interaction-history .interaction-output[data-type='text'] {
+  padding: var(--space-4) var(--space-5);
+  min-height: 36px;
+}
+
 interaction-history .interaction-output[data-type='action'] {
+  padding: var(--space-2) var(--space-5);
   display: flex;
   align-items: center;
-  padding: var(--space-1) var(--space-4);
   gap: var(--space-2);
 }
 

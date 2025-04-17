@@ -205,7 +205,7 @@
   --color-bg-content: var(--color-neutral-0);
 
   /* borders */
-  --color-border-muted: var(--color-neutral-200);
+  --color-border-muted: var(--color-neutral-100);
   --color-border-default: var(--color-neutral-200);
   --color-border-strong: var(--color-neutral-300);
   --color-border: var(--color-border-default);
