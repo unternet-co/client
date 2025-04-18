@@ -59,12 +59,12 @@ export function createMessages(
         const textOutput = output as TextOutput;
         messages.push(createAssistantMessage(textOutput.content));
       } else if (output.type === 'action') {
-        const actionOutput = output as ActionOutput;
+        const { directive, content } = output as ActionOutput;
 
-        const actionUri = encodeActionHandle(output.directive);
+        const actionUri = encodeActionHandle(directive.uri, directive.actionId);
         messages.push(
           createAssistantMessage(
-            `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`
+            `Action called: ${actionUri}.\nOutput:${JSON.stringify(content)}`
           )
         );
       }
