@@ -1,4 +1,6 @@
-import { css } from 'lit';
+import { LitElement, html, css } from 'lit';
+import { classMap } from 'lit/directives/class-map.js';
+import './icon'; // Import icon component to ensure it's registered
 
 export type ButtonType =
   | 'primary'
@@ -7,105 +9,129 @@ export type ButtonType =
   | 'outline'
   | 'ghost';
 
-export class ButtonElement extends HTMLElement {
-  private button: HTMLButtonElement;
-  private buttonContent: string = '';
+export type ButtonSize = 'small' | 'medium' | 'large';
+
+export type IconPosition = 'start' | 'end';
+
+export class ButtonElement extends LitElement {
+  type: ButtonType;
+  size: ButtonSize;
+  text: string;
+  icon?: string;
+  iconPosition: IconPosition;
+  disabled: boolean;
+  loading: boolean;
+  title: string;
+  private buttonElement: HTMLButtonElement | null = null;
+
+  static get properties() {
+    return {
+      type: { type: String },
+      size: { type: String },
+      text: { type: String },
+      icon: { type: String },
+      iconPosition: { type: String, attribute: 'icon-position' },
+      disabled: { type: Boolean },
+      loading: { type: Boolean },
+      title: { type: String },
+    };
+  }
 
   constructor() {
     super();
-    this.buttonContent = this.textContent || '';
-    this.button = document.createElement('button');
-    this.button.addEventListener('click', this.handleClick.bind(this));
-
-    // Create shadow DOM and add button
-    this.attachShadow({ mode: 'open' });
-
-    // Add styles to shadow DOM
-    const style = document.createElement('style');
-    style.textContent = ButtonElement.styles.toString();
-    this.shadowRoot!.appendChild(style);
-    this.shadowRoot!.appendChild(this.button);
-
-    // Create a slot to handle children
-    const slot = document.createElement('slot');
-    this.button.appendChild(slot);
+    this.type = 'primary';
+    this.size = 'medium';
+    this.text = '';
+    this.icon = undefined;
+    this.iconPosition = 'start';
+    this.disabled = false;
+    this.loading = false;
+    this.title = '';
   }
 
   connectedCallback() {
-    this.updateButton();
+    super.connectedCallback();
+    this.addEventListener('keydown', this.handleKeyDown);
   }
 
   disconnectedCallback() {
-    this.button.removeEventListener('click', this.handleClick.bind(this));
+    super.disconnectedCallback();
+    this.removeEventListener('keydown', this.handleKeyDown);
   }
 
-  static get observedAttributes() {
-    return ['type', 'disabled', 'text', 'title'];
+  firstUpdated() {
+    this.buttonElement = this.shadowRoot?.querySelector('button') || null;
   }
 
-  attributeChangedCallback(
-    name: string,
-    _: string | null,
-    newValue: string | null
-  ) {
-    if (!this.button) return;
-
-    switch (name) {
-      case 'type':
-        this.updateButtonClasses();
-        break;
-      case 'disabled':
-        this.button.disabled = newValue !== null;
-        break;
-      case 'text':
-        this.button.textContent = this.buttonText;
-        break;
-      case 'title':
-        this.button.title = newValue || '';
-        break;
-    }
-  }
-
-  private get buttonType(): ButtonType {
-    return (this.getAttribute('type') as ButtonType) || 'primary';
-  }
-
-  private get isDisabled(): boolean {
-    return this.hasAttribute('disabled');
-  }
-
-  private get buttonText(): string {
-    return this.getAttribute('text') || this.buttonContent || '';
-  }
-
-  private handleClick(e: Event) {
-    e.stopPropagation();
-    if (this.isDisabled) {
+  /**
+   * For keyboard accessibility, fire a click when enter is pressed
+   */
+  private handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' && !this.disabled && !this.loading) {
       e.preventDefault();
-      return;
+      this.buttonElement?.click();
     }
-    this.dispatchEvent(
-      new CustomEvent('click', {
-        bubbles: true,
-        composed: true,
-      })
-    );
+  };
+
+  /**
+   * This is needed for proper focus management in modals and keyboard navigation
+   */
+  focus() {
+    this.buttonElement?.focus();
   }
 
-  private updateButtonClasses() {
-    this.button.className = 'button';
-    if (this.buttonType !== 'primary') {
-      this.button.classList.add(`button--${this.buttonType}`);
-    }
-  }
+  render() {
+    const buttonClasses = {
+      button: true,
+      [`button--${this.type}`]: this.type !== 'primary',
+      [`button--${this.size}`]: this.size !== 'medium',
+      loading: this.loading,
+    };
 
-  private updateButton() {
-    this.updateButtonClasses();
-    this.button.disabled = this.isDisabled;
-    if (!this.hasChildNodes() && this.hasAttribute('text')) {
-      this.button.textContent = this.buttonText;
-    }
-    this.button.title = this.getAttribute('title') || '';
+    const hasSlotContent = this.hasChildNodes();
+    const showText = !hasSlotContent && this.text;
+
+    return html`
+      <button
+        part="button"
+        class=${classMap(buttonClasses)}
+        ?disabled=${this.disabled || this.loading}
+        title=${this.title}
+        aria-busy=${this.loading ? 'true' : 'false'}
+        aria-disabled=${this.disabled ? 'true' : 'false'}
+      >
+        ${this.icon && this.iconPosition === 'start'
+          ? html`
+              <span class="icon-container icon-start">
+                ${this.loading
+                  ? html`
+                      <un-icon name="loading" size=${this.size} spin></un-icon>
+                    `
+                  : html`
+                      <un-icon name=${this.icon} size=${this.size}></un-icon>
+                    `}
+              </span>
+            `
+          : ''}
+        ${showText ? this.text : html`<slot></slot>`}
+        ${this.icon && this.iconPosition === 'end'
+          ? html`
+              <span class="icon-container icon-end">
+                ${this.loading
+                  ? html`
+                      <un-icon name="loading" size=${this.size} spin></un-icon>
+                    `
+                  : html`
+                      <un-icon name=${this.icon} size=${this.size}></un-icon>
+                    `}
+              </span>
+            `
+          : ''}
+        ${this.loading && !this.icon
+          ? html` <un-icon name="loading" spin size=${this.size}></un-icon> `
+          : ''}
+      </button>
+    `;
   }
 
   static get styles() {
@@ -115,42 +141,40 @@ export class ButtonElement extends HTMLElement {
       }
 
       .button {
+        --button-height: 24px;
         --button-color: var(--color-action-800);
         --button-text-color: var(--color-action-0);
-        padding: var(--space-4);
+        padding-left: var(--space-4);
+        padding-right: var(--space-4);
+        overflow: hidden;
         border: none;
-        border-radius: var(--rounded-sm);
-        cursor: pointer;
+        border-radius: var(--rounded);
         display: flex;
         align-items: center;
         justify-content: center;
+        height: var(--button-height);
+        line-height: var(--button-height);
         gap: var(--space-2);
-        line-height: 1;
-        transition:
-          background-color 0.2s,
-          opacity 0.2s;
+        transition: all 100ms;
         background-color: var(--button-color);
         color: var(--button-text-color);
-        box-shadow:
-          inset 0 1px 1px 0px
-            color-mix(in srgb, var(--color-grey-0) 25%, transparent 100%),
-          inset 0 -1px 1px 0px
-            color-mix(in srgb, var(--color-grey-1000) 25%, transparent 100%);
+        box-shadow: var(--button-shadows);
       }
 
-      .button:hover:not(:disabled),
-      .button:focus:not(:disabled) {
-        outline: 1px solid var(--color-outline);
+      .button:hover,
+      .button:focus {
         background-color: color-mix(
           in oklch,
           var(--button-color) 100%,
-          var(--color-action-0) 15%
+          var(--color-grey-0) 25%
         );
       }
 
       .button:disabled {
         cursor: not-allowed;
-        opacity: 0.6;
+        pointer-events: none;
+        opacity: 0.5;
+        box-shadow: none;
       }
 
       .button--secondary {
@@ -158,7 +182,7 @@ export class ButtonElement extends HTMLElement {
         --button-text-color: var(--color-neutral-1000);
       }
 
-      .button--secondary:hover:not(:disabled) {
+      .button--secondary:hover {
         --button-text-color: var(--color-action-800);
       }
 
@@ -168,16 +192,15 @@ export class ButtonElement extends HTMLElement {
       }
 
       .button--outline {
-        --button-color: currentColor;
+        --button-color: transparent;
         --button-text-color: currentColor;
-        background-color: transparent;
-        border: 1px solid var(--button-color);
+        border: 1px solid
+          color-mix(in oklch, currentColor 85%, transparent 100%);
         box-shadow: none;
       }
 
-      .button--outline:hover:not(:disabled),
-      .button--outline:focus:not(:disabled) {
-        background-color: transparent;
+      .button--outline:hover {
+        border-color: currentColor;
       }
 
       .button--ghost {
@@ -186,13 +209,48 @@ export class ButtonElement extends HTMLElement {
         box-shadow: none;
       }
 
-      .button--ghost:hover:not(:disabled) {
-        --button-color: color-mix(
-          in srgb,
-          var(--color-action-800) 15%,
-          transparent 100%
-        );
+      .button--ghost:hover,
+      .button--outline:hover {
+        --button-color: var(--color-neutral-100);
         background-blend-mode: multiply;
+        opacity: 1;
+      }
+
+      .button:focus {
+        outline: var(--outline);
+        outline-offset: var(--outline-offset);
+      }
+
+      /* Hides outline eg. after mouse click, when it's not a helpful indicator */
+      .button:focus:not(:focus-visible) {
+        outline: none;
+      }
+
+      .button:active {
+        box-shadow: none;
+        background-color: var(--button-color);
+      }
+
+      .button.loading {
+        pointer-events: none;
+      }
+
+      .button--small {
+        --button-height: 18px;
+        font-size: var(--text-sm);
+      }
+
+      .button--large {
+        --button-height: 28px;
+      }
+
+      .icon-container {
+        display: flex;
+        align-items: center;
+        opacity: 0.75;
+      }
+
+      .button:hover .icon-container {
         opacity: 1;
       }
     `;

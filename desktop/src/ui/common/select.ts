@@ -1,4 +1,5 @@
-import { css } from 'lit';
+import { LitElement, html, css } from 'lit';
+import { classMap } from 'lit/directives/class-map.js';
 import './icon';
 
 export interface SelectOption {
@@ -7,11 +8,153 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
-export class SelectElement extends HTMLElement {
-  private select: HTMLSelectElement;
-  private wrapper: HTMLDivElement;
-  private icon: HTMLElement;
-  private mutationObserver: MutationObserver;
+export type SelectSize = 'small' | 'medium' | 'large';
+export type SelectVariant = 'default' | 'ghost' | 'flat';
+export type IconPosition = 'start' | 'end';
+
+export class SelectElement extends LitElement {
+  value: string = '';
+  placeholder: string = '';
+  disabled: boolean = false;
+  required: boolean = false;
+  name: string = '';
+  size: SelectSize = 'medium';
+  variant: SelectVariant = 'default';
+  loading: boolean = false;
+  icon?: string;
+  iconPosition: IconPosition = 'end';
+
+  static get properties() {
+    return {
+      value: { type: String },
+      placeholder: { type: String },
+      disabled: { type: Boolean },
+      required: { type: Boolean },
+      name: { type: String },
+      size: { type: String },
+      variant: { type: String },
+      loading: { type: Boolean },
+      icon: { type: String },
+      iconPosition: { type: String, attribute: 'icon-position' },
+    };
+  }
+
+  constructor() {
+    super();
+    this.size = 'medium';
+    this.variant = 'default';
+    this.loading = false;
+    this.icon = undefined;
+    this.iconPosition = 'end';
+  }
+
+  private handleChange(e: Event) {
+    const select = e.target as HTMLSelectElement;
+    this.value = select.value;
+
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  focus() {
+    const select = this.shadowRoot?.querySelector('select');
+    if (select) {
+      select.focus();
+    }
+  }
+
+  blur() {
+    const select = this.shadowRoot?.querySelector('select');
+    if (select) {
+      select.blur();
+    }
+  }
+
+  private get options(): SelectOption[] {
+    return Array.from(this.children).map((el) => ({
+      value: el.getAttribute('value') || '',
+      label: el.textContent || '',
+      disabled: el.hasAttribute('disabled'),
+    }));
+  }
+
+  render() {
+    const selectClasses = {
+      select: true,
+      [`select--${this.size}`]: this.size !== 'medium',
+      [`select--${this.variant}`]: this.variant !== 'default',
+      loading: this.loading,
+    };
+
+    const optionElements = [];
+
+    if (this.placeholder) {
+      optionElements.push(html`
+        <option value="" disabled ?selected=${!this.value}>
+          ${this.placeholder}
+        </option>
+      `);
+    }
+
+    this.options.forEach((opt) => {
+      optionElements.push(html`
+        <option
+          value=${opt.value}
+          ?disabled=${opt.disabled}
+          ?selected=${this.value === opt.value}
+        >
+          ${opt.label}
+        </option>
+      `);
+    });
+
+    return html`
+      <div
+        class="select-wrapper ${this.size !== 'medium'
+          ? `select-wrapper--${this.size}`
+          : ''} ${this.icon ? `has-icon icon-${this.iconPosition}` : ''}"
+      >
+        ${this.icon && this.iconPosition === 'start'
+          ? html`<un-icon
+              class="value-icon value-icon-start"
+              name=${this.icon}
+              size=${this.size}
+            ></un-icon>`
+          : ''}
+        <select
+          class=${classMap(selectClasses)}
+          .value=${this.value}
+          ?disabled=${this.disabled || this.loading}
+          ?required=${this.required}
+          name=${this.name}
+          @change=${this.handleChange}
+          aria-busy=${this.loading ? 'true' : 'false'}
+        >
+          ${optionElements}
+        </select>
+        ${this.icon && this.iconPosition === 'end'
+          ? html`<un-icon
+              class="value-icon value-icon-end"
+              name=${this.icon}
+              size=${this.size}
+            ></un-icon>`
+          : ''}
+        ${this.loading
+          ? html`<un-icon
+              class="dropdown-icon"
+              name="loading"
+              spin
+              size=${this.size}
+            ></un-icon>`
+          : html`<un-icon class="dropdown-icon" name="dropdown"></un-icon>`}
+      </div>
+    `;
+  }
 
   static get styles() {
     return css`
@@ -25,207 +168,138 @@ export class SelectElement extends HTMLElement {
         width: 100%;
       }
 
-      select {
+      .select {
+        --select-height: 24px;
         width: 100%;
-        padding: var(--space-3);
-        padding-right: var(--space-8);
-        border: 1px solid var(--color-border);
-        border-radius: var(--rounded-sm);
-        background-color: var(--color-bg-input);
-        color: var(--color-text);
+        height: var(--select-height);
+        padding: 0 var(--space-8) 0 var(--space-4);
+        border-radius: var(--rounded);
+        background-color: var(--input-bg-color);
+        color: var(--input-text-color);
         font-family: inherit;
         font-size: inherit;
-        line-height: 1.5;
+        line-height: var(--select-height);
         appearance: none;
-        cursor: pointer;
         box-sizing: border-box;
+        border: 1px solid var(--input-border-color);
+        border-top-color: color-mix(
+          in srgb,
+          var(--input-border-color) 100%,
+          transparent 50%
+        );
+        box-shadow: var(--button-shadows);
       }
 
-      select:focus {
-        outline: 2px solid var(--color-outline);
-        outline-offset: -1px;
+      .select:focus {
+        outline: var(--outline);
+        outline-offset: var(--outline-offset-inputs);
       }
 
-      select:disabled {
-        opacity: 0.6;
+      .select:disabled,
+      .select.loading {
+        opacity: 0.5;
         cursor: not-allowed;
       }
 
-      select option:disabled {
-        color: var(--color-text-subtle);
+      .loading {
+        pointer-events: none;
       }
 
-      un-icon {
+      .select option:disabled {
+        color: var(--input-placeholder-color);
+      }
+
+      .select--small {
+        --select-height: 18px;
+        font-size: var(--text-sm);
+      }
+
+      .select--large {
+        --select-height: 28px;
+      }
+
+      .select--ghost {
+        border-color: transparent;
+        background-color: transparent;
+        box-shadow: none;
+      }
+
+      .select-wrapper:has(.select--ghost):hover un-icon.dropdown-icon {
+        opacity: 1;
+      }
+
+      .select--flat {
+        border-color: transparent;
+        box-shadow: none;
+        mix-blend-mode: multiply;
+        background-color: var(--input-bg-color-flat);
+      }
+
+      .select--flat + un-icon.dropdown-icon,
+      .select--flat ~ un-icon.dropdown-icon {
+        border-left-color: transparent;
+      }
+
+      un-icon.dropdown-icon {
         position: absolute;
-        right: var(--space-3);
+        right: 1px;
         top: 50%;
         transform: translateY(-50%);
         pointer-events: none;
-        color: var(--color-text);
+        color: var(--color-text-muted);
+        border-left: 1px solid
+          color-mix(in srgb, var(--input-border-color) 100%, transparent 50%);
+        height: 100%;
+        width: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .select--ghost + un-icon.dropdown-icon,
+      .select--ghost ~ un-icon.dropdown-icon {
+        border: 1px solid var(--input-border-color);
+        border-top-color: color-mix(
+          in srgb,
+          var(--input-border-color) 100%,
+          transparent 50%
+        );
+        box-shadow: var(--button-shadows);
+        border-radius: var(--rounded);
+        height: 16px;
+        width: 16px;
+        right: var(--space-2);
+      }
+
+      un-icon.value-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--input-text-color);
+        z-index: 1;
+      }
+
+      un-icon.value-icon-start {
+        left: var(--space-4);
+      }
+
+      un-icon.value-icon-end {
+        right: calc(20px + var(--space-4));
+      }
+
+      .has-icon.icon-start select {
+        padding-left: calc(var(--space-4) + 16px);
+      }
+
+      .has-icon.icon-end select {
+        padding-right: calc(var(--space-8) + 16px);
       }
 
       select:disabled + un-icon {
-        opacity: 0.6;
+        opacity: 0.5;
       }
     `;
-  }
-
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-
-    this.wrapper = document.createElement('div');
-    this.wrapper.className = 'select-wrapper';
-
-    this.select = document.createElement('select');
-    this.select.addEventListener('change', this.handleChange.bind(this));
-
-    this.icon = document.createElement('un-icon');
-    this.icon.setAttribute('name', 'dropdown');
-
-    this.wrapper.appendChild(this.select);
-    this.wrapper.appendChild(this.icon);
-
-    // Create a mutation observer to watch for changes to child elements
-    this.mutationObserver = new MutationObserver(
-      this.handleMutations.bind(this)
-    );
-  }
-
-  static get observedAttributes() {
-    return ['value', 'disabled', 'placeholder'];
-  }
-
-  connectedCallback() {
-    // Add styles
-    const style = document.createElement('style');
-    style.textContent = SelectElement.styles.toString();
-    this.shadowRoot!.appendChild(style);
-
-    this.shadowRoot!.appendChild(this.wrapper);
-    this.updateSelect();
-
-    // Start observing changes to child elements
-    this.mutationObserver.observe(this, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-
-    // Also listen for the custom optionsChanged event
-    this.addEventListener('optionsChanged', () => this.updateSelect());
-  }
-
-  attributeChangedCallback(
-    name: string,
-    _: string | null,
-    newValue: string | null
-  ) {
-    if (!this.select) return;
-
-    switch (name) {
-      case 'value':
-        this.select.value = newValue || '';
-        break;
-      case 'disabled':
-        this.select.disabled = newValue !== null;
-        break;
-      case 'placeholder':
-        this.updateSelect();
-        break;
-    }
-  }
-
-  disconnectedCallback() {
-    // Stop observing when element is removed from the DOM
-    this.mutationObserver.disconnect();
-  }
-
-  get value(): string {
-    return this.getAttribute('value') || '';
-  }
-
-  set value(newValue: string) {
-    this.setAttribute('value', newValue);
-  }
-
-  private get options(): SelectOption[] {
-    return Array.from(this.children).map((el) => ({
-      value: el.getAttribute('value') || '',
-      label: el.textContent || '',
-      disabled: el.hasAttribute('disabled'),
-    }));
-  }
-
-  private handleChange(e: Event) {
-    const select = e.target as HTMLSelectElement;
-    this.value = select.value;
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: { value: this.value },
-      })
-    );
-  }
-
-  private handleMutations(mutations: MutationRecord[]) {
-    // Check if any of the mutations are relevant to our options
-    const shouldUpdate = mutations.some((mutation) => {
-      // If options were added or removed
-      if (mutation.type === 'childList') {
-        return true;
-      }
-
-      // If option text or attributes changed
-      if (mutation.type === 'characterData' || mutation.type === 'attributes') {
-        const target = mutation.target as Node;
-        // Check if the mutation happened within an option element
-        return (
-          this.contains(target) ||
-          (target.parentNode && this.contains(target.parentNode))
-        );
-      }
-
-      return false;
-    });
-
-    if (shouldUpdate) {
-      console.log('Select options changed, updating select element');
-      this.updateSelect();
-    }
-  }
-
-  private updateSelect() {
-    // Clear existing options
-    while (this.select.firstChild) {
-      this.select.removeChild(this.select.firstChild);
-    }
-
-    // Add placeholder if exists
-    const placeholder = this.getAttribute('placeholder');
-    if (placeholder) {
-      const option = document.createElement('option');
-      option.value = '';
-      option.textContent = placeholder;
-      option.disabled = true;
-      option.selected = !this.value;
-      this.select.appendChild(option);
-    }
-
-    // Add options from slot
-    this.options.forEach((opt) => {
-      const option = document.createElement('option');
-      option.value = opt.value;
-      option.textContent = opt.label;
-      option.disabled = opt.disabled || false;
-      this.select.appendChild(option);
-    });
-
-    // Set current value
-    this.select.value = this.value;
-    this.select.disabled = this.hasAttribute('disabled');
   }
 }
 
