@@ -12,6 +12,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "chokidar 'src/**/*' -c 'npm run build'",
+    "docs": "typedoc",
     "example": "cd example && npx tsx src/index.ts",
     "test": "vitest --root tests --watch=false",
     "test:dev": "vitest --root tests --watch"
@@ -33,6 +34,7 @@
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
     "mime-types": "^3.0.1",
+    "typedoc": "^0.28.2",
     "typescript": "^5.8.2",
     "vitest": "^3.1.1"
   }
