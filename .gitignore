@@ -7,3 +7,4 @@ node_modules/
 .vscode/
 dist
 /kernel/docs/
+release/
