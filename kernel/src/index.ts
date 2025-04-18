@@ -1,4 +1,8 @@
-export { Interpreter } from './interpreter/interpreter';
+export {
+  Interpreter,
+  TextResponse,
+  ActionResponse,
+} from './interpreter/interpreter';
 export * from './interpreter/interactions';
 export { Protocol, ProtocolHandler } from './actions/protocols';
 export { Resource } from './actions/resources';
