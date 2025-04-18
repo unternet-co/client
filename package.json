@@ -80,6 +80,7 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron-builder": "^26.0.12",
+    "ftp": "^0.3.10",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
