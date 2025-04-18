@@ -31,13 +31,18 @@ jobs:
           cache: 'npm'
 
       - name: Clean install to fix optional native module bug
+        shell: bash
+        if: matrix.os != 'windows-latest'
         run: |
-          if (${{ matrix.os }} -eq "windows-latest") {
-            Remove-Item -Recurse -Force node_modules
-            Remove-Item package-lock.json
-          } else {
-            rm -rf node_modules package-lock.json
-          }
+          rm -rf node_modules package-lock.json
+          npm install
+
+      - name: Clean install to fix optional native module bug (Windows)
+        shell: pwsh
+        if: matrix.os == 'windows-latest'
+        run: |
+          Remove-Item -Recurse -Force node_modules
+          Remove-Item package-lock.json
           npm install
 
       - name: Build and release (macOS)
