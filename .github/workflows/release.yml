@@ -30,15 +30,16 @@ jobs:
           node-version: '22.14.0'
           cache: 'npm'
 
-      - name: Clean install to fix optional native module bug (non-Windows)
+      - name: Clean install to fix optional native module bug
+        shell: bash
         if: matrix.os != 'windows-latest'
         run: |
           rm -rf node_modules package-lock.json
           npm install
 
       - name: Clean install to fix optional native module bug (Windows)
-        if: matrix.os == 'windows-latest'
         shell: pwsh
+        if: matrix.os == 'windows-latest'
         run: |
           if (Test-Path node_modules) {
             Remove-Item -Recurse -Force node_modules
@@ -74,7 +75,15 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
 
-      - name: Upload artifacts (per OS)
+      - name: Rename latest.yml files
+        shell: bash
+        run: |
+          mkdir -p release
+          if [ -f release/latest.yml ]; then mv release/latest.yml release/latest-mac.yml; fi
+          if [ -f release/release-files-ubuntu-latest/latest.yml ]; then mv release/release-files-ubuntu-latest/latest.yml release/latest-linux.yml; fi
+          if [ -f release/release-files-windows-latest/latest.yml ]; then mv release/release-files-windows-latest/latest.yml release/latest-win.yml; fi
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: release-files-${{ matrix.os }}
@@ -85,21 +94,17 @@ jobs:
     name: Upload to FTP
     needs: package
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Download all artifacts (flattened)
+      - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: release
 
       - name: Install FTP client dependency
         run: npm install ftp
-
-      - name: List release contents
-        run: find release -type f
 
       - name: Upload to FTP
         run: node scripts/upload-ftp.js
