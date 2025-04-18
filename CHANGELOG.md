@@ -1,3 +1,7 @@
+## 0.3.6
+
+- Merge branch 'unternet-co:main' into main
+
 ## 0.3.5
 
 - Add ability to search the web (#129)
