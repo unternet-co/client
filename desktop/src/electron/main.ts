@@ -32,9 +32,9 @@ function setupAutoUpdater() {
   }
 
   autoUpdater.setFeedURL({
-    provider: 'github',
-    owner: 'unternet-co',
-    repo: 'client',
+    provider: 'generic',
+    url: 'https://www.charlebois.solutions/dev/unternet/',
+    channel: 'latest',
   });
 
   // Check for updates

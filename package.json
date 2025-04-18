@@ -1,6 +1,6 @@
 {
   "name": "@unternet/client",
-  "version": "0.3.4",
+  "version": "0.3.12",
   "description": "Unternet Client",
   "author": {
     "name": "Rupert Manfredi",
@@ -22,11 +22,6 @@
     ],
     "directories": {
       "output": "release"
-    },
-    "publish": {
-      "provider": "generic",
-      "url": "ftp://ftp.koumbit.net",
-      "channel": "latest"
     },
     "mac": {
       "category": "public.app-category.developer-tools",
