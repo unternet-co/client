@@ -32,7 +32,12 @@ jobs:
 
       - name: Clean install to fix optional native module bug
         run: |
-          rm -rf node_modules package-lock.json
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            rmdir /s /q node_modules
+            del package-lock.json
+          else
+            rm -rf node_modules package-lock.json
+          fi
           npm install
 
       - name: Build and release (macOS)
