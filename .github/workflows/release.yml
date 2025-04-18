@@ -43,7 +43,6 @@ jobs:
           release: true
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
-          args: '--publish always'
         env:
           APPLE_ID: ${{ secrets.apple_id }}
           APPLE_ID_PASS: ${{ secrets.apple_id_pass }}
@@ -57,7 +56,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
-          args: '--publish always'
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
