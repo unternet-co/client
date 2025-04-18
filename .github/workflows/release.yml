@@ -70,6 +70,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
+          args: --publish never
         env:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
@@ -93,6 +94,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release
+
+      - name: Install FTP client dependency
+        run: npm install ftp
 
       - name: Upload to FTP
         run: node scripts/upload-ftp.js
