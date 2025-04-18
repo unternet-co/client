@@ -74,16 +74,10 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
 
-      - name: Ensure release folder is populated (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          mkdir -p release
-          cp -r desktop/release/* release/ || echo "Nothing to copy"
-
-      - name: Upload flattened artifacts
+      - name: Upload artifacts (per OS)
         uses: actions/upload-artifact@v4
         with:
-          name: flattened-release-files
+          name: release-files-${{ matrix.os }}
           path: release/
           if-no-files-found: error
 
@@ -96,14 +90,16 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Download flattened artifacts
+      - name: Download all artifacts (flattened)
         uses: actions/download-artifact@v4
         with:
-          name: flattened-release-files
           path: release
 
       - name: Install FTP client dependency
         run: npm install ftp
+
+      - name: List release contents
+        run: find release -type f
 
       - name: Upload to FTP
         run: node scripts/upload-ftp.js
