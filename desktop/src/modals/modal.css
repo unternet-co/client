@@ -40,7 +40,13 @@
 
 .modal-contents {
   padding: var(--space-6);
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+}
+
+.modal-container[data-padding='none'] .modal-contents {
+  padding: 0;
 }
 
 .modal-container[data-size='full'] {

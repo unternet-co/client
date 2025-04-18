@@ -20,6 +20,7 @@ import './modals/global/settings-modal';
 import './ui/app-root';
 import { ResourceModel, initialResources } from './protocols/resources';
 import { protocols } from './protocols/protocols';
+import './modals/global/bug-modal';
 
 /* Initialize databases & stores */
 
@@ -81,6 +82,11 @@ dependencies.registerSingleton('ModalService', modalService);
 modalService.register('settings', {
   title: 'Settings',
   element: 'settings-modal',
+});
+
+modalService.register('bug', {
+  title: 'Report a bug',
+  element: 'bug-modal',
 });
 
 /* Register keyboard shortcuts */
