@@ -7,13 +7,34 @@ export interface ResourceIcon {
   type?: string;
 }
 
+/**
+ * A definition of an action.
+ *
+ * Lets the assistant know what inputs can be given
+ * in order to do something.
+ *
+ * {@link ActionDirective} Passing action parameters around.
+ * {@link Protocol} Processing actions.
+ */
 export interface ActionDefinition {
   description?: string;
   params_schema?: JSONSchemaDefinition;
 }
 
+/**
+ * Action dictionary, indexed by the action id.
+ */
 export type ActionRecord = { [id: string]: ActionDefinition };
 
+/**
+ * The properties needed to create a resource.
+ *
+ * A resource is anything that a model might use to get information
+ * or perform an action in response to an input.
+ *
+ * Or, in other words, it specifies how a `Protocol` could be consumed,
+ * along with some additional (optional) metadata.
+ */
 interface ResourceInit {
   uri?: string;
   protocol?: string;
@@ -21,9 +42,16 @@ interface ResourceInit {
   short_name?: string;
   icons?: ResourceIcon[];
   description?: string;
-  actions?: Record<string, ActionDefinition>;
+  actions?: ActionRecord;
 }
 
+/**
+ * A resource is anything that a model might use to get information
+ * or perform an action in response to an input.
+ *
+ * Or, in other words, it specifies how a `Protocol` could be consumed,
+ * along with some additional (optional) metadata.
+ */
 export class Resource {
   uri: string;
   protocol: string;
@@ -36,7 +64,7 @@ export class Resource {
   short_name?: string;
   icons?: ResourceIcon[];
   description?: string;
-  actions?: Record<string, ActionDefinition>;
+  actions?: ActionRecord;
 
   constructor(init: ResourceInit) {
     let urlObject: URL;

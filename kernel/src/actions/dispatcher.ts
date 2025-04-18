@@ -1,6 +1,10 @@
 import { ActionDirective } from './actions';
 import { createProtocolHandlers, Protocol, ProtocolHandler } from './protocols';
 
+/**
+ * Dispatchers pass on the action directives to their associated
+ * protocol handler based on the protocol used in the directive URI.
+ */
 export class Dispatcher {
   handlers: Record<string, ProtocolHandler> = {};
 

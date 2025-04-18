@@ -29,6 +29,13 @@ export interface ActionOutput {
   content: any;
 }
 
+/**
+ * Utility function to create an `Interaction`
+ * based on a `InteractionInput` or a regular string.
+ *
+ * @param input The input for the interaction.
+ * @returns The interaction.
+ */
 export function createInteraction(
   input: InteractionInput | string
 ): Interaction {
