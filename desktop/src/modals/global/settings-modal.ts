@@ -68,6 +68,11 @@ export class SettingsModal extends ModalElement {
     this.close();
   }
 
+  private handleHintInput(event: InputEvent) {
+    const target = event.target as HTMLTextAreaElement;
+    this.globalHint = target.value;
+  }
+
   private handleProviderChange = async (event: CustomEvent) => {
     this.selectedModel = null;
     this.modelError = null;
@@ -138,8 +143,7 @@ export class SettingsModal extends ModalElement {
         </p>
         <un-textarea
           value=${this.globalHint}
-          @change=${(event: CustomEvent) =>
-            (this.globalHint = event.detail.value)}
+          @input=${this.handleHintInput.bind(this)}
           rows="4"
         ></un-textarea>
       </div>
