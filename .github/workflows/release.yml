@@ -30,16 +30,15 @@ jobs:
           node-version: '22.14.0'
           cache: 'npm'
 
-      - name: Clean install to fix optional native module bug
-        shell: bash
+      - name: Clean install to fix optional native module bug (non-Windows)
         if: matrix.os != 'windows-latest'
         run: |
           rm -rf node_modules package-lock.json
           npm install
 
       - name: Clean install to fix optional native module bug (Windows)
-        shell: pwsh
         if: matrix.os == 'windows-latest'
+        shell: pwsh
         run: |
           if (Test-Path node_modules) {
             Remove-Item -Recurse -Force node_modules
@@ -75,10 +74,16 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
 
-      - name: Upload artifacts
+      - name: Ensure release folder is populated (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          mkdir -p release
+          cp -r desktop/release/* release/ || echo "Nothing to copy"
+
+      - name: Upload flattened artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: release-files-${{ matrix.os }}
+          name: flattened-release-files
           path: release/
           if-no-files-found: error
 
@@ -86,13 +91,15 @@ jobs:
     name: Upload to FTP
     needs: package
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download flattened artifacts
         uses: actions/download-artifact@v4
         with:
+          name: flattened-release-files
           path: release
 
       - name: Install FTP client dependency

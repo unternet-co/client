@@ -1,0 +1,32 @@
+{
+  "appId": "co.unternet.client",
+  "productName": "Unternet Client",
+  "files": ["desktop/dist/**/*"],
+  "directories": {
+    "output": "release"
+  },
+  "publish": {
+    "provider": "generic",
+    "url": "https://unternet-update-server.com/updates",
+    "channel": "latest"
+  },
+  "mac": {
+    "category": "public.app-category.developer-tools",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist",
+    "target": ["dmg", "zip"]
+  },
+  "win": {
+    "target": ["nsis"]
+  },
+  "linux": {
+    "target": ["AppImage", "deb"],
+    "category": "Development"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
+  }
+}
