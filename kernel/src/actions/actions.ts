@@ -12,8 +12,8 @@ export function createActionRecord(resources: Resource[]): ActionRecord {
   for (const resource of resources) {
     for (const id in resource.actions) {
       const action = resource.actions[id];
-      const actionUri = `${resource.uri}#${id}`;
-      actions[actionUri] = action;
+      const actionHandle = encodeActionHandle(resource.uri, id);
+      actions[actionHandle] = action;
     }
   }
 
@@ -27,7 +27,7 @@ interface UriComponents {
 
 // Create a full tool ID that incorporates the resource
 // for use ONLY by the model
-export function encodeActionHandle({ uri, actionId }: UriComponents) {
+export function encodeActionHandle(uri: string, actionId: string) {
   // https://my-applet.example.com->action_id
   if (actionId) uri += `->${actionId}`;
   return uri;
@@ -37,7 +37,7 @@ export function decodeActionHandle(actionHandle: string): UriComponents {
   let [uri, actionId] = actionHandle.split('->');
 
   if (!actionId || !uri) {
-    throw new Error('Invalid action URI.');
+    throw new Error(`Invalid action URI: ${uri}.`);
   }
 
   return {

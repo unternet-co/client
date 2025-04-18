@@ -133,7 +133,6 @@ export class Kernel {
     interaction: Interaction,
     response: ActionResponse
   ) {
-    console.log('it an action');
     const output: ActionOutput = {
       type: 'action',
       directive: response.directive,

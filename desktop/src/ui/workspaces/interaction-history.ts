@@ -172,10 +172,7 @@ class InteractionHistory extends HTMLElement {
   }
 
   actionOutputTemplate(output: ActionOutput) {
-    const resource = this.resourceModel.find({
-      protocol: output.directive.protocol,
-      id: output.directive.resourceId,
-    });
+    const resource = this.resourceModel.find(output.directive.uri);
 
     let img = html``;
     if (resource.icons && resource.icons[0] && resource.icons[0].src) {

@@ -23,13 +23,15 @@ export class Dispatcher {
 
   async dispatch(directive: ActionDirective) {
     const { protocol } = new URL(directive.uri);
+    const scheme = protocol.replace(':', '');
+    console.log('scheme', scheme);
 
-    if (!protocol) {
+    if (!scheme) {
       throw new Error(
-        `The protocol handler for '${protocol}' has not been registered.`
+        `The protocol handler for '${scheme}' has not been registered.`
       );
     }
 
-    return this.handlers[protocol](directive);
+    return this.handlers[scheme](directive);
   }
 }
