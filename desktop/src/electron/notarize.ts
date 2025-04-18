@@ -7,7 +7,7 @@ export default async function notarizing(context: AfterPackContext) {
 
   if (
     !process.env.APPLE_ID ||
-    !process.env.APPLE_ID_PASS ||
+    !process.env.APPLE_APP_SPECIFIC_PASSWORD ||
     !process.env.APPLE_TEAM_ID
   ) {
     console.warn('[notarize] Skipping: missing Apple credentials');
