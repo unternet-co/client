@@ -1,10 +1,214 @@
-import { css } from 'lit';
+import { LitElement, html, css } from 'lit';
+import { classMap } from 'lit/directives/class-map.js';
 import './icon';
 
-export class InputElement extends HTMLElement {
-  private input: HTMLInputElement;
-  private wrapper: HTMLDivElement;
-  private clearButton?: HTMLButtonElement;
+export type InputSize = 'small' | 'medium' | 'large';
+export type InputVariant = 'default' | 'ghost' | 'flat';
+export type IconPosition = 'start' | 'end';
+
+export class InputElement extends LitElement {
+  value: string = '';
+  type: string = 'text';
+  placeholder: string = '';
+  disabled: boolean = false;
+  readonly: boolean = false;
+  required: boolean = false;
+  minlength: number = -1;
+  maxlength: number = -1;
+  min: string = '';
+  max: string = '';
+  step: string = '';
+  pattern: string = '';
+  name: string = '';
+  autocomplete: string = '';
+  size: InputSize = 'medium';
+  variant: InputVariant = 'default';
+  loading: boolean = false;
+  icon?: string;
+  iconPosition: IconPosition = 'end';
+
+  static get properties() {
+    return {
+      value: { type: String },
+      type: { type: String },
+      placeholder: { type: String },
+      disabled: { type: Boolean },
+      readonly: { type: Boolean },
+      required: { type: Boolean },
+      minlength: { type: Number },
+      maxlength: { type: Number },
+      min: { type: String },
+      max: { type: String },
+      step: { type: String },
+      pattern: { type: String },
+      name: { type: String },
+      autocomplete: { type: String },
+      size: { type: String },
+      variant: { type: String },
+      loading: { type: Boolean },
+      icon: { type: String },
+      iconPosition: { type: String, attribute: 'icon-position' },
+    };
+  }
+
+  constructor() {
+    super();
+    this.size = 'medium';
+    this.variant = 'default';
+    this.loading = false;
+    this.icon = undefined;
+    this.iconPosition = 'end';
+  }
+
+  private handleInput(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.value = input.value;
+
+    // Dispatch a custom event with the new value
+    this.dispatchEvent(
+      new CustomEvent('input', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private handleChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.value = input.value;
+
+    // Dispatch a custom event with the new value
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private handleClear() {
+    this.value = '';
+    this.dispatchEvent(
+      new CustomEvent('input', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
+    this.dispatchEvent(
+      new CustomEvent('change', {
+        detail: { value: this.value },
+        bubbles: true,
+        composed: true,
+      })
+    );
+
+    // Focus the input after clearing
+    const input = this.shadowRoot?.querySelector('input');
+    if (input) {
+      input.focus();
+    }
+  }
+
+  focus() {
+    const input = this.shadowRoot?.querySelector('input');
+    if (input) {
+      input.focus();
+    }
+  }
+
+  blur() {
+    const input = this.shadowRoot?.querySelector('input');
+    if (input) {
+      input.blur();
+    }
+  }
+
+  select() {
+    const input = this.shadowRoot?.querySelector('input');
+    if (input) {
+      input.select();
+    }
+  }
+
+  render() {
+    const showClearButton = this.type === 'search' && this.value;
+    const inputClasses = {
+      input: true,
+      [`input--${this.size}`]: this.size !== 'medium',
+      [`input--${this.variant}`]: this.variant !== 'default',
+      loading: this.loading,
+    };
+
+    return html`
+      <div
+        class="input-wrapper ${this.size !== 'medium'
+          ? `input-wrapper--${this.size}`
+          : ''} ${this.icon ? `has-icon icon-${this.iconPosition}` : ''}"
+      >
+        ${this.icon && this.iconPosition === 'start'
+          ? html`<un-icon
+              class="input-icon input-icon-start"
+              name=${this.loading ? 'loading' : this.icon}
+              size=${this.size}
+              ?spin=${this.loading}
+            ></un-icon>`
+          : ''}
+        <input
+          part="input"
+          class=${classMap(inputClasses)}
+          .value=${this.value}
+          type=${this.type}
+          placeholder=${this.placeholder}
+          ?disabled=${this.disabled || this.loading}
+          ?readonly=${this.readonly}
+          ?required=${this.required}
+          minlength=${this.minlength > 0 ? this.minlength : ''}
+          maxlength=${this.maxlength > 0 ? this.maxlength : ''}
+          min=${this.min}
+          max=${this.max}
+          step=${this.step}
+          pattern=${this.pattern}
+          name=${this.name}
+          autocomplete=${this.autocomplete}
+          @input=${this.handleInput}
+          @change=${this.handleChange}
+          aria-busy=${this.loading ? 'true' : 'false'}
+        />
+        ${this.icon && this.iconPosition === 'end'
+          ? html`<un-icon
+              class="input-icon input-icon-end"
+              name=${this.loading ? 'loading' : this.icon}
+              size=${this.size}
+              ?spin=${this.loading}
+            ></un-icon>`
+          : ''}
+        ${showClearButton && !this.loading
+          ? html`
+              <un-button
+                class="clear-button"
+                type="ghost"
+                size=${this.size}
+                icon="close"
+                aria-label="Clear search"
+                @click=${this.handleClear}
+              >
+              </un-button>
+            `
+          : ''}
+        ${this.loading && !this.icon
+          ? html`<un-icon
+              class="loading-icon"
+              name="loading"
+              spin
+              size=${this.size}
+            ></un-icon>`
+          : ''}
+      </div>
+    `;
+  }
 
   static get styles() {
     return css`
@@ -18,55 +222,126 @@ export class InputElement extends HTMLElement {
         width: 100%;
       }
 
-      input {
+      .input {
+        --input-height: 24px;
         width: 100%;
-        padding: var(--space-4);
-        border: 1px solid var(--color-border);
-        border-radius: var(--rounded-sm);
-        background-color: var(--color-bg-input);
-        color: var(--color-text);
+        height: var(--input-height);
+        padding: 0 var(--space-4);
+        border-radius: var(--rounded);
+        border: 1px solid var(--input-border-color);
+        border-bottom-color: color-mix(
+          in srgb,
+          var(--input-border-color) 100%,
+          transparent 25%
+        );
+        background-color: var(--input-bg-color);
+        color: var(--input-text-color);
         font-family: inherit;
         font-size: inherit;
-        line-height: 1;
+        line-height: var(--input-height);
         box-sizing: border-box;
+        box-shadow: var(--input-shadows);
       }
 
-      input:focus {
-        outline: 2px solid var(--color-outline);
-        outline-offset: -1px;
+      .input:focus {
+        outline: var(--outline);
+        outline-offset: var(--outline-offset-inputs);
       }
 
-      input:disabled {
-        opacity: 0.6;
+      .input:disabled {
+        opacity: 0.5;
         cursor: not-allowed;
       }
 
-      input::placeholder {
-        color: var(--color-text-disabled);
+      .input::placeholder {
+        color: var(--input-placeholder-color);
       }
 
-      /* Type-specific styles */
-      input[type='number'] {
+      .input[type='number'] {
         -moz-appearance: textfield;
       }
 
-      input[type='number']::-webkit-outer-spin-button,
-      input[type='number']::-webkit-inner-spin-button {
+      .input[type='number']::-webkit-outer-spin-button,
+      .input[type='number']::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
       }
 
-      input[type='search'] {
+      .input--small {
+        --input-height: 18px;
+        font-size: var(--text-sm);
+      }
+
+      .input--large {
+        --input-height: 28px;
+      }
+
+      .input--ghost {
+        border-color: transparent;
+        background-color: transparent;
+        box-shadow: none;
+      }
+
+      .input--flat {
+        border-color: transparent;
+        box-shadow: none;
+        background-color: var(--input-bg-color-flat);
+      }
+
+      .input[type='search'] {
         border-radius: 16px;
-        padding-left: var(--space-6);
+        padding-left: var(--space-5);
         padding-right: var(--space-8);
       }
 
-      input[type='search']::-webkit-search-decoration,
-      input[type='search']::-webkit-search-cancel-button,
-      input[type='search']::-webkit-search-results-button,
-      input[type='search']::-webkit-search-results-decoration {
+      .input[type='search']::-webkit-search-decoration,
+      .input[type='search']::-webkit-search-cancel-button,
+      .input[type='search']::-webkit-search-results-button,
+      .input[type='search']::-webkit-search-results-decoration {
         -webkit-appearance: none;
+      }
+
+      /* Icon positioning */
+      .has-icon.icon-start .input {
+        padding-left: calc(var(--space-4) * 2 + 16px);
+      }
+
+      .has-icon.icon-end .input {
+        padding-right: calc(var(--space-4) * 2 + 16px);
+      }
+
+      .input-icon,
+      .loading-icon {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--color-text-default);
+        pointer-events: none;
+      }
+
+      .input-icon-start {
+        left: var(--space-4);
+      }
+
+      .input-icon-end {
+        right: var(--space-4);
+      }
+
+      .loading-icon {
+        right: var(--space-4);
+      }
+
+      /* Adjust clear button position when there's an end icon */
+      .has-icon.icon-end .clear-button {
+        right: calc(var(--space-4) * 2 + 16px);
+      }
+
+      .input-wrapper--small .clear-button {
+        --button-height: 18px;
+      }
+
+      .input-wrapper--large .clear-button {
+        --button-height: 28px;
       }
 
       .clear-button {
@@ -81,9 +356,8 @@ export class InputElement extends HTMLElement {
         border: none;
         background: none;
         color: var(--color-text-default);
-        cursor: pointer;
-        opacity: 0.6;
         transition: opacity 0.2s ease;
+        cursor: pointer;
       }
 
       .clear-button:hover {
@@ -99,183 +373,6 @@ export class InputElement extends HTMLElement {
         display: none;
       }
     `;
-  }
-
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-
-    this.wrapper = document.createElement('div');
-    this.wrapper.className = 'input-wrapper';
-
-    this.input = document.createElement('input');
-    this.input.addEventListener('input', this.handleInput.bind(this));
-    this.input.addEventListener('change', this.handleChange.bind(this));
-
-    this.wrapper.appendChild(this.input);
-  }
-
-  private setupClearButton() {
-    if (this.input.type === 'search' && !this.clearButton) {
-      this.clearButton = document.createElement('button') as HTMLButtonElement;
-      this.clearButton.className = 'clear-button';
-      this.clearButton.setAttribute('type', 'button');
-      this.clearButton.setAttribute('aria-label', 'Clear search');
-
-      const icon = document.createElement('un-icon');
-      icon.setAttribute('name', 'close');
-      this.clearButton.appendChild(icon);
-
-      this.clearButton.addEventListener('click', () => {
-        this.input.value = '';
-        this.value = '';
-        this.input.focus();
-        this.input.dispatchEvent(new Event('input'));
-      });
-
-      this.wrapper.appendChild(this.clearButton);
-      this.updateClearButton();
-    }
-  }
-
-  private updateClearButton() {
-    if (this.clearButton) {
-      this.clearButton.disabled = !this.value;
-    }
-  }
-
-  connectedCallback() {
-    const style = document.createElement('style');
-    style.textContent = InputElement.styles.toString();
-    this.shadowRoot!.appendChild(style);
-    this.shadowRoot!.appendChild(this.wrapper);
-    this.updateInput();
-  }
-
-  static get observedAttributes() {
-    return [
-      'value',
-      'type',
-      'placeholder',
-      'disabled',
-      'readonly',
-      'required',
-      'minlength',
-      'maxlength',
-      'min',
-      'max',
-      'step',
-      'pattern',
-    ];
-  }
-
-  attributeChangedCallback(
-    name: string,
-    _: string | null,
-    newValue: string | null
-  ) {
-    if (!this.input) return;
-
-    switch (name) {
-      case 'value':
-        this.input.value = newValue || '';
-        break;
-      case 'type':
-        this.input.type = newValue || 'text';
-        break;
-      case 'placeholder':
-        this.input.placeholder = newValue || '';
-        break;
-      case 'disabled':
-        this.input.disabled = newValue !== null;
-        break;
-      case 'readonly':
-        this.input.readOnly = newValue !== null;
-        break;
-      case 'required':
-        this.input.required = newValue !== null;
-        break;
-      case 'minlength':
-        this.input.minLength = newValue ? parseInt(newValue, 10) : -1;
-        break;
-      case 'maxlength':
-        this.input.maxLength = newValue ? parseInt(newValue, 10) : -1;
-        break;
-      case 'min':
-        this.input.min = newValue || '';
-        break;
-      case 'max':
-        this.input.max = newValue || '';
-        break;
-      case 'step':
-        this.input.step = newValue || '';
-        break;
-      case 'pattern':
-        this.input.pattern = newValue || '';
-        break;
-    }
-  }
-
-  get value(): string {
-    return this.getAttribute('value') || '';
-  }
-
-  set value(newValue: string) {
-    this.setAttribute('value', newValue);
-  }
-
-  private handleInput(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.value = input.value;
-    this.updateClearButton();
-
-    this.dispatchEvent(
-      new CustomEvent('input', {
-        bubbles: true,
-        composed: true,
-        detail: { value: this.value },
-      })
-    );
-  }
-
-  private handleChange(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.value = input.value;
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: { value: this.value },
-      })
-    );
-  }
-
-  private updateInput() {
-    this.input.value = this.value;
-    this.input.type = this.getAttribute('type') || 'text';
-    this.input.placeholder = this.getAttribute('placeholder') || '';
-    this.input.disabled = this.hasAttribute('disabled');
-    this.input.readOnly = this.hasAttribute('readonly');
-    this.input.required = this.hasAttribute('required');
-
-    const minLength = this.getAttribute('minlength');
-    if (minLength !== null) {
-      this.input.minLength = parseInt(minLength, 10);
-    }
-
-    const maxLength = this.getAttribute('maxlength');
-    if (maxLength !== null) {
-      this.input.maxLength = parseInt(maxLength, 10);
-    }
-
-    this.input.min = this.getAttribute('min') || '';
-    this.input.max = this.getAttribute('max') || '';
-    this.input.step = this.getAttribute('step') || '';
-    this.input.pattern = this.getAttribute('pattern') || '';
-
-    this.setupClearButton();
-    this.updateClearButton();
   }
 }
 

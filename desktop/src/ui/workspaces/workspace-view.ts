@@ -1,4 +1,5 @@
 import { CommandSubmitEvent } from './command-input';
+import './command-bar.css';
 import './command-input';
 import './interaction-history';
 import './workspace-view.css';
@@ -13,20 +14,53 @@ export class WorkspaceView extends HTMLElement {
   workspaceId: Workspace['id'];
   kernel = dependencies.resolve<Kernel>('Kernel');
   static observedAttributes = ['for'];
+  private visibilityObserver: IntersectionObserver;
 
   // TODO: Implement dependency injection with decorators
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
     render(this.template, this);
+
+    // Autofocus the command input after rendering
+    setTimeout(() => this.focusCommandInput(), 0);
+
+    // Set up visibility observer to focus when tab is switched back to this view
+    this.setupVisibilityObserver();
+  }
+
+  disconnectedCallback() {
+    if (this.visibilityObserver) {
+      this.visibilityObserver.disconnect();
+    }
+  }
+
+  private focusCommandInput() {
+    const commandInput = this.querySelector('command-input');
+    if (commandInput) {
+      (commandInput as any).focus();
+    }
+  }
+
+  private setupVisibilityObserver() {
+    this.visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          this.focusCommandInput();
+        }
+      },
+      { threshold: [0.5] }
+    );
+
+    this.visibilityObserver.observe(this);
   }
 
   async handleCommandSubmit(e: CommandSubmitEvent) {
     try {
-      await this.kernel.handleInput(this.workspaceId, e.input);
+      await this.kernel.handleInput(this.workspaceId, e.detail.input);
     } catch (error) {
       console.error('Error handling command input:', error);
 
-      // If the error is due to kernel not being initialized, open the settings modal
       if (
         error instanceof Error &&
         error.message === 'Tried to access kernel when not initialized.'
@@ -34,12 +68,11 @@ export class WorkspaceView extends HTMLElement {
         const modalService = dependencies.resolve<ModalService>('ModalService');
         modalService.open('settings');
 
-        // Show a message to the user explaining what happened
         const workspaceModel =
           dependencies.resolve<WorkspaceModel>('WorkspaceModel');
         const interaction = workspaceModel.createInteraction(
           this.workspaceId,
-          e.input
+          e.detail.input
         );
 
         workspaceModel.addOutput(interaction.id, {
@@ -55,12 +88,14 @@ export class WorkspaceView extends HTMLElement {
       <div class="workspace-content">
         <interaction-history for=${this.workspaceId}></interaction-history>
       </div>
-      <div class="command-bar">
-        <command-input
-          @submit=${this.handleCommandSubmit.bind(this)}
-        ></command-input>
+      <div class="bottom-bar">
+        <command-bar>
+          <command-input
+            @submit=${(e) => this.handleCommandSubmit(e)}
+          ></command-input>
+        </command-bar>
+        <resource-bar for=${this.workspaceId}></resource-bar>
       </div>
-      <resource-bar for=${this.workspaceId}></resource-bar>
     `;
   }
 }

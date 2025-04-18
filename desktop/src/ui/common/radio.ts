@@ -19,12 +19,10 @@ export class RadioElement extends HTMLElement {
   }
 
   connectedCallback() {
-    // Add styles
     const style = document.createElement('style');
     style.textContent = RadioElement.styles.toString();
     this.shadowRoot!.appendChild(style);
 
-    // Add slot for label content
     const slot = document.createElement('slot');
     slot.textContent = this.getAttribute('label') || '';
     this.label.appendChild(slot);
@@ -88,14 +86,6 @@ export class RadioElement extends HTMLElement {
   private handleChange(e: Event) {
     const input = e.target as HTMLInputElement;
     this.checked = input.checked;
-
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        bubbles: true,
-        composed: true,
-        detail: { checked: this.checked, value: this.value },
-      })
-    );
   }
 
   private updateRadio() {
@@ -111,7 +101,6 @@ export class RadioElement extends HTMLElement {
         display: flex;
         align-items: center;
         gap: var(--space-3);
-        cursor: pointer;
       }
 
       .radio-wrapper:has(input:disabled) {
@@ -127,7 +116,6 @@ export class RadioElement extends HTMLElement {
         border: 1px solid var(--color-border-strong);
         border-radius: 50%;
         background-color: var(--color-bg-input);
-        cursor: pointer;
         display: grid;
         place-content: center;
       }

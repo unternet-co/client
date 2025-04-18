@@ -3,35 +3,37 @@
   Raw Colors
   *******************************************************/
 
-  --color-grey-0: oklch(99.2% 0.003 286.35);
-  /* TODO: The next two colors are in a different scheme */
-  --color-grey-50: oklch(97% 0.0027 286.35);
-  --color-grey-100: oklch(94% 0.0027 286.35);
-
-  --color-grey-200: oklch(88% 0.0027 286.35);
-  --color-grey-300: oklch(83% 0.0027 286.35);
-  --color-grey-400: oklch(64.7% 0.005 271.3);
-  --color-grey-500: oklch(54.9% 0.005 271.3);
-  --color-grey-600: oklch(47.5% 0.005 271.3);
-  --color-grey-700: oklch(40.2% 0.005 271.3);
-  --color-grey-800: oklch(36.1% 0.007 274.8);
-  --color-grey-900: oklch(30% 0.006 258.4);
-  --color-grey-950: oklch(25.6% 0.007 258.4);
-  --color-grey-1000: oklch(22.2% 0.008 264.4);
+  --color-grey-0: oklch(99.1% 0.004 271.4);
+  --color-gray-25: oklch(97.8% 0.007 260.7);
+  --color-grey-50: oklch(95.2% 0.008 271.3);
+  --color-grey-100: oklch(92.7% 0.009 258.3);
+  --color-grey-150: oklch(89.7% 0.01 267.4);
+  --color-grey-200: oklch(86.3% 0.012 264.5);
+  --color-grey-300: oklch(81.7% 0.013 266.7);
+  --color-grey-400: oklch(74.1% 0.014 266.7);
+  --color-grey-500: oklch(63.9% 0.011 267.3);
+  --color-grey-600: oklch(54.9% 0.012 261.8);
+  --color-grey-700: oklch(48.4% 0.012 267.3);
+  --color-grey-800: oklch(41.2% 0.013 261.8);
+  --color-grey-850: oklch(42.2% 0.013 261.8);
+  --color-grey-900: oklch(34.3% 0.012 258.4);
+  --color-grey-950: oklch(31.3% 0.015 264.3);
+  --color-grey-975: oklch(28% 0.014 261.7);
+  --color-grey-1000: oklch(25.5% 0.014 261.7);
 
   --color-blue-0: oklch(97.5% 0.012 259.8);
-  --color-blue-50: oklch(91.7% 0.04 263.7);
-  --color-blue-100: oklch(84.7% 0.075 264);
-  --color-blue-200: oklch(76.7% 0.118 264.2);
-  --color-blue-300: oklch(72.5% 0.142 264.1);
-  --color-blue-400: oklch(65.4% 0.183 264.6);
-  --color-blue-500: oklch(58.4% 0.226 264.3);
+  --color-blue-50: oklch(93.2% 0.032 264.4);
+  --color-blue-100: oklch(87.1% 0.063 264.2);
+  --color-blue-200: oklch(79.6% 0.102 264);
+  --color-blue-300: oklch(73.8% 0.134 264.2);
+  --color-blue-400: oklch(67.5% 0.171 264.5);
+  --color-blue-500: oklch(60.4% 0.214 264.2);
   --color-blue-600: oklch(54.2% 0.254 264.2);
   --color-blue-700: oklch(49.2% 0.286 264.3);
   --color-blue-800: oklch(45.2% 0.313 264.1);
-  --color-blue-900: oklch(40% 0.275 264.1);
-  --color-blue-950: oklch(30.5% 0.21 264.1);
-  --color-blue-1000: oklch(21.7% 0.121 263.8);
+  --color-blue-900: oklch(42.1% 0.289 264.1);
+  --color-blue-950: oklch(37.4% 0.259 264.1);
+  --color-blue-1000: oklch(34.5% 0.206 264.1);
 
   --color-purple-0: oklch(97.2% 0.012 301.3);
   --color-purple-50: oklch(92.7% 0.035 302.1);
@@ -40,26 +42,26 @@
   --color-purple-300: oklch(77.1% 0.14 301.7);
   --color-purple-400: oklch(72.1% 0.175 302);
   --color-purple-500: oklch(64.2% 0.198 302.3);
-  --color-purple-600: oklch(60% 0.23 302);
-  --color-purple-700: oklch(54.9% 0.246 302.5);
+  --color-purple-600: oklch(59.2% 0.238 302.1);
+  --color-purple-700: oklch(54.2% 0.248 302.5);
   --color-purple-800: oklch(49.6% 0.258 302.4);
-  --color-purple-900: oklch(42.9% 0.221 302.5);
-  --color-purple-950: oklch(33.3% 0.175 302.6);
-  --color-purple-1000: oklch(27.1% 0.139 301.9);
+  --color-purple-900: oklch(44.6% 0.224 302.5);
+  --color-purple-950: oklch(39.2% 0.206 302.8);
+  --color-purple-1000: oklch(35% 0.184 302.1);
 
   --color-yellow-0: oklch(98.6% 0.02 97.5);
   --color-yellow-50: oklch(97.2% 0.056 98.7);
   --color-yellow-100: oklch(95.1% 0.08 97.7);
   --color-yellow-200: oklch(93.2% 0.116 96.4);
-  --color-yellow-300: oklch(91.4% 0.136 95.4);
-  --color-yellow-400: oklch(88.9% 0.158 94.4);
-  --color-yellow-500: oklch(85.8% 0.176 92.4);
-  --color-yellow-600: oklch(79.7% 0.163 88.7);
-  --color-yellow-700: oklch(73.2% 0.15 86.6);
-  --color-yellow-800: oklch(65.9% 0.135 84.8);
-  --color-yellow-900: oklch(55.1% 0.114 81.4);
-  --color-yellow-950: oklch(41.6% 0.084 82.1);
-  --color-yellow-1000: oklch(32.2% 0.065 79.2);
+  --color-yellow-300: oklch(90.9% 0.134 93.4);
+  --color-yellow-400: oklch(89.2% 0.15 92.1);
+  --color-yellow-500: oklch(85.7% 0.157 90.7);
+  --color-yellow-600: oklch(82.5% 0.164 89.3);
+  --color-yellow-700: oklch(78.2% 0.16 87.5);
+  --color-yellow-800: oklch(72% 0.147 85.5);
+  --color-yellow-900: oklch(63% 0.129 83.8);
+  --color-yellow-950: oklch(55.1% 0.113 82.4);
+  --color-yellow-1000: oklch(44.9% 0.093 79.7);
 
   --color-red-0: oklch(97.2% 0.013 35.7);
   --color-red-50: oklch(92.6% 0.035 35.3);
@@ -67,35 +69,37 @@
   --color-red-200: oklch(82.8% 0.085 37);
   --color-red-300: oklch(77.9% 0.112 36.6);
   --color-red-400: oklch(71.2% 0.148 36.6);
-  --color-red-500: oklch(63.1% 0.197 36.8);
-  --color-red-600: oklch(56.5% 0.19 36.7);
-  --color-red-700: oklch(53% 0.179 36.6);
-  --color-red-800: oklch(48.1% 0.162 36.8);
-  --color-red-900: oklch(40.3% 0.137 36.3);
-  --color-red-950: oklch(31.3% 0.106 36.5);
-  --color-red-1000: oklch(23.4% 0.079 36.5);
+  --color-red-500: oklch(65.7% 0.171 36.5);
+  --color-red-600: oklch(60% 0.185 36.6);
+  --color-red-700: oklch(55.3% 0.181 36.6);
+  --color-red-800: oklch(49.7% 0.164 36.8);
+  --color-red-900: oklch(44.1% 0.149 36.5);
+  --color-red-950: oklch(38.8% 0.131 36.4);
+  --color-red-1000: oklch(34.2% 0.113 37.4);
 
   --color-green-0: oklch(97.1% 0.012 153.7);
   --color-green-50: oklch(92.7% 0.035 153.2);
   --color-green-100: oklch(88.2% 0.058 153.6);
   --color-green-200: oklch(82.7% 0.084 153.3);
   --color-green-300: oklch(77.9% 0.112 153.1);
-  --color-green-400: oklch(71.2% 0.147 153.2);
-  --color-green-500: oklch(61.3% 0.157 153.1);
-  --color-green-600: oklch(56.7% 0.145 153.1);
-  --color-green-700: oklch(52.9% 0.135 153.3);
+  --color-green-400: oklch(73.2% 0.144 153.1);
+  --color-green-500: oklch(66.6% 0.153 153);
+  --color-green-600: oklch(60% 0.145 152.9);
+  --color-green-700: oklch(53.8% 0.137 153.4);
   --color-green-800: oklch(48.1% 0.124 153);
-  --color-green-900: oklch(39.7% 0.102 153.2);
-  --color-green-950: oklch(30.9% 0.08 152.8);
-  --color-green-1000: oklch(23.6% 0.06 153.5);
+  --color-green-900: oklch(41.3% 0.105 153);
+  --color-green-950: oklch(35.8% 0.093 152.5);
+  --color-green-1000: oklch(32.2% 0.083 153.2);
 
   /******************************************************* 
   Brand Colors
   *******************************************************/
 
   --color-neutral-0: var(--color-grey-0);
+  --color-neutral-25: var(--color-gray-25);
   --color-neutral-50: var(--color-grey-50);
   --color-neutral-100: var(--color-grey-100);
+  --color-neutral-150: var(--color-grey-150);
   --color-neutral-200: var(--color-grey-200);
   --color-neutral-300: var(--color-grey-300);
   --color-neutral-400: var(--color-grey-400);
@@ -103,8 +107,10 @@
   --color-neutral-600: var(--color-grey-600);
   --color-neutral-700: var(--color-grey-700);
   --color-neutral-800: var(--color-grey-800);
+  --color-neutral-850: var(--color-grey-850);
   --color-neutral-900: var(--color-grey-900);
   --color-neutral-950: var(--color-grey-950);
+  --color-neutral-975: var(--color-grey-975);
   --color-neutral-1000: var(--color-grey-1000);
 
   --color-action-0: var(--color-blue-0);
@@ -186,29 +192,52 @@
   *******************************************************/
 
   /* text */
-  --color-text-disabled: var(--color-neutral-400);
-  --color-text-muted: var(--color-neutral-600);
+  --color-text-disabled: var(--color-neutral-00);
+  --color-text-muted: var(--color-neutral-700);
   --color-text-default: var(--color-neutral-900);
   --color-text-strong: var(--color-neutral-1000);
   --color-text-link: var(--color-action-800);
 
   /* background */
-  --color-bg-page: var(--color-neutral-100);
-  --color-bg-container: var(--color-neutral-50);
+  --color-bg-chrome: var(--color-neutral-100);
+  --color-bg-page: var(--color-neutral-50);
+  --color-bg-container: var(--color-neutral-25);
   --color-bg-content: var(--color-neutral-0);
-  --color-bg-input: var(--color-bg-content);
 
   /* borders */
-  --color-border-muted: var(--color-neutral-200);
-  --color-border-default: var(--color-neutral-300);
-  --color-border-strong: var(--color-neutral-500);
+  --color-border-muted: var(--color-neutral-100);
+  --color-border-default: var(--color-neutral-200);
+  --color-border-strong: var(--color-neutral-300);
   --color-border: var(--color-border-default);
-  --color-outline: color-mix(in srgb, var(--color-action-800) 75%, transparent);
 
   /* header */
   --color-header-bg: var(--color-neutral-1000);
   --color-header-link: var(--color-neutral-300);
   --color-header-link-active: var(--color-neutral-0);
+
+  /* shadow */
+  --shadow-color: color-mix(
+    in oklch,
+    var(--color-grey-1000) 100%,
+    transparent 0%
+  );
+  --shadow-color-inset: color-mix(
+    in oklch,
+    var(--color-grey-500) 100%,
+    transparent 100%
+  );
+  --shadow: 0 5px 25px -16px var(--shadow-color);
+  --shadow-inset: inset 0 1px 2px -1px var(--shadow-color-inset);
+
+  /* highlight */
+  --glow-color: var(--color-grey-0);
+
+  /* overlay */
+  --color-overlay: color-mix(
+    in oklch,
+    var(--color-neutral-100) 100%,
+    transparent 50%
+  );
 
   /* Font size */
   --text-scale: 1.2;
@@ -255,9 +284,46 @@
 
   /* Spacing */
   --spacing: 4px;
+  --space-1: calc(var(--spacing) * 0.5);
+  --space-2: calc(var(--spacing) * 1);
+  --space-3: calc(var(--spacing) * 1.5);
+  --space-4: calc(var(--spacing) * 2);
+  --space-5: calc(var(--spacing) * 3);
+  --space-6: calc(var(--spacing) * 4);
+  --space-7: calc(var(--spacing) * 6);
+  --space-8: calc(var(--spacing) * 8);
+  --space-9: calc(var(--spacing) * 10);
+  --space-10: calc(var(--spacing) * 12);
+
+  /* Border radius */
+  --rounded-sm: var(--space-1);
+  --rounded: var(--space-2);
+  --rounded-lg: var(--space-4);
+  --rounded-xl: var(--space-6);
 
   /* Typography */
   --font-sans: 'Source Sans 3', system-ui, sans-serif;
+
+  /* Outline */
+  --outline-color: var(--color-action-500);
+  --outline: 2px solid var(--outline-color);
+  --outline-offset: 1px;
+  --outline-offset-inputs: -1px;
+
+  /* Button */
+  --button-shadows:
+    inset 0 1px 2px -1px var(--glow-color),
+    inset 0 -1px 2px -2px var(--shadow-color);
+
+  /* Input */
+  --input-bg-color: var(--color-neutral-0);
+  --input-bg-color-flat: var(--color-neutral-100);
+  --input-border-color: var(--color-border-default);
+  --input-border-color-flat: var(--color-bg-container);
+  --input-border-color-error: var(--color-error-500);
+  --input-text-color: var(--color-neutral-1000);
+  --input-placeholder-color: var(--color-neutral-600);
+  --input-shadows: var(--shadow-inset);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -267,8 +333,10 @@
     *******************************************************/
 
     --color-neutral-0: var(--color-grey-1000);
+    --color-neutral-25: var(--color-grey-975);
     --color-neutral-50: var(--color-grey-950);
     --color-neutral-100: var(--color-grey-900);
+    --color-neutral-150: var(--color-grey-850);
     --color-neutral-200: var(--color-grey-800);
     --color-neutral-300: var(--color-grey-700);
     --color-neutral-400: var(--color-grey-600);
@@ -276,8 +344,10 @@
     --color-neutral-600: var(--color-grey-400);
     --color-neutral-700: var(--color-grey-300);
     --color-neutral-800: var(--color-grey-200);
+    --color-neutral-850: var(--color-grey-150);
     --color-neutral-900: var(--color-grey-100);
     --color-neutral-950: var(--color-grey-50);
+    --color-neutral-975: var(--color-grey-25);
     --color-neutral-1000: var(--color-grey-0);
 
     --color-action-0: var(--color-blue-1000);
@@ -359,13 +429,20 @@
     *******************************************************/
 
     /* background */
+    --color-bg-chrome: var(--color-neutral-100);
     --color-bg-page: var(--color-neutral-0);
-    --color-bg-container: var(--color-neutral-50);
-    --color-bg-content: var(--color-neutral-100);
+    --color-bg-container: var(--color-neutral-25);
+    --color-bg-content: var(--color-neutral-50);
 
     /* header */
     --color-header-bg: var(--color-neutral-50);
     --color-header-link: var(--color-neutral-600);
     --color-header-link-active: var(--color-neutral-1000);
+
+    /* shadow */
+    --shadow-mix: 100%;
+
+    /* highlight */
+    --glow-color: color-mix(in srgb, var(--color-grey-0) 10%, transparent 100%);
   }
 }

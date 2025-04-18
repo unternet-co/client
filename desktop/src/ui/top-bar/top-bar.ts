@@ -145,9 +145,13 @@ export class TopBar extends HTMLElement {
     `;
 
     const settingsButtonTemplate = html`
-      <button class="settings-button" @click=${() => this.openSettings()}>
-        <un-icon name="settings"></un-icon>
-      </button>
+      <un-button
+        type="ghost"
+        icon="settings"
+        class="settings-button"
+        @click=${() => this.openSettings()}
+      >
+      </un-button>
     `;
 
     render(staticTabs.map(tabTemplate), this.staticTabsContainer!);

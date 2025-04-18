@@ -38,6 +38,14 @@ class MarkdownText extends HTMLElement {
       p:last-child {
         margin-bottom: 0;
       }
+
+      p, ul, ol, blockquote {
+        margin: var(--space-4) 0;
+      }
+
+      li {
+        margin: var(--space-4) 0;
+      }
     `;
   }
 }
