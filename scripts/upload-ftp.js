@@ -4,53 +4,64 @@ const fs = require('fs');
 
 const ftpClient = new Ftp();
 
-// Configuration
 const config = {
-  host: process.env.FTP_HOST || 'ftp.koumbit.net',
+  host: process.env.FTP_HOST,
   user: process.env.FTP_USERNAME,
   password: process.env.FTP_PASSWORD,
   secure: true,
 };
 
-// Directory to upload
 const releaseDir = path.join(__dirname, '..', 'release');
 
-ftpClient.on('ready', function () {
-  console.log('FTP connection established');
+function uploadDirectory(localDir, remoteDir, done) {
+  fs.readdir(localDir, (err, items) => {
+    if (err) return done(err);
 
-  // Upload all files in the release directory
-  fs.readdir(releaseDir, (err, files) => {
-    if (err) {
-      console.error('Error reading release directory:', err);
-      ftpClient.end();
-      return;
-    }
+    let pending = items.length;
+    if (!pending) return done();
 
-    let uploadCount = 0;
-    const totalFiles = files.length;
+    items.forEach((item) => {
+      const localPath = path.join(localDir, item);
+      const remotePath = path.posix.join(remoteDir, item); // always forward slashes for FTP
 
-    files.forEach((file) => {
-      const localPath = path.join(releaseDir, file);
-      const remotePath = `/${file}`;
+      fs.stat(localPath, (err, stats) => {
+        if (err) return done(err);
 
-      ftpClient.put(localPath, remotePath, (err) => {
-        if (err) {
-          console.error(`Error uploading ${file}:`, err);
+        if (stats.isDirectory()) {
+          ftpClient.mkdir(remotePath, true, (err) => {
+            if (err && err.code !== 550)
+              console.warn(`mkdir failed for ${remotePath}:`, err);
+            uploadDirectory(localPath, remotePath, checkDone);
+          });
         } else {
-          console.log(`Uploaded ${file}`);
-        }
-
-        uploadCount++;
-        if (uploadCount === totalFiles) {
-          console.log('All files uploaded');
-          ftpClient.end();
+          ftpClient.put(localPath, remotePath, (err) => {
+            if (err) console.error(`Error uploading ${remotePath}:`, err);
+            else console.log(`Uploaded ${remotePath}`);
+            checkDone();
+          });
         }
       });
     });
+
+    function checkDone() {
+      if (--pending === 0) done();
+    }
+  });
+}
+
+ftpClient.on('ready', () => {
+  console.log('FTP connection established');
+  uploadDirectory(releaseDir, '/', (err) => {
+    if (err) {
+      console.error('Upload failed:', err);
+    } else {
+      console.log('All files uploaded');
+    }
+    ftpClient.end();
   });
 });
 
-ftpClient.on('error', function (err) {
+ftpClient.on('error', (err) => {
   console.error('FTP error:', err);
   process.exit(1);
 });
