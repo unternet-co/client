@@ -4,8 +4,10 @@ on:
   push:
     tags:
       - '*.*.*'
+
 permissions:
   contents: write
+
 jobs:
   package:
     name: Build and Release
@@ -37,16 +39,12 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install
 
-      - name: Clean install to fix optional native module bug (Windows)
+      - name: Clean  (Windows)
         shell: pwsh
         if: matrix.os == 'windows-latest'
         run: |
-          if (Test-Path node_modules) {
-            Remove-Item -Recurse -Force node_modules
-          }
-          if (Test-Path package-lock.json) {
-            Remove-Item -Force package-lock.json
-          }
+          if (Test-Path node_modules) { Remove-Item -Recurse -Force node_modules }
+          if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
           npm install
 
       - name: Build and release (macOS)
@@ -55,14 +53,13 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
+          mac_certs: ${{ secrets.MAC_CERTS }}
+          mac_certs_password: ${{ secrets.MAC_CERTS_PASSWORD }}
         env:
-          APPLE_ID: ${{ secrets.apple_id }}
-          APPLE_ID_PASS: ${{ secrets.apple_id_pass }}
-          APPLE_TEAM_ID: ${{ secrets.apple_team_id }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
 
       - name: Build and release (Windows/Linux)
         if: matrix.os != 'macos-latest'
@@ -71,22 +68,27 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
           args: --publish never
-        env:
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
 
-      - name: Rename latest.yml files
+      - name: Collect distributables
         shell: bash
         run: |
           mkdir -p release
-          if [ -f release/latest.yml ]; then mv release/latest.yml release/latest-mac.yml; fi
-          if [ -f release/release-files-ubuntu-latest/latest.yml ]; then mv release/release-files-ubuntu-latest/latest.yml release/latest-linux.yml; fi
-          if [ -f release/release-files-windows-latest/latest.yml ]; then mv release/release-files-windows-latest/latest.yml release/latest-win.yml; fi
 
-      - name: Upload artifacts
+          # move ymls
+          [ -f release/latest.yml ] && mv release/latest.yml release/latest-mac.yml
+          [ -f release/release-files-ubuntu-latest/latest.yml ] && mv release/release-files-ubuntu-latest/latest.yml release/latest-linux.yml
+          [ -f release/release-files-windows-latest/latest.yml ] && mv release/release-files-windows-latest/latest.yml release/latest-win.yml
+
+          # move distributables
+          mv release/release-files-macos-latest/*.dmg release/ 2>/dev/null || true
+          mv release/release-files-macos-latest/*.zip release/ 2>/dev/null || true
+          mv release/release-files-windows-latest/*.exe release/ 2>/dev/null || true
+          mv release/release-files-ubuntu-latest/*.AppImage release/ 2>/dev/null || true
+
+      - name: Upload distributables
         uses: actions/upload-artifact@v4
         with:
-          name: release-files-${{ matrix.os }}
+          name: flat-release
           path: release/
           if-no-files-found: error
 
@@ -98,18 +100,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      - name: Download distributables only
         uses: actions/download-artifact@v4
         with:
+          name: flat-release
           path: release
 
-      - name: Install FTP client dependency
+      - name: Install FTP client
         run: npm install ftp
-
-      - name: Flatten release artifacts
-        run: |
-          mkdir -p release-flat
-          find release -type f \( -iname '*.dmg' -o -iname '*.exe' -o -iname '*.zip' -o -iname '*.appimage' -o -iname 'latest-*.yml' \) -exec cp {} release-flat/ \;
 
       - name: Upload to FTP
         run: node scripts/upload-ftp.js

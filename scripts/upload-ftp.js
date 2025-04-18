@@ -11,38 +11,36 @@ const config = {
   secure: true,
 };
 
-const releaseDir = path.join(__dirname, '..', 'release-flat');
+const releaseDir = path.join(__dirname, '..', 'release');
 
-function isDistributableFile(filePath) {
-  const ext = path.extname(filePath).toLowerCase();
-  return ['.dmg', '.zip', '.appimage', '.exe', '.yml'].includes(ext);
+function isDistributable(filePath) {
+  return ['.dmg', '.zip', '.appimage', '.exe', '.yml'].includes(
+    path.extname(filePath).toLowerCase()
+  );
 }
 
-function uploadFlatFiles(folder, done) {
+function uploadFiles(folder, done) {
   fs.readdir(folder, (err, files) => {
     if (err) return done(err);
 
     const uploadables = files.filter((f) => {
-      const fullPath = path.join(folder, f);
-      return fs.statSync(fullPath).isFile() && isDistributableFile(fullPath);
+      const full = path.join(folder, f);
+      return fs.statSync(full).isFile() && isDistributable(full);
     });
 
     if (uploadables.length === 0) {
-      console.log('No distributable files found to upload.');
+      console.log('No distributable files found.');
       return done();
     }
 
     let count = 0;
     uploadables.forEach((file) => {
-      const localPath = path.join(folder, file);
-      const remotePath = `/${file}`;
+      const local = path.join(folder, file);
+      const remote = `/${file}`;
 
-      ftpClient.put(localPath, remotePath, (err) => {
-        if (err) {
-          console.error(`❌ Error uploading ${file}:`, err);
-        } else {
-          console.log(`✅ Uploaded ${file}`);
-        }
+      ftpClient.put(local, remote, (err) => {
+        if (err) console.error(`❌ Failed: ${file}`, err);
+        else console.log(`✅ Uploaded: ${file}`);
 
         count++;
         if (count === uploadables.length) done();
@@ -52,9 +50,9 @@ function uploadFlatFiles(folder, done) {
 }
 
 ftpClient.on('ready', () => {
-  console.log('FTP connection established');
-  uploadFlatFiles(releaseDir, () => {
-    console.log('🎉 Finished uploading distributables.');
+  console.log('🔌 FTP connected');
+  uploadFiles(releaseDir, () => {
+    console.log('🎉 All done');
     ftpClient.end();
   });
 });
@@ -64,5 +62,5 @@ ftpClient.on('error', (err) => {
   process.exit(1);
 });
 
-console.log('Connecting to FTP server...');
+console.log('Connecting to FTP...');
 ftpClient.connect(config);
