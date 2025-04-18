@@ -24,10 +24,8 @@
       "output": "release"
     },
     "publish": {
-      "provider": "ftp",
-      "host": "ftp.koumbit.net",
-      "port": 21,
-      "path": "/",
+      "provider": "generic",
+      "url": "ftp://ftp.koumbit.net",
       "useSecure": true
     },
     "mac": {
