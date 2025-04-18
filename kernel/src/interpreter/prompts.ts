@@ -1,5 +1,6 @@
 import dedent from 'dedent';
-import { ActionDefinition, Strategy } from './types.js';
+import { ActionDefinition } from '../actions/resources';
+import { Strategy } from './strategies';
 
 function chooseStrategy(strategies: Record<string, Strategy>) {
   const possibleOutputs = Object.keys(strategies)

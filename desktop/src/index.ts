@@ -18,8 +18,8 @@ import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
-import { ResourceModel, initialResources } from './processes/resources';
-import { protocols } from './processes/protocols';
+import { ResourceModel, initialResources } from './protocols/resources';
+import { protocols } from './protocols/protocols';
 
 /* Initialize databases & stores */
 

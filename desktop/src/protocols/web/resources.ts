@@ -3,9 +3,11 @@ import iconSrc from './icon-128x128.png';
 
 const unternetResources = new Array<Resource>();
 
-unternetResources.push({
-  protocol: 'unternet',
+const builtin = new Resource({
+  uri: 'web:',
   name: 'Web',
+  description:
+    'Take general actions on the web, and specific web pages, relating to parsing content, conducting searches, etc.',
   icons: [
     {
       src: iconSrc,
@@ -13,7 +15,8 @@ unternetResources.push({
   ],
   actions: {
     search: {
-      description: 'Search the internet for information.',
+      description:
+        'Search the entire web for information, from a set of keywords.',
       params_schema: {
         type: 'object',
         properties: {
@@ -28,4 +31,4 @@ unternetResources.push({
   },
 });
 
-export { unternetResources };
+export default [builtin];

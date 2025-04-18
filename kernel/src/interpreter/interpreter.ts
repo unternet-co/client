@@ -1,23 +1,38 @@
-import { LanguageModel, streamText, generateObject, generateText } from 'ai';
 import {
-  ActionDefinition,
-  ActionResponse,
-  Interaction,
+  LanguageModel,
+  streamText,
+  generateObject,
+  generateText,
   Schema,
-  Resource,
-  Strategy,
-  TextResponse,
-} from './types';
-import {
-  createActionRecord,
-  createMessages,
-  createUserMessage,
-  createAssistantMessage,
-  decodeActionUri,
-} from './utils';
+} from 'ai';
 import defaultPrompts, { InterpreterPrompts } from './prompts';
 import { actionChoiceSchema, schemas } from './schemas';
-import { defaultStrategies } from './strategies';
+import { defaultStrategies, Strategy } from './strategies';
+import {
+  ActionDirective,
+  createActionRecord,
+  decodeActionHandle,
+} from '../actions/actions';
+import { ActionDefinition, Resource } from '../actions/resources';
+import { Interaction } from './interactions';
+import {
+  createAssistantMessage,
+  createMessages,
+  createUserMessage,
+} from './messages';
+
+export interface TextResponse {
+  type: 'text';
+  text: Promise<string>;
+  textStream: AsyncIterable<string>;
+}
+
+export interface ActionResponse {
+  type: 'action';
+  directive: ActionDirective;
+}
+
+export type InterpreterResponse = TextResponse | ActionResponse;
 
 type InterpreterLogger = (
   type: 'thought' | 'action' | 'input' | 'text',
@@ -238,12 +253,11 @@ export class Interpreter {
     });
 
     return tools.map((tool) => {
-      const { protocol, resourceId, actionId } = decodeActionUri(tool.id);
+      const { uri, actionId } = decodeActionHandle(tool.id);
       return {
         type: 'action',
         directive: {
-          protocol,
-          resourceId,
+          uri,
           actionId,
           args: tool.args,
         },

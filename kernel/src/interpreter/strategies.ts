@@ -1,5 +1,13 @@
-import { Interpreter } from './interpreter';
-import { Interaction, Strategy } from './types';
+import { Interpreter, InterpreterResponse } from './interpreter';
+import { Interaction } from './interactions';
+
+export interface Strategy {
+  description: string;
+  method: (
+    interpreter: Interpreter,
+    interactions: Interaction[]
+  ) => AsyncGenerator<InterpreterResponse, any, Array<Interaction>>;
+}
 
 const defaultStrategies: Record<string, Strategy> = {};
 
