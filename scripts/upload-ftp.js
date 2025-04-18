@@ -13,50 +13,48 @@ const config = {
 
 const releaseDir = path.join(__dirname, '..', 'release');
 
-function uploadDirectory(localDir, remoteDir, done) {
-  fs.readdir(localDir, (err, items) => {
+function isDistributableFile(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  return ['.dmg', '.zip', '.appimage', '.exe', '.yml'].includes(ext);
+}
+
+function uploadFlatFiles(folder, done) {
+  fs.readdir(folder, (err, files) => {
     if (err) return done(err);
 
-    let pending = items.length;
-    if (!pending) return done();
-
-    items.forEach((item) => {
-      const localPath = path.join(localDir, item);
-      const remotePath = path.posix.join(remoteDir, item); // always forward slashes for FTP
-
-      fs.stat(localPath, (err, stats) => {
-        if (err) return done(err);
-
-        if (stats.isDirectory()) {
-          ftpClient.mkdir(remotePath, true, (err) => {
-            if (err && err.code !== 550)
-              console.warn(`mkdir failed for ${remotePath}:`, err);
-            uploadDirectory(localPath, remotePath, checkDone);
-          });
-        } else {
-          ftpClient.put(localPath, remotePath, (err) => {
-            if (err) console.error(`Error uploading ${remotePath}:`, err);
-            else console.log(`Uploaded ${remotePath}`);
-            checkDone();
-          });
-        }
-      });
+    const uploadables = files.filter((f) => {
+      const fullPath = path.join(folder, f);
+      return fs.statSync(fullPath).isFile() && isDistributableFile(fullPath);
     });
 
-    function checkDone() {
-      if (--pending === 0) done();
+    if (uploadables.length === 0) {
+      console.log('No distributable files found to upload.');
+      return done();
     }
+
+    let count = 0;
+    uploadables.forEach((file) => {
+      const localPath = path.join(folder, file);
+      const remotePath = `/${file}`;
+
+      ftpClient.put(localPath, remotePath, (err) => {
+        if (err) {
+          console.error(`❌ Error uploading ${file}:`, err);
+        } else {
+          console.log(`✅ Uploaded ${file}`);
+        }
+
+        count++;
+        if (count === uploadables.length) done();
+      });
+    });
   });
 }
 
 ftpClient.on('ready', () => {
   console.log('FTP connection established');
-  uploadDirectory(releaseDir, '/', (err) => {
-    if (err) {
-      console.error('Upload failed:', err);
-    } else {
-      console.log('All files uploaded');
-    }
+  uploadFlatFiles(releaseDir, () => {
+    console.log('🎉 Finished uploading distributables.');
     ftpClient.end();
   });
 });
