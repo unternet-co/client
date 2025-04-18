@@ -147,6 +147,13 @@ export class TopBar extends HTMLElement {
     const settingsButtonTemplate = html`
       <un-button
         type="ghost"
+        icon="bug"
+        class="settings-button"
+        @click=${() => this.modalService.open('bug')}
+      >
+      </un-button>
+      <un-button
+        type="ghost"
         icon="settings"
         class="settings-button"
         @click=${() => this.openSettings()}
