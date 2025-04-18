@@ -46,6 +46,10 @@ class MarkdownText extends HTMLElement {
       li {
         margin: var(--space-4) 0;
       }
+
+      a {
+        color: var(--color-action-600);
+      }
     `;
   }
 }

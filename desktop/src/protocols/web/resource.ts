@@ -1,9 +1,7 @@
 import { Resource } from '@unternet/kernel';
 import iconSrc from './icon-128x128.png';
 
-const unternetResources = new Array<Resource>();
-
-const builtin = new Resource({
+const web = new Resource({
   uri: 'web:',
   name: 'Web',
   description:
@@ -28,7 +26,20 @@ const builtin = new Resource({
         required: ['q'],
       },
     },
+    show: {
+      description: 'Show a particular web page, inline in the conversation.',
+      params_schema: {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description: 'The URL of the site to open.',
+          },
+        },
+        required: ['url'],
+      },
+    },
   },
 });
 
-export default [builtin];
+export default web;

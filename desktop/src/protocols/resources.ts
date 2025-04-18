@@ -1,10 +1,10 @@
 import { Resource } from '@unternet/kernel';
-import webResources from './web/resources';
+import webResource from './web/resource';
 
 const initialResources: Array<Resource> = new Array();
 
 if (import.meta.env.APP_UNTERNET_API_KEY) {
-  initialResources.push(...webResources);
+  initialResources.push(webResource);
 }
 
 interface ResourceModelInit {
