@@ -85,7 +85,8 @@ export class ModalService {
    */
   open(key: string): Modal {
     if (this.modals.has(key)) return this.modals.get(key)!;
-
+    if (!this.definitions.has(key))
+      throw new Error(`Modal with key "${key}" has not been registered.`);
     const modal = new Modal(key, this.definitions.get(key)!);
     modal.open(this.modals.size);
     this.modals.set(key, modal);
