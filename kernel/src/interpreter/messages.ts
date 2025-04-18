@@ -1,5 +1,6 @@
 import {
   CoreAssistantMessage,
+  CoreSystemMessage,
   CoreUserMessage,
   FilePart,
   ImagePart,
@@ -7,68 +8,22 @@ import {
 } from 'ai';
 import {
   ActionOutput,
-  ActionRecord,
   FileInput,
   Interaction,
-  InteractionInput,
-  Message,
-  Resource,
-  Protocol,
-  ProtocolHandler,
   TextOutput,
-} from './types';
+} from './interactions';
+import { encodeActionHandle } from '../actions/actions';
 
-export function createInteraction(
-  input: InteractionInput | string
-): Interaction {
-  if (typeof input === 'string') {
-    const text = input;
-    input = { text };
-  }
-
-  return {
-    input,
-    outputs: [],
-  };
-}
-
-export function clone(obj: Object) {
-  return JSON.parse(JSON.stringify(obj));
-}
-
-export function createProtocolHandlers(protocols: Protocol[]) {
-  const handlers: Record<string, ProtocolHandler> = {};
-  for (const protocol of protocols) {
-    handlers[protocol.scheme] = protocol.handler.bind(protocol);
-  }
-  return handlers;
-}
-
-export function createActionRecord(resources: Resource[]): ActionRecord {
-  const actions: ActionRecord = {};
-
-  for (const resource of resources) {
-    for (const actionId in resource.actions) {
-      const action = resource.actions[actionId];
-
-      const actionUri = encodeActionUri({
-        protocol: resource.protocol,
-        resourceId: resource.id,
-        actionId,
-      });
-
-      actions[actionUri] = action;
-    }
-  }
-
-  return actions;
-}
+export type Message =
+  | CoreSystemMessage
+  | CoreUserMessage
+  | CoreAssistantMessage;
 
 export function createUserMessage(content: string) {
   return {
     role: 'user',
     content,
-  } as CoreUserMessage;
+  } as Message;
 }
 
 export function createAssistantMessage(content: string) {
@@ -106,7 +61,7 @@ export function createMessages(
       } else if (output.type === 'action') {
         const actionOutput = output as ActionOutput;
 
-        const actionUri = encodeActionUri(output.directive);
+        const actionUri = encodeActionHandle(output.directive);
         messages.push(
           createAssistantMessage(
             `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`
@@ -126,43 +81,6 @@ export function createMessages(
   }
 
   return messages;
-}
-
-interface UriComponents {
-  protocol: string;
-  resourceId?: string;
-  actionId?: string;
-}
-
-export function encodeActionUri({
-  protocol,
-  resourceId,
-  actionId,
-}: UriComponents) {
-  // <protocol>:<resource_uri>#<action_id>
-  let uriString = '';
-  if (protocol) uriString += `${protocol}:`;
-  if (resourceId) uriString += encodeURIComponent(resourceId);
-  if (actionId) uriString += `#${actionId}`;
-  return uriString;
-}
-
-export function decodeActionUri(encodedActionURI: string): UriComponents {
-  let [protocol, ...rest] = encodedActionURI.split(':');
-  let [resourceId, actionId] = rest.join(':').split('#');
-
-  if (!resourceId || resourceId === 'undefined') {
-    resourceId = undefined;
-  } else {
-    resourceId = decodeURIComponent(resourceId);
-  }
-  if (!actionId || actionId === 'undefined') actionId = undefined;
-
-  return {
-    protocol,
-    resourceId,
-    actionId,
-  };
 }
 
 export function fileMessage(file: FileInput): TextPart | ImagePart | FilePart {

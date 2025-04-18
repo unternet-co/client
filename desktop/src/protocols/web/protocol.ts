@@ -2,9 +2,7 @@ import Unternet from '@unternet/sdk';
 import { ActionDirective, Protocol } from '@unternet/kernel';
 
 class UnternetProtocol implements Protocol {
-  readonly scheme = 'unternet';
-
-  // TODO: This shoud be a service
+  readonly scheme = 'web';
   connection = new Unternet({
     apiKey: import.meta.env.APP_UNTERNET_API_KEY,
     isDev: import.meta.env.DEV,

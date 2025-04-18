@@ -6,7 +6,7 @@ import { dependencies } from '../../common/dependencies';
 import '../common/scroll-container';
 import '../common/markdown-text';
 import './interaction-history.css';
-import { ResourceModel } from '../../processes/resources';
+import { ResourceModel } from '../../protocols/resources';
 import { ActionOutput, TextOutput } from '@unternet/kernel';
 
 class InteractionHistory extends HTMLElement {
@@ -175,10 +175,7 @@ class InteractionHistory extends HTMLElement {
   }
 
   actionOutputTemplate(output: ActionOutput) {
-    const resource = this.resourceModel.find({
-      protocol: output.directive.protocol,
-      id: output.directive.resourceId,
-    });
+    const resource = this.resourceModel.find(output.directive.uri);
 
     let img = html``;
     if (resource.icons && resource.icons[0] && resource.icons[0].src) {

@@ -1,5 +1,6 @@
 import { jsonSchema, Schema } from 'ai';
-import { ActionDefinition, Strategy } from './types';
+import { ActionDefinition } from '../actions/resources';
+import { Strategy } from './strategies';
 
 export interface ActionChoiceObject {
   tools: Array<{ id: string; args?: any }>;
