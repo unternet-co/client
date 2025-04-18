@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "chokidar 'src/**/*' -c 'npm run build'",
-    "run:example": "cd example && npx tsx src/index.ts"
+    "example": "cd example && npx tsx src/index.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",
