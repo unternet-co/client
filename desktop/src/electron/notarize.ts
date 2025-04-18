@@ -3,21 +3,14 @@ import type { AfterPackContext } from 'electron-builder';
 export default async function notarizing(context: AfterPackContext) {
   const { electronPlatformName, appOutDir } = context;
 
-  if (electronPlatformName !== 'darwin') {
-    console.log('[notarize] Skipping: not macOS');
-    return;
-  }
+  if (electronPlatformName !== 'darwin') return;
 
-  const missing = [
-    !process.env.APPLE_ID && 'APPLE_ID',
-    !process.env.APPLE_ID_PASS && 'APPLE_ID_PASS',
-    !process.env.APPLE_TEAM_ID && 'APPLE_TEAM_ID',
-  ].filter(Boolean);
-
-  if (missing.length > 0) {
-    console.warn(
-      `[notarize] Skipping: missing env vars → ${missing.join(', ')}`
-    );
+  if (
+    !process.env.APPLE_ID ||
+    !process.env.APPLE_APP_SPECIFIC_PASSWORD ||
+    !process.env.APPLE_TEAM_ID
+  ) {
+    console.warn('[notarize] Skipping: missing Apple credentials');
     return;
   }
 
@@ -31,17 +24,14 @@ export default async function notarizing(context: AfterPackContext) {
   try {
     const { notarize } = await import('@electron/notarize');
 
-    await notarize({
-      appPath,
-      appleId: process.env.APPLE_ID!,
-      appleIdPassword: process.env.APPLE_ID_PASS!,
-      teamId: process.env.APPLE_TEAM_ID!,
+    return notarize({
+      appPath: `${appOutDir}/${appName}.app`,
+      appleId: process.env.APPLE_ID,
+      appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
+      teamId: process.env.APPLE_TEAM_ID,
     });
-
-    console.log('[notarize] ✅ Notarization complete');
-  } catch (err) {
-    console.error('[notarize] ❌ Notarization failed:');
-    console.error(err);
-    throw err; // ensure CI fails explicitly
+  } catch (error) {
+    console.error('[notarize] Failed to notarize application:', error);
+    throw error;
   }
 }
