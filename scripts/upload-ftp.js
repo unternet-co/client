@@ -11,7 +11,7 @@ const config = {
   secure: true,
 };
 
-const releaseDir = path.join(__dirname, '..', 'release');
+const releaseDir = path.join(__dirname, '..', 'release-flat');
 
 function isDistributableFile(filePath) {
   const ext = path.extname(filePath).toLowerCase();

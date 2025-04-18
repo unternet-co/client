@@ -106,6 +106,11 @@ jobs:
       - name: Install FTP client dependency
         run: npm install ftp
 
+      - name: Flatten release artifacts
+        run: |
+          mkdir -p release-flat
+          find release -type f \( -iname '*.dmg' -o -iname '*.exe' -o -iname '*.zip' -o -iname '*.appimage' -o -iname 'latest-*.yml' \) -exec cp {} release-flat/ \;
+
       - name: Upload to FTP
         run: node scripts/upload-ftp.js
         env:
