@@ -61,7 +61,7 @@ export function createMessages(
       } else if (output.type === 'action') {
         const actionOutput = output as ActionOutput;
 
-        const actionUri = encodeActionHandle(output.directive);
+        const actionUri = encodeActionHandle(output.directive.uri, 'TODO');
         messages.push(
           createAssistantMessage(
             `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`
@@ -84,13 +84,16 @@ export function createMessages(
 }
 
 export function fileMessage(file: FileInput): TextPart | ImagePart | FilePart {
-  if (file.mimeType.startsWith('text/') || file.mimeType === 'application/json')
+  if (
+    file.mimeType?.startsWith('text/') ||
+    file.mimeType === 'application/json'
+  )
     return {
       type: 'text',
       text: new TextDecoder().decode(file.data),
     };
 
-  if (file.mimeType.startsWith('image/'))
+  if (file.mimeType?.startsWith('image/'))
     return {
       type: 'image',
       image: file.data,

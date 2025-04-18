@@ -13,8 +13,8 @@
     "build": "tsc",
     "dev": "chokidar 'src/**/*' -c 'npm run build'",
     "example": "cd example && npx tsx src/index.ts",
-    "test": "vitest tests/**/*.test.ts --watch=false",
-    "test:dev": "vitest tests/**/*.test.ts --watch"
+    "test": "vitest --root tests --watch=false",
+    "test:dev": "vitest --root tests --watch"
   },
   "imports": {
     "#src/*": "./src/*",
