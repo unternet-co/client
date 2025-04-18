@@ -24,10 +24,11 @@
       "output": "release"
     },
     "publish": {
-      "provider": "github",
-      "owner": "unternet-co",
-      "repo": "client",
-      "releaseType": "release"
+      "provider": "ftp",
+      "host": "ftp.koumbit.net",
+      "port": 21,
+      "path": "/",
+      "useSecure": true
     },
     "mac": {
       "category": "public.app-category.developer-tools",
