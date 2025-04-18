@@ -42,6 +42,10 @@ class MarkdownText extends HTMLElement {
       p, ul, ol, blockquote {
         margin: var(--space-4) 0;
       }
+
+      li {
+        margin: var(--space-4) 0;
+      }
     `;
   }
 }
