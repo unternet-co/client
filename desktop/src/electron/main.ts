@@ -14,8 +14,8 @@ const isDev = !app.isPackaged;
 const AUTOUPDATE_INTERVAL = 3_600_000; // 60 * 60 * 1000
 
 // Configure logging
+log.transports.file.level = isDev ? 'debug' : 'info';
 autoUpdater.logger = log;
-(autoUpdater.logger as any).transports.file.level = isDev ? 'debug' : 'info';
 
 function formatReleaseNotes(
   notes: string | { note: string }[] | undefined
@@ -155,7 +155,7 @@ function createWindow() {
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
   } else {
-    win.loadFile(path.join(__dirname, 'web', 'index.html'));
+    win.loadFile(path.join(__dirname, '../../dist/www/index.html'));
   }
 }
 
