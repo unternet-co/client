@@ -3,7 +3,7 @@ import { Resource } from '@unternet/kernel';
 // import './resource-picker';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../processes/resources';
+import { ResourceModel } from '../../protocols/resources';
 
 export class ResourceBar extends HTMLElement {
   resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');

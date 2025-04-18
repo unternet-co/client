@@ -1,4 +1,5 @@
-import { attachStyles, appendEl } from '../../common/utils/dom';
+import { LitElement, html, css } from 'lit';
+import { ref, createRef } from 'lit/directives/ref.js';
 import { createElement, icons } from 'lucide';
 
 export const ICON_MAP = {
@@ -8,45 +9,64 @@ export const ICON_MAP = {
   toolbox: 'shapes',
   settings: 'settings-2',
   check: 'check',
-  dropdown: 'chevron-down',
+  dropdown: 'chevrons-up-down',
   enter: 'corner-down-left',
   handle: 'grip-horizontal',
   delete: 'trash',
   history: 'history',
   refresh: 'refresh-cw',
   error: 'alert-triangle',
-  loading: 'loader',
+  loading: 'loader-circle',
+  external: 'external-link',
+  download: 'download',
+  left: 'arrow-left',
+  right: 'arrow-right',
+  up: 'arrow-up',
+  down: 'arrow-down',
+  search: 'search',
+  upload: 'upload',
+  attachment: 'paperclip',
 } as const;
 
-export class IconElement extends HTMLElement {
-  shadow: ShadowRoot;
-  iconElement: SVGElement | null = null;
-  static observedAttributes = ['name', 'spin'];
+export type IconSize = 'small' | 'medium' | 'large';
+const sizeMap = {
+  small: '12',
+  medium: '14',
+  large: '18',
+};
+
+export class IconElement extends LitElement {
+  name: string | null = null;
+  size: IconSize = 'medium';
+  spin: string | null = null;
+
+  iconContainer = createRef<HTMLDivElement>();
+
+  static get properties() {
+    return {
+      name: { type: String },
+      size: { type: String },
+      spin: { type: String, reflect: true },
+    };
+  }
 
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: 'open' });
   }
 
-  connectedCallback() {
-    this.renderIcon();
+  private getIconAttributes() {
+    return {
+      stroke: 'currentColor',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      width: sizeMap[this.size || 'medium'],
+      height: sizeMap[this.size || 'medium'],
+      fill: 'none',
+    };
   }
-
-  attributeChangedCallback() {
-    this.renderIcon();
-  }
-
-  // Standard attributes for all icons
-  private readonly iconAttributes = {
-    stroke: 'currentColor',
-    'stroke-width': '1.5',
-    'stroke-linecap': 'round',
-    'stroke-linejoin': 'round',
-    fill: 'none',
-  };
 
   /**
-   * Gets an SVG icon element based on the provided icon name
+   * Gets the Lucide icon based on the provided icon name
    * @param iconName The name of the icon to get, defaults to 'help-circle'
    * @returns SVG element for the icon
    */
@@ -62,49 +82,40 @@ export class IconElement extends HTMLElement {
 
     const iconData =
       icons[pascalCaseName as keyof typeof icons] || icons.HelpCircle;
-    return createElement(iconData, this.iconAttributes) as SVGElement;
+    return createElement(iconData, this.getIconAttributes()) as SVGElement;
   }
 
-  private renderIcon() {
-    if (this.iconElement && this.shadow.contains(this.iconElement)) {
-      this.shadow.removeChild(this.iconElement);
-    }
-    this.iconElement = this.getIcon(this.getAttribute('name'));
-    appendEl(this.shadow, this.iconElement as unknown as HTMLElement);
+  render() {
+    const spinClass = this.spin !== null ? 'spin' : '';
+    const spinStyle =
+      this.spin && this.spin !== '' ? `--spin-duration: ${this.spin};` : '';
 
-    if (this.hasAttribute('spin')) {
-      this.iconElement.classList.add('spin');
-      const spinValue = this.getAttribute('spin');
-      if (spinValue && spinValue !== '') {
-        this.iconElement.style.setProperty('--spin-duration', spinValue);
-      }
-    }
-
-    attachStyles(this.shadow, this.styles);
+    return html`
+      <div class="${spinClass}" style="${spinStyle}">
+        <div class="icon-container" ${ref(this.iconContainer)}></div>
+      </div>
+    `;
   }
 
-  get styles() {
-    return /*css*/ `
+  updated() {
+    if (this.iconContainer.value) {
+      this.iconContainer.value.innerHTML = '';
+      const iconElement = this.getIcon(this.name);
+      this.iconContainer.value.appendChild(iconElement);
+    }
+  }
+
+  static get styles() {
+    return css`
       :host {
         display: inline-block;
         color: inherit;
-        width: 16px;
       }
 
-      :host(.icon-button) {
-        border-radius: 4px;
-      }
-
-      :host(.icon-button:hover) {
-        background: var(--color-bg-container);
-      }
-
-      svg {
-        width: 100%;
-        height: 100%;
+      .icon-container svg {
         display: block;
       }
-      
+
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -113,7 +124,7 @@ export class IconElement extends HTMLElement {
           transform: rotate(360deg);
         }
       }
-      
+
       .spin {
         --spin-duration: 2s;
         animation: spin var(--spin-duration) linear infinite;

@@ -68,6 +68,11 @@ export class SettingsModal extends ModalElement {
     this.close();
   }
 
+  private handleHintInput(event: InputEvent) {
+    const target = event.target as HTMLTextAreaElement;
+    this.globalHint = target.value;
+  }
+
   private handleProviderChange = async (event: CustomEvent) => {
     this.selectedModel = null;
     this.modelError = null;
@@ -138,8 +143,7 @@ export class SettingsModal extends ModalElement {
         </p>
         <un-textarea
           value=${this.globalHint}
-          @change=${(event: CustomEvent) =>
-            (this.globalHint = event.detail.value)}
+          @input=${this.handleHintInput.bind(this)}
           rows="4"
         ></un-textarea>
       </div>
@@ -152,8 +156,9 @@ export class SettingsModal extends ModalElement {
     // Model select
     const providerSelection = html`
       <div class="setting-row">
-        <label>Provider</label>
+        <un-label for="provider" text="Provider"></un-label>
         <un-select
+          id="provider"
           value=${this.selectedProvider}
           @change=${this.handleProviderChange}
         >
@@ -171,8 +176,13 @@ export class SettingsModal extends ModalElement {
     if (this.selectedProvider === 'ollama') {
       const ollamaDetails = html`
         <div class="setting-row">
-          <label>Base URL</label>
+          <un-label
+            for="base-url"
+            text="Base URL"
+            hint="The URL where your Ollama server is running"
+          ></un-label>
           <un-input
+            id="base-url"
             type="url"
             value=${this.selectedProviderConfig.baseUrl}
             @change=${(e: CustomEvent) => {
@@ -187,8 +197,9 @@ export class SettingsModal extends ModalElement {
     } else {
       const hostedModelDetails = html`
         <div class="setting-row">
-          <label>API Key</label>
+          <un-label for="api-key" text="API Key" variant="required"></un-label>
           <un-input
+            id="api-key"
             type="password"
             value=${this.selectedProviderConfig.apiKey}
             @change=${(e: CustomEvent) => {
@@ -204,8 +215,9 @@ export class SettingsModal extends ModalElement {
 
     const modelSelection = html`
       <div class="setting-row">
-        <label>Model</label>
+        <un-label for="model" text="Model"></un-label>
         <un-select
+          id="model"
           value=${this.selectedModel?.name}
           @change=${(event: CustomEvent) => {
             this.selectedModel = this.availableModels.find(
@@ -213,6 +225,7 @@ export class SettingsModal extends ModalElement {
             );
             this.render();
           }}
+          ?loading=${this.isLoadingModels}
           placeholder="Select a model"
         >
           ${this.availableModels.map(
@@ -223,18 +236,10 @@ export class SettingsModal extends ModalElement {
         </un-select>
       </div>
     `;
-    if (!this.isLoadingModels && this.availableModels.length > 0) {
-      sections.push(modelSelection);
-    }
 
-    if (this.isLoadingModels) {
-      sections.push(
-        html`<div class="model-loading">
-          <un-icon name="loading" spin></un-icon>
-          <span>Loading models...</span>
-        </div>`
-      );
-    } else if (this.modelError) {
+    sections.push(modelSelection);
+
+    if (this.modelError) {
       sections.push(
         html`<div class="model-error">
           <un-icon name="error"></un-icon>

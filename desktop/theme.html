@@ -16,6 +16,7 @@
     <script type="module" src="src/ui/common/checkbox.ts"></script>
     <script type="module" src="src/ui/common/radio.ts"></script>
     <script type="module" src="src/ui/common/button.ts"></script>
+    <script type="module" src="src/ui/common/label.ts"></script>
     <style>
       body {
         overflow: auto;
@@ -44,6 +45,12 @@
         font-weight: 500;
       }
 
+      .theme-block {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-8);
+      }
+
       .button-showcase {
         display: flex;
         flex-direction: column;
@@ -57,7 +64,8 @@
       }
 
       .button-group h4 {
-        min-width: 100px;
+        font-weight: 500;
+        min-width: 200px;
         margin: 0;
       }
 
@@ -98,7 +106,16 @@
       }
 
       .color-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
         margin-bottom: var(--space-6);
+      }
+
+      .color-group > div {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
       }
 
       .color-group h3 {
@@ -117,9 +134,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 1rem;
-        border: 1px solid var(--color-border);
-        border-radius: 8px;
+        padding: var(--space-3);
       }
 
       .icon-name {
@@ -264,16 +279,80 @@ return "Hello, World!";
         <a href="#">Link</a>
       </div>
       <div>
-        <h3>Inputs</h3>
+        <h3>Labels & Inputs</h3>
 
         <div class="form-showcase">
           <div class="form-group">
-            <h4>Search Input</h4>
+            <un-label
+              for="search-input"
+              text="Search Input"
+              size="small"
+              variant="required"
+            ></un-label>
             <un-input type="search" placeholder="Enter some text"></un-input>
             <un-input type="search" value="Disabled input" disabled></un-input>
-            <h4>Text Input</h4>
+            <un-label for="text-input" text="Text Input"></un-label>
             <un-input type="text" placeholder="Enter some text"></un-input>
             <un-input type="text" value="Disabled input" disabled></un-input>
+          </div>
+
+          <div class="form-group">
+            <un-label
+              for="input-sizes"
+              text="Input Sizes"
+              variant="optional"
+            ></un-label>
+            <un-input
+              type="text"
+              size="small"
+              placeholder="Small input"
+            ></un-input>
+            <un-input
+              type="text"
+              placeholder="Medium input (default)"
+            ></un-input>
+            <un-input
+              type="text"
+              size="large"
+              placeholder="Large input"
+            ></un-input>
+          </div>
+
+          <div class="form-group">
+            <un-label for="input-variants" text="Input Variants"></un-label>
+            <un-input type="text" placeholder="Default variant"></un-input>
+            <un-input
+              type="text"
+              variant="ghost"
+              placeholder="Ghost variant"
+            ></un-input>
+            <un-input
+              type="text"
+              variant="flat"
+              placeholder="Flat variant"
+            ></un-input>
+          </div>
+
+          <div class="form-group">
+            <h4>Combined Size & Variant</h4>
+            <un-input
+              type="text"
+              size="small"
+              variant="ghost"
+              placeholder="Small ghost input"
+            ></un-input>
+            <un-input
+              type="text"
+              size="medium"
+              variant="flat"
+              placeholder="Medium flat input"
+            ></un-input>
+            <un-input
+              type="text"
+              size="large"
+              variant="ghost"
+              placeholder="Large ghost input"
+            ></un-input>
           </div>
 
           <div class="form-group">
@@ -285,6 +364,53 @@ return "Hello, World!";
             </un-select>
             <un-select disabled>
               <option value="1">Disabled select</option>
+            </un-select>
+            <un-select loading>
+              <option value="1">Loading select</option>
+              <option value="2">Option 2</option>
+            </un-select>
+
+            <h5>With Icons</h5>
+            <un-select icon="search" placeholder="Search options">
+              <option value="1">Search option 1</option>
+              <option value="2">Search option 2</option>
+            </un-select>
+            <un-select
+              icon="history"
+              icon-position="start"
+              placeholder="History options"
+            >
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
+
+            <h5>Variants</h5>
+            <un-select variant="ghost" placeholder="Ghost variant">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
+            <un-select variant="flat" placeholder="Flat variant">
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
+
+            <h5>Combined Variants with Icons</h5>
+            <un-select
+              variant="ghost"
+              icon="settings"
+              placeholder="Ghost with icon"
+            >
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
+            </un-select>
+            <un-select
+              variant="flat"
+              icon="history"
+              icon-position="start"
+              placeholder="Flat with icon"
+            >
+              <option value="1">Option 1</option>
+              <option value="2">Option 2</option>
             </un-select>
           </div>
 
@@ -327,6 +453,7 @@ return "Hello, World!";
     </div>
     <div class="theme-block">
       <h2>Buttons</h2>
+      <h3>Button Types</h3>
       <div class="button-showcase">
         <div class="button-group">
           <h4>Primary</h4>
@@ -336,9 +463,6 @@ return "Hello, World!";
         <div class="button-group">
           <h4>Secondary</h4>
           <un-button type="secondary" text="Secondary Button"></un-button>
-          <un-button type="secondary">
-            <un-icon name="delete"></un-icon><span>With Icon</span>
-          </un-button>
           <un-button
             type="secondary"
             text="Disabled"
@@ -346,7 +470,7 @@ return "Hello, World!";
           ></un-button>
         </div>
         <div class="button-group">
-          <h4>Danger</h4>
+          <h4>Negative</h4>
           <un-button type="negative" text="Negative Button"></un-button>
           <un-button
             type="negative"
@@ -363,6 +487,145 @@ return "Hello, World!";
           <h4>Ghost</h4>
           <un-button type="ghost" text="Ghost Button"></un-button>
           <un-button type="ghost" text="Disabled" disabled="true"></un-button>
+        </div>
+      </div>
+
+      <h3>Button Sizes</h3>
+      <div class="button-showcase">
+        <div class="button-group">
+          <h4>Small</h4>
+          <un-button
+            type="primary"
+            size="small"
+            text="Small Button"
+          ></un-button>
+          <un-button
+            type="secondary"
+            size="small"
+            text="Small Button"
+          ></un-button>
+          <un-button
+            type="outline"
+            size="small"
+            text="Small Button"
+          ></un-button>
+          <un-button type="ghost" size="small" text="Small Button"></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Medium</h4>
+          <un-button type="primary" text="Medium Button"></un-button>
+          <un-button type="secondary" text="Medium Button"></un-button>
+          <un-button type="outline" text="Medium Button"></un-button>
+          <un-button type="ghost" text="Medium Button"></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Large</h4>
+          <un-button
+            type="primary"
+            size="large"
+            text="Large Button"
+          ></un-button>
+          <un-button
+            type="secondary"
+            size="large"
+            text="Large Button"
+          ></un-button>
+          <un-button
+            type="outline"
+            size="large"
+            text="Large Button"
+          ></un-button>
+          <un-button type="ghost" size="large" text="Large Button"></un-button>
+        </div>
+      </div>
+
+      <h3>Loading State</h3>
+      <div class="button-showcase">
+        <div class="button-group">
+          <h4>Loading</h4>
+          <un-button type="primary" text="Loading" loading></un-button>
+          <un-button type="secondary" text="Loading" loading></un-button>
+          <un-button type="negative" text="Loading" loading></un-button>
+          <un-button type="outline" text="Loading" loading></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Sizes</h4>
+          <un-button
+            type="primary"
+            size="small"
+            text="Small"
+            loading
+          ></un-button>
+          <un-button type="primary" text="Medium" loading></un-button>
+          <un-button
+            type="primary"
+            size="large"
+            text="Large"
+            loading
+          ></un-button>
+        </div>
+      </div>
+
+      <h3>Buttons with Icons</h3>
+      <div class="button-showcase">
+        <div class="button-group">
+          <h4>Icon Start</h4>
+          <un-button type="primary" text="Add" icon="plus"></un-button>
+          <un-button type="secondary" text="Search" icon="search"></un-button>
+          <un-button type="outline" text="Settings" icon="settings"></un-button>
+          <un-button type="ghost" text="Delete" icon="delete"></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Icon End</h4>
+          <un-button
+            type="primary"
+            text="Next"
+            icon="right"
+            icon-position="end"
+          ></un-button>
+          <un-button
+            type="secondary"
+            text="Download"
+            icon="download"
+            icon-position="end"
+          ></un-button>
+          <un-button
+            type="outline"
+            text="External"
+            icon="external"
+            icon-position="end"
+          ></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Sizes with Icons</h4>
+          <un-button
+            type="primary"
+            text="Small"
+            size="small"
+            icon="plus"
+          ></un-button>
+          <un-button type="primary" text="Medium" icon="plus"></un-button>
+          <un-button
+            type="primary"
+            text="Large"
+            size="large"
+            icon="plus"
+          ></un-button>
+        </div>
+        <div class="button-group">
+          <h4>Loading with Icons</h4>
+          <un-button
+            type="primary"
+            text="Loading"
+            icon="refresh"
+            loading
+          ></un-button>
+          <un-button
+            type="secondary"
+            text="Loading"
+            icon="upload"
+            loading
+          ></un-button>
         </div>
       </div>
     </div>

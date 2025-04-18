@@ -1,9 +1,12 @@
-import { ActionDirective, Protocol } from '@unternet/kernel';
 import Unternet from '@unternet/sdk';
+import { ActionDirective, Protocol } from '@unternet/kernel';
 
 class UnternetProtocol implements Protocol {
-  readonly scheme = 'unternet';
-  connection = new Unternet({ isDev: import.meta.env.DEV });
+  readonly scheme = 'web';
+  connection = new Unternet({
+    apiKey: import.meta.env.APP_UNTERNET_API_KEY,
+    isDev: import.meta.env.DEV,
+  });
 
   async handler(directive: ActionDirective) {
     if (directive.actionId === 'search') {

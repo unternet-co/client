@@ -12,7 +12,15 @@
   "scripts": {
     "build": "tsc",
     "dev": "chokidar 'src/**/*' -c 'npm run build'",
-    "run:example": "cd example && npx tsx src/index.ts"
+    "docs": "typedoc",
+    "example": "cd example && npx tsx src/index.ts",
+    "test": "vitest --root tests --watch=false",
+    "test:dev": "vitest --root tests --watch"
+  },
+  "imports": {
+    "#src/*": "./src/*",
+    "#tests/tooling": "./tests/common/tooling.ts",
+    "#tests/*": "./tests/*"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.0.10",
@@ -25,6 +33,9 @@
   },
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
-    "typescript": "^5.8.2"
+    "mime-types": "^3.0.1",
+    "typedoc": "^0.28.2",
+    "typescript": "^5.8.2",
+    "vitest": "^3.1.1"
   }
 }
