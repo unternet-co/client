@@ -1,6 +1,6 @@
 {
   "name": "@unternet/client-desktop",
-  "version": "0.3.27",
+  "version": "0.3.28",
   "homepage": "https://unternet.co",
   "license": "ISC",
   "main": "dist/electron/main.js",
