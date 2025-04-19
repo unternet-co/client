@@ -1,6 +1,80 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  dialog,
+  MessageBoxOptions,
+} from 'electron';
 import path from 'path';
-const isDev = process.env.NODE_ENV !== 'production';
+import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
+
+const isDev = !app.isPackaged;
+const AUTOUPDATE_INTERVAL = 3_600_000; // 60 * 60 * 1000
+
+// Configure logging
+log.transports.file.level = isDev ? 'debug' : 'info';
+autoUpdater.logger = log;
+
+function formatReleaseNotes(
+  notes: string | { note: string }[] | undefined
+): string {
+  if (typeof notes === 'string') return notes;
+  if (Array.isArray(notes)) return notes.map((n) => n.note).join('\n\n');
+  return '';
+}
+
+// Configure auto-updater
+function setupAutoUpdater() {
+  if (isDev) {
+    return;
+  }
+
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'unternet-co',
+    repo: 'client',
+  });
+
+  // Check for updates
+  autoUpdater.on('update-downloaded', (info) => {
+    const releaseNotes =
+      typeof info.releaseNotes === 'string'
+        ? info.releaseNotes
+        : Array.isArray(info.releaseNotes)
+          ? info.releaseNotes.map((note) => note.note).join('\n\n')
+          : '';
+
+    const dialogOpts: MessageBoxOptions = {
+      type: 'info',
+      buttons: ['Restart', 'Later'],
+      title: 'Application Update',
+      message: process.platform === 'win32' ? releaseNotes : info.releaseName,
+      detail:
+        'A new version has been downloaded. Restart the application to apply the updates.',
+    };
+
+    dialog.showMessageBox(dialogOpts).then((returnValue) => {
+      if (returnValue.response === 0) autoUpdater.quitAndInstall();
+    });
+  });
+
+  autoUpdater.on('error', (error) => {
+    log.error('Error in auto-updater:', error);
+  });
+
+  // Store the interval ID so we can clear it if needed
+  let autoUpdateIntervalId: NodeJS.Timeout | null = null;
+
+  // Check for updates every hour
+  autoUpdateIntervalId = setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, AUTOUPDATE_INTERVAL);
+
+  // Initial check
+  autoUpdater.checkForUpdates();
+}
 
 function createWindow() {
   /* Create the browser window. */
@@ -16,7 +90,13 @@ function createWindow() {
       contextIsolation: true, // protect against prototype pollution
       preload: path.join(__dirname, 'preload.js'),
     },
-    // frame: false,
+    // Set icon based on platform
+    icon: path.join(
+      __dirname,
+      process.platform === 'win32'
+        ? 'app-icons/client-icon-windows.ico'
+        : 'app-icons/client-icon-macOS.png'
+    ),
     // only hide the title bar on macOS
     ...(process.platform === 'darwin'
       ? {
@@ -25,6 +105,11 @@ function createWindow() {
         }
       : {}),
   });
+
+  // For macOS, explicitly set the dock icon
+  if (process.platform === 'darwin' && app.dock) {
+    app.dock.setIcon(path.join(__dirname, 'app-icons/client-icon-macOS.png'));
+  }
 
   /* Handle links */
 
@@ -70,7 +155,7 @@ function createWindow() {
     win.loadURL('http://localhost:5173');
     win.webContents.openDevTools();
   } else {
-    win.loadFile(path.join(__dirname, 'web', 'index.html'));
+    win.loadFile(path.join(__dirname, '../../dist/www/index.html'));
   }
 }
 
@@ -113,5 +198,9 @@ ipcMain.handle('isFullScreen', (event) => {
 //   mainWindow.webContents.send('applets', appletData);
 // });
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+  createWindow();
+  setupAutoUpdater();
+});
+
 app.on('window-all-closed', app.quit);
