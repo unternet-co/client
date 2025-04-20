@@ -11,7 +11,7 @@
     "build:web": "vite build",
     "build:electron": "tsc --project tsconfig.node.json",
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
-    "dev:electron": "npm run build:electron && electron .",
+    "dev:electron": "npm run build:electron && npm run build:icons && electron .",
     "dev:web": "vite"
   },
   "dependencies": {
