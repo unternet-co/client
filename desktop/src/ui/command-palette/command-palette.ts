@@ -79,30 +79,42 @@ export class CommandInputElement extends LitElement {
   private handleInput(e: InputEvent) {
     const target = e.target as HTMLDivElement;
     this.value = target.innerText;
-    this.renderStyledContent();
+    this.highlightToolMentions();
   }
 
-  private renderStyledContent() {
+  private highlightToolMentions() {
     const inputDiv = this.shadowRoot?.querySelector(
       '.palette-input'
     ) as HTMLDivElement;
 
-    const styledHTML = this.value.replace(/@[\w]+/g, (match) => {
-      console.log({ match });
-      return `<span class="highlight">${match}</span>`;
+    const styledHTML = inputDiv.innerText.replace(/@[\w]+/g, (match) => {
+      return `<span class="highlight">${match} </span>`;
     });
-    console.log({ styledHTML });
     inputDiv.innerHTML = styledHTML;
 
     this.setCursorToEnd(inputDiv);
   }
 
   private handleToolSelection(event: CustomEvent) {
+    const inputDiv = this.shadowRoot?.querySelector(
+      '.palette-input'
+    ) as HTMLDivElement;
+    console.log('here');
+
     const item = event.detail.item;
-    this.value += `@${item} `;
+
+    const span = document.createElement('span');
+    span.className = 'highlight';
+    span.textContent = `@${item}`;
+
+    const space = document.createTextNode(' ');
+
+    inputDiv.appendChild(span);
+    inputDiv.appendChild(space);
+
     this.isMenuOpen = false;
 
-    this.renderStyledContent();
+    this.highlightToolMentions();
     this.focus();
   }
 
@@ -160,6 +172,7 @@ export class CommandInputElement extends LitElement {
     .highlight {
       color: var(--color-action-800);
       font-weight: bold;
+      text-transform: lowercase;
     }
 
     .command-input-wrapper {
