@@ -76,13 +76,12 @@ export class CommandInputElement extends LitElement {
     this.value = '';
   }
 
-  private handleInput(e: CustomEvent) {
-    if (e.detail && e.detail.value !== undefined) {
-      this.value = e.detail.value;
-    }
+  private handleInput(e: InputEvent) {
+    const target = e.target as HTMLDivElement;
+    this.value = target.innerHTML;
   }
 
-  private handleSelection(event: CustomEvent) {
+  private handleToolSelection(event: CustomEvent) {
     const item = event.detail.item;
     this.value += item;
     this.isMenuOpen = false;
@@ -99,19 +98,20 @@ export class CommandInputElement extends LitElement {
                   Fruits: ['Apple', 'Banana'],
                   Vegetables: ['Carrot', 'Spinach'],
                 }}
-                @selected=${this.handleSelection}
+                @selected=${this.handleToolSelection}
                 placeholder="Choose an option"
               ></palette-menu>
             `
           : null}
-        <un-input
-          .value=${this.value || ''}
-          variant="ghost"
+        <div
+          class="palette-input"
+          data-hello="world"
           ?disabled=${this.disabled}
           placeholder=${this.placeholder}
-          @keydown=${this.handleKeyDown}
           @input=${this.handleInput}
-        ></un-input>
+          part="input"
+          contenteditable
+        ></div>
         <un-button
           class="submit-button"
           size="small"
@@ -150,12 +150,13 @@ export class CommandInputElement extends LitElement {
       background: var(--color-neutral-0);
     }
 
-    un-input {
+    .palette-input {
       width: 100%;
       margin: 3px;
+      height: 24px;
     }
 
-    un-input::part(input) {
+    .palette-input::part(input) {
       outline: none;
     }
 
