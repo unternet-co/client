@@ -83,8 +83,26 @@ export class CommandInputElement extends LitElement {
 
   private handleToolSelection(event: CustomEvent) {
     const item = event.detail.item;
-    this.value += item;
+    this.value += `<span class="highlight">${item}</span>`;
     this.isMenuOpen = false;
+
+    const inputDiv = this.shadowRoot?.querySelector(
+      '.palette-input'
+    ) as HTMLDivElement;
+    if (inputDiv) {
+      inputDiv.innerHTML = this.value;
+
+      // Set the cursor at the end of the contenteditable div
+      const range = document.createRange();
+      const selection = window.getSelection();
+      range.selectNodeContents(inputDiv);
+      range.collapse(false); // Collapse the range to the end
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+
+      inputDiv.focus(); // Retain focus for editing
+    }
+
     this.render();
   }
 
@@ -105,12 +123,12 @@ export class CommandInputElement extends LitElement {
           : null}
         <div
           class="palette-input"
-          data-hello="world"
           ?disabled=${this.disabled}
           placeholder=${this.placeholder}
-          @input=${this.handleInput}
           part="input"
           contenteditable
+          @keydown=${this.handleKeyDown}
+          @input=${this.handleInput}
         ></div>
         <un-button
           class="submit-button"
@@ -153,7 +171,6 @@ export class CommandInputElement extends LitElement {
     .palette-input {
       width: 100%;
       margin: 3px;
-      height: 24px;
     }
 
     .palette-input::part(input) {
