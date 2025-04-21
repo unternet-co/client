@@ -99,7 +99,6 @@ export class CommandInputElement extends LitElement {
     const inputDiv = this.shadowRoot?.querySelector(
       '.palette-input'
     ) as HTMLDivElement;
-    console.log('here');
 
     const item = event.detail.item;
 
