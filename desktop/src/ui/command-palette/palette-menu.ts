@@ -73,51 +73,27 @@ export class PaletteMenu extends LitElement {
     `;
   }
 
-  handleKeyDown(e: KeyboardEvent) {
-    if (this.disabled) return;
-
-    const allItems = this.getAllItems();
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        this.selectedIndex = (this.selectedIndex + 1) % allItems.length;
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        this.selectedIndex =
-          (this.selectedIndex - 1 + allItems.length) % allItems.length;
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (this.selectedIndex >= 0) {
-          this.emitSelection(allItems[this.selectedIndex]);
-        }
-        break;
-    }
+  handleClick(item: string, index: number) {
+    this.selectedIndex = index;
+    this.emitSelection(item);
   }
 
   getAllItems() {
     return Object.values(this.options).flat();
   }
 
-  emitSelection(selectedOption: string) {
-    this.dispatchEvent(
-      new CustomEvent('select', {
-        detail: { value: selectedOption },
-        bubbles: true,
-        composed: true,
-      })
-    );
+  emitSelection(item: string) {
+    const event = new CustomEvent('selected', {
+      detail: { item },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(event);
   }
 
   render() {
     return html`
-      <ul
-        class="select-list"
-        role="listbox"
-        tabindex="0"
-        @keydown=${this.handleKeyDown}
-      >
+      <ul class="select-list" role="listbox" tabindex="0">
         ${Object.keys(this.options).length === 0
           ? html`<li class="placeholder">${this.placeholder}</li>`
           : Object.entries(this.options).map(
@@ -131,11 +107,7 @@ export class PaletteMenu extends LitElement {
                           class="select-list-item"
                           role="option"
                           aria-selected=${this.selectedIndex === index}
-                          @click=${() => {
-                            this.selectedIndex =
-                              this.getAllItems().indexOf(item);
-                            this.emitSelection(item);
-                          }}
+                          @click=${() => this.handleClick(item, index)}
                         >
                           ${item}
                         </li>

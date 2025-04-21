@@ -82,6 +82,13 @@ export class CommandInputElement extends LitElement {
     }
   }
 
+  private handleSelection(event: CustomEvent) {
+    const item = event.detail.item;
+    this.value = item;
+    this.isMenuOpen = false;
+    this.render();
+  }
+
   render() {
     return html`
       <div class="command-input-wrapper">
@@ -92,6 +99,7 @@ export class CommandInputElement extends LitElement {
                   Fruits: ['Apple', 'Banana'],
                   Vegetables: ['Carrot', 'Spinach'],
                 }}
+                @selected=${this.handleSelection}
                 placeholder="Choose an option"
               ></palette-menu>
             `
