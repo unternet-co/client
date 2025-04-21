@@ -3,6 +3,11 @@ import { InteractionInput } from '../../ai/interactions';
 import '../common/input';
 import '../common/button';
 import './palette-menu';
+import { Resource } from '@unternet/kernel';
+
+import { dependencies } from '../../common/dependencies';
+import { ResourceModel } from '../../protocols/resources';
+import resources from '../../protocols/web/resources';
 
 export class CommandSubmitEvent extends CustomEvent<{
   input: InteractionInput;
@@ -17,17 +22,25 @@ export class CommandSubmitEvent extends CustomEvent<{
 }
 
 export class CommandInputElement extends LitElement {
+  resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
+
   static properties = {
     value: { type: String, reflect: true },
     disabled: { type: Boolean, reflect: true },
     placeholder: { type: String },
     isMenuOpen: { type: Boolean, reflect: true },
+    resources: { type: Array<Resource> },
+    resourceNames: { type: Array<String> },
   };
 
   value: string = '';
   disabled: boolean = false;
   placeholder: string = 'Search or type a command...';
   isMenuOpen: boolean = false;
+  resources: Array<Resource> = this.resourceModel.resources;
+  resourceNames: Array<String> = this.resources.map(
+    (resource) => resource.name
+  );
 
   constructor() {
     super();
@@ -133,8 +146,7 @@ export class CommandInputElement extends LitElement {
           ? html`
               <palette-menu
                 .options=${{
-                  Fruits: ['Apple', 'Banana'],
-                  Vegetables: ['Carrot', 'Spinach'],
+                  Tools: this.resourceNames,
                 }}
                 @selected=${this.handleToolSelection}
                 placeholder="Choose an option"
@@ -197,16 +209,13 @@ export class CommandInputElement extends LitElement {
     .palette-input {
       width: 100%;
       margin: 3px;
-    }
-
-    .palette-input::part(input):focus-visible {
       outline: none;
     }
 
     .submit-button {
       position: absolute;
       right: 6px;
-      top: 6px;
+      bottom: 6px;
     }
 
     .submit-button::part(button) {
