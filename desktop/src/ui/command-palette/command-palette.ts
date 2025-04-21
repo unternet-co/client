@@ -199,7 +199,7 @@ export class CommandInputElement extends LitElement {
       margin: 3px;
     }
 
-    .palette-input::part(input) {
+    .palette-input::part(input):focus-visible {
       outline: none;
     }
 
