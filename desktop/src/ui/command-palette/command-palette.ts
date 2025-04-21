@@ -87,6 +87,10 @@ export class CommandInputElement extends LitElement {
 
     this.dispatchEvent(new CommandSubmitEvent(this.value));
     this.value = '';
+    const inputDiv = this.shadowRoot?.querySelector(
+      '.palette-input'
+    ) as HTMLDivElement;
+    inputDiv.innerHTML = '';
   }
 
   private handleInput(e: InputEvent) {

@@ -26,6 +26,10 @@ export class PaletteMenu extends LitElement {
         position: relative;
       }
 
+      .group-header {
+        padding-bottom: 4px;
+      }
+
       .select-list {
         list-style: none;
         margin: 0;
@@ -94,29 +98,27 @@ export class PaletteMenu extends LitElement {
   render() {
     return html`
       <ul class="select-list" role="listbox" tabindex="0">
-        ${Object.keys(this.options).length === 0
-          ? html`<li class="placeholder">${this.placeholder}</li>`
-          : Object.entries(this.options).map(
-              ([group, items]) => html`
-                <li class="group" role="group" aria-label=${group}>
-                  <div class="group-header">${group}</div>
-                  <ul class="group-items">
-                    ${items.map(
-                      (item, index) => html`
-                        <li
-                          class="select-list-item"
-                          role="option"
-                          aria-selected=${this.selectedIndex === index}
-                          @click=${() => this.handleClick(item, index)}
-                        >
-                          ${item}
-                        </li>
-                      `
-                    )}
-                  </ul>
-                </li>
-              `
-            )}
+        ${Object.entries(this.options).map(
+          ([group, items]) => html`
+            <li class="group" role="group" aria-label=${group}>
+              <div class="group-header">${group}</div>
+              <ul class="group-items">
+                ${items.map(
+                  (item, index) => html`
+                    <li
+                      class="select-list-item"
+                      role="option"
+                      aria-selected=${this.selectedIndex === index}
+                      @click=${() => this.handleClick(item, index)}
+                    >
+                      ${item}
+                    </li>
+                  `
+                )}
+              </ul>
+            </li>
+          `
+        )}
       </ul>
     `;
   }
