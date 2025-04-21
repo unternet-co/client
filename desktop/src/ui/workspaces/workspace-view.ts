@@ -1,6 +1,6 @@
 import { CommandSubmitEvent } from './command-input';
 import './command-bar.css';
-import './command-input';
+import '../command-palette/command-palette';
 import './interaction-history';
 import './workspace-view.css';
 import './resource-bar';
@@ -89,11 +89,9 @@ export class WorkspaceView extends HTMLElement {
         <interaction-history for=${this.workspaceId}></interaction-history>
       </div>
       <div class="bottom-bar">
-        <command-bar>
-          <command-input
-            @submit=${(e) => this.handleCommandSubmit(e)}
-          ></command-input>
-        </command-bar>
+        <command-palette
+          @submit=${(e) => this.handleCommandSubmit(e)}
+        ></command-palette>
         <resource-bar for=${this.workspaceId}></resource-bar>
       </div>
     `;

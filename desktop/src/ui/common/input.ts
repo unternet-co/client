@@ -74,6 +74,12 @@ export class InputElement extends LitElement {
     );
   }
 
+  private handleKeyDown(e: KeyboardEvent) {
+    // Re-emit the keydown event
+    // to allow parent components to handle it
+    this.dispatchEvent(new KeyboardEvent('keydown', e));
+  }
+
   private handleChange(e: Event) {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
@@ -175,6 +181,7 @@ export class InputElement extends LitElement {
           autocomplete=${this.autocomplete}
           @input=${this.handleInput}
           @change=${this.handleChange}
+          @keydown=${this.handleKeyDown}
           aria-busy=${this.loading ? 'true' : 'false'}
         />
         ${this.icon && this.iconPosition === 'end'

@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { InteractionInput } from '../../ai/interactions';
 import '../common/input';
 import '../common/button';
+import './palette-menu';
 
 export class CommandSubmitEvent extends CustomEvent<{
   input: InteractionInput;
@@ -34,14 +35,6 @@ export class CommandInputElement extends LitElement {
 
   firstUpdated() {
     this.focus();
-    const input = this.shadowRoot?.querySelector('un-input');
-    const realInput = input?.shadowRoot?.querySelector('input');
-
-    if (realInput) {
-      realInput.addEventListener('keydown', this.handleKeyDown.bind(this));
-    } else {
-      console.warn('Could not find real input');
-    }
   }
 
   focus() {
@@ -51,12 +44,8 @@ export class CommandInputElement extends LitElement {
     }
   }
 
-  private handleKeyDown(e: CustomEvent) {
-    console.log('here', e.detail.key);
-
-    if (this.disabled) return;
-
-    switch (e.detail.key) {
+  private handleKeyDown(e: KeyboardEvent) {
+    switch (e.key) {
       case 'Escape':
         e.preventDefault();
         this.isMenuOpen = false;
@@ -73,6 +62,8 @@ export class CommandInputElement extends LitElement {
         this.isMenuOpen = true;
         this.render();
         break;
+      case 'ArrowDown':
+      case 'ArrowUp':
       default:
         break;
     }
@@ -94,6 +85,17 @@ export class CommandInputElement extends LitElement {
   render() {
     return html`
       <div class="command-input-wrapper">
+        ${this.isMenuOpen
+          ? html`
+              <palette-menu
+                .options=${{
+                  Fruits: ['Apple', 'Banana'],
+                  Vegetables: ['Carrot', 'Spinach'],
+                }}
+                placeholder="Choose an option"
+              ></palette-menu>
+            `
+          : null}
         <un-input
           .value=${this.value || ''}
           variant="ghost"
@@ -164,4 +166,4 @@ export class CommandInputElement extends LitElement {
   `;
 }
 
-customElements.define('command-input', CommandInputElement);
+customElements.define('command-palette', CommandInputElement);
