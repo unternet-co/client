@@ -38,10 +38,10 @@ export class CommandInputElement extends LitElement {
   }
 
   focus() {
-    const input = this.shadowRoot?.querySelector('un-input');
-    if (input) {
-      (input as any).focus();
-    }
+    const inputDiv = this.shadowRoot?.querySelector(
+      '.palette-input'
+    ) as HTMLDivElement;
+    inputDiv?.focus();
   }
 
   private handleKeyDown(e: KeyboardEvent) {
@@ -78,32 +78,41 @@ export class CommandInputElement extends LitElement {
 
   private handleInput(e: InputEvent) {
     const target = e.target as HTMLDivElement;
-    this.value = target.innerHTML;
+    this.value = target.innerText;
+    this.renderStyledContent();
+  }
+
+  private renderStyledContent() {
+    const inputDiv = this.shadowRoot?.querySelector(
+      '.palette-input'
+    ) as HTMLDivElement;
+
+    const styledHTML = this.value.replace(/@[\w]+/g, (match) => {
+      console.log({ match });
+      return `<span class="highlight">${match}</span>`;
+    });
+    console.log({ styledHTML });
+    inputDiv.innerHTML = styledHTML;
+
+    this.setCursorToEnd(inputDiv);
   }
 
   private handleToolSelection(event: CustomEvent) {
     const item = event.detail.item;
-    this.value += `<span class="highlight">${item}</span>`;
+    this.value += `@${item} `;
     this.isMenuOpen = false;
 
-    const inputDiv = this.shadowRoot?.querySelector(
-      '.palette-input'
-    ) as HTMLDivElement;
-    if (inputDiv) {
-      inputDiv.innerHTML = this.value;
+    this.renderStyledContent();
+    this.focus();
+  }
 
-      // Set the cursor at the end of the contenteditable div
-      const range = document.createRange();
-      const selection = window.getSelection();
-      range.selectNodeContents(inputDiv);
-      range.collapse(false); // Collapse the range to the end
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-
-      inputDiv.focus(); // Retain focus for editing
-    }
-
-    this.render();
+  private setCursorToEnd(inputDiv: HTMLDivElement) {
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.selectNodeContents(inputDiv);
+    range.collapse(false);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
   }
 
   render() {
@@ -146,6 +155,11 @@ export class CommandInputElement extends LitElement {
       width: 100%;
       display: flex;
       justify-content: center;
+    }
+
+    .highlight {
+      color: var(--color-action-800);
+      font-weight: bold;
     }
 
     .command-input-wrapper {
