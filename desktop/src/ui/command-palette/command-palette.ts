@@ -84,7 +84,7 @@ export class CommandInputElement extends LitElement {
 
   private handleSelection(event: CustomEvent) {
     const item = event.detail.item;
-    this.value = item;
+    this.value += item;
     this.isMenuOpen = false;
     this.render();
   }
