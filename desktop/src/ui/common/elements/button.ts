@@ -211,7 +211,7 @@ export class ButtonElement extends LitElement {
 
       .button--ghost:hover,
       .button--outline:hover {
-        --button-color: var(--color-neutral-100);
+        --button-color: var(--color-neutral-200);
         background-blend-mode: multiply;
         opacity: 1;
       }
