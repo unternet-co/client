@@ -20,39 +20,29 @@ top-bar.mac.fullscreen {
   padding-left: 0;
 }
 
-top-bar::-webkit-scrollbar {
-  display: none;
-}
-
 .blurred top-bar {
   color: var(--color-text-muted);
 }
 
+top-bar .workspace-select-container {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  /* pointer-events: auto; */
+  justify-content: center;
+  border-right: 1px solid var(--color-border-default);
+}
+
+top-bar .workspace-select-container un-select {
+  width: 100%;
+  -webkit-app-region: no-drag;
+  pointer-events: auto;
+}
+
 top-bar .static-tab-list {
-  display: flex;
-  align-items: stretch;
-  justify-content: flex-start;
-  flex-shrink: 0;
-  margin: 0;
-  height: 100%;
-}
-
-top-bar .workspace-tabs-scroll-container {
-  flex-grow: 1;
-  overflow-x: auto;
-  overflow-y: hidden;
-  height: 100%;
-  display: flex;
-  /* Hide scrollbar but keep functionality */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
-}
-
-top-bar .workspace-tabs-scroll-container::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-}
-
-top-bar .workspace-tab-list {
   display: flex;
   align-items: stretch;
   justify-content: flex-start;

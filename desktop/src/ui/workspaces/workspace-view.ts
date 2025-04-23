@@ -11,18 +11,32 @@ import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
 
 export class WorkspaceView extends HTMLElement {
-  workspaceId: Workspace['id'];
+  private _workspaceId: Workspace['id'];
+  set workspaceId(id: Workspace['id']) {
+    if (this._workspaceId !== id) {
+      this._workspaceId = id;
+      render(this.template, this);
+      setTimeout(() => this.focusCommandInput(), 0);
+    }
+  }
+  get workspaceId() {
+    return this._workspaceId;
+  }
   kernel = dependencies.resolve<Kernel>('Kernel');
-  static observedAttributes = ['for'];
+  static get observedAttributes() {
+    return ['for'];
+  }
   private visibilityObserver: IntersectionObserver;
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (name === 'for' && oldValue !== newValue) {
+      this.workspaceId = newValue || '';
+    }
+  }
 
   // TODO: Implement dependency injection with decorators
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
-    render(this.template, this);
-
-    // Autofocus the command input after rendering
-    setTimeout(() => this.focusCommandInput(), 0);
 
     // Set up visibility observer to focus when tab is switched back to this view
     this.setupVisibilityObserver();

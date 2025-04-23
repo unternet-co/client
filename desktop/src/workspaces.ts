@@ -20,8 +20,10 @@ export interface WorkspaceNotification {
 }
 
 export class WorkspaceModel {
+  public activeWorkspaceId: string | null = null;  
   private workspaces = new Map<Workspace['id'], Workspace>();
   private messages = new Map<Workspace['id'], Message[]>();
+  private messageById = new Map<string, Message>();
   private workspaceDatabase: DatabaseService<string, Workspace>;
   private messageDatabase: DatabaseService<string, MessageRecord>;
   private processModel: ProcessModel;
@@ -61,14 +63,31 @@ export class WorkspaceModel {
       this.workspaces.set(record.id, record);
       this.notifier.notify({ workspaceId: record.id });
     }
+    if (this.workspaces.size === 0) {
+      const ws = this.create();
+      this.setTitle(ws.id, 'Thinking Aloud');
+    }
+    if (!this.activeWorkspaceId && this.workspaces.size > 0) {
+      this.activeWorkspaceId = Array.from(this.workspaces.keys())[0];
+      this.notifier.notify({ workspaceId: this.activeWorkspaceId });
+    }
+    const allInteractions = await this.messageDatabase.all();
+    this.messages = new Map();
+    for (const interaction of allInteractions) {
+      if (!this.messages.has(interaction.workspaceId)) {
+        this.messages.set(interaction.workspaceId, []);
+      }
+      this.messages.get(interaction.workspaceId)!.push(interaction);
+      this.messageById.set(interaction.id, interaction);
+    }
+    // Notify for the active workspace after all data is loaded
+    if (this.activeWorkspaceId) {
+      this.notifier.notify({ workspaceId: this.activeWorkspaceId });
+    }
   }
 
   all(): Workspace[] {
-    let workspaces: Workspace[] = [];
-    for (const workspace of this.workspaces.values()) {
-      workspaces.push(workspace);
-    }
-    return workspaces;
+    return Array.from(this.workspaces.values());
   }
 
   get(id: Workspace['id']): Workspace | undefined {
@@ -108,8 +127,14 @@ export class WorkspaceModel {
   }
 
   create() {
+    const ws = this._createWorkspace();
+    this.setActiveWorkspace(ws.id);
+    return ws;
+  }
+
+  private _createWorkspace() {
     const now = Date.now();
-    const workspace = {
+    const workspace: Workspace = {
       id: ulid(),
       title: 'New workspace',
       created: now,
@@ -120,8 +145,14 @@ export class WorkspaceModel {
     this.workspaces.set(workspace.id, workspace);
     this.messages.set(workspace.id, new Array<MessageRecord>());
     this.workspaceDatabase.create(workspace);
-    this.notifier.notify();
     return workspace;
+  }
+
+  setActiveWorkspace(id: Workspace['id']) {
+    if (this.activeWorkspaceId !== id && this.workspaces.has(id)) {
+      this.activeWorkspaceId = id;
+      this.notifier.notify({ workspaceId: id });
+    }
   }
 
   delete(id: Workspace['id']) {
@@ -171,7 +202,7 @@ export class WorkspaceModel {
   }
 
   updateModified(id: Workspace['id']): void {
-    const workspace = this.workspaces.get(id);
+    const workspace: Workspace = this.workspaces.get(id);
     if (workspace) {
       workspace.modified = Date.now();
       this.workspaceDatabase.update(id, { modified: workspace.modified });
