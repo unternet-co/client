@@ -1,8 +1,8 @@
-import { Resource } from '@unternet/kernel';
+import { createResource } from '@unternet/kernel';
 import iconSrc from './icon-128x128.png';
 
-const web = new Resource({
-  uri: 'web:',
+const web = createResource({
+  uri: 'builtin:web',
   name: 'Web',
   description:
     'Take general actions on the web, and specific web pages, relating to parsing content, conducting searches, etc.',
@@ -26,19 +26,19 @@ const web = new Resource({
         required: ['q'],
       },
     },
-    show: {
-      description: 'Show a particular web page, inline in the conversation.',
-      params_schema: {
-        type: 'object',
-        properties: {
-          url: {
-            type: 'string',
-            description: 'The URL of the site to open.',
-          },
-        },
-        required: ['url'],
-      },
-    },
+    // show: {
+    //   description: 'Show a particular web page, inline in the conversation.',
+    //   params_schema: {
+    //     type: 'object',
+    //     properties: {
+    //       url: {
+    //         type: 'string',
+    //         description: 'The URL of the site to open.',
+    //       },
+    //     },
+    //     required: ['url'],
+    //   },
+    // },
   },
 });
 

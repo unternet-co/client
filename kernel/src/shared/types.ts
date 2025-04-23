@@ -1,10 +1,3 @@
-import type {
-  CoreSystemMessage,
-  CoreUserMessage,
-  CoreAssistantMessage,
-  CoreToolMessage,
-} from 'ai';
-
 export { Schema } from 'ai';
 
 export interface JSONSchemaDefinition {

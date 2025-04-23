@@ -12,7 +12,7 @@ import {
   Interaction,
   TextOutput,
 } from './interactions';
-import { encodeActionHandle } from '../actions/actions';
+import { encodeActionHandle } from '../runtime/actions';
 
 export type Message =
   | CoreSystemMessage
@@ -59,14 +59,15 @@ export function createMessages(
         const textOutput = output as TextOutput;
         messages.push(createAssistantMessage(textOutput.content));
       } else if (output.type === 'action') {
-        const { directive, content } = output as ActionOutput;
-
+        const { directive, process, content } = output as ActionOutput;
         const actionUri = encodeActionHandle(directive.uri, directive.actionId);
-        messages.push(
-          createAssistantMessage(
-            `Action called: ${actionUri}.\nOutput:${JSON.stringify(content)}`
-          )
+        let messageStr = `Action called: ${actionUri}.\n`;
+        const outputStr = JSON.stringify(
+          process ? process.describe() : content
         );
+        messageStr += `Output: ${outputStr}`;
+        console.log(messageStr);
+        messages.push(createAssistantMessage(messageStr));
       }
     }
   }

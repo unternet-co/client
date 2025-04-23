@@ -4,8 +4,9 @@ export {
   ActionResponse,
 } from './interpreter/interpreter';
 export * from './interpreter/interactions';
-export { Protocol, ProtocolHandler } from './actions/protocols';
-export { Resource } from './actions/resources';
-export { Dispatcher } from './actions/dispatcher';
+export { Protocol } from './runtime/protocols';
+export { Resource, createResource } from './runtime/resources';
+export { ProcessRuntime } from './runtime/runtime';
 export { LanguageModel } from './interpreter/model';
-export { ActionDirective } from './actions/actions';
+export { ActionDirective } from './runtime/actions';
+export { Process } from './runtime/processes';

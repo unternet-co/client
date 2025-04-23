@@ -1,5 +1,5 @@
 import { jsonSchema, Schema } from 'ai';
-import { ActionDefinition } from '../actions/resources';
+import { ActionDefinition } from '../runtime/resources';
 import { Strategy } from './strategies';
 
 export interface ActionChoiceObject {

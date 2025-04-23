@@ -29,3 +29,7 @@ Actions are derived from `Resources`. A resource is anything that a model might 
 Actions are grouped under resources, to support use cases where you might have many actions being authored together. This is an emerging pattern with LLM tools (see: MCP, Web Applets).
 
 Each URI is handled by a `Protocol`, which corresponds to the given URI scheme (e.g. `http`, `mcp`, etc.). You can register protocols with `Dispatcher`, then dispatch any action from `Interpreter` and you will get a response object that corresponds to the output of that action.
+
+## Processes
+
+A process is an ongoing task that is managed by the `ProcessManager` (or can be managed independently). Processes are a bit like resources, in that they can have their own actions & URIs (`process:<pid>`). They're also a bit like Processes, in that they can handle actions.

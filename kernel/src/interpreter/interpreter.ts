@@ -12,8 +12,8 @@ import {
   ActionDirective,
   createActionRecord,
   decodeActionHandle,
-} from '../actions/actions';
-import { ActionDefinition, Resource } from '../actions/resources';
+} from '../runtime/actions';
+import { ActionDefinition, Resource } from '../runtime/resources';
 import { Interaction } from './interactions';
 import {
   createAssistantMessage,

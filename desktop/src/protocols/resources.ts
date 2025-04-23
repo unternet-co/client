@@ -1,5 +1,5 @@
 import { Resource } from '@unternet/kernel';
-import webResource from './web/resource';
+import webResource from './builtin/resources';
 
 const initialResources: Array<Resource> = new Array();
 
@@ -12,10 +12,14 @@ interface ResourceModelInit {
 }
 
 class ResourceModel {
-  readonly resources: Array<Resource>;
+  private resources: Array<Resource>;
 
   constructor({ initialResources }: ResourceModelInit) {
     this.resources = initialResources;
+  }
+
+  all() {
+    return this.resources;
   }
 
   find(uri: string) {

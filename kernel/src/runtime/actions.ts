@@ -1,3 +1,4 @@
+import { Process } from './processes';
 import { ActionRecord, Resource } from './resources';
 
 export interface ActionDirective {

@@ -5,7 +5,7 @@ import {
   ActionResponse,
   TextResponse,
   ActionOutput,
-  Dispatcher,
+  ProcessRuntime,
   Protocol,
 } from '@unternet/kernel';
 import { Workspace, WorkspaceModel } from '../workspaces';
@@ -26,7 +26,7 @@ export interface KernelInit {
 export class Kernel {
   initialized: boolean = false;
   interpreter?: Interpreter | null;
-  dispatcher: Dispatcher;
+  runtime: ProcessRuntime;
   workspaceModel: WorkspaceModel;
   configModel: ConfigModel;
   resourceModel: ResourceModel;
@@ -43,7 +43,7 @@ export class Kernel {
     this.configModel = configModel;
     this.aiModelService = aiModelService;
     this.resourceModel = resourceModel;
-    this.dispatcher = new Dispatcher(protocols);
+    this.runtime = new ProcessRuntime(protocols);
 
     this.initialize();
 
@@ -65,7 +65,7 @@ export class Kernel {
     );
 
     const hint = config.ai.globalHint;
-    const resources = this.resourceModel.resources;
+    const resources = this.resourceModel.all();
 
     if (!model) {
       this.initialized = false;
@@ -97,7 +97,6 @@ export class Kernel {
       const response = iteration.value;
       switch (response.type) {
         case 'text':
-          console.log('handling text', response);
           await this.handleTextResponse(interaction, response);
           break;
         case 'action':
@@ -133,13 +132,17 @@ export class Kernel {
     interaction: Interaction,
     response: ActionResponse
   ) {
+    const { process, content } = await this.runtime.dispatch(
+      response.directive
+    );
+
     const output: ActionOutput = {
       type: 'action',
       directive: response.directive,
-      content: {},
+      process,
+      content,
     };
 
-    output.content = await this.dispatcher.dispatch(response.directive);
     this.workspaceModel.addOutput(interaction.id, output);
   }
 }

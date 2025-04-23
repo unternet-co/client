@@ -26,6 +26,9 @@ import { protocols } from './protocols/protocols';
 const workspaceDatabaseService = new DatabaseService<string, Workspace>(
   'workspaces'
 );
+const processDatabaseService = new DatabaseService<string, ProcessRecord>(
+  'processes'
+);
 const interactionDatabaseService = new DatabaseService<string, Interaction>(
   'interactions'
 );
