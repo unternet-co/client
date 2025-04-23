@@ -46,7 +46,12 @@ export abstract class Process {
     this.subscribers.forEach((cb) => cb());
   }
 
-  abstract render(element: HTMLElement): void | Promise<void>;
+  mount(element: HTMLElement): void {}
+  unmount(): void {}
+  renderText(): string {
+    return '';
+  }
+
   handleAction(directive: ActionDirective): any | Promise<any> {
     throw new Error('No action handler implemented.');
   }
@@ -86,8 +91,16 @@ export class ProcessContainer {
     } else return '';
   }
 
-  render(el: HTMLElement) {
-    this.process.render(el);
+  mount(el: HTMLElement) {
+    this.process.mount(el);
+  }
+
+  unmount() {
+    this.process.unmount();
+  }
+
+  renderText() {
+    this.process.renderText();
   }
 
   static hydrate(

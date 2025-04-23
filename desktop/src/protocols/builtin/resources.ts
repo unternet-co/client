@@ -26,19 +26,19 @@ const web = createResource({
         required: ['q'],
       },
     },
-    // show: {
-    //   description: 'Show a particular web page, inline in the conversation.',
-    //   params_schema: {
-    //     type: 'object',
-    //     properties: {
-    //       url: {
-    //         type: 'string',
-    //         description: 'The URL of the site to open.',
-    //       },
-    //     },
-    //     required: ['url'],
-    //   },
-    // },
+    open: {
+      description: 'Show a particular web page, inline in the conversation.',
+      params_schema: {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description: 'The URL of the site to open.',
+          },
+        },
+        required: ['url'],
+      },
+    },
   },
 });
 

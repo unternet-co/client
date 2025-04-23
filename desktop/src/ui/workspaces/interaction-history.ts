@@ -8,6 +8,7 @@ import '../common/markdown-text';
 import './interaction-history.css';
 import { ResourceModel } from '../../protocols/resources';
 import { ActionOutput, TextOutput } from '@unternet/kernel';
+import './process-view';
 
 class InteractionHistory extends HTMLElement {
   private workspaceModel =
@@ -160,11 +161,12 @@ class InteractionHistory extends HTMLElement {
   }
 
   outputTemplate(output: InteractionOutput) {
-    switch (output.type) {
-      case 'text':
-        return this.textOutputTemplate(output);
-      case 'action':
-        return this.actionOutputTemplate(output);
+    if (output.type === 'text') {
+      return this.textOutputTemplate(output);
+    } else if (output.type === 'action' && output.process) {
+      return this.processOutputTemplate(output);
+    } else if (output.type === 'action') {
+      return this.actionOutputTemplate(output);
     }
   }
 
@@ -185,6 +187,14 @@ class InteractionHistory extends HTMLElement {
       ${img}
       <span class="notification-text">Used ${resource.name}</span>
     </div>`;
+  }
+
+  processOutputTemplate(output: ActionOutput) {
+    return html`
+      <div class="interaction-output" data-type="process">
+        <process-view .process=${output.process}></process-view>
+      </div>
+    `;
   }
 }
 

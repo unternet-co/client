@@ -1,4 +1,5 @@
 import { Process, Protocol } from '@unternet/kernel';
+import { WebviewTag } from 'electron';
 
 interface WebProcessState {
   url: string;
@@ -8,10 +9,13 @@ export class WebProcess extends Process {
   url: string;
   title: string;
   description: string;
+  webview: WebviewTag;
 
   constructor({ url }: WebProcessState) {
     super();
     this.url = url;
+    this.webview = document.createElement('webview');
+    this.webview.src = url;
   }
 
   describe() {
@@ -22,10 +26,12 @@ export class WebProcess extends Process {
     };
   }
 
-  render(element: HTMLElement): void | Promise<void> {
-    element.innerHTML = `
-      <webview src="${this.url}"></webview>
-    `;
+  mount(host: HTMLElement): void | Promise<void> {
+    host.appendChild(this.webview);
+  }
+
+  unmount(): void {
+    this.webview.remove();
   }
 
   static hydrate(state: WebProcessState) {

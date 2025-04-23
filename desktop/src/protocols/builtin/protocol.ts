@@ -17,8 +17,8 @@ export class BuiltinProtocol extends Protocol {
           q: directive.args.q,
         });
         return results;
-      // case 'open':
-      //   return new WebProcess({ url: directive.args.url });
+      case 'open':
+        return new WebProcess({ url: directive.args.url });
       default:
         throw new Error(
           `Invalid actionID for directive. URI: ${directive.uri}, ID: ${directive.actionId}.`
