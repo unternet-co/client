@@ -15,7 +15,7 @@ export function registerGlobalShortcuts() {
     }
   });
 
-  shortcutService.register('Meta+T', () => {
+  shortcutService.register('Meta+N', () => {
     if (tabModel.activeTab) {
       tabModel.create();
     }
@@ -28,16 +28,6 @@ export function registerGlobalShortcuts() {
   shortcutService.register('Meta+Shift+[', () => {
     tabModel.activatePrev();
   });
-
-  for (let i = 1; i <= 9; i++) {
-    shortcutService.register(`Meta+${i}`, () => {
-      const tabs = tabModel.all();
-      const tabIndex = i - 1;
-      if (tabIndex < tabs.length) {
-        tabModel.activate(tabs[tabIndex].id);
-      }
-    });
-  }
 
   // Ctrl+, or Meta+, to open settings
   shortcutService.register('Meta+,', () => {
