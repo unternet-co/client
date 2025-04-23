@@ -3,6 +3,8 @@ import { WebviewTag } from 'electron';
 
 interface WebProcessState {
   url: string;
+  title?: string;
+  description?: string;
 }
 
 export class WebProcess extends Process {
@@ -16,6 +18,8 @@ export class WebProcess extends Process {
     this.url = url;
     this.webview = document.createElement('webview');
     this.webview.src = url;
+    this.title = this.webview.getTitle();
+    console.log(this.webview.getHTML());
   }
 
   describe() {
