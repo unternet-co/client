@@ -180,7 +180,7 @@ export class WorkspaceModel {
   }
 
   serializeMessage(message: Message): MessageRecord {
-    if (message.type === 'action') {
+    if (message.type === 'action' && message.process) {
       const { process, ...rest } = message;
       return {
         ...rest,

@@ -10,7 +10,7 @@ export type InputMessage = KernelInputMessage & { workspaceId: string };
 export type ResponseMessage = KernelResponseMessage & { workspaceId: string };
 
 export type ActionMessageRecord = Omit<ActionMessage, 'process'> & {
-  pid: string;
+  pid?: string;
 };
 export type MessageRecord =
   | InputMessage
