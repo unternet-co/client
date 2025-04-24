@@ -1,3 +1,5 @@
+import { ProcessContainer, Resource } from '@unternet/kernel';
+
 export * from './dom';
 
 export function formatTimestamp(timestamp: number): string {
@@ -21,4 +23,8 @@ export function formatTimestamp(timestamp: number): string {
   } else {
     return date.toLocaleDateString();
   }
+}
+
+export function getResourceIcon(target: Resource | ProcessContainer) {
+  return target.icons && target.icons[0] && target.icons[0].src;
 }

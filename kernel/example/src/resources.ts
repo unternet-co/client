@@ -1,6 +1,6 @@
-import { Resource } from '../../src';
+import { resource } from '../../src';
 
-const functionResource = new Resource({
+const functionResource = resource({
   uri: 'function:',
   actions: {
     get_weather: {

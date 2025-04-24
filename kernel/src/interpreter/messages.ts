@@ -6,15 +6,102 @@ import {
   ImagePart,
   TextPart,
 } from 'ai';
-import {
-  ActionOutput,
-  FileInput,
-  Interaction,
-  TextOutput,
-} from './interactions';
-import { encodeActionHandle } from '../actions/actions';
+import { ActionDirective, encodeActionHandle } from '../runtime/actions';
+import { ProcessContainer } from '../runtime/processes';
+import { ulid } from 'ulid';
 
-export type Message =
+/* KERNEL MESSAGES */
+
+export type KernelMessage = InputMessage | ResponseMessage | ActionMessage;
+
+export interface BaseMessage {
+  id: string;
+  createdAt: number;
+  correlationId?: string;
+}
+
+function baseMessage(overrides: Partial<BaseMessage> = {}) {
+  return {
+    id: ulid(),
+    correlationId: overrides.correlationId ?? ulid(),
+    createdAt: Date.now(),
+    ...overrides,
+  };
+}
+
+export interface InputMessage extends BaseMessage {
+  type: 'input';
+  text?: string;
+  files?: FileInput[];
+}
+
+export interface FileInput {
+  data: Uint8Array;
+  filename?: string;
+  mimeType?: string;
+}
+
+export function inputMessage(init: {
+  text?: string;
+  files?: FileInput[];
+}): InputMessage {
+  const base = baseMessage();
+  return {
+    ...base,
+    type: 'input',
+    text: init.text,
+    files: init.files,
+    correlationId: base.id,
+  };
+}
+
+export interface ResponseMessage extends BaseMessage {
+  type: 'response';
+  text: string;
+}
+
+export function responseMessage(init?: {
+  text?: string;
+  correlationId?: string;
+}): ResponseMessage {
+  return {
+    ...baseMessage(init),
+    type: 'response',
+    text: init?.text || '',
+  };
+}
+
+export interface LogMessage {
+  type: 'log';
+  source: 'thought';
+  text: string;
+}
+
+export interface ActionMessage extends BaseMessage {
+  type: 'action';
+  directive: ActionDirective;
+  process?: ProcessContainer;
+  content?: any;
+}
+
+export function actionMessage(init: {
+  directive: ActionDirective;
+  process?: ProcessContainer;
+  content?: any;
+  correlationId?: string;
+}): ActionMessage {
+  return {
+    ...baseMessage(init),
+    type: 'action',
+    directive: init.directive,
+    process: init.process,
+    content: init.content,
+  };
+}
+
+/* MODEL MESSAGES */
+
+export type ModelMessage =
   | CoreSystemMessage
   | CoreUserMessage
   | CoreAssistantMessage;
@@ -25,11 +112,11 @@ export type Message =
  * @param content Message content.
  * @returns The user message.
  */
-export function createUserMessage(content: string) {
+export function userMessage(content: string) {
   return {
     role: 'user',
     content,
-  } as Message;
+  } as ModelMessage;
 }
 
 /**
@@ -38,69 +125,77 @@ export function createUserMessage(content: string) {
  * @param content Message content.
  * @returns The assistant message.
  */
-export function createAssistantMessage(content: string) {
+export function assistantMessage(content: string) {
   return {
     role: 'assistant',
     content,
-  } as CoreAssistantMessage;
+  } as ModelMessage;
 }
 
 /**
  * Translates a set of interactions and prompts into messages.
  * These messages can be used with the `ai` SDK.
  *
- * @param interactions The interactions to translate.
- * @param prompts Additional prompts to translate into user messages.
+ * @param kernelMsgs The kernel messages to translate.
  * @returns An array of messages.
  */
-export function createMessages(
-  interactions: Interaction[],
-  ...prompts: string[] | undefined
-): Message[] {
-  let messages: Message[] = [];
-  for (let interaction of interactions) {
-    if (interaction.input.text)
-      messages.push(createUserMessage(interaction.input.text));
+export function toModelMessages(kernelMsgs: KernelMessage[]): ModelMessage[] {
+  const modelMsgs: ModelMessage[] = [];
 
-    if (interaction.input.files?.length) {
-      const parts: Array<TextPart | ImagePart | FilePart> =
-        interaction.input.files.map(fileMessage);
+  for (const k of kernelMsgs) {
+    switch (k.type) {
+      /* INPUT MESSAGE */
 
-      messages.push({
-        role: 'user',
-        content: parts,
-      });
-    }
+      case 'input': {
+        if (k.text?.trim()) {
+          modelMsgs.push({
+            role: 'user',
+            content: k.text,
+          });
+        }
 
-    if (!interaction.outputs) continue;
+        if (k.files?.length) {
+          const parts = k.files.map(fileToPart);
+          modelMsgs.push({
+            role: 'user',
+            content: parts,
+          });
+        }
+        break;
+      }
 
-    for (let output of interaction.outputs) {
-      if (output.type === 'text') {
-        const textOutput = output as TextOutput;
-        messages.push(createAssistantMessage(textOutput.content));
-      } else if (output.type === 'action') {
-        const actionOutput = output as ActionOutput;
+      /* RESPONSE MESSAGE */
 
-        const actionUri = encodeActionHandle(output.directive.uri, 'TODO');
-        messages.push(
-          createAssistantMessage(
-            `Action called: ${actionUri}.\nOutput:${JSON.stringify(actionOutput.content)}`
-          )
+      case 'response': {
+        modelMsgs.push({
+          role: 'assistant',
+          content: k.text,
+        });
+        break;
+      }
+
+      /* ACTION MESSAGES */
+
+      case 'action': {
+        const actionUri = encodeActionHandle(
+          k.directive.uri,
+          k.directive.actionId
         );
+
+        const body = k.process !== undefined ? k.process.describe() : k.content;
+
+        modelMsgs.push({
+          role: 'assistant',
+          content: `Action invoked: ${actionUri}\nOutput: ${JSON.stringify(
+            body
+          )}`,
+        });
+        break;
       }
     }
   }
 
-  if (prompts) {
-    for (const prompt of prompts) {
-      messages.push({
-        role: 'user',
-        content: prompt,
-      });
-    }
-  }
-
-  return messages;
+  return modelMsgs;
 }
 
 /**
@@ -111,22 +206,24 @@ export function createMessages(
  * @param file The file input to translate.
  * @returns The appropriate part.
  */
-export function fileMessage(file: FileInput): TextPart | ImagePart | FilePart {
+function fileToPart(file: FileInput): TextPart | ImagePart | FilePart {
   if (
     file.mimeType?.startsWith('text/') ||
     file.mimeType === 'application/json'
-  )
+  ) {
     return {
       type: 'text',
       text: new TextDecoder().decode(file.data),
     };
+  }
 
-  if (file.mimeType?.startsWith('image/'))
+  if (file.mimeType.startsWith('image/')) {
     return {
       type: 'image',
       image: file.data,
       mimeType: file.mimeType,
     };
+  }
 
   return {
     type: 'file',
@@ -134,4 +231,14 @@ export function fileMessage(file: FileInput): TextPart | ImagePart | FilePart {
     filename: file.filename,
     mimeType: file.mimeType,
   };
+}
+
+export function modelMsg(
+  role: ModelMessage['role'],
+  content: ModelMessage['content']
+): ModelMessage {
+  return {
+    role,
+    content,
+  } as ModelMessage;
 }

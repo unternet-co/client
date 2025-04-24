@@ -1,10 +1,10 @@
 import { Resource } from '@unternet/kernel';
-import webResources from './web/resources';
+import webResource from './builtin/resources';
 
 const initialResources: Array<Resource> = new Array();
 
 if (import.meta.env.APP_UNTERNET_API_KEY) {
-  initialResources.push(...webResources);
+  initialResources.push(webResource);
 }
 
 interface ResourceModelInit {
@@ -12,10 +12,14 @@ interface ResourceModelInit {
 }
 
 class ResourceModel {
-  readonly resources: Array<Resource>;
+  private resources: Array<Resource>;
 
   constructor({ initialResources }: ResourceModelInit) {
     this.resources = initialResources;
+  }
+
+  all() {
+    return this.resources;
   }
 
   find(uri: string) {

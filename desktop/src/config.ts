@@ -58,7 +58,6 @@ export class ConfigModel {
   updateGlobalHint(hint: string) {
     this.config.ai.globalHint = hint;
     this.store.set(this.config);
-    console.log(this.config);
     this.notifier.notify({ type: 'hint' });
   }
 

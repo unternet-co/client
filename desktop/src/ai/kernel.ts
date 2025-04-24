@@ -1,18 +1,20 @@
 import {
   Interpreter,
-  InteractionInput,
   LanguageModel,
   ActionResponse,
   TextResponse,
-  ActionOutput,
-  Dispatcher,
+  ProcessRuntime,
   Protocol,
+  inputMessage,
+  InterpreterResponse,
+  actionMessage,
+  responseMessage,
 } from '@unternet/kernel';
 import { Workspace, WorkspaceModel } from '../workspaces';
 import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
 import { ResourceModel } from '../protocols/resources';
-import { Interaction } from './interactions';
+import { Notifier } from '../common/notifier';
 
 export interface KernelInit {
   model?: LanguageModel;
@@ -20,30 +22,47 @@ export interface KernelInit {
   configModel: ConfigModel;
   aiModelService: AIModelService;
   resourceModel: ResourceModel;
-  protocols: Array<Protocol>;
+  runtime: ProcessRuntime;
+}
+
+export interface KernelInput {
+  text: string;
+}
+
+export class KernelNotInitializedError extends Error {
+  name = 'KernelNotInitialized';
+}
+
+export type KernelStatus = 'idle' | 'thinking' | 'responding';
+
+export interface KernelNotification {
+  status: KernelStatus;
 }
 
 export class Kernel {
   initialized: boolean = false;
   interpreter?: Interpreter | null;
-  dispatcher: Dispatcher;
+  runtime: ProcessRuntime;
   workspaceModel: WorkspaceModel;
   configModel: ConfigModel;
   resourceModel: ResourceModel;
   aiModelService: AIModelService;
+  status: KernelStatus;
+  private notifier = new Notifier<KernelNotification>();
+  readonly subscribe = this.notifier.subscribe;
 
   constructor({
     workspaceModel,
     configModel,
     aiModelService,
     resourceModel,
-    protocols,
+    runtime,
   }: KernelInit) {
     this.workspaceModel = workspaceModel;
     this.configModel = configModel;
     this.aiModelService = aiModelService;
     this.resourceModel = resourceModel;
-    this.dispatcher = new Dispatcher(protocols);
+    this.runtime = runtime;
 
     this.initialize();
 
@@ -65,7 +84,7 @@ export class Kernel {
     );
 
     const hint = config.ai.globalHint;
-    const resources = this.resourceModel.resources;
+    const resources = this.resourceModel.all();
 
     if (!model) {
       this.initialized = false;
@@ -76,70 +95,86 @@ export class Kernel {
     }
   }
 
-  async handleInput(workspaceId: Workspace['id'], input: InteractionInput) {
+  updateStatus(status: KernelStatus) {
+    this.status = status;
+    this.notifier.notify({ status });
+  }
+
+  async handleInput(workspaceId: Workspace['id'], input: KernelInput) {
+    const inputMsg = inputMessage({ text: input.text });
+    this.workspaceModel.addMessage(workspaceId, inputMsg);
+
     if (!this.interpreter || !this.initialized) {
-      throw new Error('Tried to access kernel when not initialized.');
+      this.workspaceModel.addMessage(
+        workspaceId,
+        responseMessage({
+          text: `⚠️ No model is configured. Please select a model in the settings.`,
+        })
+      );
+
+      throw new KernelNotInitializedError(
+        'Tried to access kernel when not initialized.'
+      );
     }
 
-    this.workspaceModel.updateModified(workspaceId);
-
-    const interaction = this.workspaceModel.createInteraction(
-      workspaceId,
-      input
-    );
+    this.updateStatus('thinking');
 
     const runner = this.interpreter.run(
-      this.workspaceModel.allInteractions(workspaceId)
+      this.workspaceModel.allMessages(workspaceId)
     );
 
     let iteration = await runner.next();
     while (!iteration.done) {
-      const response = iteration.value;
+      this.updateStatus('thinking');
+      const response = iteration.value as InterpreterResponse;
       switch (response.type) {
         case 'text':
-          console.log('handling text', response);
-          await this.handleTextResponse(interaction, response);
+          this.updateStatus('responding');
+          await this.handleTextResponse(workspaceId, response);
+          this.updateStatus('idle');
           break;
         case 'action':
-          await this.handleActionResponse(interaction, response);
+          await this.handleActionResponse(workspaceId, response);
+          this.updateStatus('idle');
           break;
         default:
           throw new Error('Action type not recognized!');
       }
 
       iteration = await runner.next(
-        this.workspaceModel.allInteractions(workspaceId)
+        this.workspaceModel.allMessages(workspaceId)
       );
     }
   }
 
-  async handleTextResponse(interaction: Interaction, response: TextResponse) {
-    const outputIndex = this.workspaceModel.addOutput(interaction.id, {
-      type: response.type,
-      content: '',
-    });
+  async handleTextResponse(
+    workspaceId: Workspace['id'],
+    response: TextResponse
+  ) {
+    const message = responseMessage();
+    this.workspaceModel.addMessage(workspaceId, message);
+
     let text = '';
     for await (const chunk of response.textStream) {
       text += chunk;
-      this.workspaceModel.updateOutputContent(
-        interaction.id,
-        outputIndex,
-        text
-      );
+      this.workspaceModel.updateMessage(message.id, { text });
     }
   }
 
   async handleActionResponse(
-    interaction: Interaction,
+    workspaceId: Workspace['id'],
     response: ActionResponse
   ) {
-    const output: ActionOutput = {
-      type: 'action',
-      directive: response.directive,
-      content: {},
-    };
+    const { process, content } = await this.runtime.dispatch(
+      response.directive
+    );
 
-    output.content = await this.dispatcher.dispatch(response.directive);
-    this.workspaceModel.addOutput(interaction.id, output);
+    const message = actionMessage({
+      directive: response.directive,
+      process,
+      content,
+    });
+
+    this.workspaceModel.addMessage(workspaceId, message);
   }
 }

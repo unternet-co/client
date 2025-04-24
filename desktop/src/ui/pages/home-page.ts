@@ -3,14 +3,13 @@ import { formatTimestamp } from '../../common/utils/index';
 import { Workspace, WorkspaceModel } from '../../workspaces';
 import { TabModel } from '../../tabs';
 import { dependencies } from '../../common/dependencies';
-import { Kernel } from '../../ai/kernel';
 import { ModalService } from '../../modals/modal-service';
 import cn from 'classnames';
 import { DisposableGroup } from '../../common/disposable';
 import { ShortcutService } from '../../shortcuts/shortcut-service';
 import './home-page.css';
-import '../common/button';
-import '../common/input';
+import '../common/elements/button';
+import '../common/elements/input';
 
 export class HomePage extends HTMLElement {
   private workspaceModel =

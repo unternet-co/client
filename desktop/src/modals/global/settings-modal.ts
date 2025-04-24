@@ -10,9 +10,9 @@ import {
   AIModelService,
   AIModelProviderNames,
 } from '../../ai/ai-models';
-import '../../ui/common/textarea';
-import '../../ui/common/select';
-import '../../ui/common/input';
+import '../../ui/common/elements/textarea';
+import '../../ui/common/elements/select';
+import '../../ui/common/elements/input';
 import './settings-modal.css';
 import { OLLAMA_BASE_URL } from '../../ai/providers/ollama';
 
@@ -59,6 +59,7 @@ export class SettingsModal extends ModalElement {
   }
 
   private handleSubmit() {
+    console.log('here');
     this.configModel.updateGlobalHint(this.globalHint);
     this.configModel.updateModelProvider(
       this.selectedProvider,

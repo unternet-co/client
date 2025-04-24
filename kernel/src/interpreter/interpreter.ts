@@ -10,34 +10,28 @@ import { actionChoiceSchema, schemas } from './schemas';
 import { defaultStrategies, Strategy } from './strategies';
 import {
   ActionDirective,
-  createActionRecord,
+  createActionDict,
   decodeActionHandle,
-} from '../actions/actions';
-import { ActionDefinition, Resource } from '../actions/resources';
-import { Interaction } from './interactions';
-import {
-  createAssistantMessage,
-  createMessages,
-  createUserMessage,
-} from './messages';
+} from '../runtime/actions';
+import { ActionDefinition, Resource } from '../runtime/resources';
+import { KernelMessage, modelMsg, toModelMessages } from './messages';
 
-export interface TextResponse {
+export interface BaseResponse {
+  correlationId: string;
+}
+
+export interface TextResponse extends BaseResponse {
   type: 'text';
   text: Promise<string>;
   textStream: AsyncIterable<string>;
 }
 
-export interface ActionResponse {
+export interface ActionResponse extends BaseResponse {
   type: 'action';
   directive: ActionDirective;
 }
 
 export type InterpreterResponse = TextResponse | ActionResponse;
-
-type InterpreterLogger = (
-  type: 'thought' | 'action' | 'input' | 'text',
-  content: string
-) => void;
 
 interface InterpreterInit {
   model: LanguageModel;
@@ -45,11 +39,10 @@ interface InterpreterInit {
   strategies?: Record<string, Strategy>;
   prompts?: InterpreterPrompts;
   hint?: string;
-  logger?: InterpreterLogger;
 }
 
 interface GenerateOpts<T = unknown> {
-  interactions: Interaction[];
+  messages: KernelMessage[];
   prompt?: string;
   schema?: Schema<T>;
   system?: string;
@@ -62,7 +55,6 @@ export class Interpreter {
   prompts: InterpreterPrompts;
   strategies: Record<string, Strategy>;
   hint: string;
-  logger: InterpreterLogger = () => {};
 
   constructor({
     model,
@@ -70,14 +62,12 @@ export class Interpreter {
     prompts,
     hint,
     strategies,
-    logger,
   }: InterpreterInit) {
     this.model = model;
     this.hint = hint;
-    this.actions = createActionRecord(resources || []);
+    this.actions = createActionDict(resources || []);
     this.prompts = { ...defaultPrompts, ...prompts };
     this.strategies = { ...defaultStrategies, ...strategies };
-    if (logger) this.logger = logger;
   }
 
   /**
@@ -85,22 +75,25 @@ export class Interpreter {
    * @param interactions An array of interactions
    * @returns An async generator function that yields responses, and whose next() function takes an array of interactions
    */
-  async *run(interactions: Array<Interaction>) {
+  async *run(messages: Array<KernelMessage>) {
+    const correlationId = messages.at(-1).correlationId;
+
+    // TODO: Ensure latest message is an input
+    // TODO: Return correlation ID in response object
     if (!Object.keys(this.actions).length) {
-      yield this.createTextResponse(interactions);
+      yield this.generateTextResponse(messages);
       return;
     }
 
-    const strategy = await this.chooseStrategy(interactions);
+    const strategy = await this.chooseStrategy(messages);
     if (strategy in this.strategies) {
-      const responses = this.strategies[strategy].method(this, interactions);
-
-      console.log(interactions);
-      let response = await responses.next();
-      while (!response.done) {
-        const newInteractions = yield response.value;
-        console.log(newInteractions);
-        response = await responses.next(newInteractions);
+      const responses = this.strategies[strategy].method(this, messages);
+      let iteration = await responses.next();
+      while (!iteration.done) {
+        const response = iteration.value as InterpreterResponse;
+        response.correlationId = correlationId;
+        const updatedMessages = yield response;
+        iteration = await responses.next(updatedMessages);
       }
       return;
     }
@@ -110,12 +103,12 @@ export class Interpreter {
 
   /**
    * Chooses a strategy to respond to the user's query
-   * @param interactions An array of interactions
+   * @param messages An array of kernel messages
    * @returns An InterpreterResponse object, of type 'text' or 'action'.
    */
-  async chooseStrategy(interactions: Array<Interaction>) {
+  async chooseStrategy(messages: KernelMessage[]) {
     const { strategy } = await this.generateObject({
-      interactions,
+      messages,
       prompt: this.prompts.chooseStrategy(this.strategies),
       schema: schemas.strategies(this.strategies),
       think: true,
@@ -126,23 +119,23 @@ export class Interpreter {
 
   /* === TEXT & OBJECT GENERATORS === */
 
-  async generateText({ interactions, system, prompt, think }: GenerateOpts) {
-    const messages = createMessages(interactions);
+  async generateText({ messages, system, prompt, think }: GenerateOpts) {
+    const modelMsgs = toModelMessages(messages);
+
     if (think) {
       const thought = await this.generateText({
-        interactions,
+        messages,
         system,
         prompt: this.prompts.think(prompt),
       });
-      this.logger('thought', thought);
-      messages.push(createAssistantMessage(thought));
+      modelMsgs.push(modelMsg('assistant', thought));
     }
-    if (prompt) messages.push(createUserMessage(prompt));
-    if (prompt) messages.push(createUserMessage(prompt));
+    if (prompt) modelMsgs.push(modelMsg('user', prompt));
+    if (prompt) modelMsgs.push(modelMsg('user', prompt));
 
     const output = await generateText({
       model: this.model,
-      messages,
+      messages: modelMsgs,
       system:
         system ||
         this.prompts.system({ actions: this.actions, hint: this.hint }),
@@ -151,24 +144,23 @@ export class Interpreter {
     return output.text;
   }
 
-  async streamText({ interactions, system, prompt, think }: GenerateOpts) {
+  async streamText({ messages, system, prompt, think }: GenerateOpts) {
     // TODO: Put all this into createMessages
-    const messages = createMessages(interactions);
+    const modelMsgs = toModelMessages(messages);
     if (think) {
       const thought = await this.generateText({
-        interactions,
+        messages,
         system,
         prompt: this.prompts.think(prompt),
       });
-      this.logger('thought', thought);
-      messages.push(createAssistantMessage(thought));
+      modelMsgs.push(modelMsg('assistant', thought));
     }
-    if (prompt) messages.push(createUserMessage(prompt));
-    if (prompt) messages.push(createUserMessage(prompt));
+    if (prompt) modelMsgs.push(modelMsg('user', prompt));
+    if (prompt) modelMsgs.push(modelMsg('user', prompt));
 
     const output = streamText({
       model: this.model,
-      messages,
+      messages: modelMsgs,
       system:
         system ||
         this.prompts.system({ actions: this.actions, hint: this.hint }),
@@ -181,27 +173,26 @@ export class Interpreter {
   }
 
   async generateObject<T>({
-    interactions,
+    messages,
     schema,
     system,
     prompt,
     think,
   }: GenerateOpts<T>) {
-    const messages = createMessages(interactions);
+    const modelMsgs = toModelMessages(messages);
     if (think) {
       const thought = await this.generateText({
-        interactions,
+        messages,
         system,
         prompt: this.prompts.think(prompt),
       });
-      this.logger('thought', thought);
-      messages.push(createAssistantMessage(thought));
+      modelMsgs.push(modelMsg('assistant', thought));
     }
-    if (prompt) messages.push(createUserMessage(prompt));
+    if (prompt) modelMsgs.push(modelMsg('user', prompt));
 
     const output = await generateObject({
       model: this.model,
-      messages,
+      messages: modelMsgs,
       system:
         system ||
         this.prompts.system({ actions: this.actions, hint: this.hint }),
@@ -218,22 +209,24 @@ export class Interpreter {
    * @param interactions An array of interactions.
    * @returns A TextResponse object, which can be used to get or stream the response text.
    */
-  async createTextResponse(
-    interactions: Array<Interaction>
+  async generateTextResponse(
+    messages: Array<KernelMessage>
   ): Promise<TextResponse> {
-    const output = await this.streamText({ interactions });
+    const correlationId = messages.at(-1).correlationId;
+    const output = await this.streamText({ messages });
 
     return {
       type: 'text',
       text: output.text,
       textStream: output.textStream,
+      correlationId,
     };
   }
 
-  async createActionResponse(
-    interactions: Array<Interaction>
+  async generateActionResponse(
+    messages: Array<KernelMessage>
   ): Promise<ActionResponse> {
-    const responses = await this.createActionResponses(interactions);
+    const responses = await this.generateActionResponses(messages);
     return responses[0];
   }
 
@@ -242,11 +235,13 @@ export class Interpreter {
    * @param interactions An array of interactions
    * @returns An ActionResponse containing the action directive.
    */
-  async createActionResponses(
-    interactions: Array<Interaction>
+  async generateActionResponses(
+    messages: Array<KernelMessage>
   ): Promise<ActionResponse[]> {
+    const correlationId = messages.at(-1).correlationId;
+
     const { tools } = await this.generateObject({
-      interactions,
+      messages,
       system: this.prompts.system({ actions: this.actions, hint: this.hint }),
       prompt: this.prompts.chooseAction(),
       schema: actionChoiceSchema(this.actions),
@@ -261,6 +256,7 @@ export class Interpreter {
           actionId,
           args: tool.args,
         },
+        correlationId,
       };
     });
   }

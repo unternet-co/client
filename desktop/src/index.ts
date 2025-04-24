@@ -1,5 +1,5 @@
 import { initTabStoreData, TabModel, TabStoreData } from './tabs';
-import { Interaction } from './ai/interactions';
+import { MessageRecord } from './messages';
 import { Workspace, WorkspaceModel } from './workspaces';
 import { dependencies } from './common/dependencies';
 import { DatabaseService } from './storage/database-service';
@@ -13,13 +13,15 @@ import { Kernel } from './ai/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
 import { AIModelService } from './ai/ai-models';
+import { ResourceModel, initialResources } from './protocols/resources';
+import { protocols } from './protocols/protocols';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
-import { ResourceModel, initialResources } from './protocols/resources';
-import { protocols } from './protocols/protocols';
+import { ProcessModel, SerializedProcess } from './processes';
+import { ProcessRuntime } from '@unternet/kernel';
 import './modals/global/bug-modal';
 
 /* Initialize databases & stores */
@@ -27,17 +29,29 @@ import './modals/global/bug-modal';
 const workspaceDatabaseService = new DatabaseService<string, Workspace>(
   'workspaces'
 );
-const interactionDatabaseService = new DatabaseService<string, Interaction>(
-  'interactions'
+const processDatabaseService = new DatabaseService<string, SerializedProcess>(
+  'processes'
+);
+const messageDatabaseService = new DatabaseService<string, MessageRecord>(
+  'messages'
 );
 const tabKeyStore = new KeyStoreService<TabStoreData>('tabs', initTabStoreData);
 const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
+/* Initialize model dependencies */
+
+const runtime = new ProcessRuntime(protocols);
+console.log(runtime.protocols);
+
 /* Initialize models */
+
+const processModel = new ProcessModel(processDatabaseService, runtime);
+dependencies.registerSingleton('ProcessModel', ProcessModel);
 
 const workspaceModel = new WorkspaceModel(
   workspaceDatabaseService,
-  interactionDatabaseService
+  messageDatabaseService,
+  processModel
 );
 dependencies.registerSingleton('WorkspaceModel', workspaceModel);
 
@@ -65,7 +79,7 @@ const kernel = new Kernel({
   configModel,
   aiModelService,
   resourceModel,
-  protocols,
+  runtime,
 });
 dependencies.registerSingleton('Kernel', kernel);
 

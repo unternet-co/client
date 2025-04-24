@@ -1,5 +1,5 @@
 import { marked } from 'marked';
-import { attachStyles } from '../../common/utils';
+import { attachStyles } from '../../../common/utils';
 
 class MarkdownText extends HTMLElement {
   constructor() {
@@ -45,6 +45,10 @@ class MarkdownText extends HTMLElement {
 
       li {
         margin: var(--space-4) 0;
+      }
+
+      a {
+        color: var(--color-action-600);
       }
     `;
   }

@@ -17,7 +17,7 @@ export const ICON = {
   history: 'history',
   refresh: 'refresh-cw',
   error: 'alert-triangle',
-  loading: 'loader-circle',
+  loading: 'loader',
   external: 'external-link',
   download: 'download',
   left: 'arrow-left',
@@ -109,6 +109,7 @@ export class IconElement extends LitElement {
     return css`
       :host {
         display: inline-block;
+        width: min-content;
         color: inherit;
       }
 

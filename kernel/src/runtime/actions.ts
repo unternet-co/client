@@ -1,4 +1,5 @@
-import { ActionRecord, Resource } from './resources';
+import { Process } from './processes';
+import { ActionDict, Resource } from './resources';
 
 /**
  * An instruction of how an action should be consumed.
@@ -16,8 +17,8 @@ export interface ActionDirective {
  * @param resources
  * @returns Action dictionary/record/map.
  */
-export function createActionRecord(resources: Resource[]): ActionRecord {
-  const actions: ActionRecord = {};
+export function createActionDict(resources: Resource[]): ActionDict {
+  const actions: ActionDict = {};
 
   for (const resource of resources) {
     for (const id in resource.actions) {

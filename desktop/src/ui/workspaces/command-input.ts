@@ -1,17 +1,18 @@
 import { LitElement, html, css } from 'lit';
-import { InteractionInput } from '../../ai/interactions';
-import '../common/input';
-import '../common/button';
+import { KernelInput } from '../../ai/kernel';
+import '../common/elements/input';
+import '../common/elements/button';
 
-export class CommandSubmitEvent extends CustomEvent<{
-  input: InteractionInput;
-}> {
+export class CommandSubmitEvent extends Event {
+  input: KernelInput;
+
   constructor(value: string) {
     super('submit', {
-      detail: { input: { text: value } },
       bubbles: true,
       composed: true,
     });
+
+    this.input = { text: value };
   }
 }
 

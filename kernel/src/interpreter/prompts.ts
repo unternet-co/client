@@ -1,5 +1,5 @@
 import dedent from 'dedent';
-import { ActionDefinition } from '../actions/resources';
+import { ActionDefinition } from '../runtime/resources';
 import { Strategy } from './strategies';
 
 function chooseStrategy(strategies: Record<string, Strategy>) {

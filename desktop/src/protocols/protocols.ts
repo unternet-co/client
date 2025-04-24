@@ -1,3 +1,4 @@
-import { unternetProtocol } from './web/protocol';
+import { builtinProtocol } from './builtin/protocol';
+import { webProtocol } from './web/web-process';
 
-export const protocols = [unternetProtocol];
+export const protocols = [builtinProtocol, webProtocol];

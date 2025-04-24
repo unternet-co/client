@@ -1,6 +1,4 @@
 import { html, render } from 'lit';
-import { Resource } from '@unternet/kernel';
-// import './resource-picker';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
 import { ResourceModel } from '../../protocols/resources';
@@ -13,7 +11,7 @@ export class ResourceBar extends HTMLElement {
   }
 
   render(): void {
-    const resources = this.resourceModel.resources;
+    const resources = this.resourceModel.all();
 
     const resourceTemplate = resources.map((resource) => {
       return html`<li class="applet-item">
