@@ -4,8 +4,8 @@ import { dependencies } from '../common/dependencies';
 import { ShortcutService } from '../shortcuts/shortcut-service';
 import { createEl } from '../common/utils/dom';
 import './modal.css';
-import '../ui/common/button';
-import '../ui/common/icon';
+import '../ui/common/elements/button';
+import '../ui/common/elements/icon';
 import { ModalElement } from './modal-element';
 
 export type ModalSize = 'full' | 'auto';

@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { KernelInput } from '../../ai/kernel';
-import '../common/input';
-import '../common/button';
+import '../common/elements/input';
+import '../common/elements/button';
 
 export class CommandSubmitEvent extends Event {
   input: KernelInput;

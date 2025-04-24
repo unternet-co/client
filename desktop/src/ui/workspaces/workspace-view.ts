@@ -76,7 +76,7 @@ export class WorkspaceView extends HTMLElement {
       <div class="bottom-bar">
         <command-bar>
           <command-input
-            @submit=${(e) => this.handleCommandSubmit(e)}
+            @submit=${this.handleCommandSubmit.bind(this)}
           ></command-input>
         </command-bar>
         <resource-bar for=${this.workspaceId}></resource-bar>

@@ -13,13 +13,13 @@ import { Kernel } from './ai/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
 import { AIModelService } from './ai/ai-models';
+import { ResourceModel, initialResources } from './protocols/resources';
+import { protocols } from './protocols/protocols';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
-import { ResourceModel, initialResources } from './protocols/resources';
-import { protocols } from './protocols/protocols';
 
 /* Initialize databases & stores */
 

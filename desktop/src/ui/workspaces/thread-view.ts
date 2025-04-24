@@ -1,8 +1,8 @@
 import { html, render } from 'lit';
 import { Workspace, WorkspaceModel } from '../../workspaces';
 import { dependencies } from '../../common/dependencies';
-import '../common/scroll-container';
-import '../common/markdown-text';
+import '../common/elements/scroll-container';
+import '../common/elements/markdown-text';
 import './thread-view.css';
 import { repeat } from 'lit/directives/repeat.js';
 import { ResourceModel } from '../../protocols/resources';

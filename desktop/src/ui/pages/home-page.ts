@@ -8,8 +8,8 @@ import cn from 'classnames';
 import { DisposableGroup } from '../../common/disposable';
 import { ShortcutService } from '../../shortcuts/shortcut-service';
 import './home-page.css';
-import '../common/button';
-import '../common/input';
+import '../common/elements/button';
+import '../common/elements/input';
 
 export class HomePage extends HTMLElement {
   private workspaceModel =
