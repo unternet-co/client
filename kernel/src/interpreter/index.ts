@@ -8,30 +8,15 @@ import {
 import defaultPrompts, { InterpreterPrompts } from './prompts';
 import { actionChoiceSchema, schemas } from './schemas';
 import { defaultStrategies, Strategy } from './strategies';
-import {
-  ActionDirective,
-  createActionDict,
-  decodeActionHandle,
-} from '../runtime/actions';
+import { createActionDict, decodeActionHandle } from '../runtime/actions';
 import { ActionDefinition, Resource } from '../runtime/resources';
 import { KernelMessage, modelMsg, toModelMessages } from './messages';
-
-export interface BaseResponse {
-  correlationId: string;
-}
-
-export interface TextResponse extends BaseResponse {
-  type: 'text';
-  text: Promise<string>;
-  textStream: AsyncIterable<string>;
-}
-
-export interface ActionResponse extends BaseResponse {
-  type: 'action';
-  directive: ActionDirective;
-}
-
-export type InterpreterResponse = TextResponse | ActionResponse;
+import {
+  actionProposalResponse,
+  ActionProposalResponse,
+  DirectResponse,
+  KernelResponse,
+} from '../response-types';
 
 interface InterpreterInit {
   model: LanguageModel;
@@ -90,8 +75,7 @@ export class Interpreter {
       const responses = this.strategies[strategy].method(this, messages);
       let iteration = await responses.next();
       while (!iteration.done) {
-        const response = iteration.value as InterpreterResponse;
-        response.correlationId = correlationId;
+        const response = iteration.value as KernelResponse;
         const updatedMessages = yield response;
         iteration = await responses.next(updatedMessages);
       }
@@ -104,7 +88,7 @@ export class Interpreter {
   /**
    * Chooses a strategy to respond to the user's query
    * @param messages An array of kernel messages
-   * @returns An InterpreterResponse object, of type 'text' or 'action'.
+   * @returns A KernelResponse object, of type 'direct' or 'actionproposal'
    */
   async chooseStrategy(messages: KernelMessage[]) {
     const { strategy } = await this.generateObject({
@@ -211,21 +195,20 @@ export class Interpreter {
    */
   async generateTextResponse(
     messages: Array<KernelMessage>
-  ): Promise<TextResponse> {
-    const correlationId = messages.at(-1).correlationId;
+  ): Promise<DirectResponse> {
     const output = await this.streamText({ messages });
 
     return {
-      type: 'text',
-      text: output.text,
-      textStream: output.textStream,
-      correlationId,
+      type: 'direct',
+      mimeType: 'text/markdown',
+      content: output.text,
+      contentStream: output.textStream,
     };
   }
 
   async generateActionResponse(
     messages: Array<KernelMessage>
-  ): Promise<ActionResponse> {
+  ): Promise<ActionProposalResponse> {
     const responses = await this.generateActionResponses(messages);
     return responses[0];
   }
@@ -237,7 +220,7 @@ export class Interpreter {
    */
   async generateActionResponses(
     messages: Array<KernelMessage>
-  ): Promise<ActionResponse[]> {
+  ): Promise<ActionProposalResponse[]> {
     const correlationId = messages.at(-1).correlationId;
 
     const { tools } = await this.generateObject({
@@ -249,15 +232,11 @@ export class Interpreter {
 
     return tools.map((tool) => {
       const { uri, actionId } = decodeActionHandle(tool.id);
-      return {
-        type: 'action',
-        directive: {
-          uri,
-          actionId,
-          args: tool.args,
-        },
-        correlationId,
-      };
+      return actionProposalResponse({
+        uri,
+        actionId,
+        args: tool.args,
+      });
     });
   }
 }

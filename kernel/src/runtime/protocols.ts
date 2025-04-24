@@ -1,4 +1,4 @@
-import { ActionDirective } from './actions';
+import { ActionProposal } from './actions';
 import { Process, ProcessConstructor } from './processes';
 
 export type ProtocolHandlerResult = Process | any;
@@ -17,7 +17,7 @@ export abstract class Protocol {
   private processRegistry? = new Map<string, ProcessConstructor>();
 
   handleAction(
-    directive: ActionDirective
+    action: ActionProposal
   ): ProtocolHandlerResult | Promise<ProtocolHandlerResult> {
     return {
       error: 'Action handler not defined.',

@@ -95,7 +95,7 @@ class ThreadView extends HTMLElement {
   }
 
   actionMessageTemplate(message: ActionMessage) {
-    const resource = this.resourceModel.find(message.directive.uri);
+    const resource = this.resourceModel.find(message.uri);
 
     let icon = html``;
     const iconSrc = getResourceIcon(resource);

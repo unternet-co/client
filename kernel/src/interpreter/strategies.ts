@@ -1,4 +1,5 @@
-import { Interpreter, InterpreterResponse } from './interpreter';
+import { Interpreter } from '.';
+import { KernelResponse } from '../response-types';
 import { KernelMessage } from './messages';
 
 export interface Strategy {
@@ -6,7 +7,7 @@ export interface Strategy {
   method: (
     interpreter: Interpreter,
     messages: KernelMessage[]
-  ) => AsyncGenerator<InterpreterResponse, any, Array<KernelMessage>>;
+  ) => AsyncGenerator<KernelResponse, any, Array<KernelMessage>>;
 }
 
 const defaultStrategies: Record<string, Strategy> = {};
