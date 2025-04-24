@@ -1,5 +1,6 @@
-import { html, render, TemplateResult } from 'lit';
+import { html, render } from 'lit';
 import { Workspace, WorkspaceModel } from '../../workspaces';
+import { MessageRecord } from '../../messages';
 import { dependencies } from '../../common/dependencies';
 import '../common/elements/scroll-container';
 import '../common/elements/markdown-text';
@@ -7,17 +8,26 @@ import './thread-view.css';
 import { repeat } from 'lit/directives/repeat.js';
 import { ResourceModel } from '../../protocols/resources';
 import './process-view';
-import { MessageRecord } from '../../messages';
 import { ActionMessage, InputMessage, ResponseMessage } from '@unternet/kernel';
+import { Kernel, KernelStatus } from '../../ai/kernel';
 
 class ThreadView extends HTMLElement {
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  private messages: MessageRecord[] = [];
+  private status: KernelStatus;
   private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
+  private kernel = dependencies.resolve<Kernel>('Kernel');
   private workspaceId: Workspace['id'];
 
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
+
+    this.kernel.subscribe((notification) => {
+      if (notification.status) this.updateKernelStatus(notification.status);
+    });
+    this.updateKernelStatus(this.kernel.status);
+
     this.updateMessages();
     this.workspaceModel.subscribeToWorkspace(
       this.workspaceId,
@@ -26,26 +36,39 @@ class ThreadView extends HTMLElement {
   }
 
   updateMessages() {
-    const messages = Array.from(
+    this.messages = Array.from(
       this.workspaceModel.allMessages(this.workspaceId)
     );
-    this.render(messages);
+    this.render();
   }
 
-  render(messages: MessageRecord[]) {
+  updateKernelStatus(status: KernelStatus) {
+    console.log('UPDATING', status);
+    this.status = status;
+    this.render();
+  }
+
+  render() {
     const messagesTemplate = repeat(
-      messages,
+      this.messages,
       (message) => message.id,
       this.messageTemplate.bind(this)
     );
 
     const template = html`
       <message-scroll class="inner">
-        <div class="message-list">${messagesTemplate}</div>
+        <div class="message-list">
+          ${messagesTemplate} ${this.loadingTemplate()}
+        </div>
       </message-scroll>
     `;
 
     render(template, this);
+  }
+
+  loadingTemplate() {
+    if (this.status !== 'thinking') return null;
+    return html`<un-icon name="loading" spin class="loading"></un-icon>`;
   }
 
   messageTemplate(message: MessageRecord) {
@@ -66,7 +89,7 @@ class ThreadView extends HTMLElement {
 
   responseMessageTemplate(message: ResponseMessage) {
     return html`<div class="message" data-type="response">
-      <markdown-text>${message.text}</markdown-text>
+      <markdown-text>${message.text || html`&nbsp;`}</markdown-text>
     </div>`;
   }
 

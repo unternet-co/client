@@ -16,6 +16,7 @@ import { Workspace, WorkspaceModel } from '../workspaces';
 import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
 import { ResourceModel } from '../protocols/resources';
+import { Notifier } from '../common/notifier';
 
 export interface KernelInit {
   model?: LanguageModel;
@@ -34,6 +35,12 @@ export class KernelNotInitializedError extends Error {
   name = 'KernelNotInitialized';
 }
 
+export type KernelStatus = 'idle' | 'thinking' | 'responding';
+
+export interface KernelNotification {
+  status: KernelStatus;
+}
+
 export class Kernel {
   initialized: boolean = false;
   interpreter?: Interpreter | null;
@@ -42,6 +49,9 @@ export class Kernel {
   configModel: ConfigModel;
   resourceModel: ResourceModel;
   aiModelService: AIModelService;
+  status: KernelStatus;
+  private notifier = new Notifier<KernelNotification>();
+  readonly subscribe = this.notifier.subscribe;
 
   constructor({
     workspaceModel,
@@ -87,6 +97,11 @@ export class Kernel {
     }
   }
 
+  updateStatus(status: KernelStatus) {
+    this.status = status;
+    this.notifier.notify({ status });
+  }
+
   async handleInput(workspaceId: Workspace['id'], input: KernelInput) {
     const inputMsg = inputMessage({ text: input.text });
     this.workspaceModel.addMessage(workspaceId, inputMsg);
@@ -104,19 +119,25 @@ export class Kernel {
       );
     }
 
+    this.updateStatus('thinking');
+
     const runner = this.interpreter.run(
       this.workspaceModel.allMessages(workspaceId)
     );
 
     let iteration = await runner.next();
     while (!iteration.done) {
+      this.updateStatus('thinking');
       const response = iteration.value as InterpreterResponse;
       switch (response.type) {
         case 'text':
+          this.updateStatus('responding');
           await this.handleTextResponse(workspaceId, response);
+          this.updateStatus('idle');
           break;
         case 'action':
           await this.handleActionResponse(workspaceId, response);
+          this.updateStatus('idle');
           break;
         default:
           throw new Error('Action type not recognized!');

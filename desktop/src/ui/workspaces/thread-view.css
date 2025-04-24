@@ -13,6 +13,11 @@ thread-view .inner::part(slot) {
   padding: var(--space-8) var(--space-4);
 }
 
+thread-view .loading {
+  position: relative;
+  left: var(--space-5);
+}
+
 thread-view .message-list {
   display: flex;
   flex-direction: column;
