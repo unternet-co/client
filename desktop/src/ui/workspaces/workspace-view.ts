@@ -1,12 +1,12 @@
 import { CommandSubmitEvent } from './command-input';
 import './command-bar.css';
 import './command-input';
-import './interaction-history';
+import './thread-view';
 import './workspace-view.css';
 import './resource-bar';
 import { html, render } from 'lit';
 import { Workspace, WorkspaceModel } from '../../workspaces';
-import { Kernel } from '../../ai/kernel';
+import { Kernel, KernelNotInitializedError } from '../../ai/kernel';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
 
@@ -57,28 +57,13 @@ export class WorkspaceView extends HTMLElement {
 
   async handleCommandSubmit(e: CommandSubmitEvent) {
     try {
-      await this.kernel.handleInput(this.workspaceId, e.detail.input);
+      await this.kernel.handleInput(this.workspaceId, e.input);
     } catch (error) {
       console.error('Error handling command input:', error);
 
-      if (
-        error instanceof Error &&
-        error.message === 'Tried to access kernel when not initialized.'
-      ) {
+      if (error instanceof KernelNotInitializedError) {
         const modalService = dependencies.resolve<ModalService>('ModalService');
         modalService.open('settings');
-
-        const workspaceModel =
-          dependencies.resolve<WorkspaceModel>('WorkspaceModel');
-        const interaction = workspaceModel.createInteraction(
-          this.workspaceId,
-          e.detail.input
-        );
-
-        workspaceModel.addOutput(interaction.id, {
-          type: 'text',
-          content: `⚠️ No model is configured. Please select a model in the settings.`,
-        });
       }
     }
   }
@@ -86,7 +71,7 @@ export class WorkspaceView extends HTMLElement {
   get template() {
     return html`
       <div class="workspace-content">
-        <interaction-history for=${this.workspaceId}></interaction-history>
+        <thread-view for=${this.workspaceId}></thread-view>
       </div>
       <div class="bottom-bar">
         <command-bar>

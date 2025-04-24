@@ -1,5 +1,5 @@
 import { initTabStoreData, TabModel, TabStoreData } from './tabs';
-import { Interaction } from './ai/interactions';
+import { MessageRecord } from './messages';
 import { Workspace, WorkspaceModel } from './workspaces';
 import { dependencies } from './common/dependencies';
 import { DatabaseService } from './storage/database-service';
@@ -26,11 +26,11 @@ import { protocols } from './protocols/protocols';
 const workspaceDatabaseService = new DatabaseService<string, Workspace>(
   'workspaces'
 );
-const processDatabaseService = new DatabaseService<string, ProcessRecord>(
-  'processes'
-);
-const interactionDatabaseService = new DatabaseService<string, Interaction>(
-  'interactions'
+// const processDatabaseService = new DatabaseService<string, ProcessRecord>(
+//   'processes'
+// );
+const messageDatabaseService = new DatabaseService<string, MessageRecord>(
+  'messages'
 );
 const tabKeyStore = new KeyStoreService<TabStoreData>('tabs', initTabStoreData);
 const configStore = new KeyStoreService<ConfigData>('config', initConfig);
@@ -39,7 +39,7 @@ const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
 const workspaceModel = new WorkspaceModel(
   workspaceDatabaseService,
-  interactionDatabaseService
+  messageDatabaseService
 );
 dependencies.registerSingleton('WorkspaceModel', workspaceModel);
 

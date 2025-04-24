@@ -30,7 +30,7 @@ export interface Resource {
 
 type ResourceInit = { uri: string } & Partial<Resource>;
 
-export function createResource(init: ResourceInit): Resource {
+export function resource(init: ResourceInit): Resource {
   let urlObject: URL;
   try {
     urlObject = new URL(init.uri);

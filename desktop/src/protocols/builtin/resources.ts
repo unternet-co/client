@@ -1,7 +1,7 @@
-import { createResource } from '@unternet/kernel';
+import { resource } from '@unternet/kernel';
 import iconSrc from './icon-128x128.png';
 
-const web = createResource({
+const web = resource({
   uri: 'builtin:web',
   name: 'Web',
   description:

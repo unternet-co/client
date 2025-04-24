@@ -5,102 +5,97 @@ import mime from 'mime-types';
 import parseShell from 'shell-quote/parse';
 import untildify from 'untildify';
 
-import { Interaction } from '../../../src';
-
 /**
  * Create or extend an interaction based on user input.
  */
-export function interaction(
-  userInput: string,
-  interaction?: Interaction
-): Interaction {
-  const rawParts =
-    userInput.replace(/^\/file /, '').match(/"[^"]+"|'[^']+'|\S+/g) ?? [];
+// export function interaction(
+//   userInput: string,
+//   interaction?: Interaction
+// ): Interaction {
+//   const rawParts =
+//     userInput.replace(/^\/file /, '').match(/"[^"]+"|'[^']+'|\S+/g) ?? [];
 
-  const { files, textParts } = rawParts.reduce(
-    (
-      acc: {
-        files: Array<{ data: Uint8Array; filename: string; mimeType: string }>;
-        textParts: string[];
-      },
-      p: string
-    ) => {
-      const parsed_ = parseShell(p);
-      const parsed = parsed_[0];
+//   const { files, textParts } = rawParts.reduce(
+//     (
+//       acc: {
+//         files: Array<{ data: Uint8Array; filename: string; mimeType: string }>;
+//         textParts: string[];
+//       },
+//       p: string
+//     ) => {
+//       const parsed_ = parseShell(p);
+//       const parsed = parsed_[0];
 
-      if (
-        typeof parsed === 'string' &&
-        (parsed.startsWith('./') ||
-          parsed.startsWith('~/') ||
-          parsed.startsWith('/'))
-      ) {
-        const resolvedPath = untildify(parsed);
-        let files = acc.files;
-        let kind;
+//       if (
+//         typeof parsed === 'string' &&
+//         (parsed.startsWith('./') ||
+//           parsed.startsWith('~/') ||
+//           parsed.startsWith('/'))
+//       ) {
+//         const resolvedPath = untildify(parsed);
+//         let files = acc.files;
+//         let kind;
 
-        try {
-          const stats = nodeFs.lstatSync(resolvedPath);
-          kind = stats.isDirectory()
-            ? 'directory'
-            : stats.isFile()
-              ? 'file'
-              : undefined;
-        } catch (err) {
-          console.error(chalk.red(err));
-        }
+//         try {
+//           const stats = nodeFs.lstatSync(resolvedPath);
+//           kind = stats.isDirectory()
+//             ? 'directory'
+//             : stats.isFile()
+//               ? 'file'
+//               : undefined;
+//         } catch (err) {
+//           console.error(chalk.red(err));
+//         }
 
-        switch (kind) {
-          case 'directory':
-            const dirFiles = readDir(resolvedPath, {
-              ignoreDotFiles: true,
-              recursive: true,
-            });
+//         switch (kind) {
+//           case 'directory':
+//             const dirFiles = readDir(resolvedPath, {
+//               ignoreDotFiles: true,
+//               recursive: true,
+//             });
 
-            files = [...files, ...dirFiles];
-            break;
+//             files = [...files, ...dirFiles];
+//             break;
 
-          case 'file':
-            const filename = nodePath.basename(resolvedPath);
-            const mimeType = fileMimeType(filename);
-            const data = nodeFs.readFileSync(resolvedPath);
+//           case 'file':
+//             const filename = nodePath.basename(resolvedPath);
+//             const mimeType = fileMimeType(filename);
+//             const data = nodeFs.readFileSync(resolvedPath);
 
-            files = [
-              ...files,
-              { data: new Uint8Array(data), filename, mimeType },
-            ];
-            break;
-        }
+//             files = [
+//               ...files,
+//               { data: new Uint8Array(data), filename, mimeType },
+//             ];
+//             break;
+//         }
 
-        return { ...acc, files };
-      }
+//         return { ...acc, files };
+//       }
 
-      return {
-        ...acc,
-        textParts: p.startsWith('--') ? acc.textParts : [...acc.textParts, p],
-      };
-    },
-    {
-      files: [],
-      textParts: [],
-    }
-  );
+//       return {
+//         ...acc,
+//         textParts: p.startsWith('--') ? acc.textParts : [...acc.textParts, p],
+//       };
+//     },
+//     {
+//       files: [],
+//       textParts: [],
+//     }
+//   );
 
-  // Print files added to stdout
-  if (files.length) console.log('');
+//   // Print files added to stdout
+//   if (files.length) console.log('');
 
-  files.forEach((file) => {
-    console.log(chalk.italic(`File added: '${file.filename}'`));
-  });
+//   files.forEach((file) => {
+//     console.log(chalk.italic(`File added: '${file.filename}'`));
+//   });
 
-  // Fin
-  return {
-    input: {
-      text: textParts.length ? textParts.join(' ') : interaction?.input?.text,
-      files: [...(interaction?.input?.files || []), ...files],
-    },
-    outputs: interaction?.outputs || [],
-  };
-}
+//   // Fin
+//   return {
+//     text: textParts.length ? textParts.join(' ') : message?.text,
+//     files: [...(message?.files || []), ...files],
+//   };
+// }
 
 /* 🛠️ */
 

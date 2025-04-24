@@ -4,18 +4,24 @@ import chalk from 'chalk';
 import 'dotenv/config';
 
 import {
-  ActionOutput,
-  Interaction,
-  InteractionOutput,
   Interpreter,
-  Dispatcher,
   TextResponse,
   ActionResponse,
+  ProcessRuntime,
 } from '../../src';
 import { Command } from './types';
 import { protocols } from './protocols';
 import * as commands from './commands';
 import resources from './resources';
+import {
+  actionMessage,
+  ActionMessage,
+  inputMessage,
+  InputMessage,
+  KernelMessage,
+  responseMessage,
+  ResponseMessage,
+} from '../../src/interpreter/messages';
 
 /* MODEL & KERNEL SETUP */
 
@@ -24,14 +30,14 @@ const model = openai('gpt-4o');
 const interpreter = new Interpreter({
   model,
   resources,
-  logger: (type, content) =>
-    console.log(chalk.bgGray(type.toUpperCase()), chalk.dim(content)),
+  // logger: (type, content) =>
+  //   console.log(chalk.bgGray(type.toUpperCase()), chalk.dim(content)),
 });
-const dispatcher = new Dispatcher(protocols);
+const runtime = new ProcessRuntime(protocols);
 
 /* CLI INPUT & OUTPUT MANAGEMENT */
 
-const interactions: Interaction[] = [];
+const messages: KernelMessage[] = [];
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -42,60 +48,64 @@ const rl = readline.createInterface({
  *
  * Supports interaction reuse, hence the function currying.
  */
-const handleInput =
-  (interaction?: Interaction) => async (userInput: string) => {
-    // Execute a command if one was provided,
-    // and ensure an interaction.
-    switch (command(userInput)) {
-      case 'exit':
-        console.log(chalk.bold('\nGoodbye!'));
-        rl.close();
-        return;
+async function handleInput(userInput: string) {
+  // Execute a command if one was provided,
+  // and ensure an interaction.
+  // switch (command(userInput)) {
+  //   case 'exit':
+  //     console.log(chalk.bold('\nGoodbye!'));
+  //     rl.close();
+  //     return;
 
-      case 'file':
-        interaction = commands.file.interaction(userInput, interaction);
-        break;
+  //   case 'file':
+  //     message = commands.file.interaction(userInput, interaction);
+  //     break;
 
-      default:
-        interaction = interaction || { input: {}, outputs: [] };
-        interaction.input.text = userInput;
-    }
+  //   default:
+  //     interaction = interaction || { input: {}, outputs: [] };
+  //     interaction.input.text = userInput;
+  // }
 
-    // If no text was assigned to the interaction input,
-    // stop here and initiate another user prompt.
-    if (!interaction.input.text) return promptUser(interaction);
+  // If no text was assigned to the interaction input,
+  // stop here and initiate another user prompt.
+  // if (!inputMessage.text) return promptUser(inputMessage);
 
-    // Add interaction to stack
-    interactions.push(interaction);
-    console.log(chalk.bold(`\nKernel`));
+  // Add interaction to stack
+  const inputMsg = inputMessage({
+    text: userInput,
+  });
+  messages.push(inputMsg);
+  console.log(chalk.bold(`\nKernel`));
 
-    // Interpret the interaction
-    try {
-      const responses = interpreter.run(interactions);
+  // Interpret the interaction
+  try {
+    const responses = interpreter.run(messages);
 
-      let iteration = await responses.next();
-      while (!iteration.done) {
-        const response = iteration.value;
-        switch (response.type) {
-          case 'text':
-            await appendTextOutput(response, interaction!);
-            break;
-          case 'action':
-            await appendActionOutput(response, interaction!);
-            break;
-          default:
-            console.error('Error: Unrecognized action type.');
-        }
-        iteration = await responses.next(interactions);
+    let iteration = await responses.next();
+    while (!iteration.done) {
+      const response = iteration.value;
+      switch (response.type) {
+        case 'text':
+          const responseMsg = await createResponseMessage(response);
+          messages.push(responseMsg);
+          break;
+        case 'action':
+          const actionMsg = await createActionMessage(response);
+          messages.push(actionMsg);
+          break;
+        default:
+          console.error('Error: Unrecognized action type.');
       }
-    } catch (error) {
-      console.error(chalk.red('Error:', error));
-      console.error(error);
+      iteration = await responses.next(messages);
     }
+  } catch (error) {
+    console.error(chalk.red('Error:', error));
+    console.error(error);
+  }
 
-    // Initiate another user prompt
-    promptUser();
-  };
+  // Initiate another user prompt
+  promptUser();
+}
 
 /**
  * Check if a command was used or not.
@@ -117,55 +127,44 @@ function command(userInput: string): Command | null {
 /**
  * Manage an action response from the interpreter.
  */
-async function appendActionOutput(
-  response: ActionResponse,
-  interaction: Interaction
-) {
-  const output: ActionOutput = {
-    type: 'action',
+async function createActionMessage(response: ActionResponse) {
+  const outputMessage = actionMessage({
     directive: response.directive,
     content: {},
-  };
+  });
 
-  output.content = await dispatcher.dispatch(response.directive);
+  outputMessage.content = await runtime.dispatch(response.directive);
   console.log(
     chalk.bgGray('ACTION'),
     '\n',
-    chalk.dim(JSON.stringify(output.content, null, 2))
+    chalk.dim(JSON.stringify(outputMessage.content, null, 2))
   );
-  interaction.outputs.push(output);
-  return output;
+
+  return outputMessage;
 }
 
 /**
  * Manage a text response from the interpreter.
  */
-async function appendTextOutput(
-  response: TextResponse,
-  interaction: Interaction
-): Promise<InteractionOutput> {
+async function createResponseMessage(
+  response: TextResponse
+): Promise<ResponseMessage> {
   let totalText = '';
   for await (const part of response.textStream) {
     totalText += part;
     process.stdout.write(part);
   }
   process.stdout.write('\n');
-  interaction.outputs = [
-    {
-      type: 'text',
-      content: totalText,
-    },
-  ];
-  return {
-    type: 'text',
-    content: totalText,
-  };
+
+  return responseMessage({
+    text: totalText,
+  });
 }
 
 /* PROMPTS */
 
-function promptUser(interaction?: Interaction) {
-  rl.question(chalk.bold('\nYou\n'), handleInput(interaction));
+function promptUser() {
+  rl.question(chalk.bold('\nYou\n'), handleInput);
 }
 
 /* PRINT INTRO */

@@ -1,0 +1,64 @@
+thread-view {
+  width: 100%;
+  flex-grow: 1;
+}
+
+thread-view .inner {
+  height: 100%;
+  width: 100%;
+}
+
+thread-view .inner::part(slot) {
+  gap: var(--space-7);
+  padding: var(--space-8) var(--space-4);
+}
+
+thread-view .message-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 72ch;
+  gap: var(--space-4);
+}
+
+thread-view .message {
+  user-select: text;
+}
+
+thread-view .message[data-type='input'] {
+  margin-top: var(--space-6);
+  padding: 0 var(--space-5);
+  align-self: flex-start;
+  font-weight: 500;
+}
+
+thread-view .message:first-child {
+  margin-top: 0;
+}
+
+thread-view .message[data-type='response'] {
+  padding: var(--space-5) var(--space-5);
+  min-height: 36px;
+  border-radius: var(--rounded);
+  border: 1px solid var(--color-border-muted);
+  background: var(--color-bg-content);
+}
+
+thread-view .message[data-type='action'] {
+  padding: 0 var(--space-5);
+  padding-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+thread-view .message[data-type='action'] .resource-icon {
+  width: 14px;
+  height: 14px;
+}
+
+thread-view .message[data-type='action'] .notification-text {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}

@@ -1,17 +1,17 @@
 import { Dexie, Table } from 'dexie';
 import { Workspace } from '../workspaces';
-import { Interaction } from '../ai/interactions';
+import { MessageRecord } from '../messages';
 
 export class IndexedDB extends Dexie {
   workspaces!: Table<Workspace, string>;
-  interactions!: Table<Interaction, string>;
+  messages!: Table<MessageRecord, string>;
 
   constructor() {
     super('DB');
 
     this.version(1).stores({
       workspaces: 'id',
-      interactions: 'id,workspaceId',
+      messages: 'id,workspaceId',
     });
   }
 }

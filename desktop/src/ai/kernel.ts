@@ -1,18 +1,21 @@
 import {
   Interpreter,
-  InteractionInput,
   LanguageModel,
   ActionResponse,
   TextResponse,
-  ActionOutput,
   ProcessRuntime,
   Protocol,
+  KernelMessage,
+  InputMessage,
+  inputMessage,
+  InterpreterResponse,
+  actionMessage,
+  responseMessage,
 } from '@unternet/kernel';
 import { Workspace, WorkspaceModel } from '../workspaces';
 import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
 import { ResourceModel } from '../protocols/resources';
-import { Interaction } from './interactions';
 
 export interface KernelInit {
   model?: LanguageModel;
@@ -21,6 +24,14 @@ export interface KernelInit {
   aiModelService: AIModelService;
   resourceModel: ResourceModel;
   protocols: Array<Protocol>;
+}
+
+export interface KernelInput {
+  text: string;
+}
+
+export class KernelNotInitializedError extends Error {
+  name = 'KernelNotInitialized';
 }
 
 export class Kernel {
@@ -76,73 +87,75 @@ export class Kernel {
     }
   }
 
-  async handleInput(workspaceId: Workspace['id'], input: InteractionInput) {
+  async handleInput(workspaceId: Workspace['id'], input: KernelInput) {
+    const inputMsg = inputMessage({ text: input.text });
+    this.workspaceModel.addMessage(workspaceId, inputMsg);
+
     if (!this.interpreter || !this.initialized) {
-      throw new Error('Tried to access kernel when not initialized.');
+      this.workspaceModel.addMessage(
+        workspaceId,
+        responseMessage({
+          text: `⚠️ No model is configured. Please select a model in the settings.`,
+        })
+      );
+
+      throw new KernelNotInitializedError(
+        'Tried to access kernel when not initialized.'
+      );
     }
 
-    this.workspaceModel.updateModified(workspaceId);
-
-    const interaction = this.workspaceModel.createInteraction(
-      workspaceId,
-      input
-    );
-
     const runner = this.interpreter.run(
-      this.workspaceModel.allInteractions(workspaceId)
+      this.workspaceModel.allMessages(workspaceId)
     );
 
     let iteration = await runner.next();
     while (!iteration.done) {
-      const response = iteration.value;
+      const response = iteration.value as InterpreterResponse;
       switch (response.type) {
         case 'text':
-          await this.handleTextResponse(interaction, response);
+          await this.handleTextResponse(workspaceId, response);
           break;
         case 'action':
-          await this.handleActionResponse(interaction, response);
+          await this.handleActionResponse(workspaceId, response);
           break;
         default:
           throw new Error('Action type not recognized!');
       }
 
       iteration = await runner.next(
-        this.workspaceModel.allInteractions(workspaceId)
+        this.workspaceModel.allMessages(workspaceId)
       );
     }
   }
 
-  async handleTextResponse(interaction: Interaction, response: TextResponse) {
-    const outputIndex = this.workspaceModel.addOutput(interaction.id, {
-      type: response.type,
-      content: '',
-    });
+  async handleTextResponse(
+    workspaceId: Workspace['id'],
+    response: TextResponse
+  ) {
+    const message = responseMessage();
+    this.workspaceModel.addMessage(workspaceId, message);
+
     let text = '';
     for await (const chunk of response.textStream) {
       text += chunk;
-      this.workspaceModel.updateOutputContent(
-        interaction.id,
-        outputIndex,
-        text
-      );
+      this.workspaceModel.updateMessage(message.id, { text });
     }
   }
 
   async handleActionResponse(
-    interaction: Interaction,
+    workspaceId: Workspace['id'],
     response: ActionResponse
   ) {
     const { process, content } = await this.runtime.dispatch(
       response.directive
     );
 
-    const output: ActionOutput = {
-      type: 'action',
+    const message = actionMessage({
       directive: response.directive,
       process,
       content,
-    };
+    });
 
-    this.workspaceModel.addOutput(interaction.id, output);
+    this.workspaceModel.addMessage(workspaceId, message);
   }
 }
