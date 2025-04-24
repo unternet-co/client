@@ -1,7 +1,6 @@
 import { appendEl, createEl } from '../common/utils/dom';
 import { html, render } from 'lit';
 import './top-bar/top-bar';
-import './pages/home-page';
 import './workspaces/workspace-view';
 import './app-root.css';
 import { dependencies } from '../common/dependencies';
