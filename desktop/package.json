@@ -7,7 +7,7 @@
   "scripts": {
     "build": "npm run build:notarize && vite build && npm run build:electron && npm run build:icons",
     "build:notarize": "tsc -p tsconfig.notarize.json",
-    "build:icons": "shx mkdir -p dist/electron/app-icons && shx cp -r build/app-icons/* dist/electron/app-icons/ && shx cp build/app-icons/linux/512x512.png dist/electron/app-icons/client-icon-linux.png",
+    "build:icons": "shx mkdir -p dist/electron/app-icons && shx cp -r build/app-icons/* dist/electron/app-icons/ && shx cp build/app-icons/client-icon-linux-512.png dist/electron/app-icons/client-icon-linux.png",
     "build:web": "vite build",
     "build:electron": "tsc --project tsconfig.node.json",
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
