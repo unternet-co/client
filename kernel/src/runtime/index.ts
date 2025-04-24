@@ -3,11 +3,7 @@ import { Protocol } from './protocols';
 import { Process, ProcessContainer, SerializedProcess } from './processes';
 import mitt from 'mitt';
 import { listener } from '../shared/utils';
-
-interface ActionResponse {
-  process?: ProcessContainer;
-  content?: any;
-}
+import { ActionResultResponse } from '../response-types';
 
 type RuntimeEvents = {
   processcreated: ProcessContainer;
@@ -81,7 +77,7 @@ export class ProcessRuntime {
     this.processes.set(serializedProcess.pid, process);
   }
 
-  async dispatch(directive: ActionDirective): Promise<ActionResponse> {
+  async dispatch(directive: ActionDirective): Promise<ActionResultResponse> {
     const [scheme, ...restParts] = directive.uri.split(':');
     const rest = restParts.join();
 

@@ -1,4 +1,4 @@
-import { Interpreter, InterpreterResponse } from './interpreter';
+import { Interpreter, InterpreterResponse } from '.';
 import { KernelMessage } from './messages';
 
 export interface Strategy {
