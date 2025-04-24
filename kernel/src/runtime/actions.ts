@@ -4,7 +4,7 @@ import { ActionDict, Resource } from './resources';
 /**
  * An instruction of how an action should be consumed.
  */
-export interface ActionDirective {
+export interface ActionProposal {
   uri: string;
   actionId: string;
   args?: Record<string, any>;

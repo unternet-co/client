@@ -4,9 +4,9 @@ import chalk from 'chalk';
 import 'dotenv/config';
 
 import {
+  ActionProposalResponse,
+  DirectResponse,
   Interpreter,
-  TextResponse,
-  ActionResponse,
   ProcessRuntime,
 } from '../../src';
 import { Command } from './types';
@@ -85,11 +85,11 @@ async function handleInput(userInput: string) {
     while (!iteration.done) {
       const response = iteration.value;
       switch (response.type) {
-        case 'text':
+        case 'direct':
           const responseMsg = await createResponseMessage(response);
           messages.push(responseMsg);
           break;
-        case 'action':
+        case 'actionproposal':
           const actionMsg = await createActionMessage(response);
           messages.push(actionMsg);
           break;
@@ -127,13 +127,16 @@ function command(userInput: string): Command | null {
 /**
  * Manage an action response from the interpreter.
  */
-async function createActionMessage(response: ActionResponse) {
+async function createActionMessage(response: ActionProposalResponse) {
+  const content = await runtime.dispatch(response);
+
   const outputMessage = actionMessage({
-    directive: response.directive,
-    content: {},
+    uri: response.uri,
+    actionId: response.actionId,
+    args: response.args,
+    content,
   });
 
-  outputMessage.content = await runtime.dispatch(response.directive);
   console.log(
     chalk.bgGray('ACTION'),
     '\n',
@@ -147,10 +150,10 @@ async function createActionMessage(response: ActionResponse) {
  * Manage a text response from the interpreter.
  */
 async function createResponseMessage(
-  response: TextResponse
+  response: DirectResponse
 ): Promise<ResponseMessage> {
   let totalText = '';
-  for await (const part of response.textStream) {
+  for await (const part of response.contentStream) {
     totalText += part;
     process.stdout.write(part);
   }

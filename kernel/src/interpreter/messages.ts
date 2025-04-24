@@ -6,7 +6,7 @@ import {
   ImagePart,
   TextPart,
 } from 'ai';
-import { ActionDirective, encodeActionHandle } from '../runtime/actions';
+import { ActionProposal, encodeActionHandle } from '../runtime/actions';
 import { ProcessContainer } from '../runtime/processes';
 import { ulid } from 'ulid';
 
@@ -77,15 +77,16 @@ export interface LogMessage {
   text: string;
 }
 
-export interface ActionMessage extends BaseMessage {
+export interface ActionMessage extends BaseMessage, ActionProposal {
   type: 'action';
-  directive: ActionDirective;
   process?: ProcessContainer;
   content?: any;
 }
 
 export function actionMessage(init: {
-  directive: ActionDirective;
+  uri: string;
+  actionId: string;
+  args: any;
   process?: ProcessContainer;
   content?: any;
   correlationId?: string;
@@ -93,7 +94,9 @@ export function actionMessage(init: {
   return {
     ...baseMessage(init),
     type: 'action',
-    directive: init.directive,
+    uri: init.uri,
+    actionId: init.actionId,
+    args: init.args,
     process: init.process,
     content: init.content,
   };
@@ -177,10 +180,7 @@ export function toModelMessages(kernelMsgs: KernelMessage[]): ModelMessage[] {
       /* ACTION MESSAGES */
 
       case 'action': {
-        const actionUri = encodeActionHandle(
-          k.directive.uri,
-          k.directive.actionId
-        );
+        const actionUri = encodeActionHandle(k.uri, k.actionId);
 
         const body = k.process !== undefined ? k.process.describe() : k.content;
 

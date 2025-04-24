@@ -1,6 +1,6 @@
 import { ulid } from 'ulid';
-import { ActionDirective } from './actions';
 import { ActionMap, ResourceIcon } from './resources';
+import { ActionProposal } from './actions';
 
 export interface SerializedProcess {
   pid: string;
@@ -58,7 +58,7 @@ export abstract class Process {
     return '';
   }
 
-  handleAction(directive: ActionDirective): any | Promise<any> {
+  handleAction(action: ActionProposal): any | Promise<any> {
     throw new Error('No action handler implemented.');
   }
 

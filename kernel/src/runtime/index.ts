@@ -1,9 +1,9 @@
-import { ActionDirective } from './actions';
+import { ActionProposal } from './actions';
 import { Protocol } from './protocols';
 import { Process, ProcessContainer, SerializedProcess } from './processes';
 import mitt from 'mitt';
 import { listener } from '../shared/utils';
-import { ActionResultResponse } from '../response-types';
+import { actionResultResponse, ActionResultResponse } from '../response-types';
 
 type RuntimeEvents = {
   processcreated: ProcessContainer;
@@ -77,7 +77,7 @@ export class ProcessRuntime {
     this.processes.set(serializedProcess.pid, process);
   }
 
-  async dispatch(directive: ActionDirective): Promise<ActionResultResponse> {
+  async dispatch(directive: ActionProposal): Promise<ActionResultResponse> {
     const [scheme, ...restParts] = directive.uri.split(':');
     const rest = restParts.join();
 
@@ -98,10 +98,10 @@ export class ProcessRuntime {
       const process = new ProcessContainer(result);
       this.processes.set(process.pid, process);
       this.emitter.emit('processcreated', process);
-      return { process };
+      return actionResultResponse({ process });
     }
 
-    return { content: result };
+    return actionResultResponse({ content: result });
   }
 
   getProcess(pid: ProcessContainer['pid']) {

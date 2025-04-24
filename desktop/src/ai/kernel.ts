@@ -1,14 +1,13 @@
 import {
   Interpreter,
   LanguageModel,
-  ActionResponse,
-  TextResponse,
   ProcessRuntime,
-  Protocol,
   inputMessage,
-  InterpreterResponse,
   actionMessage,
   responseMessage,
+  KernelResponse,
+  DirectResponse,
+  ActionProposalResponse,
 } from '@unternet/kernel';
 import { Workspace, WorkspaceModel } from '../workspaces';
 import { ConfigModel, ConfigNotification } from '../config';
@@ -126,14 +125,14 @@ export class Kernel {
     let iteration = await runner.next();
     while (!iteration.done) {
       this.updateStatus('thinking');
-      const response = iteration.value as InterpreterResponse;
+      const response = iteration.value as KernelResponse;
       switch (response.type) {
-        case 'text':
+        case 'direct':
           this.updateStatus('responding');
           await this.handleTextResponse(workspaceId, response);
           this.updateStatus('idle');
           break;
-        case 'action':
+        case 'actionproposal':
           await this.handleActionResponse(workspaceId, response);
           this.updateStatus('idle');
           break;
@@ -149,13 +148,13 @@ export class Kernel {
 
   async handleTextResponse(
     workspaceId: Workspace['id'],
-    response: TextResponse
+    response: DirectResponse
   ) {
     const message = responseMessage();
     this.workspaceModel.addMessage(workspaceId, message);
 
     let text = '';
-    for await (const chunk of response.textStream) {
+    for await (const chunk of response.contentStream) {
       text += chunk;
       this.workspaceModel.updateMessage(message.id, { text });
     }
@@ -163,14 +162,14 @@ export class Kernel {
 
   async handleActionResponse(
     workspaceId: Workspace['id'],
-    response: ActionResponse
+    proposal: ActionProposalResponse
   ) {
-    const { process, content } = await this.runtime.dispatch(
-      response.directive
-    );
+    const { process, content } = await this.runtime.dispatch(proposal);
 
     const message = actionMessage({
-      directive: response.directive,
+      uri: proposal.uri,
+      actionId: proposal.actionId,
+      args: proposal.args,
       process,
       content,
     });

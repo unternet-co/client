@@ -1,3 +1,4 @@
+import { ActionProposal } from './runtime/actions';
 import { ProcessContainer } from './runtime/processes';
 
 export type KernelResponse =
@@ -25,11 +26,8 @@ export function directResponse(init: {
   };
 }
 
-export interface ActionProposalResponse {
+export interface ActionProposalResponse extends ActionProposal {
   type: 'actionproposal';
-  uri: string;
-  actionId: string;
-  args?: Record<string, any>;
 }
 
 export function actionProposalResponse(init: {
