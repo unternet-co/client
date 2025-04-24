@@ -1,4 +1,4 @@
-import { html, render } from 'lit';
+import { html, render, TemplateResult } from 'lit';
 import { Workspace, WorkspaceModel } from '../../workspaces';
 import { dependencies } from '../../common/dependencies';
 import '../common/elements/scroll-container';
@@ -26,12 +26,13 @@ class ThreadView extends HTMLElement {
   }
 
   updateMessages() {
-    const messages = this.workspaceModel.allMessages(this.workspaceId);
+    const messages = Array.from(
+      this.workspaceModel.allMessages(this.workspaceId)
+    );
     this.render(messages);
   }
 
   render(messages: MessageRecord[]) {
-    console.log('UPDAYTING');
     const messagesTemplate = repeat(
       messages,
       (message) => message.id,
@@ -60,7 +61,7 @@ class ThreadView extends HTMLElement {
   }
 
   inputMessageTemplate(message: InputMessage) {
-    return html` <div class="message" data-type="input">${message.text}</div> `;
+    return html`<div class="message" data-type="input">${message.text}</div>`;
   }
 
   responseMessageTemplate(message: ResponseMessage) {

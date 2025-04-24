@@ -150,8 +150,8 @@ export class WorkspaceModel {
   ) {
     const message = this.getMessage(messageId);
     console.log('notifying', message.workspaceId);
-    const updatedMessage = { ...message, ...updates };
-    this.messageDatabase.update(messageId, updatedMessage);
+    Object.assign(message, updates);
+    this.messageDatabase.update(messageId, message);
     this.updateModified(message.workspaceId);
     this.notifier.notify({ workspaceId: message.workspaceId });
   }
