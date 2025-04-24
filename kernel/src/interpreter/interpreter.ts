@@ -10,7 +10,7 @@ import { actionChoiceSchema, schemas } from './schemas';
 import { defaultStrategies, Strategy } from './strategies';
 import {
   ActionDirective,
-  createActionRecord,
+  createActionDict,
   decodeActionHandle,
 } from '../runtime/actions';
 import { ActionDefinition, Resource } from '../runtime/resources';
@@ -65,7 +65,7 @@ export class Interpreter {
   }: InterpreterInit) {
     this.model = model;
     this.hint = hint;
-    this.actions = createActionRecord(resources || []);
+    this.actions = createActionDict(resources || []);
     this.prompts = { ...defaultPrompts, ...prompts };
     this.strategies = { ...defaultStrategies, ...strategies };
   }

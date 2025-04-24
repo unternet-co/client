@@ -106,6 +106,12 @@ export type ModelMessage =
   | CoreUserMessage
   | CoreAssistantMessage;
 
+/**
+ * Utility function to create an `ai` user message.
+ *
+ * @param content Message content.
+ * @returns The user message.
+ */
 export function userMessage(content: string) {
   return {
     role: 'user',
@@ -113,6 +119,12 @@ export function userMessage(content: string) {
   } as ModelMessage;
 }
 
+/**
+ * Utility function to create an `ai` assistant message.
+ *
+ * @param content Message content.
+ * @returns The assistant message.
+ */
 export function assistantMessage(content: string) {
   return {
     role: 'assistant',
@@ -120,6 +132,13 @@ export function assistantMessage(content: string) {
   } as ModelMessage;
 }
 
+/**
+ * Translates a set of interactions and prompts into messages.
+ * These messages can be used with the `ai` SDK.
+ *
+ * @param kernelMsgs The kernel messages to translate.
+ * @returns An array of messages.
+ */
 export function toModelMessages(kernelMsgs: KernelMessage[]): ModelMessage[] {
   const modelMsgs: ModelMessage[] = [];
 
@@ -179,21 +198,30 @@ export function toModelMessages(kernelMsgs: KernelMessage[]): ModelMessage[] {
   return modelMsgs;
 }
 
+/**
+ * Translate `FileInput` into an appropriate `ai` message.
+ * Text files are translated into a `TextPart`,
+ * images into a `ImagePart`, and other files into a `FilePart`.
+ *
+ * @param file The file input to translate.
+ * @returns The appropriate part.
+ */
 function fileToPart(file: FileInput): TextPart | ImagePart | FilePart {
-  const { mimeType } = file;
-
-  if (mimeType.startsWith('text/') || mimeType === 'application/json') {
+  if (
+    file.mimeType?.startsWith('text/') ||
+    file.mimeType === 'application/json'
+  ) {
     return {
       type: 'text',
       text: new TextDecoder().decode(file.data),
     };
   }
 
-  if (mimeType.startsWith('image/')) {
+  if (file.mimeType.startsWith('image/')) {
     return {
       type: 'image',
       image: file.data,
-      mimeType,
+      mimeType: file.mimeType,
     };
   }
 
@@ -201,7 +229,7 @@ function fileToPart(file: FileInput): TextPart | ImagePart | FilePart {
     type: 'file',
     data: file.data,
     filename: file.filename,
-    mimeType,
+    mimeType: file.mimeType,
   };
 }
 

@@ -22,6 +22,7 @@ import './modals/global/settings-modal';
 import './ui/app-root';
 import { ProcessModel, SerializedProcess } from './processes';
 import { ProcessRuntime } from '@unternet/kernel';
+import './modals/global/bug-modal';
 
 /* Initialize databases & stores */
 
@@ -95,6 +96,11 @@ dependencies.registerSingleton('ModalService', modalService);
 modalService.register('settings', {
   title: 'Settings',
   element: 'settings-modal',
+});
+
+modalService.register('bug', {
+  title: 'Report a bug',
+  element: 'bug-modal',
 });
 
 /* Register keyboard shortcuts */

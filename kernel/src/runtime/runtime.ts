@@ -13,6 +13,13 @@ type RuntimeEvents = {
   processcreated: ProcessContainer;
 };
 
+/**
+ * ProcessRuntime passes on the action directives to their associated
+ * protocol handler based on the protocol used in the directive URI.
+ *
+ * It also manages & stores ongoing processes returned by the protocol
+ * action handlers.
+ */
 export class ProcessRuntime {
   protocols = new Map<string, Protocol>();
   processes = new Map<string, ProcessContainer>();

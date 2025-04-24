@@ -2,10 +2,11 @@ import { LitElement, html, css } from 'lit';
 import { ref, createRef } from 'lit/directives/ref.js';
 import { createElement, icons } from 'lucide';
 
-export const ICON_MAP = {
+export const ICON = {
   close: 'x',
   home: 'home',
   plus: 'plus',
+  bug: 'bug',
   toolbox: 'shapes',
   settings: 'settings-2',
   check: 'check',
@@ -71,8 +72,7 @@ export class IconElement extends LitElement {
    * @returns SVG element for the icon
    */
   private getIcon(iconName: string | null): SVGElement {
-    const mappedName =
-      ICON_MAP[iconName as keyof typeof ICON_MAP] || 'help-circle';
+    const mappedName = ICON[iconName as keyof typeof ICON] || 'help-circle';
 
     // Convert kebab-case to PascalCase for Lucide icons
     const pascalCaseName = mappedName

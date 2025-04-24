@@ -755,14 +755,14 @@ return "Hello, World!";
       });
     </script>
     <script type="module">
-      import { ICON_MAP } from './src/ui/common/icon.ts';
+      import { ICON } from './src/ui/common/icon.ts';
 
       // Function to generate icon grid
       function generateIconGrid() {
         const iconGrid = document.getElementById('icon-grid');
 
-        // Build HTML for all icons from ICON_MAP
-        let iconsHtml = Object.entries(ICON_MAP)
+        // Build HTML for all icons from ICON
+        let iconsHtml = Object.entries(ICON)
           .map(
             ([key, value]) => `
           <div class="icon-item" title="${key}${key !== value ? ` (${value})` : ''}">

@@ -3,6 +3,15 @@ import { Process, ProcessConstructor } from './processes';
 
 export type ProtocolHandlerResult = Process | any;
 
+/**
+ * Protocols determine how an `ActionDirective` is executed.
+ *
+ * This goes hand in hand with `Resource`s.
+ * Each protocol has a unique `scheme`.
+ *
+ * {@link ActionDirective}
+ * {@link Resource}
+ */
 export abstract class Protocol {
   scheme: string | string[];
   private processRegistry? = new Map<string, ProcessConstructor>();

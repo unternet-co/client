@@ -9,11 +9,13 @@ import '../ui/common/elements/icon';
 import { ModalElement } from './modal-element';
 
 export type ModalSize = 'full' | 'auto';
+export type ModalPadding = 'none' | 'auto';
 
 export class Modal {
   id: string;
   title: string;
   size: ModalSize = 'auto';
+  padding: ModalPadding = 'auto';
   contents = createEl('div', { className: 'modal-contents' });
   private root?: HTMLElement;
   private modalContainer?: HTMLElement;
@@ -45,6 +47,7 @@ export class Modal {
         this.elementName
       ) as ModalElement;
       this.size = contentsComponent.size || 'auto';
+      this.padding = contentsComponent.padding || 'auto';
       contentsComponent.addEventListener('close', this.closeCallback);
       this.contents.appendChild(contentsComponent);
     }
@@ -88,6 +91,7 @@ export class Modal {
     return html`<div
       class="modal-container"
       data-size=${this.size}
+      data-padding=${this.padding}
       tabindex="-1"
       role="dialog"
       aria-modal="true"

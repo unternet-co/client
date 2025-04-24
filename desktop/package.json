@@ -5,11 +5,13 @@
   "license": "ISC",
   "main": "dist/electron/main.js",
   "scripts": {
-    "build": "npm run build:web && npm run build:electron",
+    "build": "npm run build:notarize && vite build && npm run build:electron && npm run build:icons",
+    "build:notarize": "tsc -p tsconfig.notarize.json",
+    "build:icons": "shx mkdir -p dist/electron/app-icons && shx cp -r src/electron/app-icons/* dist/electron/app-icons/ && shx cp src/electron/app-icons/linux/512x512.png dist/electron/app-icons/client-icon-linux.png",
     "build:web": "vite build",
     "build:electron": "tsc --project tsconfig.node.json",
     "dev": "concurrently 'npm run dev:web' 'npm run dev:electron' ",
-    "dev:electron": "npm run build:electron && electron .",
+    "dev:electron": "npm run build:electron && npm run build:icons && electron .",
     "dev:web": "vite"
   },
   "dependencies": {
@@ -18,6 +20,8 @@
     "@web-applets/sdk": "^0.2.6",
     "dexie": "^4.0.11",
     "electron-is-dev": "^3.0.1",
+    "electron-log": "^5.0.0-beta.16",
+    "electron-updater": "^6.6.2",
     "immer": "^10.1.1",
     "lit": "^3.2.1",
     "lucide": "^0.484.0",
