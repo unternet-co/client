@@ -82,14 +82,14 @@ export class ProcessRuntime {
       // TODO: Do something with scheme
       throw new Error('Process calling not implemented yet!');
     } else {
-      if (!(scheme in this.protocols)) {
+      if (!this.protocols.has(scheme)) {
         throw new Error(
           `The protocol handler for '${scheme}' has not been registered.`
         );
       }
     }
 
-    const result = await this.protocols[scheme].handleAction(directive);
+    const result = await this.protocols.get(scheme).handleAction(directive);
 
     if (result instanceof Process) {
       const process = new ProcessContainer(result);

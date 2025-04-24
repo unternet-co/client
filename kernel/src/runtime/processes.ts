@@ -1,6 +1,6 @@
 import { ulid } from 'ulid';
 import { ActionDirective } from './actions';
-import { ActionMap } from './resources';
+import { ActionMap, ResourceIcon } from './resources';
 
 export interface SerializedProcess {
   pid: string;
@@ -29,6 +29,8 @@ export abstract class Process {
   tag: string;
   static source: string;
   source: string;
+  title: string;
+  icons: ResourceIcon[];
   actions?: ActionMap;
 
   constructor() {
@@ -77,8 +79,16 @@ export class ProcessContainer {
   readonly createdAt = Date.now();
   updatedAt = Date.now();
   state: any;
+
   get uri() {
     return `process:${this.pid}`;
+  }
+
+  get title() {
+    return this.process.title;
+  }
+  get icons() {
+    return this.process.icons;
   }
 
   constructor(process: Process) {

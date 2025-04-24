@@ -40,6 +40,7 @@ const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 /* Initialize model dependencies */
 
 const runtime = new ProcessRuntime(protocols);
+console.log(runtime.protocols);
 
 /* Initialize models */
 

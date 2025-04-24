@@ -27,4 +27,4 @@ export class BuiltinProtocol extends Protocol {
   }
 }
 
-export const builtin = new BuiltinProtocol();
+export const builtinProtocol = new BuiltinProtocol();

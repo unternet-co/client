@@ -1,5 +1,6 @@
-import { Process, Protocol } from '@unternet/kernel';
+import { Process, Protocol, ResourceIcon } from '@unternet/kernel';
 import { WebviewTag } from 'electron';
+import iconSrc from '../builtin/icon-128x128.png';
 
 interface WebProcessState {
   url: string;
@@ -18,8 +19,13 @@ export class WebProcess extends Process {
     this.url = url;
     this.webview = document.createElement('webview');
     this.webview.src = url;
-    // this.title = this.webview.getTitle();
-    // console.log(this.webview.getHTML());
+    this.icons = [
+      {
+        src: iconSrc,
+      },
+    ];
+    this.title = 'Web view';
+    this.webview.style.height = '400px';
   }
 
   describe() {

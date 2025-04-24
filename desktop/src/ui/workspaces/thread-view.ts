@@ -1,15 +1,17 @@
 import { html, render } from 'lit';
 import { Workspace, WorkspaceModel } from '../../workspaces';
-import { Message, MessageRecord } from '../../messages';
+import { Message } from '../../messages';
 import { dependencies } from '../../common/dependencies';
 import '../common/elements/scroll-container';
 import '../common/elements/markdown-text';
 import './thread-view.css';
+import './process-frame';
 import { repeat } from 'lit/directives/repeat.js';
 import { ResourceModel } from '../../protocols/resources';
 import './process-view';
 import { ActionMessage, InputMessage, ResponseMessage } from '@unternet/kernel';
 import { Kernel, KernelStatus } from '../../ai/kernel';
+import { getResourceIcon } from '../../common/utils';
 
 class ThreadView extends HTMLElement {
   private workspaceModel =
@@ -96,8 +98,9 @@ class ThreadView extends HTMLElement {
     const resource = this.resourceModel.find(message.directive.uri);
 
     let icon = html``;
-    if (resource.icons && resource.icons[0] && resource.icons[0].src) {
-      icon = html`<img src=${resource.icons[0].src} class="resource-icon" />`;
+    const iconSrc = getResourceIcon(resource);
+    if (iconSrc) {
+      icon = html`<img src=${iconSrc} class="resource-icon" />`;
     }
     return html`<div class="message" data-type="action">
       ${icon}
@@ -108,7 +111,7 @@ class ThreadView extends HTMLElement {
   processMessageTemplate(message: ActionMessage) {
     return html`
       <div class="message" data-type="process">
-        <process-view .process=${message.process}></process-view>
+        <process-frame .process=${message.process}></process-frame>
       </div>
     `;
   }
