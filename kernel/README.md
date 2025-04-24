@@ -21,6 +21,8 @@ The `@unternet/kernel` package is designed to be a plug-and-play system for asse
 
 The two core modules are the interpreter (which take message inputs, and generates a response) & the process runtime (which kicks off actions, and manages running processes).
 
+![A schematic diagram of the kernel components](assets/kernel-schematic.png)
+
 ## Interpreter
 
 The `Interpreter` class (`interpreter/interpreter`) acts as the main cognitive processing unit for the kernel. When given a series of messages, it will return either a direct response, or an "action directive" to perform an action. Interpreter modules accept arrays of `KernelMessage`, defined in `interpreter/messages`.
