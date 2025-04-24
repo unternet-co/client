@@ -1,6 +1,6 @@
 class MessageScroll extends HTMLElement {
-  #slot;
-  #lastScrollTop = 0;
+  #slot: HTMLSlotElement;
+  #autoFollow: boolean = true;
 
   constructor() {
     super();
@@ -36,28 +36,50 @@ class MessageScroll extends HTMLElement {
     shadow.appendChild(style);
   }
 
+  /**
+   * Keeps the newest message in view until user scrolls up.
+   */
+  #startAutoFollow = () => {
+    this.#autoFollow = true;
+    this.#slot.addEventListener('scroll', this.#onUserScroll);
+  };
+
+  #stopAutoFollow = () => {
+    this.#autoFollow = false;
+    this.#slot.removeEventListener('scroll', this.#onUserScroll);
+  };
+
+  #onUserScroll = () => {
+    // If user scrolls away from the bottom (scrollTop !== 0), stop auto-follow
+    if (this.#slot.scrollTop !== 0) {
+      this.#stopAutoFollow();
+    }
+  };
+
+  #scrollToBottom = () => {
+    const assigned = this.#slot.assignedElements
+      ? this.#slot.assignedElements()
+      : [];
+    if (assigned.length > 0) {
+      assigned[0].scrollIntoView({ behavior: 'auto', block: 'start' });
+    } else {
+      this.#slot.scrollTop = 0;
+    }
+  };
+
+  #onMessageAdded = () => {
+    this.#scrollToBottom();
+    this.#startAutoFollow();
+  };
+
   connectedCallback() {
-    // Scroll to bottom (= 0 with column-reverse) on connect
-    this.#slot.scrollTop = 0;
+    this.#scrollToBottom();
+    this.#slot.addEventListener('slotchange', this.#onMessageAdded);
+  }
 
-    // Log the scroll position
-    // (Timeout is here so we don't take into account scroll event
-    // as element becomes visible again)
-    this.#slot.addEventListener('scroll', () => {
-      setTimeout(() => {
-        this.#lastScrollTop = this.#slot.scrollTop;
-      }, 100);
-    });
-
-    // Whenever element is made visible, return to prior scroll position
-    const intersectionObserver = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          this.#slot.scrollTop = this.#lastScrollTop;
-        }
-      }
-    });
-    intersectionObserver.observe(this);
+  disconnectedCallback() {
+    this.#slot.removeEventListener('slotchange', this.#onMessageAdded);
+    this.#stopAutoFollow();
   }
 }
 
