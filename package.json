@@ -41,7 +41,7 @@
       ],
       "icon": "desktop/src/electron/app-icons/client-icon-macOS.png"
     },
-    "afterSign": "desktop/dist/notarize.js",
+    "afterSign": "desktop/build/notarize.js",
     "win": {
       "target": [
         "nsis"
