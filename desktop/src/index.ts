@@ -20,26 +20,36 @@ import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
+import { ProcessModel, SerializedProcess } from './processes';
+import { ProcessRuntime } from '@unternet/kernel';
 
 /* Initialize databases & stores */
 
 const workspaceDatabaseService = new DatabaseService<string, Workspace>(
   'workspaces'
 );
-// const processDatabaseService = new DatabaseService<string, ProcessRecord>(
-//   'processes'
-// );
+const processDatabaseService = new DatabaseService<string, SerializedProcess>(
+  'processes'
+);
 const messageDatabaseService = new DatabaseService<string, MessageRecord>(
   'messages'
 );
 const tabKeyStore = new KeyStoreService<TabStoreData>('tabs', initTabStoreData);
 const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
+/* Initialize model dependencies */
+
+const runtime = new ProcessRuntime(protocols);
+
 /* Initialize models */
+
+const processModel = new ProcessModel(processDatabaseService, runtime);
+dependencies.registerSingleton('ProcessModel', ProcessModel);
 
 const workspaceModel = new WorkspaceModel(
   workspaceDatabaseService,
-  messageDatabaseService
+  messageDatabaseService,
+  processModel
 );
 dependencies.registerSingleton('WorkspaceModel', workspaceModel);
 
@@ -67,7 +77,7 @@ const kernel = new Kernel({
   configModel,
   aiModelService,
   resourceModel,
-  protocols,
+  runtime,
 });
 dependencies.registerSingleton('Kernel', kernel);
 

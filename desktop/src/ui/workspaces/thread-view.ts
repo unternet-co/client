@@ -1,6 +1,6 @@
 import { html, render } from 'lit';
 import { Workspace, WorkspaceModel } from '../../workspaces';
-import { MessageRecord } from '../../messages';
+import { Message, MessageRecord } from '../../messages';
 import { dependencies } from '../../common/dependencies';
 import '../common/elements/scroll-container';
 import '../common/elements/markdown-text';
@@ -14,7 +14,7 @@ import { Kernel, KernelStatus } from '../../ai/kernel';
 class ThreadView extends HTMLElement {
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
-  private messages: MessageRecord[] = [];
+  private messages: Message[] = [];
   private status: KernelStatus;
   private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   private kernel = dependencies.resolve<Kernel>('Kernel');
@@ -43,7 +43,6 @@ class ThreadView extends HTMLElement {
   }
 
   updateKernelStatus(status: KernelStatus) {
-    console.log('UPDATING', status);
     this.status = status;
     this.render();
   }
@@ -71,7 +70,7 @@ class ThreadView extends HTMLElement {
     return html`<un-icon name="loading" spin class="loading"></un-icon>`;
   }
 
-  messageTemplate(message: MessageRecord) {
+  messageTemplate(message: Message) {
     if (message.type === 'input') {
       return this.inputMessageTemplate(message);
     } else if (message.type === 'response') {

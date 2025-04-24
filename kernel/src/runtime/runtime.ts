@@ -1,15 +1,23 @@
 import { ActionDirective } from './actions';
 import { Protocol } from './protocols';
 import { Process, ProcessContainer, SerializedProcess } from './processes';
+import mitt from 'mitt';
+import { listener } from '../shared/utils';
 
 interface ActionResponse {
   process?: ProcessContainer;
   content?: any;
 }
 
+type RuntimeEvents = {
+  processcreated: ProcessContainer;
+};
+
 export class ProcessRuntime {
   protocols = new Map<string, Protocol>();
   processes = new Map<string, ProcessContainer>();
+  private emitter = mitt<RuntimeEvents>();
+  readonly on = listener<RuntimeEvents>(this.emitter);
 
   constructor(protocols?: Array<Protocol>) {
     for (const protocol of protocols) {
@@ -20,22 +28,23 @@ export class ProcessRuntime {
 
   registerProtocol(protocol: Protocol) {
     if (typeof protocol.scheme === 'string') {
-      if (protocol.scheme === 'process')
+      if (protocol.scheme === 'process') {
         throw new Error("'process' is a reserved protocol scheme.");
-      this.protocols[protocol.scheme] = protocol;
+      }
+      this.protocols.set(protocol.scheme, protocol);
     } else {
       for (const scheme of protocol.scheme) {
-        this.protocols[scheme] = protocol;
+        this.protocols.set(scheme, protocol);
       }
     }
   }
 
   deregisterProtocol(scheme: string | string[]) {
     if (typeof scheme === 'string') {
-      delete this.protocols[scheme];
+      this.protocols.delete(scheme);
     } else {
       for (const sch of scheme) {
-        delete this.protocols[sch];
+        this.protocols.delete(sch);
       }
     }
   }
@@ -44,7 +53,7 @@ export class ProcessRuntime {
     const protocol = this.protocols.get(serializedProcess.source);
     if (!protocol) {
       throw new Error(
-        `Tried to instantiate process ${serializedProcess.pid} with source protocol '${serializedProcess.source}, but that protocol hasn't been registered.`
+        `Tried to instantiate process ${serializedProcess.pid} with source protocol '${serializedProcess.source}', but that protocol hasn't been registered.`
       );
     }
 
@@ -80,16 +89,19 @@ export class ProcessRuntime {
       }
     }
 
-    console.log();
-
     const result = await this.protocols[scheme].handleAction(directive);
 
     if (result instanceof Process) {
-      const process = new ProcessContainer(scheme, result);
+      const process = new ProcessContainer(result);
       this.processes.set(process.pid, process);
+      this.emitter.emit('processcreated', process);
       return { process };
     }
 
     return { content: result };
+  }
+
+  getProcess(pid: ProcessContainer['pid']) {
+    return this.processes.get(pid);
   }
 }

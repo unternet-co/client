@@ -18,6 +18,7 @@
     "@ai-sdk/openai": "^1.0.10",
     "ai": "^4.0.20",
     "dedent": "^1.5.3",
+    "mitt": "^3.0.1",
     "ollama-ai-provider": "^1.2.0",
     "openai": "^4.76.1",
     "ulid": "^3.0.0",

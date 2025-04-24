@@ -2,8 +2,9 @@ import { Notifier } from './common/notifier';
 import { DatabaseService } from './storage/database-service';
 import { ulid } from 'ulid';
 import { KernelMessage } from '@unternet/kernel';
-import { MessageRecord } from './messages';
+import { Message, MessageRecord } from './messages';
 import { DisposableGroup } from './common/disposable';
+import { ProcessModel } from './processes';
 
 export interface Workspace {
   id: string;
@@ -20,9 +21,10 @@ export interface WorkspaceNotification {
 
 export class WorkspaceModel {
   private workspaces = new Map<Workspace['id'], Workspace>();
-  private messages = new Map<Workspace['id'], MessageRecord[]>();
+  private messages = new Map<Workspace['id'], Message[]>();
   private workspaceDatabase: DatabaseService<string, Workspace>;
   private messageDatabase: DatabaseService<string, MessageRecord>;
+  private processModel: ProcessModel;
   private notifier = new Notifier<WorkspaceNotification>();
   readonly subscribe = this.notifier.subscribe;
   private disposables = new DisposableGroup();
@@ -44,10 +46,12 @@ export class WorkspaceModel {
 
   constructor(
     workspaceDatabase: DatabaseService<string, Workspace>,
-    messageDatabase: DatabaseService<string, MessageRecord>
+    messageDatabase: DatabaseService<string, MessageRecord>,
+    processModel: ProcessModel
   ) {
     this.workspaceDatabase = workspaceDatabase;
     this.messageDatabase = messageDatabase;
+    this.processModel = processModel;
     this.load();
   }
 
@@ -90,10 +94,11 @@ export class WorkspaceModel {
       });
     }
 
-    const messages = await this.messageDatabase.where({
+    const records = await this.messageDatabase.where({
       workspaceId: id,
     });
 
+    const messages: Message[] = records.map(this.hydrateMessage.bind(this));
     this.messages.set(id, messages);
     this.notifier.notify({ workspaceId: id });
   }
@@ -113,6 +118,7 @@ export class WorkspaceModel {
     };
 
     this.workspaces.set(workspace.id, workspace);
+    this.messages.set(workspace.id, new Array<MessageRecord>());
     this.workspaceDatabase.create(workspace);
     this.notifier.notify();
     return workspace;
@@ -127,16 +133,13 @@ export class WorkspaceModel {
   }
 
   addMessage(workspaceId: Workspace['id'], message: KernelMessage) {
-    const record: MessageRecord = {
+    const msg: Message = {
       ...message,
       workspaceId,
     };
 
-    if (!this.messages.has(workspaceId)) {
-      this.messages.set(workspaceId, new Array<MessageRecord>());
-    }
-
-    this.messages.get(workspaceId)!.push(record);
+    this.messages.get(workspaceId).push(msg);
+    const record = this.serializeMessage(msg);
     this.messageDatabase.create(record);
     this.updateModified(workspaceId);
     this.notifier.notify({ workspaceId });
@@ -149,14 +152,13 @@ export class WorkspaceModel {
     updates: Partial<MessageRecord>
   ) {
     const message = this.getMessage(messageId);
-    console.log('notifying', message.workspaceId);
     Object.assign(message, updates);
     this.messageDatabase.update(messageId, message);
     this.updateModified(message.workspaceId);
     this.notifier.notify({ workspaceId: message.workspaceId });
   }
 
-  getMessage(id: MessageRecord['id']): MessageRecord {
+  getMessage(id: MessageRecord['id']): Message {
     for (const messages of this.messages.values()) {
       const message = messages.find((m: MessageRecord) => m.id === id);
       if (message) return message;
@@ -164,7 +166,7 @@ export class WorkspaceModel {
     throw new Error('No interaction with this ID!');
   }
 
-  allMessages(workspaceId: Workspace['id']): MessageRecord[] {
+  allMessages(workspaceId: Workspace['id']): Message[] {
     return this.messages.get(workspaceId) || [];
   }
 
@@ -175,5 +177,27 @@ export class WorkspaceModel {
       this.workspaceDatabase.update(id, { modified: workspace.modified });
       this.notifier.notify({ workspaceId: id });
     }
+  }
+
+  serializeMessage(message: Message): MessageRecord {
+    if (message.type === 'action') {
+      const { process, ...rest } = message;
+      return {
+        ...rest,
+        pid: process.pid,
+      };
+    }
+    return message;
+  }
+
+  hydrateMessage(record: MessageRecord): Message {
+    if (record.type === 'action' && record.pid) {
+      const { pid, ...rest } = record;
+      return {
+        ...rest,
+        process: this.processModel.get(record.pid),
+      };
+    }
+    return record;
   }
 }

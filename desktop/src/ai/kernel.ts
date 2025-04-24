@@ -5,8 +5,6 @@ import {
   TextResponse,
   ProcessRuntime,
   Protocol,
-  KernelMessage,
-  InputMessage,
   inputMessage,
   InterpreterResponse,
   actionMessage,
@@ -24,7 +22,7 @@ export interface KernelInit {
   configModel: ConfigModel;
   aiModelService: AIModelService;
   resourceModel: ResourceModel;
-  protocols: Array<Protocol>;
+  runtime: ProcessRuntime;
 }
 
 export interface KernelInput {
@@ -58,13 +56,13 @@ export class Kernel {
     configModel,
     aiModelService,
     resourceModel,
-    protocols,
+    runtime,
   }: KernelInit) {
     this.workspaceModel = workspaceModel;
     this.configModel = configModel;
     this.aiModelService = aiModelService;
     this.resourceModel = resourceModel;
-    this.runtime = new ProcessRuntime(protocols);
+    this.runtime = runtime;
 
     this.initialize();
 

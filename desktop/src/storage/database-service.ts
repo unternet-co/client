@@ -14,6 +14,10 @@ export class DatabaseService<Id, T> {
     return this.table.add(item);
   }
 
+  async put(item: T): Promise<void> {
+    return this.table.put(item);
+  }
+
   async delete(id: Id): Promise<void> {
     return this.table.delete(id);
   }

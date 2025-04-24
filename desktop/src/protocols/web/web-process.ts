@@ -18,8 +18,8 @@ export class WebProcess extends Process {
     this.url = url;
     this.webview = document.createElement('webview');
     this.webview.src = url;
-    this.title = this.webview.getTitle();
-    console.log(this.webview.getHTML());
+    // this.title = this.webview.getTitle();
+    // console.log(this.webview.getHTML());
   }
 
   describe() {
@@ -48,7 +48,7 @@ export class WebProcess extends Process {
 }
 
 export class WebProtocol extends Protocol {
-  protocol = ['http', 'https'];
+  scheme = ['http', 'https'];
 }
 
 const webProtocol = new WebProtocol();

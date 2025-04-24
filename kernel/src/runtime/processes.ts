@@ -11,6 +11,7 @@ export interface SerializedProcess {
 
 export interface ProcessConstructor {
   tag: string;
+  source: string;
   hydrate(state: any): Process | undefined;
   new (state?: any): Process;
 }
@@ -26,11 +27,14 @@ export interface ProcessConstructor {
 export abstract class Process {
   static tag: string;
   tag: string;
+  static source: string;
+  source: string;
   actions?: ActionMap;
 
   constructor() {
     const constructor = this.constructor as typeof Process;
     this.tag = constructor.tag;
+    this.source = constructor.source;
   }
 
   /**
@@ -77,11 +81,11 @@ export class ProcessContainer {
     return `process:${this.pid}`;
   }
 
-  constructor(source: string, process: Process) {
+  constructor(process: Process) {
     this.pid = ulid();
     this.tag = process.tag;
+    this.source = process.source;
     this.process = process;
-    this.source = source;
   }
 
   describe() {
@@ -108,10 +112,7 @@ export class ProcessContainer {
     constructor: ProcessConstructor
   ) {
     const process = new constructor(serializedProcess.state);
-    const containedProcess = new ProcessContainer(
-      serializedProcess.source,
-      process
-    );
+    const containedProcess = new ProcessContainer(process);
     return containedProcess;
   }
 

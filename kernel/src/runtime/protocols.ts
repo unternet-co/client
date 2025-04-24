@@ -22,6 +22,8 @@ export abstract class Protocol {
 
     if (!tag) tag = 'default';
     constructor.tag = tag;
+    constructor.source =
+      typeof this.scheme === 'string' ? this.scheme : this.scheme[0];
     this.processRegistry.set(tag, constructor);
   }
 
