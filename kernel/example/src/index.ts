@@ -15,9 +15,7 @@ import * as commands from './commands';
 import resources from './resources';
 import {
   actionMessage,
-  ActionMessage,
   inputMessage,
-  InputMessage,
   KernelMessage,
   responseMessage,
   ResponseMessage,

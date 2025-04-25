@@ -26,8 +26,8 @@ export interface ProcessConstructor {
  */
 export abstract class Process {
   static tag: string;
-  tag: string;
   static source: string;
+  tag: string;
   source: string;
   title: string;
   icons: ResourceIcon[];

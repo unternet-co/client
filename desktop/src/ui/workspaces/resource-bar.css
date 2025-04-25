@@ -7,7 +7,7 @@ resource-bar {
   border-top: 1px solid var(--color-border);
 }
 
-ul.applets-list {
+ul.resources-list {
   list-style: none;
   display: flex;
   align-items: center;

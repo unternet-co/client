@@ -56,15 +56,11 @@ export class Interpreter {
   }
 
   /**
-   * Runs the interpretation loop with a given set of interactions, returning when complete.
-   * @param interactions An array of interactions
-   * @returns An async generator function that yields responses, and whose next() function takes an array of interactions
+   * Runs the interpretation loop with a given set of messages, returning when complete.
+   * @param messages An array of messages
+   * @returns An async generator function that yields responses, and whose next() function takes an array of messages
    */
   async *run(messages: Array<KernelMessage>) {
-    const correlationId = messages.at(-1).correlationId;
-
-    // TODO: Ensure latest message is an input
-    // TODO: Return correlation ID in response object
     if (!Object.keys(this.actions).length) {
       yield this.generateTextResponse(messages);
       return;
@@ -99,6 +95,58 @@ export class Interpreter {
     });
 
     return strategy;
+  }
+
+  /* === RESPONDERS === */
+
+  /**
+   * Generates a simple streaming text response.
+   * @param messages An array of messages.
+   * @returns A TextResponse object, which can be used to get or stream the response text.
+   */
+  async generateTextResponse(
+    messages: Array<KernelMessage>
+  ): Promise<DirectResponse> {
+    const output = await this.streamText({ messages });
+
+    return {
+      type: 'direct',
+      mimeType: 'text/markdown',
+      content: output.text,
+      contentStream: output.textStream,
+    };
+  }
+
+  async generateActionResponse(
+    messages: Array<KernelMessage>
+  ): Promise<ActionProposalResponse> {
+    const responses = await this.generateActionResponses(messages);
+    return responses[0];
+  }
+
+  /**
+   * Generates an action proposal in response to the user's query.
+   * @param messages An array of messages
+   * @returns An ActionResponse containing the action proposal.
+   */
+  async generateActionResponses(
+    messages: Array<KernelMessage>
+  ): Promise<ActionProposalResponse[]> {
+    const { tools } = await this.generateObject({
+      messages,
+      system: this.prompts.system({ actions: this.actions, hint: this.hint }),
+      prompt: this.prompts.chooseAction(),
+      schema: actionChoiceSchema(this.actions),
+    });
+
+    return tools.map((tool) => {
+      const { uri, actionId } = decodeActionHandle(tool.id);
+      return actionProposalResponse({
+        uri,
+        actionId,
+        args: tool.args,
+      });
+    });
   }
 
   /* === TEXT & OBJECT GENERATORS === */
@@ -186,57 +234,9 @@ export class Interpreter {
     return output.object;
   }
 
-  /* === RESPONSES === */
+  /* === UTILITY METHODS === */
 
-  /**
-   * Generates a simple streaming text response.
-   * @param interactions An array of interactions.
-   * @returns A TextResponse object, which can be used to get or stream the response text.
-   */
-  async generateTextResponse(
-    messages: Array<KernelMessage>
-  ): Promise<DirectResponse> {
-    const output = await this.streamText({ messages });
-
-    return {
-      type: 'direct',
-      mimeType: 'text/markdown',
-      content: output.text,
-      contentStream: output.textStream,
-    };
-  }
-
-  async generateActionResponse(
-    messages: Array<KernelMessage>
-  ): Promise<ActionProposalResponse> {
-    const responses = await this.generateActionResponses(messages);
-    return responses[0];
-  }
-
-  /**
-   * Generates an action directive in response to the user's query.
-   * @param interactions An array of interactions
-   * @returns An ActionResponse containing the action directive.
-   */
-  async generateActionResponses(
-    messages: Array<KernelMessage>
-  ): Promise<ActionProposalResponse[]> {
-    const correlationId = messages.at(-1).correlationId;
-
-    const { tools } = await this.generateObject({
-      messages,
-      system: this.prompts.system({ actions: this.actions, hint: this.hint }),
-      prompt: this.prompts.chooseAction(),
-      schema: actionChoiceSchema(this.actions),
-    });
-
-    return tools.map((tool) => {
-      const { uri, actionId } = decodeActionHandle(tool.id);
-      return actionProposalResponse({
-        uri,
-        actionId,
-        args: tool.args,
-      });
-    });
+  updateResources(resources: Array<Resource> = []) {
+    this.actions = createActionDict(resources);
   }
 }
