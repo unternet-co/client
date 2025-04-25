@@ -6,7 +6,6 @@ import { WorkspaceModel, Workspace } from '../../workspaces';
 import '../common/elements/input';
 import '../common/elements/button';
 import '../common/elements/label';
-import './workspace-settings-modal.css';
 
 export class WorkspaceSettingsModal extends ModalElement {
   size: ModalSize = 'auto';

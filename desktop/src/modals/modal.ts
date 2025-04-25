@@ -24,17 +24,20 @@ export class Modal {
   private modalService = dependencies.resolve<ModalService>('ModalService');
   private closeCallback = () => this.modalService.close(this.id);
   private isModal: boolean = true;
+  private position?: string;
 
   constructor(key: string, definition: ModalDefinition, modal: boolean = true) {
     this.id = key;
     this.title = definition.title;
     this.elementName = definition.element;
     this.isModal = modal;
+    this.position = definition.position;
   }
 
   open(stackPosition: number) {
     this.dialog = document.createElement('dialog');
     this.dialog.className = 'modal-container';
+    this.dialog.classList.add(`modal--${this.position || 'center'}`);
     this.dialog.setAttribute('data-size', this.size);
     this.dialog.setAttribute('data-padding', this.padding);
     this.dialog.setAttribute('tabindex', '-1');

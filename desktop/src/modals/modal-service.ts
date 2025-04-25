@@ -16,6 +16,12 @@ export interface ModalDefinition {
 
   /** If the modal should be deregistered when closed. */
   ephemeral?: boolean;
+
+  /** If the modal should be a non-modal, right-docked variant. */
+  modal?: boolean;
+
+  /** If the modal should be docked to the right. */
+  position?: 'right' | 'left' | 'bottom' | 'top' | 'center' | 'full';
 }
 
 export class ModalService {
@@ -87,7 +93,12 @@ export class ModalService {
     if (this.modals.has(key)) return this.modals.get(key)!;
     if (!this.definitions.has(key))
       throw new Error(`Modal with key "${key}" has not been registered.`);
-    const modal = new Modal(key, this.definitions.get(key)!);
+    const definition = this.definitions.get(key)!;
+    const modal = new Modal(
+      key,
+      definition,
+      definition.modal !== false ? true : false
+    );
     modal.open(this.modals.size);
     this.modals.set(key, modal);
     return modal;

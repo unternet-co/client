@@ -107,6 +107,8 @@ modalService.register('bug', {
 modalService.register('workspace-settings', {
   title: 'Workspace Settings',
   element: 'workspace-settings-modal',
+  modal: false,
+  position: 'right',
 });
 
 /* Register keyboard shortcuts */
