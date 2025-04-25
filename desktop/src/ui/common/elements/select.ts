@@ -13,6 +13,8 @@ export type SelectVariant = 'default' | 'ghost' | 'flat';
 export type IconPosition = 'start' | 'end';
 
 export class SelectElement extends LitElement {
+  private _mutationObserver?: MutationObserver;
+
   value: string = '';
   placeholder: string = '';
   disabled: boolean = false;
@@ -46,6 +48,23 @@ export class SelectElement extends LitElement {
     this.loading = false;
     this.icon = undefined;
     this.iconPosition = 'end';
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._mutationObserver = new MutationObserver(() => {
+      this.requestUpdate();
+    });
+    this._mutationObserver.observe(this, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._mutationObserver?.disconnect();
   }
 
   private handleChange(e: Event) {

@@ -1,6 +1,7 @@
 import { appendEl, createEl } from '../../common/utils/dom';
 import { DisposableGroup } from '../../common/disposable';
 import { render, html } from 'lit';
+import { repeat } from 'lit/directives/repeat.js';
 
 import { dependencies } from '../../common/dependencies';
 import { WorkspaceModel } from '../../workspaces';
@@ -118,7 +119,9 @@ export class TopBar extends HTMLElement {
           }
         }}
       >
-        ${workspaces.map(
+        ${repeat(
+          workspaces,
+          (ws) => ws.id,
           (ws) => html`<option value=${ws.id}>${ws.title}</option>`
         )}
       </un-select>

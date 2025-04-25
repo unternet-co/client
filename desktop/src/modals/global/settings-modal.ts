@@ -13,6 +13,7 @@ import {
 import '../../ui/common/elements/textarea';
 import '../../ui/common/elements/select';
 import '../../ui/common/elements/input';
+import '../../ui/common/elements/label';
 import './settings-modal.css';
 import { OLLAMA_BASE_URL } from '../../ai/providers/ollama';
 

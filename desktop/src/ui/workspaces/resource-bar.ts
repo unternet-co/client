@@ -2,9 +2,11 @@ import { html, render } from 'lit';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
 import { ResourceModel } from '../../protocols/resources';
+import { ModalService } from '../../modals/modal-service';
 
 export class ResourceBar extends HTMLElement {
   resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
+  modalService = dependencies.resolve<ModalService>('ModalService');
 
   connectedCallback(): void {
     this.render();
@@ -23,9 +25,18 @@ export class ResourceBar extends HTMLElement {
       </li>`;
     });
 
-    const template = html`<ul class="resources-list">
-      ${resourceTemplate}
-    </ul>`;
+    const template = html`
+      <ul class="resources-list">
+        ${resourceTemplate}
+      </ul>
+      <un-button
+        type="ghost"
+        icon="workspace-settings"
+        @click=${() => this.modalService.open('workspace-settings')}
+      >
+        Workspace Settings
+      </un-button>
+    `;
 
     render(template, this);
   }

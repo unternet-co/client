@@ -37,4 +37,12 @@ export function registerGlobalShortcuts() {
   shortcutService.register('Ctrl+,', () => {
     modalService.open('settings');
   });
+
+  shortcutService.register('Meta+Shift+,', () => {
+    modalService.open('workspace-settings');
+  });
+
+  shortcutService.register('Ctrl+Shift+,', () => {
+    modalService.open('workspace-settings');
+  });
 }

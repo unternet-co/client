@@ -26,7 +26,3 @@ workspace-view .workspace-content {
 .bottom-bar > command-bar {
   padding: var(--space-5) var(--space-4);
 }
-
-.bottom-bar > resource-bar {
-  padding: var(--space-2) var(--space-4);
-}

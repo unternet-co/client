@@ -23,6 +23,7 @@ import './ui/app-root';
 import { ProcessModel, SerializedProcess } from './processes';
 import { ProcessRuntime } from '@unternet/kernel';
 import './modals/global/bug-modal';
+import './ui/workspaces/workspace-settings-modal';
 
 /* Initialize databases & stores */
 
@@ -101,6 +102,11 @@ modalService.register('settings', {
 modalService.register('bug', {
   title: 'Report a bug',
   element: 'bug-modal',
+});
+
+modalService.register('workspace-settings', {
+  title: 'Workspace Settings',
+  element: 'workspace-settings-modal',
 });
 
 /* Register keyboard shortcuts */
