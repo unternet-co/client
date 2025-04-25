@@ -25,9 +25,9 @@ The two core modules are the interpreter (which take message inputs, and generat
 
 ## Interpreter
 
-The `Interpreter` class (`interpreter/interpreter`) acts as the main cognitive processing unit for the kernel. When given a series of messages, it will return either a direct response, or an "action directive" to perform an action. Interpreter modules accept arrays of `KernelMessage`, defined in `interpreter/messages`.
+The `Interpreter` class acts as the main cognitive processing unit for the kernel. When given a series of messages, it will return either a "direct response" to the user, or an "action proposal" to perform an action. Interpreter modules accept arrays of `KernelMessage`.
 
-You pass the Interpreter a set of `Resource` object. A resource is anything that a model might use to get information or perform an action in response to an input. These objects have associated actions that the kernel can use for its actions directives. A resource could be a web applet, MCP server, or set of system actions.
+You pass the Interpreter a set of `Resource` object. A resource is anything that a model might use to get information or perform an action in response to an input. These objects have associated actions that the kernel can use for its action proposals. A resource could be a web applet, MCP server, or set of system actions.
 
 All resources must have a URI, which is a string that adheres to [RFC3986](https://datatracker.ietf.org/doc/html/rfc3986), an internet standard. For example, the following are valid URIs:
 
