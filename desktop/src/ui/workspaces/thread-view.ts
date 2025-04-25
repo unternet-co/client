@@ -22,6 +22,17 @@ class ThreadView extends HTMLElement {
   private kernel = dependencies.resolve<Kernel>('Kernel');
   private workspaceId: Workspace['id'];
 
+  static get observedAttributes() {
+    return ['for'];
+  }
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (name === 'for' && oldValue !== newValue) {
+      this.workspaceId = newValue;
+      this.updateMessages();
+    }
+  }
+
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
 
