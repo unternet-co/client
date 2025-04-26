@@ -127,7 +127,3 @@ if (
   console.warn('Primary model not defined in config, opening settings modal');
   modalService.open('settings');
 }
-
-resourceModel.register('https://applets.unternet.co/calculator');
-resourceModel.register('unternet.co');
-console.log(resourceModel.all());
