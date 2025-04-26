@@ -7,6 +7,7 @@ export type ButtonType =
   | 'secondary'
   | 'negative'
   | 'outline'
+  | 'link'
   | 'ghost';
 
 export type ButtonSize = 'small' | 'medium' | 'large';
@@ -209,6 +210,13 @@ export class ButtonElement extends LitElement {
         box-shadow: none;
       }
 
+      .button--link {
+        --button-color: transparent;
+        --button-text-color: var(--color-action-800);
+        box-shadow: none;
+      }
+
+      .button--link:hover,
       .button--ghost:hover,
       .button--outline:hover {
         --button-color: var(--color-neutral-200);
