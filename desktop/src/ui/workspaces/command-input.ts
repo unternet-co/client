@@ -25,7 +25,7 @@ export class CommandInputElement extends LitElement {
 
   value: string = '';
   disabled: boolean = false;
-  placeholder: string = 'Search or type a command...';
+  placeholder: string = 'Do anything...';
 
   constructor() {
     super();
