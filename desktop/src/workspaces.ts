@@ -73,8 +73,14 @@ export class WorkspaceModel {
       const ws = this.create();
       this.setTitle('Default Workspace');
     }
-    if (!this.activeWorkspaceId && this.workspaces.size > 0) {
+    // Restore activeWorkspaceId from localStorage if possible
+    const storedId = localStorage.getItem('activeWorkspaceId');
+    if (storedId && this.workspaces.has(storedId)) {
+      this.activeWorkspaceId = storedId;
+    } else if (!this.activeWorkspaceId && this.workspaces.size > 0) {
       this.activeWorkspaceId = Array.from(this.workspaces.keys())[0];
+    }
+    if (this.activeWorkspaceId) {
       this.notifier.notify({ workspaceId: this.activeWorkspaceId });
     }
     const allInteractions = await this.messageDatabase.all();
@@ -204,6 +210,7 @@ export class WorkspaceModel {
   setActiveWorkspace(id: Workspace['id']) {
     if (this.activeWorkspaceId !== id && this.workspaces.has(id)) {
       this.activeWorkspaceId = id;
+      localStorage.setItem('activeWorkspaceId', id);
       this.notifier.notify({ workspaceId: id });
     }
   }
