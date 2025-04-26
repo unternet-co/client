@@ -14,6 +14,7 @@ import { Kernel, KernelStatus } from '../../ai/kernel';
 import { getResourceIcon } from '../../common/utils';
 
 class ThreadView extends HTMLElement {
+  private workspaceSubscription: { dispose: () => void } | null = null;
   private archivedCount: number = 0;
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
@@ -30,6 +31,16 @@ class ThreadView extends HTMLElement {
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (name === 'for' && oldValue !== newValue) {
       this.workspaceId = newValue;
+      // Clean up previous subscription
+      if (this.workspaceSubscription) {
+        this.workspaceSubscription.dispose();
+        this.workspaceSubscription = null;
+      }
+      // Subscribe to new workspace
+      this.workspaceSubscription = this.workspaceModel.subscribeToWorkspace(
+        this.workspaceId,
+        this.updateMessages.bind(this)
+      );
       this.updateMessages();
     }
   }
@@ -43,10 +54,18 @@ class ThreadView extends HTMLElement {
     this.updateKernelStatus(this.kernel.status);
 
     this.updateMessages();
-    this.workspaceModel.subscribeToWorkspace(
+    // Subscribe to workspace and store disposable
+    this.workspaceSubscription = this.workspaceModel.subscribeToWorkspace(
       this.workspaceId,
       this.updateMessages.bind(this)
     );
+  }
+
+  disconnectedCallback() {
+    if (this.workspaceSubscription) {
+      this.workspaceSubscription.dispose();
+      this.workspaceSubscription = null;
+    }
   }
 
   updateMessages() {
