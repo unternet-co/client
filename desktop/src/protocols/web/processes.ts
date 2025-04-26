@@ -1,4 +1,4 @@
-import { Process, Protocol, ResourceIcon } from '@unternet/kernel';
+import { Process } from '@unternet/kernel';
 import { WebviewTag } from 'electron';
 import iconSrc from '../builtin/icon-128x128.png';
 
@@ -52,12 +52,3 @@ export class WebProcess extends Process {
     return { url: this.url };
   }
 }
-
-export class WebProtocol extends Protocol {
-  scheme = ['http', 'https'];
-}
-
-const webProtocol = new WebProtocol();
-webProtocol.registerProcess(WebProcess);
-
-export { webProtocol };

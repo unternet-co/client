@@ -6,6 +6,11 @@ import { ResourceModel } from '../../protocols/resources';
 export class ResourceBar extends HTMLElement {
   resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
 
+  constructor() {
+    super();
+    this.resourceModel.subscribe(() => this.render());
+  }
+
   connectedCallback(): void {
     this.render();
   }
