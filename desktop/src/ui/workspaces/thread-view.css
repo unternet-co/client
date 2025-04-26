@@ -1,7 +1,6 @@
 thread-view {
   width: 100%;
   flex-grow: 1;
-  min-height: 0;
 }
 
 thread-view .inner {
@@ -10,7 +9,7 @@ thread-view .inner {
 }
 
 thread-view .inner::part(slot) {
-  gap: var(--space-4);
+  gap: var(--space-7);
   padding: var(--space-8) var(--space-4);
 }
 
@@ -19,11 +18,17 @@ thread-view .loading {
   left: var(--space-5);
 }
 
-thread-view .message {
-  user-select: text;
+thread-view .message-list {
+  display: flex;
+  flex-direction: column;
   margin: 0 auto;
   width: 100%;
   max-width: 72ch;
+  gap: var(--space-4);
+}
+
+thread-view .message {
+  user-select: text;
 }
 
 thread-view .message[data-type='input'] {
@@ -38,10 +43,10 @@ thread-view .message:first-child {
 }
 
 thread-view .message[data-type='response'] {
-  padding: var(--space-5);
-  /* min-height: 36px; */
-  border-radius: var(--rounded-lg);
-  /* border: 1px solid var(--color-border-muted); */
+  padding: var(--space-5) var(--space-5);
+  min-height: 36px;
+  border-radius: var(--rounded);
+  border: 1px solid var(--color-border-muted);
   background: var(--color-bg-content);
 }
 

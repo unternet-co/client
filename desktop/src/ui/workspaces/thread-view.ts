@@ -69,7 +69,9 @@ class ThreadView extends HTMLElement {
 
     const template = html`
       <message-scroll class="inner">
-        ${messagesTemplate} ${this.loadingTemplate()}
+        <div class="message-list">
+          ${messagesTemplate} ${this.loadingTemplate()}
+        </div>
       </message-scroll>
     `;
 

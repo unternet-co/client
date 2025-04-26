@@ -1,20 +1,18 @@
 class MessageScroll extends HTMLElement {
   #slot: HTMLSlotElement;
-  #container: HTMLElement;
-  #autoFollow: boolean = false;
-  #activeMessageMutationObserver: MutationObserver | null = null;
+  #lastScrollTop = 0;
 
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
 
-    this.#container = document.createElement('div');
-    this.#container.classList.add('container');
-    shadow.appendChild(this.#container);
+    const container = document.createElement('div');
+    container.classList.add('container');
+    shadow.appendChild(container);
 
     this.#slot = document.createElement('slot');
     this.#slot.setAttribute('part', 'slot');
-    this.#container.appendChild(this.#slot);
+    container.appendChild(this.#slot);
 
     const style = document.createElement('style');
     style.textContent = /*css*/ `
@@ -29,80 +27,37 @@ class MessageScroll extends HTMLElement {
       slot {
         box-sizing: border-box;
         display: flex;
-        flex-direction: column;
+        flex-direction: column-reverse;
         overflow-y: auto;
-        scroll-behavior: smooth;;
+        scroll-behavior: smooth;
         width: 100%;
-        scroll-margin-bottom: 20px;
       }
     `;
     shadow.appendChild(style);
   }
 
-  #startObservingActiveMessage = () => {
-    this.#stopObservingActiveMessage();
-    const assigned = this.#slot.assignedElements
-      ? this.#slot.assignedElements()
-      : [];
-    if (assigned.length < 1) return;
+  connectedCallback() {
+    // Scroll to bottom (= 0 with column-reverse) on connect
+    this.#slot.scrollTop = 0;
 
-    const activeMessageEl = assigned[assigned.length - 1];
-    this.#activeMessageMutationObserver = new MutationObserver(() => {
-      if (this.#autoFollow) {
-        this.#scrollToBottom();
+    // Log the scroll position
+    // (Timeout is here so we don't take into account scroll event
+    // as element becomes visible again)
+    this.#slot.addEventListener('scroll', () => {
+      setTimeout(() => {
+        this.#lastScrollTop = this.#slot.scrollTop;
+      }, 100);
+    });
+
+    // Whenever element is made visible, return to prior scroll position
+    const intersectionObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          this.#slot.scrollTop = this.#lastScrollTop;
+        }
       }
     });
-    this.#activeMessageMutationObserver.observe(activeMessageEl, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-  };
-
-  #stopObservingActiveMessage = () => {
-    if (this.#activeMessageMutationObserver) {
-      this.#activeMessageMutationObserver.disconnect();
-      this.#activeMessageMutationObserver = null;
-    }
-  };
-
-  /**
-   * autoFollow Keeps the newest message in view until user scrolls up.
-   */
-  #onUserScroll = () => {
-    const threshold = 3;
-    const slot = this.#slot;
-    const nearBottom =
-      slot.scrollHeight - slot.scrollTop - slot.clientHeight < threshold;
-    if (nearBottom) {
-      this.#autoFollow = true;
-    } else {
-      this.#autoFollow = false;
-    }
-  };
-
-  #scrollToBottom = () => {
-    // Small delay to ensure the messages have all rendered
-    setTimeout(() => {
-      this.#slot.scrollTop = this.#slot.scrollHeight;
-    }, 100);
-  };
-
-  #onMessageAdded = () => {
-    this.#scrollToBottom();
-    this.#startObservingActiveMessage();
-  };
-
-  connectedCallback() {
-    this.#scrollToBottom();
-    this.#slot.addEventListener('slotchange', this.#onMessageAdded);
-    this.#slot.addEventListener('scroll', this.#onUserScroll);
-  }
-
-  disconnectedCallback() {
-    this.#slot.removeEventListener('slotchange', this.#onMessageAdded);
-    this.#stopObservingActiveMessage();
-    this.#slot.removeEventListener('scroll', this.#onUserScroll);
+    intersectionObserver.observe(this);
   }
 }
 
