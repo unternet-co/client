@@ -12,8 +12,12 @@ export interface Workspace {
   created: number;
   accessed: number;
   modified: number;
+  // Scroll position of the workspace
+  scrollPosition?: number;
   // If set, messages with an id less than this will be hidden by default.
   archivedMessageId?: string;
+  // If set, archived messages will be visible by default.
+  showArchivedMessages?: boolean;
 }
 
 export interface WorkspaceNotification {
@@ -108,6 +112,19 @@ export class WorkspaceModel {
     }
   }
 
+  setScrollPosition(position: number, id?: Workspace['id']) {
+    if (!id) {
+      id = this.activeWorkspaceId;
+    }
+
+    const workspace = this.workspaces.get(id);
+    if (workspace) {
+      workspace.scrollPosition = position;
+      this.workspaceDatabase.update(id, { scrollPosition: position });
+      this.notifier.notify({ workspaceId: id });
+    }
+  }
+
   setArchivedMessageId(messageId?: string, id?: Workspace['id']) {
     if (!id) {
       id = this.activeWorkspaceId;
@@ -123,6 +140,19 @@ export class WorkspaceModel {
 
     workspace.archivedMessageId = messageId;
     this.workspaceDatabase.update(id, { archivedMessageId: messageId });
+    this.notifier.notify({ workspaceId: id });
+  }
+
+  setArchiveVisibility(visible: boolean, id?: Workspace['id']) {
+    if (!id) {
+      id = this.activeWorkspaceId;
+    }
+    const workspace = this.workspaces.get(id);
+    if (!workspace) return;
+    workspace.showArchivedMessages = visible;
+    this.workspaceDatabase.update(id, {
+      showArchivedMessages: workspace.showArchivedMessages,
+    });
     this.notifier.notify({ workspaceId: id });
   }
 

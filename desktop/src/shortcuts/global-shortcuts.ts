@@ -43,10 +43,16 @@ export function registerGlobalShortcuts() {
 
   // Meta+K: Archive messages up to the most recent message in the active workspace
   shortcutService.register('Meta+K', () => {
+    const ws = workspaceModel.get(workspaceModel.activeWorkspaceId);
+    if (!ws) return;
     workspaceModel.setArchivedMessageId();
+    workspaceModel.setArchiveVisibility(false);
   });
 
   shortcutService.register('Meta+Shift+L', () => {
+    const ws = workspaceModel.get(workspaceModel.activeWorkspaceId);
+    if (!ws) return;
     workspaceModel.setArchivedMessageId();
+    workspaceModel.setArchiveVisibility(false);
   });
 }

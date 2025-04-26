@@ -86,7 +86,10 @@ export class WorkspaceView extends HTMLElement {
   }
 
   private handleArchive = () => {
+    const ws = this.workspaceModel.get(this.workspaceId);
+    if (!ws) return;
     this.workspaceModel.setArchivedMessageId();
+    this.workspaceModel.setArchiveVisibility(!ws.showArchivedMessages);
   };
 
   get template() {
@@ -100,10 +103,7 @@ export class WorkspaceView extends HTMLElement {
         >
           Tidy up
         </un-button>
-        <thread-view
-          for=${this.workspaceId}
-          @scroll-position-changed=${this.handleThreadScrollChanged}
-        ></thread-view>
+        <thread-view for=${this.workspaceId}></thread-view>
       </div>
       <div class="bottom-bar">
         <command-bar>

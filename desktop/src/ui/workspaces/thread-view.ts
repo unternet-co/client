@@ -15,7 +15,6 @@ import { getResourceIcon } from '../../common/utils';
 
 class ThreadView extends HTMLElement {
   private archivedCount: number = 0;
-  private showArchive: boolean = false;
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private messages: Message[] = [];
@@ -56,7 +55,7 @@ class ThreadView extends HTMLElement {
       this.workspaceModel.allMessages(this.workspaceId)
     );
     this.archivedCount = 0;
-    if (!this.showArchive && workspace?.archivedMessageId) {
+    if (!workspace?.showArchivedMessages && workspace?.archivedMessageId) {
       const i = allMessages.findIndex(
         (m) => m.id === workspace.archivedMessageId
       );
@@ -81,6 +80,10 @@ class ThreadView extends HTMLElement {
     this.render();
   }
 
+  handleScrollPositionChanged = (e: CustomEvent) => {
+    this.workspaceModel.setScrollPosition(e.detail.scrollTop);
+  };
+
   render() {
     const messagesTemplate = repeat(
       this.messages,
@@ -88,25 +91,30 @@ class ThreadView extends HTMLElement {
       this.messageTemplate.bind(this)
     );
 
+    const workspace = this.workspaceModel.get(this.workspaceId);
     const archivedButton = this.archivedCount
       ? html` <div class="archived-message">
-          ${this.archivedCount} hidden
+          ${this.archivedCount} archived
           message${this.archivedCount > 1 ? 's' : ''}&nbsp;
           <un-button
             type="link"
             size="small"
             @click=${this.toggleArchivedMessages}
           >
-            ${this.showArchive ? 'Hide' : 'Show'}
+            ${workspace.showArchivedMessages ? 'Hide' : 'Show'}
           </un-button>
         </div>`
       : null;
 
+    const scrollPosition =
+      workspace && typeof workspace.scrollPosition === 'number'
+        ? workspace.scrollPosition
+        : undefined;
     const template = html`
       <message-scroll
         class="inner"
-        @scroll-position-changed=${(e: CustomEvent) =>
-          this.handleScrollPositionChanged(e)}
+        .scrollPosition=${scrollPosition}
+        @scroll-position-changed=${this.handleScrollPositionChanged}
       >
         <div class="message-list">
           ${archivedButton} ${messagesTemplate} ${this.loadingTemplate()}
@@ -118,7 +126,9 @@ class ThreadView extends HTMLElement {
   }
 
   toggleArchivedMessages = () => {
-    this.showArchive = !this.showArchive;
+    const ws = this.workspaceModel.get(this.workspaceId);
+    if (!ws) return;
+    this.workspaceModel.setArchiveVisibility(!ws.showArchivedMessages);
     this.updateMessages();
   };
 
