@@ -1,18 +1,21 @@
 class MessageScroll extends HTMLElement {
   #slot: HTMLSlotElement;
+  #container: HTMLDivElement;
   #lastScrollTop = 0;
+  #mutationObserver: MutationObserver | null = null;
+  #intersectionObserver: IntersectionObserver | null = null;
 
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
 
-    const container = document.createElement('div');
-    container.classList.add('container');
-    shadow.appendChild(container);
+    this.#container = document.createElement('div');
+    this.#container.classList.add('container');
+    shadow.appendChild(this.#container);
 
     this.#slot = document.createElement('slot');
     this.#slot.setAttribute('part', 'slot');
-    container.appendChild(this.#slot);
+    this.#container.appendChild(this.#slot);
 
     const style = document.createElement('style');
     style.textContent = /*css*/ `
@@ -37,8 +40,22 @@ class MessageScroll extends HTMLElement {
   }
 
   connectedCallback() {
-    // Scroll to bottom (= 0 with column-reverse) on connect
-    this.#slot.scrollTop = 0;
+    // Set up MutationObserver on slotted element (e.g. message-list)
+    const assigned = this.#slot.assignedElements
+      ? this.#slot.assignedElements()
+      : [];
+    if (assigned.length > 0) {
+      this.#mutationObserver = new MutationObserver(() => {
+        // Wait for the DOM to update
+        setTimeout(() => {
+          this.#slot.scrollTop = 0;
+        }, 100);
+      });
+      this.#mutationObserver.observe(assigned[0], {
+        childList: true,
+        subtree: true,
+      });
+    }
 
     // Log the scroll position
     // (Timeout is here so we don't take into account scroll event
@@ -50,14 +67,28 @@ class MessageScroll extends HTMLElement {
     });
 
     // Whenever element is made visible, return to prior scroll position
-    const intersectionObserver = new IntersectionObserver((entries) => {
+    // TODO: since we no longer use tabs, this element is always visible
+    // so if we want to manage scroll state we should probably keep track
+    // of it in the workspace definition.
+    this.#intersectionObserver = new IntersectionObserver((entries) => {
       for (const entry of entries) {
         if (entry.isIntersecting) {
           this.#slot.scrollTop = this.#lastScrollTop;
         }
       }
     });
-    intersectionObserver.observe(this);
+    this.#intersectionObserver.observe(this);
+  }
+
+  disconnectedCallback() {
+    if (this.#mutationObserver) {
+      this.#mutationObserver.disconnect();
+      this.#mutationObserver = null;
+    }
+    if (this.#intersectionObserver) {
+      this.#intersectionObserver.disconnect();
+      this.#intersectionObserver = null;
+    }
   }
 }
 
