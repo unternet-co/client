@@ -54,18 +54,18 @@
   }
 }
 
-.modal-container.modal--center[open],
-.modal-container.modal--full[open] {
+.modal-container[data-position='center'][open],
+.modal-container[data-position='full'][open] {
   animation: modal-fade-up 200ms ease-out;
 }
 
 /* Right modal animation */
-.modal-container.modal--right[open] {
+.modal-container[data-position='right'][open] {
   animation: modal-slide-in-right 150ms ease-out;
 }
 
 /* Right-positioned modal variant */
-.modal-container.modal--right {
+.modal-container[data-position='right'] {
   position: fixed;
   top: 0;
   right: 0;

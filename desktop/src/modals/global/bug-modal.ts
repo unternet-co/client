@@ -1,15 +1,16 @@
+import { css } from 'lit';
 import { appendEl, attachStyles, createEl } from '../../common/utils';
 import { BUG_REPORT_URL } from '../../constants';
-import { ModalSize, ModalPadding } from '../modal';
-import { ModalElement } from '../modal-element';
+import { ModalElement, ModalOptions } from '../modal-element';
 
 export class BugModal extends ModalElement {
-  size: ModalSize = 'full';
-  padding: ModalPadding = 'none';
-
   constructor() {
-    super();
-    const styles = /*css*/ `
+    super({
+      title: 'Report a bug',
+      size: 'full',
+      padding: 'none',
+    } as ModalOptions);
+    const styles = css`
       :root {
         width: 100%;
         height: 100%;
@@ -23,7 +24,7 @@ export class BugModal extends ModalElement {
     `;
 
     const shadow = this.attachShadow({ mode: 'open' });
-    attachStyles(shadow, styles);
+    attachStyles(shadow, styles.cssText);
     appendEl(shadow, createEl('iframe', { src: BUG_REPORT_URL }));
   }
 }

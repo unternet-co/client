@@ -1,6 +1,5 @@
 import { html, render, TemplateResult } from 'lit';
-import { ModalSize } from '../modal';
-import { ModalElement } from '../modal-element';
+import { ModalElement, ModalOptions } from '../modal-element';
 import { ConfigModel, ConfigData } from '../../config';
 import { dependencies } from '../../common/dependencies';
 import {
@@ -18,7 +17,6 @@ import './settings-modal.css';
 import { OLLAMA_BASE_URL } from '../../ai/providers/ollama';
 
 export class SettingsModal extends ModalElement {
-  size: ModalSize = 'full';
   private configModel: ConfigModel;
   private aiModelService: AIModelService;
 
@@ -32,6 +30,12 @@ export class SettingsModal extends ModalElement {
   private selectedModel: AIModelDescriptor;
   private isLoadingModels: boolean = false;
   private modelError: string | null = null;
+
+  constructor() {
+    super({
+      title: 'Global Settings',
+    } as ModalOptions);
+  }
 
   connectedCallback() {
     this.configModel = dependencies.resolve<ConfigModel>('ConfigModel');

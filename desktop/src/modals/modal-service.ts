@@ -6,7 +6,7 @@ import { Modal } from './modal';
  */
 export interface ModalDefinition {
   /** The title of the modal displayed in the header. */
-  title: string;
+  title?: string;
 
   /**
    * The name of the element to render as the content of the modal.
@@ -16,12 +16,6 @@ export interface ModalDefinition {
 
   /** If the modal should be deregistered when closed. */
   ephemeral?: boolean;
-
-  /** If the modal should be a non-modal, right-docked variant. */
-  modal?: boolean;
-
-  /** If the modal should be docked to the right. */
-  position?: 'right' | 'left' | 'bottom' | 'top' | 'center' | 'full';
 }
 
 export class ModalService {
@@ -94,11 +88,7 @@ export class ModalService {
     if (!this.definitions.has(key))
       throw new Error(`Modal with key "${key}" has not been registered.`);
     const definition = this.definitions.get(key)!;
-    const modal = new Modal(
-      key,
-      definition,
-      definition.modal !== false ? true : false
-    );
+    const modal = new Modal(key, definition);
     modal.open(this.modals.size);
     this.modals.set(key, modal);
     return modal;

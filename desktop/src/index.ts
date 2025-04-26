@@ -95,20 +95,15 @@ dependencies.registerSingleton('ModalService', modalService);
 /* Register global modals */
 
 modalService.register('settings', {
-  title: 'Settings',
   element: 'settings-modal',
 });
 
 modalService.register('bug', {
-  title: 'Report a bug',
   element: 'bug-modal',
 });
 
 modalService.register('workspace-settings', {
-  title: 'Workspace Settings',
   element: 'workspace-settings-modal',
-  modal: false,
-  position: 'right',
 });
 
 /* Register keyboard shortcuts */
