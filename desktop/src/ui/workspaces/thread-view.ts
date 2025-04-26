@@ -14,6 +14,8 @@ import { Kernel, KernelStatus } from '../../ai/kernel';
 import { getResourceIcon } from '../../common/utils';
 
 class ThreadView extends HTMLElement {
+  private archivedCount: number = 0;
+  private showArchive: boolean = false;
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private messages: Message[] = [];
@@ -49,9 +51,28 @@ class ThreadView extends HTMLElement {
   }
 
   updateMessages() {
-    this.messages = Array.from(
+    const workspace = this.workspaceModel.get(this.workspaceId);
+    let allMessages = Array.from(
       this.workspaceModel.allMessages(this.workspaceId)
     );
+    this.archivedCount = 0;
+    if (!this.showArchive && workspace?.archivedMessageId) {
+      const i = allMessages.findIndex(
+        (m) => m.id === workspace.archivedMessageId
+      );
+      if (i !== -1) {
+        this.archivedCount = i + 1;
+        allMessages = allMessages.slice(i + 1);
+      }
+    } else if (workspace?.archivedMessageId) {
+      const i = allMessages.findIndex(
+        (m) => m.id === workspace.archivedMessageId
+      );
+      if (i !== -1) {
+        this.archivedCount = i + 1;
+      }
+    }
+    this.messages = allMessages;
     this.render();
   }
 
@@ -67,16 +88,39 @@ class ThreadView extends HTMLElement {
       this.messageTemplate.bind(this)
     );
 
+    const archivedButton = this.archivedCount
+      ? html` <div class="archived-message">
+          ${this.archivedCount} hidden
+          message${this.archivedCount > 1 ? 's' : ''}&nbsp;
+          <un-button
+            type="link"
+            size="small"
+            @click=${this.toggleArchivedMessages}
+          >
+            ${this.showArchive ? 'Hide' : 'Show'}
+          </un-button>
+        </div>`
+      : null;
+
     const template = html`
-      <message-scroll class="inner">
+      <message-scroll
+        class="inner"
+        @scroll-position-changed=${(e: CustomEvent) =>
+          this.handleScrollPositionChanged(e)}
+      >
         <div class="message-list">
-          ${messagesTemplate} ${this.loadingTemplate()}
+          ${archivedButton} ${messagesTemplate} ${this.loadingTemplate()}
         </div>
       </message-scroll>
     `;
 
     render(template, this);
   }
+
+  toggleArchivedMessages = () => {
+    this.showArchive = !this.showArchive;
+    this.updateMessages();
+  };
 
   loadingTemplate() {
     if (this.status !== 'thinking') return null;

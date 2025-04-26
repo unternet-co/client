@@ -3,31 +3,26 @@ import { TabModel } from '../tabs';
 import { ModalService } from '../modals/modal-service';
 import { ShortcutService } from './shortcut-service';
 
+import { WorkspaceModel } from '../workspaces';
+
 export function registerGlobalShortcuts() {
   const shortcutService =
     dependencies.resolve<ShortcutService>('ShortcutService');
-  const tabModel = dependencies.resolve<TabModel>('TabModel');
+  // const tabModel = dependencies.resolve<TabModel>('TabModel');
   const modalService = dependencies.resolve<ModalService>('ModalService');
-
-  shortcutService.register('Meta+W', () => {
-    if (tabModel.activeTab) {
-      tabModel.close(tabModel.activeTab.id);
-    }
-  });
+  const workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
 
   shortcutService.register('Meta+N', () => {
-    if (tabModel.activeTab) {
-      tabModel.create();
-    }
+    workspaceModel.create();
   });
 
-  shortcutService.register('Meta+Shift+]', () => {
-    tabModel.activateNext();
-  });
+  // shortcutService.register('Meta+Shift+]', () => {
+  //   tabModel.activateNext();
+  // });
 
-  shortcutService.register('Meta+Shift+[', () => {
-    tabModel.activatePrev();
-  });
+  // shortcutService.register('Meta+Shift+[', () => {
+  //   tabModel.activatePrev();
+  // });
 
   // Ctrl+, or Meta+, to open settings
   shortcutService.register('Meta+,', () => {
@@ -44,5 +39,14 @@ export function registerGlobalShortcuts() {
 
   shortcutService.register('Ctrl+Shift+,', () => {
     modalService.open('workspace-settings');
+  });
+
+  // Meta+K: Archive messages up to the most recent message in the active workspace
+  shortcutService.register('Meta+K', () => {
+    workspaceModel.setArchivedMessageId();
+  });
+
+  shortcutService.register('Meta+Shift+L', () => {
+    workspaceModel.setArchivedMessageId();
   });
 }

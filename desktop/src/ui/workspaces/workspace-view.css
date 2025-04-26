@@ -6,6 +6,7 @@ workspace-view {
 }
 
 workspace-view .workspace-content {
+  position: relative;
   flex-grow: 1;
   background: var(--color-bg-page);
   display: flex;
@@ -22,4 +23,12 @@ workspace-view .workspace-content {
 
 .bottom-bar > command-bar {
   padding: var(--space-5) var(--space-4);
+}
+
+workspace-view .archive-button {
+  position: fixed;
+  top: calc(34px + var(--space-5));
+  left: var(--space-5);
+  align-self: center;
+  color: var(--color-text-muted);
 }

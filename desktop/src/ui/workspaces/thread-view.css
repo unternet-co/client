@@ -27,6 +27,15 @@ thread-view .message-list {
   gap: var(--space-4);
 }
 
+thread-view .archived-message {
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-bg-chrome);
+  border-radius: 16px;
+  align-self: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
 thread-view .message {
   user-select: text;
 }

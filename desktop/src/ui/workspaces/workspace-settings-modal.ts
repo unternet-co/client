@@ -31,7 +31,7 @@ export class WorkspaceSettingsModal extends ModalElement {
   #handleSave = async () => {
     if (!this.newName.trim() || this.saving) return;
     this.saving = true;
-    this.workspaceModel.setTitle(this.workspace!.id, this.newName.trim());
+    this.workspaceModel.setTitle(this.newName.trim());
     this.saving = false;
     this.close();
   };

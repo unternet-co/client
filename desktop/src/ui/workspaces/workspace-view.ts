@@ -12,6 +12,10 @@ import { ModalService } from '../../modals/modal-service';
 
 export class WorkspaceView extends HTMLElement {
   private _workspaceId: Workspace['id'];
+  private workspaceModel: WorkspaceModel =
+    dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  private visibilityObserver: IntersectionObserver;
+
   set workspaceId(id: Workspace['id']) {
     if (this._workspaceId !== id) {
       this._workspaceId = id;
@@ -26,7 +30,6 @@ export class WorkspaceView extends HTMLElement {
   static get observedAttributes() {
     return ['for'];
   }
-  private visibilityObserver: IntersectionObserver;
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (name === 'for' && oldValue !== newValue) {
@@ -82,10 +85,25 @@ export class WorkspaceView extends HTMLElement {
     }
   }
 
+  private handleArchive = () => {
+    this.workspaceModel.setArchivedMessageId();
+  };
+
   get template() {
     return html`
       <div class="workspace-content">
-        <thread-view for=${this.workspaceId}></thread-view>
+        <un-button
+          class="archive-button"
+          type="secondary"
+          icon="archive"
+          @click=${this.handleArchive}
+        >
+          Tidy up
+        </un-button>
+        <thread-view
+          for=${this.workspaceId}
+          @scroll-position-changed=${this.handleThreadScrollChanged}
+        ></thread-view>
       </div>
       <div class="bottom-bar">
         <command-bar>

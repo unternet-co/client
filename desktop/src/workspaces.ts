@@ -12,6 +12,8 @@ export interface Workspace {
   created: number;
   accessed: number;
   modified: number;
+  // If set, messages with an id less than this will be hidden by default.
+  archivedMessageId?: string;
 }
 
 export interface WorkspaceNotification {
@@ -20,7 +22,7 @@ export interface WorkspaceNotification {
 }
 
 export class WorkspaceModel {
-  public activeWorkspaceId: string | null = null;  
+  public activeWorkspaceId: string | null = null;
   private workspaces = new Map<Workspace['id'], Workspace>();
   private messages = new Map<Workspace['id'], Message[]>();
   private messageById = new Map<string, Message>();
@@ -65,7 +67,7 @@ export class WorkspaceModel {
     }
     if (this.workspaces.size === 0) {
       const ws = this.create();
-      this.setTitle(ws.id, 'Thinking Aloud');
+      this.setTitle('Default Workspace');
     }
     if (!this.activeWorkspaceId && this.workspaces.size > 0) {
       this.activeWorkspaceId = Array.from(this.workspaces.keys())[0];
@@ -94,13 +96,34 @@ export class WorkspaceModel {
     return this.workspaces.get(id);
   }
 
-  setTitle(id: Workspace['id'], title: string) {
+  setTitle(title: string, id?: Workspace['id']) {
+    if (!id) {
+      id = this.activeWorkspaceId;
+    }
     const workspace = this.workspaces.get(id);
     if (workspace) {
       workspace.title = title;
       this.workspaceDatabase.update(id, { title });
       this.notifier.notify({ workspaceId: id });
     }
+  }
+
+  setArchivedMessageId(messageId?: string, id?: Workspace['id']) {
+    if (!id) {
+      id = this.activeWorkspaceId;
+    }
+    const workspace = this.workspaces.get(id);
+    if (!workspace) return;
+
+    if (!messageId) {
+      const messages = this.allMessages(id);
+      if (!messages.length) return;
+      messageId = messages[messages.length - 1].id;
+    }
+
+    workspace.archivedMessageId = messageId;
+    this.workspaceDatabase.update(id, { archivedMessageId: messageId });
+    this.notifier.notify({ workspaceId: id });
   }
 
   async activate(id: Workspace['id']): Promise<void> {
