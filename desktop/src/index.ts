@@ -129,4 +129,5 @@ if (
 }
 
 resourceModel.register('https://applets.unternet.co/calculator');
+resourceModel.register('unternet.co');
 console.log(resourceModel.all());
