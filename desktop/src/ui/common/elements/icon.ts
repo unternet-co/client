@@ -1,6 +1,11 @@
 import { LitElement, html, css } from 'lit';
 import { ref, createRef } from 'lit/directives/ref.js';
 import { createElement, icons } from 'lucide';
+import { broom } from '@lucide/lab';
+
+const LAB_ICONS = {
+  broom,
+};
 
 export const ICON = {
   close: 'x',
@@ -28,6 +33,7 @@ export const ICON = {
   search: 'search',
   upload: 'upload',
   attachment: 'paperclip',
+  archive: 'broom',
 } as const;
 
 export type IconSize = 'small' | 'medium' | 'large';
@@ -82,7 +88,9 @@ export class IconElement extends LitElement {
       .join('');
 
     const iconData =
-      icons[pascalCaseName as keyof typeof icons] || icons.HelpCircle;
+      icons[pascalCaseName as keyof typeof icons] ||
+      LAB_ICONS[mappedName as keyof typeof LAB_ICONS] ||
+      icons.HelpCircle;
     return createElement(iconData, this.getIconAttributes()) as SVGElement;
   }
 

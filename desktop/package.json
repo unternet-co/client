@@ -15,6 +15,7 @@
     "dev:web": "vite"
   },
   "dependencies": {
+    "@lucide/lab": "^0.1.2",
     "@unternet/kernel": "*",
     "@unternet/sdk": "^0.1.1",
     "@web-applets/sdk": "^0.2.6",
