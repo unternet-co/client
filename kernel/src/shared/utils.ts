@@ -20,4 +20,3 @@ export function listener<E extends Record<string, any>>(emitter: {
     return () => emitter.off(event, listener); // detach handle
   };
 }
-screen;
