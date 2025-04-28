@@ -35,6 +35,7 @@ jobs:
 
       - name: Build project
         run: npm run build
+        if: matrix.os != 'windows-latest' && matrix.os != 'ubuntu-latest'
 
       - name: Build and release (macOS)
         if: matrix.os == 'macos-latest'
