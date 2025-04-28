@@ -1,6 +1,9 @@
-import type { AfterPackContext } from 'electron-builder';
+/**
+ * @type {import('electron-builder').AfterPackContext}
+ */
+const { notarize } = require('@electron/notarize');
 
-export default async function notarizing(context: AfterPackContext) {
+module.exports = async function notarizing(context) {
   const { electronPlatformName, appOutDir } = context;
 
   if (electronPlatformName !== 'darwin') return;
@@ -16,13 +19,10 @@ export default async function notarizing(context: AfterPackContext) {
 
   const appName = context.packager.appInfo.productFilename;
 
-  // ✅ Dynamic import of ESM module from CJS environment
-  const { notarize } = await import('@electron/notarize');
-
   return notarize({
     appPath: `${appOutDir}/${appName}.app`,
     appleId: process.env.APPLE_ID,
     appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
     teamId: process.env.APPLE_TEAM_ID,
   });
-}
+};
