@@ -21,7 +21,7 @@ import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
 import { ProcessModel, SerializedProcess } from './processes';
-import { ProcessRuntime } from '@unternet/kernel';
+import { ProcessRuntime, Resource } from '@unternet/kernel';
 import './modals/global/bug-modal';
 import './ui/workspaces/workspace-settings-modal';
 import './ui/workspaces/workspace-delete-modal';
@@ -36,6 +36,9 @@ const processDatabaseService = new DatabaseService<string, SerializedProcess>(
 );
 const messageDatabaseService = new DatabaseService<string, MessageRecord>(
   'messages'
+);
+const resourceDatabaseService = new DatabaseService<string, Resource>(
+  'resources'
 );
 const tabKeyStore = new KeyStoreService<TabStoreData>('tabs', initTabStoreData);
 const configStore = new KeyStoreService<ConfigData>('config', initConfig);
@@ -63,7 +66,10 @@ dependencies.registerSingleton('TabModel', tabModel);
 const configModel = new ConfigModel(configStore);
 dependencies.registerSingleton('ConfigModel', configModel);
 
-const resourceModel = new ResourceModel({ initialResources });
+const resourceModel = new ResourceModel({
+  resourceDatabaseService,
+  initialResources,
+});
 dependencies.registerSingleton('ResourceModel', resourceModel);
 
 /* Initialize kernel & LLMs */

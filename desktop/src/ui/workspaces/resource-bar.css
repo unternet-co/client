@@ -8,7 +8,7 @@ resource-bar {
   justify-content: space-between;
 }
 
-ul.applets-list {
+ul.resources-list {
   list-style: none;
   display: flex;
   align-items: center;

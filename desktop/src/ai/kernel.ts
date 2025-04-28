@@ -84,6 +84,7 @@ export class Kernel {
 
     const hint = config.ai.globalHint;
     const resources = this.resourceModel.all();
+    this.resourceModel.subscribe(this.updateResources.bind(this));
 
     if (!model) {
       this.initialized = false;
@@ -92,6 +93,12 @@ export class Kernel {
       this.interpreter = new Interpreter({ model, hint, resources });
       this.initialized = true;
     }
+  }
+
+  updateResources() {
+    const resources = this.resourceModel.all();
+    console.log('updating res', resources);
+    this.interpreter.updateResources(resources);
   }
 
   updateStatus(status: KernelStatus) {

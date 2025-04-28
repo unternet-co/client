@@ -1,6 +1,6 @@
 import Unternet from '@unternet/sdk';
-import { ActionDirective, Protocol } from '@unternet/kernel';
-import { WebProcess } from '../web/web-process';
+import { ActionProposal, Protocol } from '@unternet/kernel';
+import { WebProcess } from '../web/processes';
 
 export class BuiltinProtocol extends Protocol {
   scheme = 'builtin';
@@ -10,7 +10,7 @@ export class BuiltinProtocol extends Protocol {
     isDev: import.meta.env.DEV,
   });
 
-  async handleAction(directive: ActionDirective) {
+  async handleAction(directive: ActionProposal) {
     switch (directive.actionId) {
       case 'search':
         const results = await this.connection.lookup.query({

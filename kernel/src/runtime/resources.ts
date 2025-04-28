@@ -59,7 +59,7 @@ export function resource(init: ResourceInit): Resource {
 
   const resource: Resource = {
     uri: init.uri,
-    protocol: urlObject.protocol,
+    protocol: urlObject.protocol.replace(':', ''),
     ...init,
   };
 

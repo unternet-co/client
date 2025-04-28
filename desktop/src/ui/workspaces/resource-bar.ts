@@ -8,6 +8,11 @@ export class ResourceBar extends HTMLElement {
   resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   modalService = dependencies.resolve<ModalService>('ModalService');
 
+  constructor() {
+    super();
+    this.resourceModel.subscribe(() => this.render());
+  }
+
   connectedCallback(): void {
     this.render();
   }
