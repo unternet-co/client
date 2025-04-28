@@ -1,4 +1,4 @@
-import { html, TemplateResult } from 'lit';
+import { LitElement, html, TemplateResult } from 'lit';
 import '../ui/common/elements/button';
 import '../ui/common/elements/icon';
 
@@ -10,9 +10,8 @@ export interface ModalOptions {
   position?: 'right' | 'left' | 'bottom' | 'top' | 'center' | 'full';
 }
 
-export class ModalElement extends HTMLElement {
-  #options: ModalOptions = {};
-  #defaultOptions: ModalOptions = {
+export class ModalElement extends LitElement {
+  options: ModalOptions = {
     title: '',
     size: 'auto',
     padding: 'auto',
@@ -22,15 +21,7 @@ export class ModalElement extends HTMLElement {
 
   constructor(options?: ModalOptions) {
     super();
-    this.#options = { ...this.#defaultOptions, ...options };
-  }
-
-  get options(): ModalOptions {
-    return this.#options;
-  }
-
-  set options(opts: ModalOptions) {
-    this.#options = { ...this.#options, ...opts };
+    this.options = { ...this.options, ...options };
   }
 
   close() {
@@ -39,16 +30,15 @@ export class ModalElement extends HTMLElement {
 
   getHeaderTemplate(title?: string): TemplateResult {
     return html`
-      <div class="modal-header">
-        <span id="modal-title">${title ?? this.#options.title}</span>
+      <header class="modal-header">
+        <span id="modal-title">${title ?? this.options.title}</span>
         <un-button
           type="ghost"
           icon="close"
           aria-label="Close"
           @click="${this.close}"
-        >
-        </un-button>
-      </div>
+        ></un-button>
+      </header>
     `;
   }
 }

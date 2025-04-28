@@ -24,6 +24,7 @@ import { ProcessModel, SerializedProcess } from './processes';
 import { ProcessRuntime } from '@unternet/kernel';
 import './modals/global/bug-modal';
 import './ui/workspaces/workspace-settings-modal';
+import './ui/workspaces/workspace-delete-modal';
 
 /* Initialize databases & stores */
 
@@ -104,6 +105,10 @@ modalService.register('bug', {
 
 modalService.register('workspace-settings', {
   element: 'workspace-settings-modal',
+});
+
+modalService.register('workspace-delete', {
+  element: 'workspace-delete-modal',
 });
 
 /* Register keyboard shortcuts */

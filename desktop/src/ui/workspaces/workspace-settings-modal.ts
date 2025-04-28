@@ -2,12 +2,14 @@ import { html, render, TemplateResult } from 'lit';
 import { ModalElement, ModalOptions } from '../../modals/modal-element';
 import { dependencies } from '../../common/dependencies';
 import { WorkspaceModel, Workspace } from '../../workspaces';
+import { ModalService } from '../../modals/modal-service';
 import '../common/elements/input';
 import '../common/elements/button';
 import '../common/elements/label';
 
 export class WorkspaceSettingsModal extends ModalElement {
   #workspaceModel!: WorkspaceModel;
+  #modalService!: ModalService;
   #workspace?: Workspace;
   #newName = '';
   #saving = false;
@@ -23,6 +25,7 @@ export class WorkspaceSettingsModal extends ModalElement {
   connectedCallback() {
     this.#workspaceModel =
       dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+    this.#modalService = dependencies.resolve<ModalService>('ModalService');
     const id = this.#workspaceModel.activeWorkspaceId!;
     this.#workspace = this.#workspaceModel.get(id);
     this.#newName = this.#workspace?.title || '';
@@ -44,6 +47,20 @@ export class WorkspaceSettingsModal extends ModalElement {
 
   #handleCancel = () => {
     this.close();
+  };
+
+  #handleDelete = async () => {
+    if (!this.#workspace) return;
+    const wsTitle = this.#workspace.title;
+    const wsId = this.#workspace.id;
+    setTimeout(() => {
+      const modalEl = document.querySelector('workspace-delete-modal');
+      if (modalEl) {
+        modalEl.setAttribute('workspace-id', wsId);
+        modalEl.setAttribute('workspace-title', wsTitle);
+      }
+    }, 0);
+    this.#modalService.open('workspace-delete');
   };
 
   private get template(): TemplateResult {
@@ -75,6 +92,14 @@ export class WorkspaceSettingsModal extends ModalElement {
           >
         </footer>
       </form>
+      <hr />
+      <un-button
+        size="small"
+        type="outline"
+        icon="delete"
+        @click=${this.#handleDelete}
+        >Delete Workspace</un-button
+      >
     `;
   }
 
