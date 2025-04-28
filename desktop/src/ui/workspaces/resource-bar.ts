@@ -30,6 +30,7 @@ export class ResourceBar extends HTMLElement {
         ${resourceTemplate}
       </ul>
       <un-button
+        size="small"
         type="ghost"
         icon="workspace-settings"
         @click=${() => this.modalService.open('workspace-settings')}
