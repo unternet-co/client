@@ -74,6 +74,17 @@ class ThreadView extends HTMLElement {
       this.workspaceModel.allMessages(this.workspaceId)
     );
     this.archivedCount = 0;
+
+    if (workspace.archivedMessageId) {
+      const i = allMessages.findIndex(
+        (m) => m.id === workspace.archivedMessageId
+      );
+      if (i !== -1) {
+        this.archivedCount = i + 1;
+        allMessages = allMessages.slice(i + 1);
+      }
+    }
+
     if (!workspace?.showArchivedMessages && workspace?.archivedMessageId) {
       const i = allMessages.findIndex(
         (m) => m.id === workspace.archivedMessageId

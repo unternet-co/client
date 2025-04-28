@@ -17,8 +17,8 @@ export class WorkspaceSettingsModal extends ModalElement {
   constructor() {
     super({
       title: 'Workspace Settings',
-      blocking: false,
-      position: 'right',
+      blocking: true,
+      position: 'center',
     } as ModalOptions);
   }
 

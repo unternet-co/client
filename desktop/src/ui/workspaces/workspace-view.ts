@@ -1,5 +1,4 @@
 import { CommandSubmitEvent } from './command-input';
-import './command-bar.css';
 import './command-input';
 import './thread-view';
 import './workspace-view.css';
@@ -52,10 +51,10 @@ export class WorkspaceView extends HTMLElement {
   }
 
   private focusCommandInput() {
-    const commandInput = this.querySelector('command-input');
-    if (commandInput) {
-      (commandInput as any).focus();
-    }
+    const commandInput = this.querySelector(
+      'command-input'
+    ) as HTMLInputElement;
+    commandInput.focus();
   }
 
   private setupVisibilityObserver() {
@@ -98,22 +97,18 @@ export class WorkspaceView extends HTMLElement {
         <thread-view for=${this.workspaceId}></thread-view>
       </div>
       <div class="bottom-bar">
-        <command-bar>
-          <div class="commands-left"></div>
+        <div class="command-bar">
+          <div></div>
           <command-input
             @submit=${this.handleCommandSubmit.bind(this)}
           ></command-input>
-          <div class="commands-right">
-            <un-button
-              class="archive-button"
-              type="secondary"
-              icon="archive"
-              @click=${this.handleArchive}
-            >
-              Tidy up
-            </un-button>
-          </div>
-        </command-bar>
+          <un-button
+            class="archive-button"
+            type="ghost"
+            icon="archive"
+            @click=${this.handleArchive}
+          ></un-button>
+        </div>
         <resource-bar for=${this.workspaceId}></resource-bar>
       </div>
     `;

@@ -31,7 +31,6 @@ class MessageScroll extends HTMLElement {
         display: flex;
         flex-direction: column-reverse;
         overflow-y: auto;
-        scroll-behavior: smooth;
         width: 100%;
       }
     `;

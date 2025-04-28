@@ -145,8 +145,8 @@ export class ButtonElement extends LitElement {
         --button-height: 24px;
         --button-color: var(--color-action-800);
         --button-text-color: var(--color-action-0);
-        padding-left: var(--space-4);
-        padding-right: var(--space-4);
+        padding-left: var(--space-3);
+        padding-right: var(--space-3);
         overflow: hidden;
         border: none;
         border-radius: var(--rounded);

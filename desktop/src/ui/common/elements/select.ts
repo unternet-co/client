@@ -50,6 +50,7 @@ export class SelectElement extends LitElement {
     this.iconPosition = 'end';
   }
 
+  // Watch change in children (e.g. options)
   connectedCallback() {
     super.connectedCallback();
     this._mutationObserver = new MutationObserver(() => {
