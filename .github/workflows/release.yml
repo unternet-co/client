@@ -37,6 +37,9 @@ jobs:
         run: npm run build
         if: matrix.os != 'windows-latest' && matrix.os != 'ubuntu-latest'
 
+      - name: List desktop/build folder
+        run: ls -la desktop/build
+
       - name: Build and release (macOS)
         if: matrix.os == 'macos-latest'
         uses: samuelmeuli/action-electron-builder@v1
