@@ -118,7 +118,7 @@ export class ComboboxElement extends LitElement {
       }
 
       .combobox-option {
-        padding: 8px;
+        padding: 4px;
         cursor: pointer;
       }
       .combobox-option:hover,
