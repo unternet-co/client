@@ -30,14 +30,11 @@ top-bar .workspace-select-container {
   align-items: center;
   height: 100%;
   padding: 0 8px;
-  -webkit-app-region: no-drag;
-  /* pointer-events: auto; */
   justify-content: center;
   border-right: 1px solid var(--color-border-default);
 }
 
 top-bar .workspace-select-container un-select {
-  width: 100%;
   -webkit-app-region: no-drag;
   pointer-events: auto;
 }

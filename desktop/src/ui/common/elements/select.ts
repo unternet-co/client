@@ -241,6 +241,10 @@ export class SelectElement extends LitElement {
         border-color: transparent;
         background-color: transparent;
         box-shadow: none;
+        font-weight: 500;
+        font-size: var(--text-sm);
+        padding-right: var(--space-6);
+        margin-bottom: 2px;
       }
 
       .select-wrapper:has(.select--ghost):hover un-icon.dropdown-icon {
