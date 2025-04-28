@@ -18,15 +18,18 @@ export class ComboboxElement extends LitElement {
   static properties = {
     options: { type: Array },
     selectedValue: { type: String, reflect: true },
+    searchString: { type: String },
   };
 
   options: { label: string; value: string }[] = [];
   selectedValue: string | undefined;
+  searchString: string;
 
   constructor() {
     super();
     this.selectedValue = this.selectedValue || this.options?.[0]?.value;
     this.onSelect = this.onSelect.bind(this);
+    this.searchString = this.searchString || '';
   }
 
   private onSelect(value: string) {
@@ -35,9 +38,12 @@ export class ComboboxElement extends LitElement {
   }
 
   render() {
+    const filteredOptions = this.options.filter(({ value }) =>
+      value.includes(this.searchString)
+    );
     return html`
       <ul class="combobox">
-        ${this.options.map(
+        ${filteredOptions.map(
           ({ value, label }) => html`
             <li
               class="combobox-option ${this.selectedValue === value
