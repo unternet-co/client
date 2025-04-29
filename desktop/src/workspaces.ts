@@ -6,6 +6,7 @@ import { Message, MessageRecord } from './messages';
 import { DisposableGroup } from './common/disposable';
 import { ProcessModel } from './processes';
 import { ConfigModel } from './config';
+import { DEFAULT_WORKSPACE_NAME } from './constants';
 
 /**
  * Workspaces, as persisted to the database
@@ -81,7 +82,7 @@ export class WorkspaceModel {
     const workspaceRecords = await this.workspaceDatabase.all();
 
     if (!workspaceRecords.length) {
-      this.create();
+      this.create(DEFAULT_WORKSPACE_NAME);
     }
 
     for (const record of workspaceRecords) {

@@ -108,12 +108,21 @@ export class TopBar extends HTMLElement {
       this.workspaceModel.activeWorkspaceId || (workspaces[0]?.id ?? '');
 
     const selectTemplate = html`
+      <un-button
+        type="ghost"
+        size="small"
+        icon="info"
+        class="settings-button"
+        @click=${() => this.modalService.open('workspace-settings')}
+      >
+      </un-button>
       <un-select
         variant="ghost"
         .value=${activeWorkspaceId}
         placeholder="Select workspace"
         @change=${(e: CustomEvent) => {
           const newId = e.detail.value;
+          if (newId === '+') this.workspaceModel.create();
           if (newId && newId !== activeWorkspaceId) {
             this.workspaceModel.activate(newId);
           }
@@ -124,6 +133,7 @@ export class TopBar extends HTMLElement {
           (ws) => ws.id,
           (ws) => html`<option value=${ws.id}>${ws.title}</option>`
         )}
+        <option value="+">New workspace...</option>
       </un-select>
     `;
 
