@@ -90,12 +90,18 @@ class ThreadView extends HTMLElement {
       ? messagesTemplate(this.workspace.inactiveMessages)
       : [];
 
-    const archivedButton = html` <div class="archived-message">
-      ${numArchived} archived ${pluralize('message', numArchived)}&nbsp;
-      <un-button type="link" size="small" @click=${this.toggleArchivedMessages}>
-        ${this.workspace.showArchived ? 'Hide' : 'Show'}
-      </un-button>
-    </div>`;
+    const archivedButton = numArchived
+      ? html` <div class="archived-message">
+          ${numArchived} archived ${pluralize('message', numArchived)}&nbsp;
+          <un-button
+            type="link"
+            size="small"
+            @click=${this.toggleArchivedMessages}
+          >
+            ${this.workspace.showArchived ? 'Hide' : 'Show'}
+          </un-button>
+        </div>`
+      : null;
 
     const template = html`
       <message-scroll

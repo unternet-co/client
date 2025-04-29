@@ -85,18 +85,13 @@ export class WorkspaceModel {
     }
 
     for (const record of workspaceRecords) {
-      this.workspaces.set(record.id, {
-        ...record,
-        activeMessages: [],
-        inactiveMessages: [],
-        showArchived: false,
-        scrollPosition: null,
-      });
+      const workspace = await this.hydrate(record);
+      this.workspaces.set(workspace.id, workspace);
       this.notifier.notify({ workspaceId: record.id });
     }
 
-    let activeWorkspaceId: Workspace['id'];
     // Restore activeWorkspaceId (if saved previously)
+    let activeWorkspaceId: Workspace['id'];
     const storedId = this.configModel.get('activeWorkspaceId');
     if (storedId && this.workspaces.has(storedId)) {
       activeWorkspaceId = storedId;
@@ -115,36 +110,9 @@ export class WorkspaceModel {
    * Activates a given workspace. This loads all the active messages into memory.
    */
   async activate(id: WorkspaceRecord['id']): Promise<void> {
-    if (this.activeWorkspaceId) {
-      if (id === this.activeWorkspace.id) return;
-      // Empty the previous workspace messages
-      this.deactivate(this.activeWorkspace?.id);
-    }
+    if (id === this.activeWorkspace?.id) return;
     this.activeWorkspaceId = id;
-    this.activeWorkspace.activeMessages = [];
-    this.activeWorkspace.inactiveMessages = [];
-
-    // Get all message records, hydrate them & add to appropriate bucket (active vs. inactive)
-    const records = await this.messageDatabase.where({ workspaceId: id });
-    for (const record of records) {
-      const message = this.hydrateMessage(record);
-      if (message.id > this.activeWorkspace.archiveUpToId) {
-        this.activeWorkspace.activeMessages.push(message);
-      } else {
-        this.activeWorkspace.inactiveMessages.push(message);
-      }
-    }
-
     this.notifier.notify({ workspaceId: id });
-  }
-
-  /**
-   * Deactivates the given workspace, which removes messages from memory.
-   */
-  deactivate(id: WorkspaceRecord['id']): void {
-    const workspace = this.get(id);
-    workspace.activeMessages = null;
-    workspace.inactiveMessages = null;
   }
 
   all(): WorkspaceRecord[] {
@@ -200,25 +168,68 @@ export class WorkspaceModel {
     this.notifier.notify({ workspaceId: id });
   }
 
-  create(title?: string): Workspace['id'] {
+  create(title?: string): Workspace {
+    // Create workspace record & add to database
     const now = Date.now();
-    const workspace: WorkspaceRecord = {
+    const record: WorkspaceRecord = {
       id: ulid(),
       title: title ?? 'Untitled',
       created: now,
       accessed: now,
       modified: now,
     };
+    this.workspaceDatabase.create(record);
 
-    this.workspaceDatabase.create(workspace);
+    // Create workspace
+    const workspace = {
+      ...record,
+      activeMessages: [],
+      inactiveMessages: [],
+      showArchived: false,
+      scrollPosition: null,
+    };
+    this.workspaces.set(workspace.id, workspace);
     this.activate(workspace.id);
-    return workspace.id;
+    return workspace;
+  }
+
+  // TODO: At some point, we will only want inactive messages in memory when the user requests them
+  async hydrate(record: WorkspaceRecord) {
+    const activeMessages = [];
+    const inactiveMessages = [];
+
+    // Get all message records, hydrate them & add to appropriate bucket (active vs. inactive)
+    const records = await this.messageDatabase.where({
+      workspaceId: record.id,
+    });
+    for (const record of records) {
+      const message = this.hydrateMessage(record);
+      if (!record.archiveUpToId || message.id > record.archiveUpToId) {
+        activeMessages.push(message);
+      } else {
+        inactiveMessages.push(message);
+      }
+    }
+
+    return {
+      ...record,
+      activeMessages,
+      inactiveMessages,
+      showArchived: false,
+      scrollPosition: null,
+    };
   }
 
   delete(id: WorkspaceRecord['id']) {
     this.workspaces.delete(id);
     this.workspaceDatabase.delete(id);
     this.messageDatabase.deleteWhere({ workspaceId: id });
+    if (this.workspaces.size) {
+      const lastWorkspace = [...this.workspaces.values()].pop();
+      this.activate(lastWorkspace.id);
+    } else {
+      this.create();
+    }
     this.notifier.notify({ workspaceId: id, type: 'delete' });
   }
 
@@ -267,12 +278,24 @@ export class WorkspaceModel {
   }
 
   getMessage(id: MessageRecord['id']): Message {
-    for (const msg of this.activeWorkspace.activeMessages) {
-      if (msg.id === id) return msg;
+    // TODO: Probably replace this with a message model for reliability, so caching can't affect this
+    const sortedWorkspaces = Array.from(this.workspaces.values()).sort(
+      (a, b) => b.accessed - a.accessed
+    );
+
+    // Sort through all workspaces, with active messages first
+    // Then sort through all workspaces, with inactive messages
+
+    for (const workspace of sortedWorkspaces) {
+      for (const msg of workspace.activeMessages) {
+        if (msg.id === id) return msg;
+      }
     }
 
-    for (const msg of this.activeWorkspace.inactiveMessages) {
-      if (msg.id === id) return msg;
+    for (const workspace of sortedWorkspaces) {
+      for (const msg of workspace.inactiveMessages) {
+        if (msg.id === id) return msg;
+      }
     }
 
     throw new Error('No message with this ID!');

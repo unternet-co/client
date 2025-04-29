@@ -23,6 +23,8 @@ export class AppRoot extends HTMLElement {
   updateContents() {
     const ws = this.workspaceModel.activeWorkspace;
     if (!ws) return;
+    console.log('updating!', ws);
+
     render(
       html`<workspace-view .key=${ws.id} for=${ws.id} active></workspace-view>`,
       this.contentEl
