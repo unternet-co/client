@@ -1,4 +1,4 @@
-import { html } from 'lit';
+import { html, render } from 'lit';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
 import { WorkspaceModel } from '../../workspaces';
@@ -36,7 +36,7 @@ export class WorkspaceDeleteModal extends ModalElement {
     } else if (name === 'workspace-title') {
       this.workspaceTitle = newValue || '';
     }
-    this.requestUpdate?.();
+    this.render();
   }
 
   #handleCancel = () => {
@@ -50,7 +50,7 @@ export class WorkspaceDeleteModal extends ModalElement {
   };
 
   render() {
-    return html`
+    const template = html`
       <div>
         <p>
           Are you sure you want to delete
@@ -66,6 +66,8 @@ export class WorkspaceDeleteModal extends ModalElement {
         </footer>
       </div>
     `;
+
+    render(template, this);
   }
 }
 
