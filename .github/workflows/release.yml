@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - '*.*.*'
+    branches:
+      - fix-pipeline-files
 permissions:
   contents: write
 jobs:
@@ -30,16 +32,16 @@ jobs:
           node-version-file: .nvmrc
           cache: 'npm'
 
-      - name: Clean install
+      - name: Install dependencies
         run: |
-          npm install
+          npm ci
 
-      - name: Build and release (macOS)
+      - name: Package (macOS)
         if: matrix.os == 'macos-latest'
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: true
+          release: false
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
         env:
@@ -48,9 +50,20 @@ jobs:
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APP_UNTERNET_API_KEY: ${{ secrets.APP_UNTERNET_API_KEY }}
 
-      - name: Build and release (Windows/Linux)
+      - name: Package (Windows/Linux)
         if: matrix.os != 'macos-latest'
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: true
+          release: false
+
+      - name: Release
+        uses: 'marvinpinto/action-automatic-releases@latest'
+        with:
+          repo_token: '${{ secrets.GITHUB_TOKEN }}'
+          prerelease: false
+          files: |
+            *.dmg
+            *.exe
+            *.yml
+            *.AppImage
