@@ -16,7 +16,6 @@ export default async function notarizing(context: AfterPackContext) {
 
   const appName = context.packager.appInfo.productFilename;
 
-  // ✅ Dynamic import of ESM module from CJS environment
   const { notarize } = await import('@electron/notarize');
 
   return notarize({

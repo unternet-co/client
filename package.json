@@ -1,6 +1,6 @@
 {
   "name": "@unternet/client",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Unternet Client",
   "author": {
     "name": "Rupert Manfredi",
@@ -41,7 +41,7 @@
       ],
       "icon": "desktop/src/electron/app-icons/client-icon-macOS.png"
     },
-    "afterSign": "desktop/build/notarize.js",
+    "afterSign": "desktop/dist/notarize.js",
     "win": {
       "target": [
         "nsis"
@@ -95,6 +95,9 @@
     "electron-updater": "^6.6.2",
     "glob": "^11.0.1",
     "lit-markdown": "^1.3.2"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.9.5"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
