@@ -18,7 +18,7 @@
     "files": [
       "desktop/dist/electron/**/*",
       "desktop/dist/www/**/*",
-      "desktop/src/electron/app-icons/**/*"
+      "desktop/build/app-icons/**/*"
     ],
     "directories": {
       "output": "release"
@@ -39,21 +39,21 @@
         "dmg",
         "zip"
       ],
-      "icon": "desktop/src/electron/app-icons/client-icon-macOS.png"
+      "icon": "desktop/build/app-icons/client-icon-macOS.png"
     },
     "afterSign": "desktop/dist/notarize.js",
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "desktop/src/electron/app-icons/client-icon-windows.ico"
+      "icon": "desktop/build/electron/app-icons/client-icon-windows.ico"
     },
     "linux": {
       "target": [
         "AppImage"
       ],
       "category": "Development",
-      "icon": "desktop/src/electron/app-icons"
+      "icon": "desktop/build/electron/app-icons"
     }
   },
   "scripts": {
