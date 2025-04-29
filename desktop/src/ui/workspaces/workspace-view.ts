@@ -107,15 +107,16 @@ export class WorkspaceView extends HTMLElement {
       </div>
       <div class="bottom-bar">
         <div class="command-bar">
-          <un-button
-            class="archive-button"
-            type="ghost"
-            icon="plus"
-            @click=${this.handleArchive}
-          ></un-button>
+          <div></div>
           <command-input
             @submit=${this.handleCommandSubmit.bind(this)}
           ></command-input>
+          <un-button
+            class="archive-button"
+            type="ghost"
+            icon="archive"
+            @click=${this.handleArchive}
+          ></un-button>
         </div>
         <resource-bar for=${this.workspaceId}></resource-bar>
       </div>
