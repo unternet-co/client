@@ -1,7 +1,7 @@
 import { html, render, TemplateResult } from 'lit';
 import { ModalElement, ModalOptions } from '../../modals/modal-element';
 import { dependencies } from '../../common/dependencies';
-import { WorkspaceModel, Workspace } from '../../workspaces';
+import { WorkspaceModel, WorkspaceRecord } from '../../workspaces';
 import { ModalService } from '../../modals/modal-service';
 import '../common/elements/input';
 import '../common/elements/button';
@@ -10,7 +10,7 @@ import '../common/elements/label';
 export class WorkspaceSettingsModal extends ModalElement {
   #workspaceModel!: WorkspaceModel;
   #modalService!: ModalService;
-  #workspace?: Workspace;
+  #workspace?: WorkspaceRecord;
   #newName = '';
   #saving = false;
 

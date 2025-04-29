@@ -5,40 +5,50 @@ import { KernelMessage } from '@unternet/kernel';
 import { Message, MessageRecord } from './messages';
 import { DisposableGroup } from './common/disposable';
 import { ProcessModel } from './processes';
+import { ConfigModel } from './config';
 
-export interface Workspace {
+/**
+ * Workspaces, as persisted to the database
+ */
+export interface WorkspaceRecord {
   id: string;
   title: string;
   created: number;
   accessed: number;
   modified: number;
-  // Scroll position of the workspace
-  scrollPosition?: number;
-  // If set, messages with an id less than this will be hidden by default.
-  archivedMessageId?: string;
-  // If set, archived messages will be visible by default.
-  showArchivedMessages?: boolean;
+  // Messages with an id less than this will be inactive
+  archiveUpToId?: string;
+}
+
+/**
+ * Workspaces as enriched in-memory objects.
+ */
+export interface Workspace extends WorkspaceRecord {
+  activeMessages: Message[] | null;
+  inactiveMessages: Message[] | null;
+  scrollPosition: number | null;
+  // If true, archived messages will be visible
+  showArchived: boolean;
 }
 
 export interface WorkspaceNotification {
-  workspaceId: Workspace['id'];
+  workspaceId: WorkspaceRecord['id'];
   type?: 'delete';
 }
 
 export class WorkspaceModel {
   public activeWorkspaceId: string | null = null;
+  private configModel: ConfigModel;
   private workspaces = new Map<Workspace['id'], Workspace>();
-  private messages = new Map<Workspace['id'], Message[]>();
-  private messageById = new Map<string, Message>();
-  private workspaceDatabase: DatabaseService<string, Workspace>;
+  private workspaceDatabase: DatabaseService<string, WorkspaceRecord>;
   private messageDatabase: DatabaseService<string, MessageRecord>;
   private processModel: ProcessModel;
+  private disposables = new DisposableGroup();
   private notifier = new Notifier<WorkspaceNotification>();
   readonly subscribe = this.notifier.subscribe;
-  private disposables = new DisposableGroup();
 
   subscribeToWorkspace(
-    workspaceId: Workspace['id'],
+    workspaceId: WorkspaceRecord['id'],
     subscriber: (notification: WorkspaceNotification) => void
   ) {
     function workspaceSubscriber(notification?: WorkspaceNotification) {
@@ -46,192 +56,199 @@ export class WorkspaceModel {
         subscriber(notification);
       }
     }
-
     const disposable = this.subscribe(workspaceSubscriber);
     this.disposables.add(disposable);
     return disposable;
   }
 
   constructor(
-    workspaceDatabase: DatabaseService<string, Workspace>,
+    workspaceDatabase: DatabaseService<string, WorkspaceRecord>,
     messageDatabase: DatabaseService<string, MessageRecord>,
-    processModel: ProcessModel
+    processModel: ProcessModel,
+    configModel: ConfigModel
   ) {
     this.workspaceDatabase = workspaceDatabase;
     this.messageDatabase = messageDatabase;
     this.processModel = processModel;
+    this.configModel = configModel;
     this.load();
   }
 
+  /**
+   * Loads the active workspace, or creates one if none are available.
+   */
   async load() {
     const workspaceRecords = await this.workspaceDatabase.all();
+
+    if (!workspaceRecords.length) {
+      this.create();
+    }
+
     for (const record of workspaceRecords) {
-      this.workspaces.set(record.id, record);
+      this.workspaces.set(record.id, {
+        ...record,
+        activeMessages: [],
+        inactiveMessages: [],
+        showArchived: false,
+        scrollPosition: null,
+      });
       this.notifier.notify({ workspaceId: record.id });
     }
-    if (this.workspaces.size === 0) {
-      const ws = this.create();
-      this.setTitle('Default Workspace');
-    }
-    // Restore activeWorkspaceId from localStorage if possible
-    const storedId = localStorage.getItem('activeWorkspaceId');
+
+    let activeWorkspaceId: Workspace['id'];
+    // Restore activeWorkspaceId (if saved previously)
+    const storedId = this.configModel.get('activeWorkspaceId');
     if (storedId && this.workspaces.has(storedId)) {
-      this.activeWorkspaceId = storedId;
+      activeWorkspaceId = storedId;
     } else if (!this.activeWorkspaceId && this.workspaces.size > 0) {
-      this.activeWorkspaceId = Array.from(this.workspaces.keys())[0];
+      activeWorkspaceId = Array.from(this.workspaces.keys())[0];
+    } else {
+      throw new Error(`No workspaces exist!`);
     }
-    if (this.activeWorkspaceId) {
-      this.notifier.notify({ workspaceId: this.activeWorkspaceId });
-    }
-    const allInteractions = await this.messageDatabase.all();
-    this.messages = new Map();
-    for (const interaction of allInteractions) {
-      if (!this.messages.has(interaction.workspaceId)) {
-        this.messages.set(interaction.workspaceId, []);
-      }
-      this.messages.get(interaction.workspaceId)!.push(interaction);
-      this.messageById.set(interaction.id, interaction);
-    }
-    // Notify for the active workspace after all data is loaded
-    if (this.activeWorkspaceId) {
-      this.notifier.notify({ workspaceId: this.activeWorkspaceId });
-    }
+
+    // Load the messages & update
+    this.activate(activeWorkspaceId);
+    this.notifier.notify({ workspaceId: this.activeWorkspaceId });
   }
 
-  all(): Workspace[] {
+  /**
+   * Activates a given workspace. This loads all the active messages into memory.
+   */
+  async activate(id: WorkspaceRecord['id']): Promise<void> {
+    if (this.activeWorkspaceId) {
+      if (id === this.activeWorkspace.id) return;
+      // Empty the previous workspace messages
+      this.deactivate(this.activeWorkspace?.id);
+    }
+    this.activeWorkspaceId = id;
+    this.activeWorkspace.activeMessages = [];
+    this.activeWorkspace.inactiveMessages = [];
+
+    // Get all message records, hydrate them & add to appropriate bucket (active vs. inactive)
+    const records = await this.messageDatabase.where({ workspaceId: id });
+    for (const record of records) {
+      const message = this.hydrateMessage(record);
+      if (message.id > this.activeWorkspace.archiveUpToId) {
+        this.activeWorkspace.activeMessages.push(message);
+      } else {
+        this.activeWorkspace.inactiveMessages.push(message);
+      }
+    }
+
+    this.notifier.notify({ workspaceId: id });
+  }
+
+  /**
+   * Deactivates the given workspace, which removes messages from memory.
+   */
+  deactivate(id: WorkspaceRecord['id']): void {
+    const workspace = this.get(id);
+    workspace.activeMessages = null;
+    workspace.inactiveMessages = null;
+  }
+
+  all(): WorkspaceRecord[] {
     return Array.from(this.workspaces.values());
   }
 
-  get(id: Workspace['id']): Workspace | undefined {
-    return this.workspaces.get(id);
+  get(id?: WorkspaceRecord['id']): Workspace {
+    id = id || this.activeWorkspaceId;
+    const workspace = this.workspaces.get(id);
+    if (!workspace) throw new Error(`No workspace with ID '${id}'`);
+    return workspace;
   }
 
-  setTitle(title: string, id?: Workspace['id']) {
-    if (!id) {
-      id = this.activeWorkspaceId;
-    }
-    const workspace = this.workspaces.get(id);
-    if (workspace) {
-      workspace.title = title;
-      this.workspaceDatabase.update(id, { title });
-      this.notifier.notify({ workspaceId: id });
-    }
+  get activeWorkspace() {
+    return this.workspaces.get(this.activeWorkspaceId);
   }
 
-  setScrollPosition(position: number, id?: Workspace['id']) {
-    if (!id) {
-      id = this.activeWorkspaceId;
-    }
-
-    const workspace = this.workspaces.get(id);
-    if (workspace) {
-      workspace.scrollPosition = position;
-      this.workspaceDatabase.update(id, { scrollPosition: position });
-      this.notifier.notify({ workspaceId: id });
-    }
-  }
-
-  setArchivedMessageId(messageId?: string, id?: Workspace['id']) {
-    if (!id) {
-      id = this.activeWorkspaceId;
-    }
-    const workspace = this.workspaces.get(id);
-    if (!workspace) return;
-
-    if (!messageId) {
-      const messages = this.allMessages(id);
-      if (!messages.length) return;
-      messageId = messages[messages.length - 1].id;
-    }
-
-    workspace.archivedMessageId = messageId;
-    this.workspaceDatabase.update(id, { archivedMessageId: messageId });
+  setTitle(title: string, id?: WorkspaceRecord['id']) {
+    const workspace = this.get(id);
+    workspace.title = title;
+    this.workspaceDatabase.update(id, { title });
     this.notifier.notify({ workspaceId: id });
   }
 
-  setArchiveVisibility(visible: boolean, id?: Workspace['id']) {
-    if (!id) {
-      id = this.activeWorkspaceId;
-    }
-    const workspace = this.workspaces.get(id);
-    if (!workspace) return;
-    workspace.showArchivedMessages = visible;
-    this.workspaceDatabase.update(id, {
-      showArchivedMessages: workspace.showArchivedMessages,
-    });
+  setScrollPosition(position: number, id?: WorkspaceRecord['id']) {
+    const workspace = this.get(id);
+    workspace.scrollPosition = position;
     this.notifier.notify({ workspaceId: id });
   }
 
-  async activate(id: Workspace['id']): Promise<void> {
-    const workspace = this.workspaces.get(id);
-
-    if (workspace) {
-      workspace.accessed = Date.now();
-      this.workspaceDatabase.update(id, {
-        accessed: workspace.accessed,
+  archiveMessages(workspaceId?: WorkspaceRecord['id']) {
+    const workspace = this.get(workspaceId);
+    if (workspace.activeMessages.length) {
+      workspace.archiveUpToId = workspace.activeMessages.at(-1).id;
+      workspace.inactiveMessages = [
+        ...workspace.inactiveMessages,
+        ...workspace.activeMessages,
+      ];
+      workspace.activeMessages = [];
+      console.log(workspace);
+      this.workspaceDatabase.update(workspace.id, {
+        archiveUpToId: workspace.archiveUpToId,
       });
+      this.notifier.notify({ workspaceId: workspace.id });
     }
+  }
 
-    const records = await this.messageDatabase.where({
-      workspaceId: id,
-    });
-
-    const messages: Message[] = records.map(this.hydrateMessage.bind(this));
-    this.messages.set(id, messages);
+  // TODO: Turn this into something that loads the last x archived messages
+  // (and otherwise we shouldn't load them)
+  setArchiveVisibility(visible: boolean, id?: WorkspaceRecord['id']) {
+    const workspace = this.get(id);
+    workspace.showArchived = visible;
     this.notifier.notify({ workspaceId: id });
   }
 
-  deactivate(id: Workspace['id']): void {
-    this.messages.delete(id);
-  }
-
-  create() {
-    const ws = this._createWorkspace();
-    this.setActiveWorkspace(ws.id);
-    return ws;
-  }
-
-  private _createWorkspace() {
+  create(title?: string): Workspace['id'] {
     const now = Date.now();
-    const workspace: Workspace = {
+    const workspace: WorkspaceRecord = {
       id: ulid(),
-      title: 'New workspace',
+      title: title ?? 'Untitled',
       created: now,
       accessed: now,
       modified: now,
     };
 
-    this.workspaces.set(workspace.id, workspace);
-    this.messages.set(workspace.id, new Array<MessageRecord>());
     this.workspaceDatabase.create(workspace);
-    return workspace;
+    this.activate(workspace.id);
+    return workspace.id;
   }
 
-  setActiveWorkspace(id: Workspace['id']) {
-    if (this.activeWorkspaceId !== id && this.workspaces.has(id)) {
-      this.activeWorkspaceId = id;
-      localStorage.setItem('activeWorkspaceId', id);
-      this.notifier.notify({ workspaceId: id });
-    }
-  }
-
-  delete(id: Workspace['id']) {
+  delete(id: WorkspaceRecord['id']) {
     this.workspaces.delete(id);
-    this.messages.delete(id);
     this.workspaceDatabase.delete(id);
     this.messageDatabase.deleteWhere({ workspaceId: id });
     this.notifier.notify({ workspaceId: id, type: 'delete' });
   }
 
-  addMessage(workspaceId: Workspace['id'], message: KernelMessage) {
+  updateModified(id: WorkspaceRecord['id']): void {
+    const workspace: WorkspaceRecord = this.workspaces.get(id);
+    workspace.modified = Date.now();
+    this.workspaceDatabase.update(id, { modified: workspace.modified });
+    this.notifier.notify({ workspaceId: id });
+  }
+
+  updateAccessed(id: WorkspaceRecord['id']): void {
+    const workspace = this.workspaces.get(id);
+    workspace.accessed = Date.now();
+    this.workspaceDatabase.update(id, {
+      accessed: workspace.accessed,
+    });
+  }
+
+  /* MESSAGES */
+
+  addMessage(workspaceId: WorkspaceRecord['id'], message: KernelMessage) {
     const msg: Message = {
       ...message,
       workspaceId,
     };
+    this.workspaces.get(workspaceId).activeMessages.push(msg);
 
-    this.messages.get(workspaceId).push(msg);
     const record = this.serializeMessage(msg);
     this.messageDatabase.create(record);
+
     this.updateModified(workspaceId);
     this.notifier.notify({ workspaceId });
 
@@ -250,24 +267,15 @@ export class WorkspaceModel {
   }
 
   getMessage(id: MessageRecord['id']): Message {
-    for (const messages of this.messages.values()) {
-      const message = messages.find((m: MessageRecord) => m.id === id);
-      if (message) return message;
+    for (const msg of this.activeWorkspace.activeMessages) {
+      if (msg.id === id) return msg;
     }
-    throw new Error('No interaction with this ID!');
-  }
 
-  allMessages(workspaceId: Workspace['id']): Message[] {
-    return this.messages.get(workspaceId) || [];
-  }
-
-  updateModified(id: Workspace['id']): void {
-    const workspace: Workspace = this.workspaces.get(id);
-    if (workspace) {
-      workspace.modified = Date.now();
-      this.workspaceDatabase.update(id, { modified: workspace.modified });
-      this.notifier.notify({ workspaceId: id });
+    for (const msg of this.activeWorkspace.inactiveMessages) {
+      if (msg.id === id) return msg;
     }
+
+    throw new Error('No message with this ID!');
   }
 
   serializeMessage(message: Message): MessageRecord {

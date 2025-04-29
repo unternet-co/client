@@ -1,5 +1,5 @@
 import { html, render } from 'lit';
-import { Workspace, WorkspaceModel } from '../../workspaces';
+import { WorkspaceRecord, WorkspaceModel, Workspace } from '../../workspaces';
 import { Message } from '../../messages';
 import { dependencies } from '../../common/dependencies';
 import '../common/elements/scroll-container';
@@ -15,14 +15,12 @@ import { getResourceIcon } from '../../common/utils';
 
 class ThreadView extends HTMLElement {
   private workspaceSubscription: { dispose: () => void } | null = null;
-  private archivedCount: number = 0;
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
-  private messages: Message[] = [];
+  private workspace: Workspace;
   private status: KernelStatus;
   private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   private kernel = dependencies.resolve<Kernel>('Kernel');
-  private workspaceId: Workspace['id'];
 
   static get observedAttributes() {
     return ['for'];
@@ -30,79 +28,40 @@ class ThreadView extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (name === 'for' && oldValue !== newValue) {
-      this.workspaceId = newValue;
-      // Clean up previous subscription
-      if (this.workspaceSubscription) {
-        this.workspaceSubscription.dispose();
-        this.workspaceSubscription = null;
-      }
-      // Subscribe to new workspace
-      this.workspaceSubscription = this.workspaceModel.subscribeToWorkspace(
-        this.workspaceId,
-        this.updateMessages.bind(this)
-      );
-      this.updateMessages();
+      this.setActiveWorkspace(newValue);
     }
   }
 
   connectedCallback() {
-    this.workspaceId = this.getAttribute('for') || '';
-
     this.kernel.subscribe((notification) => {
       if (notification.status) this.updateKernelStatus(notification.status);
     });
     this.updateKernelStatus(this.kernel.status);
 
-    this.updateMessages();
-    // Subscribe to workspace and store disposable
+    const workspaceId = this.getAttribute('for') || '';
+    this.setActiveWorkspace(workspaceId);
+  }
+
+  setActiveWorkspace(workspaceId: Workspace['id']) {
+    // Clean up previous subscription
+    if (this.workspaceSubscription) {
+      this.workspaceSubscription.dispose();
+    }
+
+    // Subscribe to new workspace
     this.workspaceSubscription = this.workspaceModel.subscribeToWorkspace(
-      this.workspaceId,
-      this.updateMessages.bind(this)
+      workspaceId,
+      this.render.bind(this)
     );
+
+    this.workspace = this.workspaceModel.get(workspaceId);
+    this.render();
   }
 
   disconnectedCallback() {
     if (this.workspaceSubscription) {
       this.workspaceSubscription.dispose();
-      this.workspaceSubscription = null;
     }
-  }
-
-  updateMessages() {
-    const workspace = this.workspaceModel.get(this.workspaceId);
-    let allMessages = Array.from(
-      this.workspaceModel.allMessages(this.workspaceId)
-    );
-    this.archivedCount = 0;
-
-    if (workspace.archivedMessageId) {
-      const i = allMessages.findIndex(
-        (m) => m.id === workspace.archivedMessageId
-      );
-      if (i !== -1) {
-        this.archivedCount = i + 1;
-        allMessages = allMessages.slice(i + 1);
-      }
-    }
-
-    if (!workspace?.showArchivedMessages && workspace?.archivedMessageId) {
-      const i = allMessages.findIndex(
-        (m) => m.id === workspace.archivedMessageId
-      );
-      if (i !== -1) {
-        this.archivedCount = i + 1;
-        allMessages = allMessages.slice(i + 1);
-      }
-    } else if (workspace?.archivedMessageId) {
-      const i = allMessages.findIndex(
-        (m) => m.id === workspace.archivedMessageId
-      );
-      if (i !== -1) {
-        this.archivedCount = i + 1;
-      }
-    }
-    this.messages = allMessages;
-    this.render();
   }
 
   updateKernelStatus(status: KernelStatus) {
@@ -115,39 +74,35 @@ class ThreadView extends HTMLElement {
   };
 
   render() {
-    const messagesTemplate = repeat(
-      this.messages,
-      (message) => message.id,
-      this.messageTemplate.bind(this)
+    if (!this.workspace) return html``;
+
+    const messagesTemplate = (msgs: Message[]) =>
+      repeat(msgs, (message) => message.id, this.messageTemplate.bind(this));
+
+    const activeMessagesTemplate = messagesTemplate(
+      this.workspace.activeMessages
     );
 
-    const workspace = this.workspaceModel.get(this.workspaceId);
-    const archivedButton = this.archivedCount
-      ? html` <div class="archived-message">
-          ${this.archivedCount} archived
-          message${this.archivedCount > 1 ? 's' : ''}&nbsp;
-          <un-button
-            type="link"
-            size="small"
-            @click=${this.toggleArchivedMessages}
-          >
-            ${workspace.showArchivedMessages ? 'Hide' : 'Show'}
-          </un-button>
-        </div>`
-      : null;
+    const inactiveMessagesTemplate = this.workspace.showArchived
+      ? messagesTemplate(this.workspace.inactiveMessages)
+      : [];
 
-    const scrollPosition =
-      workspace && typeof workspace.scrollPosition === 'number'
-        ? workspace.scrollPosition
-        : undefined;
+    const archivedButton = html` <div class="archived-message">
+      ?? archived message${2 > 1 ? 's' : ''}&nbsp;
+      <un-button type="link" size="small" @click=${this.toggleArchivedMessages}>
+        ${this.workspace.showArchived ? 'Hide' : 'Show'}
+      </un-button>
+    </div>`;
+
     const template = html`
       <message-scroll
         class="inner"
-        .scrollPosition=${scrollPosition}
+        .scrollPosition=${this.workspace.scrollPosition}
         @scroll-position-changed=${this.handleScrollPositionChanged}
       >
         <div class="message-list">
-          ${archivedButton} ${messagesTemplate} ${this.loadingTemplate()}
+          ${inactiveMessagesTemplate} ${archivedButton}
+          ${activeMessagesTemplate} ${this.loadingTemplate}
         </div>
       </message-scroll>
     `;
@@ -156,13 +111,12 @@ class ThreadView extends HTMLElement {
   }
 
   toggleArchivedMessages = () => {
-    const ws = this.workspaceModel.get(this.workspaceId);
-    if (!ws) return;
-    this.workspaceModel.setArchiveVisibility(!ws.showArchivedMessages);
-    this.updateMessages();
+    const ws = this.workspaceModel.activeWorkspace;
+    this.workspaceModel.setArchiveVisibility(!ws.showArchived);
+    this.render();
   };
 
-  loadingTemplate() {
+  get loadingTemplate() {
     if (this.status !== 'thinking') return null;
     return html`<un-icon name="loading" spin class="loading"></un-icon>`;
   }

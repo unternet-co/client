@@ -21,10 +21,7 @@ export class AppRoot extends HTMLElement {
   }
 
   updateContents() {
-    const workspaces = this.workspaceModel.all();
-    const ws = workspaces.find(
-      (w) => w.id === this.workspaceModel.activeWorkspaceId
-    );
+    const ws = this.workspaceModel.activeWorkspace;
     if (!ws) return;
     render(
       html`<workspace-view .key=${ws.id} for=${ws.id} active></workspace-view>`,

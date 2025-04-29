@@ -9,7 +9,7 @@ import {
   DirectResponse,
   ActionProposalResponse,
 } from '@unternet/kernel';
-import { Workspace, WorkspaceModel } from '../workspaces';
+import { WorkspaceRecord, WorkspaceModel } from '../workspaces';
 import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
 import { ResourceModel } from '../protocols/resources';
@@ -106,7 +106,7 @@ export class Kernel {
     this.notifier.notify({ status });
   }
 
-  async handleInput(workspaceId: Workspace['id'], input: KernelInput) {
+  async handleInput(workspaceId: WorkspaceRecord['id'], input: KernelInput) {
     const inputMsg = inputMessage({ text: input.text });
     this.workspaceModel.addMessage(workspaceId, inputMsg);
 
@@ -126,7 +126,7 @@ export class Kernel {
     this.updateStatus('thinking');
 
     const runner = this.interpreter.run(
-      this.workspaceModel.allMessages(workspaceId)
+      this.workspaceModel.get(workspaceId).activeMessages
     );
 
     let iteration = await runner.next();
@@ -148,13 +148,13 @@ export class Kernel {
       }
 
       iteration = await runner.next(
-        this.workspaceModel.allMessages(workspaceId)
+        this.workspaceModel.get(workspaceId).activeMessages
       );
     }
   }
 
   async handleTextResponse(
-    workspaceId: Workspace['id'],
+    workspaceId: WorkspaceRecord['id'],
     response: DirectResponse
   ) {
     const message = responseMessage();
@@ -168,7 +168,7 @@ export class Kernel {
   }
 
   async handleActionResponse(
-    workspaceId: Workspace['id'],
+    workspaceId: WorkspaceRecord['id'],
     proposal: ActionProposalResponse
   ) {
     const { process, content } = await this.runtime.dispatch(proposal);

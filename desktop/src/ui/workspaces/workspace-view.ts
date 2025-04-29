@@ -4,18 +4,18 @@ import './thread-view';
 import './workspace-view.css';
 import './resource-bar';
 import { html, render } from 'lit';
-import { Workspace, WorkspaceModel } from '../../workspaces';
+import { WorkspaceRecord, WorkspaceModel } from '../../workspaces';
 import { Kernel, KernelNotInitializedError } from '../../ai/kernel';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
 
 export class WorkspaceView extends HTMLElement {
-  private _workspaceId: Workspace['id'];
+  private _workspaceId: WorkspaceRecord['id'];
   private workspaceModel: WorkspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private visibilityObserver: IntersectionObserver;
 
-  set workspaceId(id: Workspace['id']) {
+  set workspaceId(id: WorkspaceRecord['id']) {
     if (this._workspaceId !== id) {
       this._workspaceId = id;
       render(this.template, this);
@@ -87,8 +87,8 @@ export class WorkspaceView extends HTMLElement {
   private handleArchive = () => {
     const ws = this.workspaceModel.get(this.workspaceId);
     if (!ws) return;
-    this.workspaceModel.setArchivedMessageId();
-    this.workspaceModel.setArchiveVisibility(!ws.showArchivedMessages);
+    this.workspaceModel.archiveMessages();
+    this.workspaceModel.setArchiveVisibility(!ws.showArchived);
   };
 
   get template() {

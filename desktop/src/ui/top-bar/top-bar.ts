@@ -115,7 +115,7 @@ export class TopBar extends HTMLElement {
         @change=${(e: CustomEvent) => {
           const newId = e.detail.value;
           if (newId && newId !== activeWorkspaceId) {
-            this.workspaceModel.setActiveWorkspace(newId);
+            this.workspaceModel.activate(newId);
           }
         }}
       >
