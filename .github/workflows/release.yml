@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    tags:
-      - '*.*.*'
+    branches:
+      - fix-release-pipeline
 permissions:
   contents: write
 jobs:
@@ -32,7 +32,6 @@ jobs:
 
       - name: Clean install
         run: |
-          rm -rf node_modules package-lock.json
           npm install
 
       - name: Build and release (macOS)
