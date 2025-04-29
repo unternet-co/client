@@ -1,4 +1,4 @@
-import { LitElement, html, TemplateResult } from 'lit';
+import { html, TemplateResult } from 'lit';
 import '../ui/common/elements/button';
 import '../ui/common/elements/icon';
 
@@ -10,7 +10,7 @@ export interface ModalOptions {
   position?: 'right' | 'left' | 'bottom' | 'top' | 'center' | 'full';
 }
 
-export class ModalElement extends LitElement {
+export class ModalElement extends HTMLElement {
   options: ModalOptions = {
     title: '',
     size: 'auto',
