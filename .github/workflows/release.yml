@@ -56,6 +56,8 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: false
+      - name: pwd
+        run: pwd
       - name: Create Release
         uses: softprops/action-gh-release@v2
         env:
@@ -63,9 +65,9 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           files: |
-            desktop/dist/*.dmg
-            desktop/dist/*.exe
-            desktop/dist/*.yml
-            desktop/dist/*.AppImage
+            ./desktop/dist/*.dmg
+            ./desktop/dist/*.exe
+            ./desktop/dist/*.yml
+            ./desktop/dist/*.AppImage
           draft: false
           prerelease: false
