@@ -1,5 +1,5 @@
 import { html, render } from 'lit';
-import { WorkspaceRecord, WorkspaceModel, Workspace } from '../../workspaces';
+import { WorkspaceModel, Workspace } from '../../workspaces';
 import { Message } from '../../messages';
 import { dependencies } from '../../common/dependencies';
 import '../common/elements/scroll-container';
@@ -7,6 +7,7 @@ import '../common/elements/markdown-text';
 import './thread-view.css';
 import './process-frame';
 import { repeat } from 'lit/directives/repeat.js';
+import pluralize from 'pluralize';
 import { ResourceModel } from '../../protocols/resources';
 import './process-view';
 import { ActionMessage, InputMessage, ResponseMessage } from '@unternet/kernel';
@@ -79,6 +80,8 @@ class ThreadView extends HTMLElement {
     const messagesTemplate = (msgs: Message[]) =>
       repeat(msgs, (message) => message.id, this.messageTemplate.bind(this));
 
+    const numArchived = Math.floor(this.workspace.inactiveMessages.length / 2);
+
     const activeMessagesTemplate = messagesTemplate(
       this.workspace.activeMessages
     );
@@ -88,7 +91,7 @@ class ThreadView extends HTMLElement {
       : [];
 
     const archivedButton = html` <div class="archived-message">
-      ?? archived message${2 > 1 ? 's' : ''}&nbsp;
+      ${numArchived} archived ${pluralize('message', numArchived)}&nbsp;
       <un-button type="link" size="small" @click=${this.toggleArchivedMessages}>
         ${this.workspace.showArchived ? 'Hide' : 'Show'}
       </un-button>

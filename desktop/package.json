@@ -28,6 +28,7 @@
     "lucide": "^0.484.0",
     "marked": "^15.0.7",
     "openai": "^4.91.1",
+    "pluralize": "^8.0.0",
     "ulid": "^2.4.0"
   },
   "devDependencies": {
