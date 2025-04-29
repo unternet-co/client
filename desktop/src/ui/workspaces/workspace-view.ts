@@ -93,21 +93,29 @@ export class WorkspaceView extends HTMLElement {
 
   get template() {
     return html`
+      <!-- <div class="workspace-toolbar">
+        <un-button
+          class="archive-button"
+          type="ghost"
+          size="small"
+          icon="archive"
+          @click=${this.handleArchive}
+        >Archive</un-button>
+      </div> -->
       <div class="workspace-content">
         <thread-view for=${this.workspaceId}></thread-view>
       </div>
       <div class="bottom-bar">
         <div class="command-bar">
-          <div></div>
-          <command-input
-            @submit=${this.handleCommandSubmit.bind(this)}
-          ></command-input>
           <un-button
             class="archive-button"
             type="ghost"
-            icon="archive"
+            icon="plus"
             @click=${this.handleArchive}
           ></un-button>
+          <command-input
+            @submit=${this.handleCommandSubmit.bind(this)}
+          ></command-input>
         </div>
         <resource-bar for=${this.workspaceId}></resource-bar>
       </div>

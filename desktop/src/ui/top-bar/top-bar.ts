@@ -110,7 +110,6 @@ export class TopBar extends HTMLElement {
     const selectTemplate = html`
       <un-button
         type="ghost"
-        size="small"
         icon="info"
         class="settings-button"
         @click=${() => this.modalService.open('workspace-settings')}

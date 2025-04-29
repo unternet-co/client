@@ -121,6 +121,7 @@ class ThreadView extends HTMLElement {
 
   toggleArchivedMessages = () => {
     const ws = this.workspaceModel.activeWorkspace;
+    console.log(ws.showArchived);
     this.workspaceModel.setArchiveVisibility(!ws.showArchived);
     this.render();
   };

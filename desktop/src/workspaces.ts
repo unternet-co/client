@@ -153,7 +153,6 @@ export class WorkspaceModel {
         ...workspace.activeMessages,
       ];
       workspace.activeMessages = [];
-      console.log(workspace);
       this.workspaceDatabase.update(workspace.id, {
         archiveUpToId: workspace.archiveUpToId,
       });
@@ -200,12 +199,12 @@ export class WorkspaceModel {
     const inactiveMessages = [];
 
     // Get all message records, hydrate them & add to appropriate bucket (active vs. inactive)
-    const records = await this.messageDatabase.where({
+    const messageRecords = await this.messageDatabase.where({
       workspaceId: record.id,
     });
-    for (const record of records) {
-      const message = this.hydrateMessage(record);
-      if (!record.archiveUpToId || message.id > record.archiveUpToId) {
+    for (const messageRecord of messageRecords) {
+      const message = this.hydrateMessage(messageRecord);
+      if (!record.archiveUpToId || message.id > messageRecord.archiveUpToId) {
         activeMessages.push(message);
       } else {
         inactiveMessages.push(message);

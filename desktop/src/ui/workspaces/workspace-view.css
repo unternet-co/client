@@ -14,9 +14,18 @@ workspace-view .workspace-content {
   overflow: hidden;
 }
 
-.workspace-toolbar {
+/* .workspace-toolbar {
   padding: var(--space-2);
+  position: absolute;
+  z-index: 100;
+  bottom: 73px;
+  width: 100%;
 }
+
+.archive-button {
+      color: var(--color-neutral-600);
+    background: var(--color-bg-page);
+} */
 
 .bottom-bar {
   background: var(--color-bg-chrome);
@@ -36,9 +45,16 @@ workspace-view .workspace-content {
   align-items: center;
   justify-content: center;
   padding: var(--space-4) var(--space-4);
-  gap: var(--space-4);
+  gap: var(--space-2);
   width: 100%;
-  max-width: 72ch;
+  max-width: 77ch;
+  margin-left: -3ch;
+}
+
+@media screen and (max-width: 86ch) {
+  .command-bar {
+    margin-left: 0;
+  }
 }
 
 resource-bar {
