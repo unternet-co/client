@@ -63,9 +63,9 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           files: |
-            dist/*.dmg
-            dist/*.exe
-            dist/*.yml
-            dist/*.AppImage
+            desktop/dist/*.dmg
+            desktop/dist/*.exe
+            desktop/dist/*.yml
+            desktop/dist/*.AppImage
           draft: false
           prerelease: false
