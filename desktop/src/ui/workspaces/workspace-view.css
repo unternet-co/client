@@ -43,17 +43,19 @@ workspace-view .workspace-content {
 .command-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: var(--space-4) var(--space-4);
   gap: var(--space-2);
   width: 100%;
-  max-width: 77ch;
-  margin-left: -3ch;
 }
 
-@media screen and (max-width: 86ch) {
-  .command-bar {
-    margin-left: 0;
+.command-bar command-input {
+  margin-right: -28px;
+}
+
+@media screen and (max-width: 720px) {
+  .command-bar command-input {
+    margin-right: 0;
   }
 }
 
