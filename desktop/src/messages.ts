@@ -5,9 +5,11 @@ import {
   ResponseMessage as KernelResponseMessage,
 } from '@unternet/kernel';
 
-export type ActionMessage = KernelActionMessage & { workspaceId: string };
-export type InputMessage = KernelInputMessage & { workspaceId: string };
-export type ResponseMessage = KernelResponseMessage & { workspaceId: string };
+type ExtendedMessageProperties = { workspaceId: string };
+
+export type ActionMessage = KernelActionMessage & ExtendedMessageProperties;
+export type InputMessage = KernelInputMessage & ExtendedMessageProperties;
+export type ResponseMessage = KernelResponseMessage & ExtendedMessageProperties;
 
 export type ActionMessageRecord = Omit<ActionMessage, 'process'> & {
   pid?: string;

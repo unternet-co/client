@@ -2,152 +2,83 @@ import { html, render } from 'lit';
 import { ModalDefinition, ModalService } from './modal-service';
 import { dependencies } from '../common/dependencies';
 import { ShortcutService } from '../shortcuts/shortcut-service';
-import { createEl } from '../common/utils/dom';
 import './modal.css';
-import '../ui/common/elements/button';
-import '../ui/common/elements/icon';
 import { ModalElement } from './modal-element';
-
-export type ModalSize = 'full' | 'auto';
-export type ModalPadding = 'none' | 'auto';
 
 export class Modal {
   id: string;
-  title: string;
-  size: ModalSize = 'auto';
-  padding: ModalPadding = 'auto';
-  contents = createEl('div', { className: 'modal-contents' });
-  private root?: HTMLElement;
-  private modalContainer?: HTMLElement;
-  private elementName?: string;
-  private shortcutService =
-    dependencies.resolve<ShortcutService>('ShortcutService');
-  private modalService = dependencies.resolve<ModalService>('ModalService');
-  private closeCallback = () => this.modalService.close(this.id);
-  private handleKeyDown = this.onKeyDown.bind(this);
-  private previousActiveElement: HTMLElement | null = null;
+  title?: string;
+
+  #contents: ModalElement;
+  #dialog: HTMLDialogElement;
+  #elementName?: string;
+  #shortcutService = dependencies.resolve<ShortcutService>('ShortcutService');
+  #modalService = dependencies.resolve<ModalService>('ModalService');
+  #closeCallback = () => this.#modalService.close(this.id);
 
   constructor(key: string, definition: ModalDefinition) {
     this.id = key;
     this.title = definition.title;
-    this.elementName = definition.element;
+    this.#elementName = definition.element;
+  }
+
+  configureDialog(stackPosition: number) {
+    this.#dialog = document.createElement('dialog');
+    this.#dialog.className = 'modal-container';
+    this.#dialog.setAttribute('data-size', this.#contents.options.size);
+    this.#dialog.setAttribute('data-padding', this.#contents.options.padding);
+    this.#dialog.setAttribute('data-position', this.#contents.options.position);
+    this.#dialog.setAttribute('tabindex', '-1');
+    this.#dialog.setAttribute('role', 'dialog');
+    this.#dialog.setAttribute('aria-modal', 'true');
+    this.#dialog.setAttribute('aria-labelledby', 'modal-title');
+    this.#dialog.style.zIndex = String(300 + stackPosition);
   }
 
   open(stackPosition: number) {
-    // Store the currently focused element
-    this.previousActiveElement = document.activeElement as HTMLElement;
+    if (!this.#elementName) return null;
+    this.#contents = document.createElement(this.#elementName) as ModalElement;
+    this.configureDialog(stackPosition);
 
-    this.root = createEl('div', {
-      className: 'modal-overlay',
-      style: { zIndex: 300 + stackPosition },
+    render(this.template, this.#dialog);
+    document.body.appendChild(this.#dialog);
+
+    if (this.#contents.options.blocking) {
+      this.#dialog.showModal();
+    } else {
+      this.#dialog.show();
+    }
+
+    this.#dialog.focus();
+    this.#dialog.addEventListener('close', this.#closeCallback);
+    this.#dialog.addEventListener('click', this.closeOnBackdropClick);
+
+    this.#dialog.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      this.#closeCallback();
     });
 
-    if (this.elementName) {
-      const contentsComponent = document.createElement(
-        this.elementName
-      ) as ModalElement;
-      this.size = contentsComponent.size || 'auto';
-      this.padding = contentsComponent.padding || 'auto';
-      contentsComponent.addEventListener('close', this.closeCallback);
-      this.contents.appendChild(contentsComponent);
-    }
-
-    render(this.template, this.root);
-    document.body.appendChild(this.root);
-    this.modalContainer = this.root.querySelector(
-      '.modal-container'
-    ) as HTMLElement;
-    this.root.addEventListener('keydown', this.handleKeyDown);
-    this.modalContainer.focus();
-
-    this.root.onmousedown = (event) => {
-      if (event.target === this.root) this.closeCallback();
-    };
-
-    this.shortcutService.register('Escape', this.closeCallback);
+    this.#shortcutService.register('Escape', this.#closeCallback);
   }
 
+  closeOnBackdropClick = (event: MouseEvent) => {
+    if (event.target === this.#dialog && this.#contents.options.blocking) {
+      this.#closeCallback();
+    }
+  };
+
   close() {
-    if (this.root) {
-      this.root.removeEventListener('keydown', this.handleKeyDown);
-      this.root.remove();
-    }
-
-    // Restore focus to the previously active element
-    if (this.previousActiveElement) {
-      try {
-        setTimeout(() => {
-          this.previousActiveElement.focus();
-        }, 0);
-      } catch (e) {
-        console.error('Modal: Error restoring focus:', e);
-      }
-    }
-
-    this.shortcutService.deregister('Escape', this.closeCallback);
+    this.#dialog.removeEventListener('click', this.closeOnBackdropClick);
+    this.#dialog.removeEventListener('close', this.#closeCallback);
+    this.#dialog.close();
+    this.#dialog.remove();
+    this.#shortcutService.deregister('Escape', this.#closeCallback);
   }
 
   get template() {
-    return html`<div
-      class="modal-container"
-      data-size=${this.size}
-      data-padding=${this.padding}
-      tabindex="-1"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <div class="modal-header">
-        <span id="modal-title">${this.title}</span>
-        <un-button
-          icon="close"
-          type="ghost"
-          @click=${this.closeCallback}
-          aria-label="Close modal"
-        >
-        </un-button>
-      </div>
-      ${this.contents}
-    </div>`;
-  }
-
-  private getFocusableElements(): HTMLElement[] {
-    if (!this.modalContainer) return [];
-
-    const selector = [
-      'a[href]',
-      'button:not([disabled])',
-      'input:not([disabled])',
-      'select:not([disabled])',
-      'textarea:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])',
-      'un-button:not([disabled])',
-      'un-input:not([disabled])',
-    ].join(',');
-
-    return Array.from(
-      this.modalContainer.querySelectorAll(selector)
-    ) as HTMLElement[];
-  }
-
-  /**
-   * Handle keydown events to trap focus within the modal
-   */
-  private onKeyDown(event: KeyboardEvent): void {
-    if (event.key !== 'Tab') return;
-
-    const focusableElements = this.getFocusableElements();
-    if (focusableElements.length === 0) return;
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    if (event.shiftKey && document.activeElement === firstElement) {
-      event.preventDefault();
-      lastElement.focus();
-    } else if (!event.shiftKey && document.activeElement === lastElement) {
-      event.preventDefault();
-      firstElement.focus();
-    }
+    return html`
+      ${this.#contents.getHeaderTemplate(this.title)}
+      <div class="modal-contents">${this.#contents}</div>
+    `;
   }
 }

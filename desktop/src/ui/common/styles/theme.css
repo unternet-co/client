@@ -192,7 +192,7 @@
   *******************************************************/
 
   /* text */
-  --color-text-disabled: var(--color-neutral-00);
+  --color-text-disabled: var(--color-neutral-500);
   --color-text-muted: var(--color-neutral-700);
   --color-text-default: var(--color-neutral-900);
   --color-text-strong: var(--color-neutral-1000);

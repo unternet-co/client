@@ -27,6 +27,16 @@ thread-view .message-list {
   gap: var(--space-4);
 }
 
+thread-view .archived-message {
+  padding: var(--space-2) var(--space-5);
+  margin-top: var(--space-8);
+  background: var(--color-bg-chrome);
+  border-radius: 16px;
+  align-self: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
 thread-view .message {
   user-select: text;
 }
@@ -45,8 +55,7 @@ thread-view .message:first-child {
 thread-view .message[data-type='response'] {
   padding: var(--space-5) var(--space-5);
   min-height: 36px;
-  border-radius: var(--rounded);
-  border: 1px solid var(--color-border-muted);
+  border-radius: var(--rounded-lg);
   background: var(--color-bg-content);
 }
 

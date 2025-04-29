@@ -52,8 +52,6 @@ class ResourceModel {
       uri,
       ...metadata,
     });
-    console.log(_resource);
-
     this.add(_resource);
   }
 

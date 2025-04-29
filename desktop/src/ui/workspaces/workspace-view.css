@@ -6,6 +6,7 @@ workspace-view {
 }
 
 workspace-view .workspace-content {
+  position: relative;
   flex-grow: 1;
   background: var(--color-bg-page);
   display: flex;
@@ -13,17 +14,49 @@ workspace-view .workspace-content {
   overflow: hidden;
 }
 
+/* .workspace-toolbar {
+  padding: var(--space-2);
+  position: absolute;
+  z-index: 100;
+  bottom: 73px;
+  width: 100%;
+}
+
+.archive-button {
+      color: var(--color-neutral-600);
+    background: var(--color-bg-page);
+} */
+
 .bottom-bar {
   background: var(--color-bg-chrome);
   border-top: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  color: var(--color-text-muted);
 }
 
-.bottom-bar > command-bar {
-  padding: var(--space-5) var(--space-4);
+.bottom-bar .archive-button {
+  flex-shrink: 0;
 }
 
-.bottom-bar > resource-bar {
-  padding: var(--space-2) var(--space-4);
+.command-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4) var(--space-4);
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 77ch;
+  margin-left: -3ch;
+}
+
+@media screen and (max-width: 86ch) {
+  .command-bar {
+    margin-left: 0;
+  }
+}
+
+resource-bar {
+  align-self: stretch;
 }

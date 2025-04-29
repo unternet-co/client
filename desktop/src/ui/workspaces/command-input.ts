@@ -25,7 +25,7 @@ export class CommandInputElement extends LitElement {
 
   value: string = '';
   disabled: boolean = false;
-  placeholder: string = 'Search or type a command...';
+  placeholder: string = 'Ask a question...';
 
   constructor() {
     super();
@@ -117,7 +117,7 @@ export class CommandInputElement extends LitElement {
 
     un-input {
       width: 100%;
-      margin: 3px;
+      margin: 1px;
     }
 
     un-input::part(input) {
@@ -126,8 +126,8 @@ export class CommandInputElement extends LitElement {
 
     .submit-button {
       position: absolute;
-      right: 6px;
-      top: 6px;
+      right: 4px;
+      top: 4px;
     }
 
     .submit-button::part(button) {

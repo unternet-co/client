@@ -1,6 +1,6 @@
 import { initTabStoreData, TabModel, TabStoreData } from './tabs';
 import { MessageRecord } from './messages';
-import { Workspace, WorkspaceModel } from './workspaces';
+import { WorkspaceRecord, WorkspaceModel } from './workspaces';
 import { dependencies } from './common/dependencies';
 import { DatabaseService } from './storage/database-service';
 import { KeyStoreService } from './storage/keystore-service';
@@ -23,10 +23,12 @@ import './ui/app-root';
 import { ProcessModel, SerializedProcess } from './processes';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
 import './modals/global/bug-modal';
+import './ui/workspaces/workspace-settings-modal';
+import './ui/workspaces/workspace-delete-modal';
 
 /* Initialize databases & stores */
 
-const workspaceDatabaseService = new DatabaseService<string, Workspace>(
+const workspaceDatabaseService = new DatabaseService<string, WorkspaceRecord>(
   'workspaces'
 );
 const processDatabaseService = new DatabaseService<string, SerializedProcess>(
@@ -51,18 +53,19 @@ console.log(runtime.protocols);
 const processModel = new ProcessModel(processDatabaseService, runtime);
 dependencies.registerSingleton('ProcessModel', ProcessModel);
 
+const configModel = new ConfigModel(configStore);
+dependencies.registerSingleton('ConfigModel', configModel);
+
 const workspaceModel = new WorkspaceModel(
   workspaceDatabaseService,
   messageDatabaseService,
-  processModel
+  processModel,
+  configModel
 );
 dependencies.registerSingleton('WorkspaceModel', workspaceModel);
 
 const tabModel = new TabModel(tabKeyStore, workspaceModel);
 dependencies.registerSingleton('TabModel', tabModel);
-
-const configModel = new ConfigModel(configStore);
-dependencies.registerSingleton('ConfigModel', configModel);
 
 const resourceModel = new ResourceModel({
   resourceDatabaseService,
@@ -100,13 +103,19 @@ dependencies.registerSingleton('ModalService', modalService);
 /* Register global modals */
 
 modalService.register('settings', {
-  title: 'Settings',
   element: 'settings-modal',
 });
 
 modalService.register('bug', {
-  title: 'Report a bug',
   element: 'bug-modal',
+});
+
+modalService.register('workspace-settings', {
+  element: 'workspace-settings-modal',
+});
+
+modalService.register('workspace-delete', {
+  element: 'workspace-delete-modal',
 });
 
 /* Register keyboard shortcuts */
