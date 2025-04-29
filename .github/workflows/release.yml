@@ -2,8 +2,8 @@ name: Release
 
 on:
   push:
-    branches:
-      - fix-release-pipeline
+    tags:
+      - '*.*.*'
 permissions:
   contents: write
 jobs:
