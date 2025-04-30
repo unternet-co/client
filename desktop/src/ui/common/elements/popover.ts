@@ -9,8 +9,12 @@ import { LitElement, html, css } from 'lit';
  *   <un-popover id="my-popover"> ... </un-popover>
  */
 export class PopoverElement extends LitElement {
+  public anchor?: string;
+  public position: 'top' | 'right' | 'bottom' | 'left' = 'bottom';
   static properties = {
     loading: { type: Boolean },
+    anchor: { type: String, reflect: true },
+    position: { type: String, reflect: true },
   };
 
   constructor() {
@@ -20,6 +24,32 @@ export class PopoverElement extends LitElement {
   connectedCallback() {
     super.connectedCallback?.();
     this.setAttribute('popover', '');
+    this.updateAnchorPositioning();
+  }
+
+  updated(changedProperties: Map<string, any>) {
+    if (changedProperties.has('anchor') || changedProperties.has('position')) {
+      this.updateAnchorPositioning();
+    }
+  }
+
+  updateAnchorPositioning() {
+    if (!this.anchor) return;
+    const anchorEl = document.getElementById(this.anchor);
+    if (!anchorEl) {
+      const msg = `[un-popover] Anchor element with id "${this.anchor}" not found.`;
+      console.error(msg);
+      throw new Error(msg);
+    }
+    const anchorNameValue = `--${this.anchor}`;
+    const style = anchorEl.style as CSSStyleDeclaration & {
+      anchorName?: string;
+    };
+    style.anchorName = anchorNameValue;
+    (this.style as any).positionAnchor = anchorNameValue;
+
+    // Set data attribute for CSS to pick up
+    this.setAttribute('data-position', this.position || 'bottom');
   }
 
   render() {
@@ -29,17 +59,34 @@ export class PopoverElement extends LitElement {
   static get styles() {
     return css`
       :host {
-        border: 1px solid var(--color-border-default, #e0e0e0);
-        min-width: 320px;
-        max-width: 95vw;
-        background: var(--color-bg-content, #fff);
-        border-radius: var(--rounded-lg, 12px);
-        box-shadow: var(--shadow, 0 4px 32px rgba(0, 0, 0, 0.14));
-        padding: 20px 24px;
-        z-index: 1000;
-        outline: none;
-        font: inherit;
-        transition: box-shadow 0.13s;
+        border: 1px solid var(--color-border-default);
+        max-width: 320px;
+        background: var(--color-bg-content);
+        border-radius: var(--rounded-lg);
+        box-shadow: var(--shadow);
+        padding: var(--space-6);
+        margin: var(--space-6);
+        position-try-fallbacks: flip-block, flip-inline;
+        position-try: flip-block, flip-inline;
+      }
+      :host:popover-open {
+        inset: unset;
+      }
+      :host([data-position='top']) {
+        position-area: top;
+      }
+      :host([data-position='right']) {
+        position-area: right;
+      }
+      :host([data-position='bottom']) {
+        top: anchor(bottom);
+        left: max(
+          0px,
+          min(anchor(center), 100vw - var(--popover-width, 320px))
+        );
+      }
+      :host([data-position='left']) {
+        position-area: left;
       }
     `;
   }
