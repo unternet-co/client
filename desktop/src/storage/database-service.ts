@@ -1,7 +1,7 @@
-import { Table } from 'dexie';
+import { IndexableType, Table } from 'dexie';
 import { db } from './indexed-db';
 
-export type WhereConditions = { [key: string]: string | number };
+export type WhereConditions = { [key: string]: IndexableType };
 
 export class DatabaseService<Id, T> {
   table: Table;
@@ -10,8 +10,12 @@ export class DatabaseService<Id, T> {
     this.table = db[tableName];
   }
 
-  create(item: T): Promise<void> {
+  async create(item: T): Promise<void> {
     return this.table.add(item);
+  }
+
+  async get(id: Id): Promise<T> {
+    return this.table.get(id);
   }
 
   async put(item: T): Promise<void> {
@@ -40,6 +44,7 @@ export class DatabaseService<Id, T> {
   }
 
   async update(id: Id, item: Partial<T>): Promise<void> {
+    console.log(id, item);
     await this.table.update(id, item);
   }
 

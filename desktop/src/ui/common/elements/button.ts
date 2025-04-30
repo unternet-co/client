@@ -7,6 +7,7 @@ export type ButtonType =
   | 'secondary'
   | 'negative'
   | 'outline'
+  | 'link'
   | 'ghost';
 
 export type ButtonSize = 'small' | 'medium' | 'large';
@@ -144,8 +145,8 @@ export class ButtonElement extends LitElement {
         --button-height: 24px;
         --button-color: var(--color-action-800);
         --button-text-color: var(--color-action-0);
-        padding-left: var(--space-4);
-        padding-right: var(--space-4);
+        padding-left: var(--space-3);
+        padding-right: var(--space-3);
         overflow: hidden;
         border: none;
         border-radius: var(--rounded);
@@ -209,9 +210,16 @@ export class ButtonElement extends LitElement {
         box-shadow: none;
       }
 
+      .button--link {
+        --button-color: transparent;
+        --button-text-color: var(--color-action-800);
+        box-shadow: none;
+      }
+
+      .button--link:hover,
       .button--ghost:hover,
       .button--outline:hover {
-        --button-color: var(--color-neutral-100);
+        --button-color: var(--color-neutral-200);
         background-blend-mode: multiply;
         opacity: 1;
       }

@@ -1,16 +1,17 @@
 import { appendEl, attachStyles, createEl } from '../../common/utils';
 import { BUG_REPORT_URL } from '../../constants';
-import { ModalSize, ModalPadding } from '../modal';
 import { ModalElement } from '../modal-element';
 
 export class BugModal extends ModalElement {
-  size: ModalSize = 'full';
-  padding: ModalPadding = 'none';
-
   constructor() {
-    super();
+    super({
+      title: 'Report a bug',
+      size: 'full',
+      padding: 'none',
+    });
+
     const styles = /*css*/ `
-      :root {
+      :host {
         width: 100%;
         height: 100%;
       }

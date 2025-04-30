@@ -1,11 +1,12 @@
 import { marked } from 'marked';
 import { attachStyles } from '../../../common/utils';
+import { css } from 'lit';
 
 class MarkdownText extends HTMLElement {
   constructor() {
     super();
     const shadow = this.attachShadow({ mode: 'open' });
-    attachStyles(shadow, this.styles);
+    attachStyles(shadow, this.styles.toString());
   }
 
   connectedCallback() {
@@ -30,21 +31,143 @@ class MarkdownText extends HTMLElement {
   }
 
   get styles() {
-    return /*css*/ `
-      p:first-child {
+    return css`
+      :host {
+        max-width: 65ch;
+        line-height: 1.5;
+      }
+
+      *:first-child {
         margin-top: 0;
       }
 
-      p:last-child {
+      *:last-child {
         margin-bottom: 0;
       }
 
-      p, ul, ol, blockquote {
-        margin: var(--space-4) 0;
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin-top: var(--space-7);
+        margin-bottom: var(--space-4);
+        line-height: var(--leading-tight);
+        font-weight: 600;
+      }
+
+      p,
+      ul,
+      ol,
+      blockquote {
+        margin-bottom: var(--space-4);
+      }
+
+      ul,
+      ol {
+        padding-left: var(--space-8);
       }
 
       li {
-        margin: var(--space-4) 0;
+        margin-bottom: var(--space-2);
+      }
+
+      a {
+        color: var(--color-action-800);
+        text-underline-offset: var(--space-1);
+      }
+
+      blockquote {
+        border-left: 2px groove var(--color-text-muted);
+        padding-left: var(--space-6);
+        padding-top: var(--space-3);
+        padding-bottom: var(--space-3);
+      }
+
+      blockquote *:last-child {
+        margin-bottom: unset;
+      }
+
+      pre {
+        font-family: var(--font-mono);
+        padding: var(--space-4);
+        background: var(--color-bg-page);
+        border-radius: 6px;
+        overflow-x: auto;
+        margin-bottom: var(--space-4);
+      }
+
+      pre code {
+        background: none;
+        padding: 0;
+        color: var(--color-text-default);
+      }
+
+      code {
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+        padding: var(--space-1) var(--space-2);
+        background: var(--color-bg-page);
+        border-radius: var(--rounded);
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid var(--color-border-muted);
+        margin: var(--space-5) 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: var(--space-4);
+      }
+
+      th {
+        font-weight: 600;
+        text-align: left;
+        background: var(--color-bg-container);
+        border-bottom: 1px solid var(--color-border-default);
+      }
+
+      td {
+        border-bottom: 1px solid var(--color-border-default);
+      }
+
+      th,
+      td {
+        padding: var(--space-3) var(--space-4);
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      small {
+        font-size: var(--text-sm);
+      }
+
+      kbd {
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+        padding: var(--space-1) var(--space-2);
+        background: var(--color-bg-container);
+        border: 1px solid var(--color-border-default);
+        border-bottom-width: 2px;
+        border-radius: var(--rounded);
+      }
+
+      sub,
+      sup {
+        font-size: var(--text-xs);
+      }
+
+      abbr {
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        cursor: help;
       }
 
       a {

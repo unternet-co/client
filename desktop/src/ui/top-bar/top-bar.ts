@@ -1,6 +1,8 @@
 import { appendEl, createEl } from '../../common/utils/dom';
+import { DisposableGroup } from '../../common/disposable';
 import { render, html } from 'lit';
-import { Tab, TabModel } from '../../tabs';
+import { repeat } from 'lit/directives/repeat.js';
+
 import { dependencies } from '../../common/dependencies';
 import { WorkspaceModel } from '../../workspaces';
 import './tab-handle';
@@ -32,33 +34,31 @@ declare global {
 }
 
 export class TopBar extends HTMLElement {
-  tabModel = dependencies.resolve<TabModel>('TabModel');
   modalService = dependencies.resolve<ModalService>('ModalService');
+  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   staticTabsContainer?: HTMLElement;
-  workspaceTabsContainer?: HTMLElement;
+  workspaceSelectContainer?: HTMLElement;
   settingsButtonContainer?: HTMLElement;
+  private disposables = new DisposableGroup();
 
   // TODO: Add dependency injection using decorators for model
   connectedCallback() {
-    // Container for static tabs (like home)
     this.staticTabsContainer = appendEl(
       this,
       createEl('div', { className: 'static-tab-list' })
     );
-    const scrollContainer = appendEl(
+    this.workspaceSelectContainer = appendEl(
       this,
-      createEl('div', { className: 'workspace-tabs-scroll-container' })
-    );
-    this.workspaceTabsContainer = appendEl(
-      scrollContainer,
-      createEl('div', { className: 'workspace-tab-list' })
+      createEl('div', { className: 'workspace-select-container' })
     );
     this.settingsButtonContainer = appendEl(
       this,
       createEl('div', { className: 'settings-button-container' })
     );
 
-    this.tabModel.subscribe(this.updateTabs.bind(this));
+    this.disposables.add(
+      this.workspaceModel.subscribe(this.updateTabs.bind(this))
+    );
     this.updateTabs();
 
     const isMac = window.electronAPI?.platform === 'darwin';
@@ -70,6 +70,7 @@ export class TopBar extends HTMLElement {
     if (window.electronAPI) {
       window.electronAPI.removeWindowStateListeners();
     }
+    this.disposables.dispose();
   }
 
   private initializeWindowStateListeners(): void {
@@ -97,52 +98,45 @@ export class TopBar extends HTMLElement {
     }
   }
 
-  iconFor(tabId: Tab['id']) {
-    if (tabId === 'home') {
-      return html`<un-icon name="home"></un-icon>`;
-    }
-    return null;
-  }
-
-  handleSelect(tab: Tab) {
-    if (this.tabModel.activeTab?.id !== tab.id) {
-      this.tabModel.activate(tab.id);
-      // Tab will be scrolled into view after activation in updateTabs
-    }
-  }
-
   openSettings() {
     this.modalService.open('settings');
   }
 
-  handleRename(tab: Tab, e: CustomEvent) {
-    if (tab.type === 'workspace') {
-      const workspaceModel =
-        dependencies.resolve<WorkspaceModel>('WorkspaceModel');
-      workspaceModel.setTitle(tab.id, e.detail.value);
-      this.updateTabs();
-    }
-  }
-
   updateTabs() {
-    const tabs = this.tabModel.all();
-    const staticTabs = tabs.filter((tab) => tab.type === 'page');
-    const workspaceTabs = tabs.filter((tab) => tab.type === 'workspace');
+    const workspaces = this.workspaceModel.all();
+    const activeWorkspaceId =
+      this.workspaceModel.activeWorkspaceId || (workspaces[0]?.id ?? '');
 
-    const tabTemplate = (tab: Tab) => html`
-      <tab-handle
-        ?static=${tab.type === 'page'}
-        ?active=${this.tabModel.activeTab?.id === tab.id}
-        @select=${() => this.handleSelect(tab)}
-        @close=${() => this.tabModel.close(tab.id)}
-        @rename=${(e: CustomEvent) => this.handleRename(tab, e)}
-        id=${`tab-${tab.id}`}
+    const selectTemplate = html`
+      <un-button
+        type="ghost"
+        icon="info"
+        class="settings-button"
+        @click=${() => this.modalService.open('workspace-settings')}
       >
-        ${tab.type === 'page'
-          ? this.iconFor(tab.id)
-          : this.tabModel.getTitle(tab.id)}
-      </tab-handle>
+      </un-button>
+      <un-select
+        variant="ghost"
+        .value=${activeWorkspaceId}
+        placeholder="Select workspace"
+        @change=${(e: CustomEvent) => {
+          const newId = e.detail.value;
+          if (newId === '+') this.workspaceModel.create();
+          if (newId && newId !== activeWorkspaceId) {
+            this.workspaceModel.activate(newId);
+          }
+        }}
+      >
+        ${repeat(
+          workspaces,
+          (ws) => ws.id,
+          (ws) => html`<option value=${ws.id}>${ws.title}</option>`
+        )}
+        <option value="+">New workspace...</option>
+      </un-select>
     `;
+
+    render(selectTemplate, this.workspaceSelectContainer!);
 
     const settingsButtonTemplate = html`
       <un-button
@@ -160,32 +154,7 @@ export class TopBar extends HTMLElement {
       >
       </un-button>
     `;
-
-    render(staticTabs.map(tabTemplate), this.staticTabsContainer!);
-    render(workspaceTabs.map(tabTemplate), this.workspaceTabsContainer!);
     render(settingsButtonTemplate, this.settingsButtonContainer!);
-
-    this.scrollActiveTabIntoView();
-  }
-
-  private scrollActiveTabIntoView(): void {
-    setTimeout(() => {
-      const activeTab = this.tabModel.activeTab;
-      if (activeTab && activeTab.type === 'workspace') {
-        const tabElement = this.querySelector(`#tab-${activeTab.id}`);
-        const scrollContainer = this.querySelector(
-          '.workspace-tabs-scroll-container'
-        );
-
-        if (tabElement && scrollContainer) {
-          tabElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'nearest',
-          });
-        }
-      }
-    }, 0);
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@unternet/client-desktop",
-  "version": "0.3.4",
+  "version": "0.9.4",
   "homepage": "https://unternet.co",
   "license": "ISC",
   "main": "dist/electron/main.js",
@@ -15,6 +15,7 @@
     "dev:web": "vite"
   },
   "dependencies": {
+    "@lucide/lab": "^0.1.2",
     "@unternet/kernel": "*",
     "@unternet/sdk": "^0.1.1",
     "@web-applets/sdk": "^0.2.6",
@@ -27,6 +28,7 @@
     "lucide": "^0.484.0",
     "marked": "^15.0.7",
     "openai": "^4.91.1",
+    "pluralize": "^8.0.0",
     "ulid": "^2.4.0"
   },
   "devDependencies": {

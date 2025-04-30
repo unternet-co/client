@@ -2,9 +2,11 @@ import { html, render } from 'lit';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
 import { ResourceModel } from '../../protocols/resources';
+import { ModalService } from '../../modals/modal-service';
 
 export class ResourceBar extends HTMLElement {
   resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
+  modalService = dependencies.resolve<ModalService>('ModalService');
 
   constructor() {
     super();
@@ -28,9 +30,11 @@ export class ResourceBar extends HTMLElement {
       </li>`;
     });
 
-    const template = html`<ul class="resources-list">
-      ${resourceTemplate}
-    </ul>`;
+    const template = html`
+      <ul class="resources-list">
+        ${resourceTemplate}
+      </ul>
+    `;
 
     render(template, this);
   }

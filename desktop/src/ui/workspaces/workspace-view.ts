@@ -1,28 +1,44 @@
 import { CommandSubmitEvent } from './command-input';
-import './command-bar.css';
 import './command-input';
 import './thread-view';
 import './workspace-view.css';
 import './resource-bar';
 import { html, render } from 'lit';
-import { Workspace, WorkspaceModel } from '../../workspaces';
+import { WorkspaceRecord, WorkspaceModel } from '../../workspaces';
 import { Kernel, KernelNotInitializedError } from '../../ai/kernel';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
 
 export class WorkspaceView extends HTMLElement {
-  workspaceId: Workspace['id'];
-  kernel = dependencies.resolve<Kernel>('Kernel');
-  static observedAttributes = ['for'];
+  private _workspaceId: WorkspaceRecord['id'];
+  private workspaceModel: WorkspaceModel =
+    dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   private visibilityObserver: IntersectionObserver;
+
+  set workspaceId(id: WorkspaceRecord['id']) {
+    if (this._workspaceId !== id) {
+      this._workspaceId = id;
+      render(this.template, this);
+      setTimeout(() => this.focusCommandInput(), 0);
+    }
+  }
+  get workspaceId() {
+    return this._workspaceId;
+  }
+  kernel = dependencies.resolve<Kernel>('Kernel');
+  static get observedAttributes() {
+    return ['for'];
+  }
+
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+    if (name === 'for' && oldValue !== newValue) {
+      this.workspaceId = newValue || '';
+    }
+  }
 
   // TODO: Implement dependency injection with decorators
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
-    render(this.template, this);
-
-    // Autofocus the command input after rendering
-    setTimeout(() => this.focusCommandInput(), 0);
 
     // Set up visibility observer to focus when tab is switched back to this view
     this.setupVisibilityObserver();
@@ -35,10 +51,10 @@ export class WorkspaceView extends HTMLElement {
   }
 
   private focusCommandInput() {
-    const commandInput = this.querySelector('command-input');
-    if (commandInput) {
-      (commandInput as any).focus();
-    }
+    const commandInput = this.querySelector(
+      'command-input'
+    ) as HTMLInputElement;
+    commandInput.focus();
   }
 
   private setupVisibilityObserver() {
@@ -68,17 +84,40 @@ export class WorkspaceView extends HTMLElement {
     }
   }
 
+  private handleArchive = () => {
+    const ws = this.workspaceModel.get(this.workspaceId);
+    if (!ws) return;
+    this.workspaceModel.archiveMessages();
+    this.workspaceModel.setArchiveVisibility(!ws.showArchived);
+  };
+
   get template() {
     return html`
+      <!-- <div class="workspace-toolbar">
+        <un-button
+          class="archive-button"
+          type="ghost"
+          size="small"
+          icon="archive"
+          @click=${this.handleArchive}
+        >Archive</un-button>
+      </div> -->
       <div class="workspace-content">
         <thread-view for=${this.workspaceId}></thread-view>
       </div>
       <div class="bottom-bar">
-        <command-bar>
+        <div class="command-bar">
+          <div></div>
           <command-input
             @submit=${this.handleCommandSubmit.bind(this)}
           ></command-input>
-        </command-bar>
+          <un-button
+            class="archive-button"
+            type="ghost"
+            icon="archive"
+            @click=${this.handleArchive}
+          ></un-button>
+        </div>
         <resource-bar for=${this.workspaceId}></resource-bar>
       </div>
     `;

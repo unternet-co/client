@@ -1,6 +1,6 @@
 {
   "name": "@unternet/client",
-  "version": "0.3.4",
+  "version": "0.9.4",
   "description": "Unternet Client",
   "author": {
     "name": "Rupert Manfredi",
@@ -18,7 +18,7 @@
     "files": [
       "desktop/dist/electron/**/*",
       "desktop/dist/www/**/*",
-      "desktop/src/electron/app-icons/**/*"
+      "desktop/build/app-icons/**/*"
     ],
     "directories": {
       "output": "release"
@@ -39,21 +39,21 @@
         "dmg",
         "zip"
       ],
-      "icon": "desktop/src/electron/app-icons/client-icon-macOS.png"
+      "icon": "desktop/build/app-icons/client-icon-macOS.png"
     },
-    "afterSign": "desktop/build/notarize.js",
+    "afterSign": "desktop/dist/notarize.js",
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "desktop/src/electron/app-icons/client-icon-windows.ico"
+      "icon": "desktop/build/electron/app-icons/client-icon-windows.ico"
     },
     "linux": {
       "target": [
         "AppImage"
       ],
       "category": "Development",
-      "icon": "desktop/src/electron/app-icons"
+      "icon": "desktop/build/electron/app-icons"
     }
   },
   "scripts": {
@@ -95,6 +95,9 @@
     "electron-updater": "^6.6.2",
     "glob": "^11.0.1",
     "lit-markdown": "^1.3.2"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.9.5"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"

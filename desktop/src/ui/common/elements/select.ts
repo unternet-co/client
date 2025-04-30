@@ -13,6 +13,8 @@ export type SelectVariant = 'default' | 'ghost' | 'flat';
 export type IconPosition = 'start' | 'end';
 
 export class SelectElement extends LitElement {
+  private _mutationObserver?: MutationObserver;
+
   value: string = '';
   placeholder: string = '';
   disabled: boolean = false;
@@ -46,6 +48,24 @@ export class SelectElement extends LitElement {
     this.loading = false;
     this.icon = undefined;
     this.iconPosition = 'end';
+  }
+
+  // Watch change in children (e.g. options)
+  connectedCallback() {
+    super.connectedCallback();
+    this._mutationObserver = new MutationObserver(() => {
+      this.requestUpdate();
+    });
+    this._mutationObserver.observe(this, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._mutationObserver?.disconnect();
   }
 
   private handleChange(e: Event) {
@@ -222,6 +242,10 @@ export class SelectElement extends LitElement {
         border-color: transparent;
         background-color: transparent;
         box-shadow: none;
+        font-weight: 500;
+        font-size: var(--text-sm);
+        padding-right: var(--space-6);
+        margin-bottom: 2px;
       }
 
       .select-wrapper:has(.select--ghost):hover un-icon.dropdown-icon {

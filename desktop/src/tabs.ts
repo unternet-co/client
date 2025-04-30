@@ -1,7 +1,11 @@
 import { Disposable } from './common/disposable';
 import { Notifier } from './common/notifier';
 import { KeyStoreService } from './storage/keystore-service';
-import { Workspace, WorkspaceModel, WorkspaceNotification } from './workspaces';
+import {
+  WorkspaceRecord,
+  WorkspaceModel,
+  WorkspaceNotification,
+} from './workspaces';
 
 export interface Tab {
   type: 'page' | 'workspace';
@@ -112,8 +116,8 @@ export class TabModel extends Disposable {
     }
   }
 
-  create(id?: Workspace['id']) {
-    let workspace: Workspace;
+  create(id?: WorkspaceRecord['id']) {
+    let workspace: WorkspaceRecord;
 
     if (id) {
       workspace = this.workspaceModel.get(id)!;
