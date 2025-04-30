@@ -275,6 +275,21 @@ return "Hello, World!";
     </div>
     <div class="theme-block">
       <h2>Elements</h2>
+
+      <!-- un-popover showcase example -->
+      <script type="module" src="src/ui/common/elements/popover.ts"></script>
+      <div style="margin: 24px 0">
+        <un-button
+          text="Show Popover"
+          command="toggle-popover"
+          commandfor="demo-popover"
+        ></un-button>
+        <un-popover popover id="demo-popover">
+          <strong>This is a popover!</strong>
+          <p style="margin: 8px 0 0">You can put any content here.</p>
+        </un-popover>
+      </div>
+
       <div>
         <a href="#">Link</a>
       </div>
