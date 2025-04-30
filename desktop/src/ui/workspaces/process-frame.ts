@@ -9,7 +9,7 @@ class ProcessFrame extends HTMLElement {
     this.render(process);
   }
 
-  render(process) {
+  render(process: ProcessContainer) {
     const iconSrc = getResourceIcon(process);
     const iconTemplate = html`<img src=${iconSrc} />`;
 

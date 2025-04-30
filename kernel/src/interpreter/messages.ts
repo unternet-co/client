@@ -181,8 +181,12 @@ export function toModelMessages(kernelMsgs: KernelMessage[]): ModelMessage[] {
 
       case 'action': {
         const actionUri = encodeActionHandle(k.uri, k.actionId);
+        console.log(k.process);
 
         const body = k.process !== undefined ? k.process.describe() : k.content;
+        console.log(
+          `Action invoked: ${actionUri}\nOutput: ${JSON.stringify(body)}`
+        );
 
         modelMsgs.push({
           role: 'assistant',

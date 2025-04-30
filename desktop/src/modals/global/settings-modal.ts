@@ -64,7 +64,6 @@ export class SettingsModal extends ModalElement {
   }
 
   private handleSubmit() {
-    console.log('here');
     this.configModel.updateGlobalHint(this.globalHint);
     this.configModel.updateModelProvider(
       this.selectedProvider,
