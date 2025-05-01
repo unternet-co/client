@@ -1,4 +1,5 @@
 import { html, render } from 'lit';
+import './resource-management-popover';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
 import { ResourceModel } from '../../protocols/resources';
@@ -34,6 +35,20 @@ export class ResourceBar extends HTMLElement {
       <ul class="resources-list">
         ${resourceTemplate}
       </ul>
+      <un-button
+        type="ghost"
+        icon="toolbox"
+        icon-position="end"
+        id="resource-management-button"
+        command="toggle-popover"
+        commandfor="resource-management-popover"
+        >Manage Resources</un-button
+      >
+      <resource-management-popover
+        id="resource-management-popover"
+        anchor="resource-management-button"
+        position="top"
+      ></resource-management-popover>
     `;
 
     render(template, this);

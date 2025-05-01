@@ -31,7 +31,7 @@ export class PopoverElement extends HTMLElement {
     newValue: string | null
   ) {
     if (oldValue === newValue) return;
-    this.#render();
+    this.render();
   }
 
   /**
@@ -59,9 +59,13 @@ export class PopoverElement extends HTMLElement {
     this.setAttribute('data-position', position);
   }
 
-  #render() {
+  render() {
     this.#updateAnchorPositioning();
-    render(html`<slot></slot>`, this);
+    render(this.template, this);
+  }
+
+  get template() {
+    return html`<section class="content"><slot></slot></section>`;
   }
 }
 

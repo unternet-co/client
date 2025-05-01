@@ -1,7 +1,9 @@
 /* Resets */
 .un-popover {
-  margin: 0;
+  margin: unset;
   inset: unset;
+  border: unset;
+  padding: unset;
 }
 
 /* Modal-like presentation */
@@ -10,14 +12,33 @@
   background: var(--color-bg-content);
   border-radius: var(--rounded-lg);
   box-shadow: var(--shadow);
-  padding: var(--space-6);
   margin: var(--space-6);
+}
+
+.un-popover .header {
+  position: sticky;
+  top: 0;
+  background: var(--color-neutral-50);
+  color: var(--color-text-muted);
+  padding: var(--space-2) var(--space-4) var(--space-2) var(--space-6);
+  display: flex;
+  text-transform: uppercase;
+  letter-spacing: 0.08ch;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.un-popover .content {
+  padding: var(--space-6);
 }
 
 /* Positioning logic */
 .un-popover:popover-open {
   position-try-fallbacks: flip-block, flip-inline;
 }
+.un-popover,
 .un-popover[data-position='top'] {
   position-area: top;
   justify-self: anchor-center;

@@ -78,6 +78,12 @@ class ResourceModel {
 
     return result;
   }
+
+  async remove(uri: string) {
+    this.resources.delete(uri);
+    await this.db.delete(uri);
+    this.notifier.notify();
+  }
 }
 
 export { ResourceModel, initialResources };
