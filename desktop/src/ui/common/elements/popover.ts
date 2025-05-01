@@ -1,5 +1,6 @@
-import { html, css, render } from 'lit';
+import { html, render } from 'lit';
 import { attachStyles } from '../../../common/utils/dom';
+import './popover.css';
 
 export type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';
 
@@ -18,15 +19,13 @@ export type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';
 export class PopoverElement extends HTMLElement {
   static observedAttributes = ['anchor', 'position'];
 
-  #shadow: ShadowRoot;
   #position: PopoverPosition = 'top';
   #anchor?: string;
 
   constructor() {
     super();
-    this.#shadow = this.attachShadow({ mode: 'open' });
-    attachStyles(this.#shadow, this.styles.toString());
     this.setAttribute('popover', '');
+    this.classList.add('un-popover');
   }
 
   connectedCallback() {
@@ -37,8 +36,7 @@ export class PopoverElement extends HTMLElement {
         (this.getAttribute('position') as PopoverPosition) || 'top';
 
     this.#updateAnchorPositioning();
-
-    render(this.template, this.#shadow);
+    render(this.template, this);
   }
 
   attributeChangedCallback(
@@ -67,7 +65,8 @@ export class PopoverElement extends HTMLElement {
     if (!anchorEl) {
       const msg = `[un-popover] Anchor element with id "${this.anchor}" not found.`;
       console.error(msg);
-      throw new Error(msg);
+      return;
+      // throw new Error(msg);
     }
     const anchorNameValue = `--${this.anchor}`;
     const style = anchorEl.style as CSSStyleDeclaration & {
@@ -93,7 +92,7 @@ export class PopoverElement extends HTMLElement {
         this.removeAttribute('anchor');
       }
       this.#updateAnchorPositioning();
-      render(this.template, this.#shadow);
+      render(this.template, this);
     }
   }
 
@@ -108,57 +107,12 @@ export class PopoverElement extends HTMLElement {
       this.#position = val;
       this.setAttribute('position', val);
       this.#updateAnchorPositioning();
-      render(this.template, this.#shadow);
+      render(this.template, this);
     }
   }
 
   get template() {
     return html`<slot></slot>`;
-  }
-
-  get styles() {
-    return css`
-      /** 
-      * Resets
-      **/
-      :host {
-        margin: 0;
-        inset: unset;
-      }
-
-      /**
-      * Default "modal" styles
-      **/
-      :host {
-        border: 1px solid var(--color-border-default);
-        max-width: 320px;
-        background: var(--color-bg-content);
-        border-radius: var(--rounded-lg);
-        box-shadow: var(--shadow);
-        padding: var(--space-6);
-        margin: var(--space-6);
-      }
-
-      /** 
-      * Positioning logic
-      **/
-      :host {
-        position-try-fallbacks: flip-block, flip-inline;
-        position-try: flip-block, flip-inline;
-      }
-      :host([data-position='top']) {
-        position-area: top;
-      }
-      :host([data-position='right']) {
-        position-area: right;
-      }
-      :host([data-position='bottom']) {
-        position-area: bottom;
-      }
-      :host([data-position='left']) {
-        position-area: left;
-      }
-    `;
   }
 }
 
