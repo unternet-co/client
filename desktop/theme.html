@@ -295,6 +295,7 @@ return "Hello, World!";
               let locked = false;
               let moveHandler = null;
               function moveButton(e) {
+                anchor.classList.add('locked-to-cursor');
                 const rect = anchor.getBoundingClientRect();
                 anchor.style.left = `${e.clientX - rect.width / 2}px`;
                 anchor.style.top = `${e.clientY - rect.height / 2}px`;
@@ -302,10 +303,6 @@ return "Hello, World!";
               anchor.addEventListener('click', (ev) => {
                 locked = !locked;
                 if (locked) {
-                  anchor.classList.add('locked-to-cursor');
-                  anchor.style.position = 'fixed';
-                  anchor.style.margin = '0';
-                  document.body.appendChild(anchor);
                   moveHandler = moveButton;
                   window.addEventListener('mousemove', moveHandler);
                 } else {
@@ -317,62 +314,63 @@ return "Hello, World!";
               });
             });
         </script>
+        <div style="display: flex; justify-content: space-between">
+          <un-button
+            id="anchor-id-right"
+            text="Right Popover"
+            command="show-popover"
+            commandfor="popover-id-right"
+          ></un-button>
+          <un-popover
+            id="popover-id-right"
+            anchor="anchor-id-right"
+            position="right"
+          >
+            <strong>This is a popover!</strong>
+            <p>You can put any content here.</p>
+          </un-popover>
 
-        <un-button
-          id="anchor-id-right"
-          text="Right Popover"
-          command="show-popover"
-          commandfor="popover-id-right"
-        ></un-button>
-        <un-popover
-          id="popover-id-right"
-          anchor="anchor-id-right"
-          position="right"
-        >
-          <strong>This is a popover!</strong>
-          <p>You can put any content here.</p>
-        </un-popover>
+          <un-button
+            id="anchor-id-top"
+            text="Top Popover"
+            command="show-popover"
+            commandfor="popover-id-top"
+          ></un-button>
+          <un-popover id="popover-id-top" anchor="anchor-id-top" position="top">
+            <strong>This is a popover!</strong>
+            <p>You can put any content here.</p>
+          </un-popover>
 
-        <un-button
-          id="anchor-id-top"
-          text="Top Popover"
-          command="show-popover"
-          commandfor="popover-id-top"
-        ></un-button>
-        <un-popover id="popover-id-top" anchor="anchor-id-top" position="top">
-          <strong>This is a popover!</strong>
-          <p>You can put any content here.</p>
-        </un-popover>
+          <un-button
+            id="anchor-id-bottom"
+            text="Bottom Popover"
+            command="show-popover"
+            commandfor="popover-id-bottom"
+          ></un-button>
+          <un-popover
+            id="popover-id-bottom"
+            anchor="anchor-id-bottom"
+            position="bottom"
+          >
+            <strong>This is a popover!</strong>
+            <p>You can put any content here.</p>
+          </un-popover>
 
-        <un-button
-          id="anchor-id-bottom"
-          text="Bottom Popover"
-          command="show-popover"
-          commandfor="popover-id-bottom"
-        ></un-button>
-        <un-popover
-          id="popover-id-bottom"
-          anchor="anchor-id-bottom"
-          position="bottom"
-        >
-          <strong>This is a popover!</strong>
-          <p>You can put any content here.</p>
-        </un-popover>
-
-        <un-button
-          id="anchor-id-left"
-          text="Left Popover"
-          command="show-popover"
-          commandfor="popover-id-left"
-        ></un-button>
-        <un-popover
-          id="popover-id-left"
-          anchor="anchor-id-left"
-          position="left"
-        >
-          <strong>This is a popover!</strong>
-          <p>You can put any content here.</p>
-        </un-popover>
+          <un-button
+            id="anchor-id-left"
+            text="Left Popover"
+            command="show-popover"
+            commandfor="popover-id-left"
+          ></un-button>
+          <un-popover
+            id="popover-id-left"
+            anchor="anchor-id-left"
+            position="left"
+          >
+            <strong>This is a popover!</strong>
+            <p>You can put any content here.</p>
+          </un-popover>
+        </div>
       </div>
 
       <div>
