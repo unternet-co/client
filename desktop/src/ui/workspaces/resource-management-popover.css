@@ -1,0 +1,4 @@
+resource-management-popover:popover-open {
+  margin: var(--space-2);
+  justify-self: end;
+}
