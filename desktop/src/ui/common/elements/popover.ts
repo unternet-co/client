@@ -118,6 +118,17 @@ export class PopoverElement extends HTMLElement {
 
   get styles() {
     return css`
+      /** 
+      * Resets
+      **/
+      :host {
+        margin: 0;
+        inset: unset;
+      }
+
+      /**
+      * Default "modal" styles
+      **/
       :host {
         border: 1px solid var(--color-border-default);
         max-width: 320px;
@@ -126,11 +137,14 @@ export class PopoverElement extends HTMLElement {
         box-shadow: var(--shadow);
         padding: var(--space-6);
         margin: var(--space-6);
+      }
+
+      /** 
+      * Positioning logic
+      **/
+      :host {
         position-try-fallbacks: flip-block, flip-inline;
         position-try: flip-block, flip-inline;
-      }
-      :host:popover-open {
-        inset: unset;
       }
       :host([data-position='top']) {
         position-area: top;
