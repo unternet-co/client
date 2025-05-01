@@ -1,39 +1,67 @@
-import { LitElement, html, css } from 'lit';
+import { html, css, render } from 'lit';
+import { attachStyles } from '../../../common/utils/dom';
+
+export type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';
 
 /**
- * <un-popover>
- * A generic, composable popover using the native Popover API.
+ * A generic, composable popover custom element using the native Popover API.
  *
- * Usage:
- *   <button popovertarget="my-popover">Open</button>
- *   <un-popover id="my-popover"> ... </un-popover>
+ * @element un-popover
+ * @attr {string} anchor - The id of the anchor element this popover is positioned against.
+ * @attr {PopoverPosition} position - The position of the popover relative to the anchor (top, right, bottom, left).
+ * @slot - Default slot for popover content.
+ *
+ * Usage example:
+ *   <button id="popover-button" command="toggle-popover" commandfor="my-popover">Open</button>
+ *   <un-popover id="my-popover" anchor="popover-button" position="top"> ... </un-popover>
  */
-export class PopoverElement extends LitElement {
-  public anchor?: string;
-  public position: 'top' | 'right' | 'bottom' | 'left' = 'bottom';
-  static properties = {
-    loading: { type: Boolean },
-    anchor: { type: String, reflect: true },
-    position: { type: String, reflect: true },
-  };
+export class PopoverElement extends HTMLElement {
+  static observedAttributes = ['anchor', 'position'];
+
+  #shadow: ShadowRoot;
+  #position: PopoverPosition = 'top';
+  #anchor?: string;
 
   constructor() {
     super();
+    this.#shadow = this.attachShadow({ mode: 'open' });
+    attachStyles(this.#shadow, this.styles.toString());
+    this.setAttribute('popover', '');
   }
 
   connectedCallback() {
-    super.connectedCallback?.();
-    this.setAttribute('popover', '');
-    this.updateAnchorPositioning();
+    if (this.hasAttribute('anchor'))
+      this.#anchor = this.getAttribute('anchor') || undefined;
+    if (this.hasAttribute('position'))
+      this.#position =
+        (this.getAttribute('position') as PopoverPosition) || 'top';
+
+    this.#updateAnchorPositioning();
+
+    render(this.template, this.#shadow);
   }
 
-  updated(changedProperties: Map<string, any>) {
-    if (changedProperties.has('anchor') || changedProperties.has('position')) {
-      this.updateAnchorPositioning();
+  attributeChangedCallback(
+    name: string,
+    oldValue: string | null,
+    newValue: string | null
+  ) {
+    if (oldValue === newValue) return;
+    switch (name) {
+      case 'anchor':
+        this.anchor = newValue || undefined;
+        break;
+      case 'position':
+        this.position = (newValue as PopoverPosition) || 'top';
+        break;
     }
   }
 
-  updateAnchorPositioning() {
+  /**
+   * Ensures the anchor element exists and updates popover positioning styles.
+   * Throws if the anchor id is defined, but no element with that id is found.
+   */
+  #updateAnchorPositioning() {
     if (!this.anchor) return;
     const anchorEl = document.getElementById(this.anchor);
     if (!anchorEl) {
@@ -47,16 +75,48 @@ export class PopoverElement extends LitElement {
     };
     style.anchorName = anchorNameValue;
     (this.style as any).positionAnchor = anchorNameValue;
-
-    // Set data attribute for CSS to pick up
-    this.setAttribute('data-position', this.position || 'bottom');
+    this.setAttribute('data-position', this.position);
   }
 
-  render() {
-    return html` <slot></slot> `;
+  /**
+   * The id of the anchor element this popover is positioned against.
+   */
+  get anchor(): string | undefined {
+    return this.#anchor;
+  }
+  set anchor(val: string | undefined) {
+    if (val !== this.#anchor) {
+      this.#anchor = val;
+      if (val !== undefined) {
+        this.setAttribute('anchor', val);
+      } else {
+        this.removeAttribute('anchor');
+      }
+      this.#updateAnchorPositioning();
+      render(this.template, this.#shadow);
+    }
   }
 
-  static get styles() {
+  /**
+   * The position of the popover relative to the anchor.
+   */
+  get position(): PopoverPosition {
+    return this.#position;
+  }
+  set position(val: PopoverPosition) {
+    if (val !== this.#position) {
+      this.#position = val;
+      this.setAttribute('position', val);
+      this.#updateAnchorPositioning();
+      render(this.template, this.#shadow);
+    }
+  }
+
+  get template() {
+    return html`<slot></slot>`;
+  }
+
+  get styles() {
     return css`
       :host {
         border: 1px solid var(--color-border-default);
@@ -79,11 +139,7 @@ export class PopoverElement extends LitElement {
         position-area: right;
       }
       :host([data-position='bottom']) {
-        top: anchor(bottom);
-        left: max(
-          0px,
-          min(anchor(center), 100vw - var(--popover-width, 320px))
-        );
+        position-area: bottom;
       }
       :host([data-position='left']) {
         position-area: left;
