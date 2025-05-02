@@ -95,6 +95,7 @@ export class ComboboxElement extends LitElement {
     this.selectedValue = null;
     this.selectedIndex = 0;
     this.searchString = '';
+    this.deregisterShortcuts(); // So keyboard events don't continue to handle the menu
     this.onClose();
   }
 

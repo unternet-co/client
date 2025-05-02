@@ -14,9 +14,10 @@ import { ResourceModel } from '../../protocols/resources';
 export class WorkspaceView extends HTMLElement {
   constructor() {
     super();
+    this.monitorCommandInput = this.monitorCommandInput.bind(this);
     this.openToolsMenu = this.openToolsMenu.bind(this);
     this.closeToolsMenu = this.closeToolsMenu.bind(this);
-    this.monitorCommandInput = this.monitorCommandInput.bind(this);
+    this.appendSpace = this.appendSpace.bind(this);
   }
   private _workspaceId: WorkspaceRecord['id'];
   private workspaceModel: WorkspaceModel =
@@ -52,18 +53,19 @@ export class WorkspaceView extends HTMLElement {
 
     // Set up visibility observer to focus when tab is switched back to this view
     this.setupVisibilityObserver();
-    setTimeout(() => {
-      const inputDiv = this.getCommandInput();
-      inputDiv.addEventListener('input', () => {
-        this.monitorCommandInput();
-      });
-    }, 0);
+    // Wait for the DOM to be ready before setting up the input listener
+    requestAnimationFrame(() => this.setupInputListener());
   }
 
   disconnectedCallback() {
     if (this.visibilityObserver) {
       this.visibilityObserver.disconnect();
     }
+  }
+
+  private setupInputListener() {
+    const inputDiv = this.getCommandInput();
+    inputDiv.addEventListener('input', this.monitorCommandInput);
   }
 
   private focusCommandInput() {
@@ -142,31 +144,16 @@ export class WorkspaceView extends HTMLElement {
 
   normalizeInputContent(inputContent: string) {
     // Normalize the input content by replacing non-breaking spaces with regular spaces
-    return inputContent.replace(/\u00A0/g, ' ').replace(/[\u00A0\u200B]/g, ' ');
-  }
-
-  getNormalizedInputContent() {
-    return this.normalizeInputContent(this.getInputContent());
-  }
-
-  isBeginningOfInput(inputContent: string) {
-    return inputContent.length === 0;
-  }
-
-  isAfterSpace(inputContent: string) {
-    return inputContent.endsWith(' ');
-  }
-
-  isAfterNewline(inputContent: string) {
-    return inputContent.endsWith('\n');
+    return inputContent.replace(/[\u00A0\u200B]/g, ' ');
   }
 
   shouldOpenToolsMenu() {
-    const inputContent = this.getNormalizedInputContent();
+    const inputContent = this.normalizeInputContent(this.getInputContent());
+    // Return true if the input is empty, ends with a space, or ends with a newline
     return (
-      this.isBeginningOfInput(inputContent) ||
-      this.isAfterSpace(inputContent) ||
-      this.isAfterNewline(inputContent)
+      inputContent.length === 0 ||
+      inputContent.endsWith(' ') ||
+      inputContent.endsWith('\n')
     );
   }
 
@@ -193,11 +180,9 @@ export class WorkspaceView extends HTMLElement {
   }
 
   selectTool(tool: string) {
-    const commandInput = this.querySelector('command-input') as HTMLElement;
-    const shadowRoot = commandInput.shadowRoot;
-    const commandInputDiv = shadowRoot.querySelector('.command-input');
+    const commandInputDiv = this.getCommandInput();
     // Append the selected tool
-    commandInputDiv.innerHTML += `${tool}`;
+    commandInputDiv.appendChild(document.createTextNode(tool));
     this.appendSpace();
     this.setCaretToEnd();
     this.isToolsMenuOpen = false;
@@ -205,9 +190,12 @@ export class WorkspaceView extends HTMLElement {
   }
 
   isInputEmpty() {
-    const inputContent = this.getNormalizedInputContent();
-    const cleaned = inputContent.replace(/[\u200B\u00A0\n\r]/g, '');
-    return cleaned.length === 0;
+    // Remove Chromium-injected invisible characters and structural whitespace
+    const cleanedInputContent = this.getInputContent().replace(
+      /[\u200B\u00A0\n\r]/g,
+      ''
+    );
+    return cleanedInputContent.length === 0;
   }
 
   monitorCommandInput() {
