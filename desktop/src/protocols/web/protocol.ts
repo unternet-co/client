@@ -3,19 +3,12 @@ import { WebProcess } from './processes';
 
 export class WebProtocol extends Protocol {
   scheme = ['http', 'https'];
-  hiddenContainer = document.createElement('div');
 
-  constructor() {
-    super();
-    this.hiddenContainer.style.display = 'none';
-    document.body.appendChild(this.hiddenContainer);
-  }
+  // TODO: Make this a standard part of the kernel
+  static createResource() {}
 
   async handleAction(action: ActionProposal) {
-    const process = new WebProcess({
-      url: action.uri,
-      hiddenContainer: this.hiddenContainer,
-    });
+    const process = await WebProcess.create(action.uri);
     await process.handleAction(action);
     return process;
   }

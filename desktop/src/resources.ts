@@ -1,8 +1,8 @@
 import { resource, Resource } from '@unternet/kernel';
-import webResource from './builtin/resources';
-import { Notifier } from '../common/notifier';
-import { getMetadata, uriWithScheme } from '../common/utils/http';
-import { DatabaseService } from '../storage/database-service';
+import webResource from './protocols/builtin/resources';
+import { Notifier } from './common/notifier';
+import { getMetadata, uriWithScheme } from './common/utils/http';
+import { DatabaseService } from './storage/database-service';
 
 const initialResources: Array<Resource> = new Array();
 
@@ -48,11 +48,12 @@ class ResourceModel {
     }
 
     const metadata = await getMetadata(uri);
-    const _resource = resource({
+    const newResource = resource({
       uri,
       ...metadata,
     });
-    this.add(_resource);
+
+    this.add(newResource);
   }
 
   add(resource: Resource) {

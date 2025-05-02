@@ -1,34 +1,50 @@
-import { ActionProposal, Process } from '@unternet/kernel';
+import { ActionProposal, Process, ResourceIcon } from '@unternet/kernel';
 import { WebviewTag } from 'electron';
 import iconSrc from '../builtin/icon-128x128.png';
 import { Applet, applets } from '@web-applets/sdk';
-
-interface WebProcessInit {
-  url: string;
-  hiddenContainer: HTMLElement;
-}
+import { getMetadata } from '../../common/utils/http';
 
 interface WebProcessState {
   url: string;
   title?: string;
   description?: string;
+  icons?: ResourceIcon[];
   data?: any;
 }
 
+// TODO: Put this somewhere better?
+const hiddenContainer = document.createElement('div');
+hiddenContainer.style.display = 'none';
+document.body.appendChild(hiddenContainer);
+
 export class WebProcess extends Process {
   url: string;
-  hiddenContainer: HTMLElement;
-  title: string;
-  description: string;
-  // webview: WebviewTag;
-  data: any;
-  webview: HTMLIFrameElement;
+  webview: HTMLIFrameElement; // TODO: WebviewTag
+  title?: string;
+  description?: string;
+  icons?: ResourceIcon[];
+  data?: any;
 
-  constructor({ url, data }: WebProcessState) {
+  static async create(url: string) {
+    const process = new WebProcess(url);
+    const metadata = await getMetadata(url);
+    console.log(metadata);
+    process.title = metadata.title;
+    process.description = metadata.description;
+    process.icons = metadata.icons;
+    return process;
+  }
+
+  static hydrate(state: WebProcessState) {
+    console.log('hydrate', state.url);
+    const process = new WebProcess(state.url);
+    process.data = state.data;
+    return process;
+  }
+
+  constructor(url: string) {
     super();
     this.url = url;
-    this.data = data;
-
     this.webview = document.createElement('iframe');
     this.webview.src = url;
     this.icons = [
@@ -40,19 +56,15 @@ export class WebProcess extends Process {
     this.webview.style.height = '400px';
     this.webview.style.border = 'none';
     this.webview.style.width = '100%';
-    this.webview.style.background = 'white';
-  }
-
-  static spawn({ url, hiddenContainer }: WebProcessInit) {
-    const process = new WebProcess({ url });
-    process.hiddenContainer = hiddenContainer;
-    return process;
+    this.webview.style.background = 'var(--color-bg-content)';
   }
 
   async handleAction(action: ActionProposal) {
-    const applet = await this.connectApplet(this.hiddenContainer);
+    console.log('handleAction');
+    const applet = await this.connectApplet(hiddenContainer);
+    await applet.sendAction(action.actionId, action.args);
     this.data = applet.data;
-    this.disconnectApplet(this.hiddenContainer);
+    this.disconnectApplet(hiddenContainer);
   }
 
   describe() {
@@ -67,19 +79,19 @@ export class WebProcess extends Process {
   mount(host: HTMLElement): void | Promise<void> {
     host.appendChild(this.webview);
     setTimeout(async () => {
-      console.log(this.webview.contentWindow);
       const applet = await applets.connect(this.webview.contentWindow);
-      console.log('setting data', this.data);
       applet.data = this.data;
     }, 10);
     // this.connectApplet(host);
   }
 
+  unmount(): void {
+    this.disconnectApplet();
+  }
+
   async connectApplet(element: HTMLElement): Promise<Applet> {
     element.appendChild(this.webview);
-    console.log(this.webview.contentWindow);
     const applet = await applets.connect(this.webview.contentWindow);
-    console.log('setting data', this.data);
     applet.data = this.data;
     return applet;
   }
@@ -88,15 +100,13 @@ export class WebProcess extends Process {
     this.webview.remove();
   }
 
-  unmount(): void {
-    this.disconnectApplet();
-  }
-
-  static hydrate(state: WebProcessState) {
-    return new WebProcess(state);
-  }
-
   serialize(): WebProcessState {
-    return { url: this.url, data: this.data };
+    return {
+      url: this.url,
+      data: this.data,
+      title: this.title,
+      description: this.description,
+      icons: this.icons,
+    };
   }
 }

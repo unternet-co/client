@@ -12,7 +12,7 @@ import {
 import { WorkspaceRecord, WorkspaceModel } from '../workspaces';
 import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
-import { ResourceModel } from '../protocols/resources';
+import { ResourceModel } from '../resources';
 import { Notifier } from '../common/notifier';
 
 export interface KernelInit {

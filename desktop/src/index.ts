@@ -13,7 +13,7 @@ import { Kernel } from './ai/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
 import { AIModelService } from './ai/ai-models';
-import { ResourceModel, initialResources } from './protocols/resources';
+import { ResourceModel, initialResources } from './resources';
 import { protocols } from './protocols/protocols';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
@@ -138,4 +138,5 @@ if (
 
 /* Add web applets */
 
+resourceModel.register('https://ruperts.world');
 resourceModel.register('https://applets.unternet.co/calculator');

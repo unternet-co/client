@@ -29,8 +29,8 @@ export abstract class Process {
   static source: string;
   tag: string;
   source: string;
-  title: string;
-  icons: ResourceIcon[];
+  title?: string;
+  icons?: ResourceIcon[];
   actions?: ActionMap;
 
   constructor() {
@@ -121,7 +121,7 @@ export class ProcessContainer {
     serializedProcess: SerializedProcess,
     constructor: ProcessConstructor
   ) {
-    const process = new constructor(serializedProcess.state);
+    const process = constructor.hydrate(serializedProcess.state);
     const containedProcess = new ProcessContainer(process);
     return containedProcess;
   }

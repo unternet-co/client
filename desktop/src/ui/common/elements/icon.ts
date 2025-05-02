@@ -36,9 +36,7 @@ export const ICON = {
   search: 'search',
   upload: 'upload',
   attachment: 'paperclip',
-  archive: 'plus',
-  // archive: 'broom',
-  // archive: 'check-check',
+  archive: 'check-check',
 } as const;
 
 export type IconSize = 'small' | 'medium' | 'large';

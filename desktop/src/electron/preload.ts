@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('system', {
-  fetch: (url) => ipcRenderer.invoke('fetch', url),
+  fetch: (url: string) => ipcRenderer.invoke('fetch', url),
 });
 
 // Expose simplified electron API for window state
