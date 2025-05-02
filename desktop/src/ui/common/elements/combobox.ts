@@ -51,19 +51,11 @@ export class ComboboxElement extends LitElement {
   constructor() {
     super();
     this.selectedValue = this.selectedValue || this.options?.[0]?.value;
-    this.onSelect = this.onSelect.bind(this);
     this.searchString = this.searchString || '';
     this.selectNextOption = this.selectNextOption.bind(this);
     this.selectPrevOption = this.selectPrevOption.bind(this);
     this.selectOption = this.selectOption.bind(this);
     this.closeOptions = this.closeOptions.bind(this);
-    this.onClose = this.onClose.bind(this);
-    this.shouldSelect = this.shouldSelect.bind(this);
-    this.registerShortcuts = this.registerShortcuts.bind(this);
-    this.deregisterShortcuts = this.deregisterShortcuts.bind(this);
-    this.render = this.render.bind(this);
-    this.focus = this.focus.bind(this);
-    this.deregisterShortcuts = this.deregisterShortcuts.bind(this);
     this.registerShortcuts();
   }
 
