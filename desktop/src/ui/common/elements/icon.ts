@@ -36,7 +36,7 @@ export const ICON = {
   search: 'search',
   upload: 'upload',
   attachment: 'paperclip',
-  archive: 'plus',
+  archive: 'check-check',
   // archive: 'broom',
   // archive: 'check-check',
 } as const;
