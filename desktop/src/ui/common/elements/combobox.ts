@@ -39,12 +39,14 @@ export class ComboboxElement extends LitElement {
     options: { type: Array },
     selectedValue: { type: String, reflect: true },
     searchString: { type: String },
+    visible: { type: Boolean, reflect: true },
   };
 
   options: { label: string; value: string }[] = [];
   selectedValue: string | null;
   searchString: string;
   selectedIndex: number = 0;
+  visible: boolean = false;
   private shortcutService =
     dependencies.resolve<ShortcutService>('ShortcutService');
 
@@ -57,6 +59,16 @@ export class ComboboxElement extends LitElement {
     this.selectOption = this.selectOption.bind(this);
     this.closeOptions = this.closeOptions.bind(this);
     this.registerShortcuts();
+  }
+
+  updated(changedProps: Map<string, unknown>) {
+    if (changedProps.has('visible')) {
+      if (this.visible) {
+        this.registerShortcuts();
+      } else {
+        this.deregisterShortcuts();
+      }
+    }
   }
 
   private onSelect(selectedValue: string) {
@@ -150,8 +162,19 @@ export class ComboboxElement extends LitElement {
         list-style: none;
         padding: 0;
         margin: 0;
-        display: block;
         width: 100%;
+      }
+
+      :host {
+        display: block;
+      }
+
+      :host([visible]) {
+        display: block;
+      }
+
+      :host(:not([visible])) {
+        display: none;
       }
 
       .combobox-option {

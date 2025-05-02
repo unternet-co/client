@@ -225,6 +225,7 @@ export class WorkspaceView extends HTMLElement {
           <un-combobox
             class="combobox"
             .options=${this.toolsMenuOptions}
+            .visible=${this.isToolsMenuOpen}
             @select=${(e) => {
               console.log('Selected:', e.input.text);
               this.selectTool(e.input.text);
