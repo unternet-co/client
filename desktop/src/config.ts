@@ -51,6 +51,11 @@ export class ConfigModel {
     this.notifier.notify();
   }
 
+  updateActiveWorkspaceId(id: string | null) {
+    this.config.activeWorkspaceId = id;
+    this.store.set(this.config);
+  }
+
   updatePrimaryModel(model: AIModelDescriptor) {
     this.config.ai.primaryModel = model;
     this.store.set(this.config);
