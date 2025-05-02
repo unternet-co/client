@@ -48,19 +48,17 @@ export class CommandInputElement extends LitElement {
   private handleKeyDown(e: KeyboardEvent) {
     if (this.disabled) return;
 
-    // if (e.key === 'Enter') {
-    //   e.preventDefault();
-    //   if (this.value && this.value.trim()) {
-    //     this.handleSubmit();
-    //   }
-    // }
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      this.handleSubmit();
+    }
     if (e.key === '@') {
       this.dispatchEvent(new ComboboxOpenEvent());
     }
   }
 
   private handleSubmit() {
-    if (this.disabled || !this.value || !this.value.trim()) return;
+    if (this.disabled) return;
 
     this.dispatchEvent(new CommandSubmitEvent(this.value));
     this.value = '';

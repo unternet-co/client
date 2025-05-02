@@ -75,7 +75,6 @@ export class ComboboxElement extends LitElement {
     // This resets the selection for next time it is rendered
     this.selectedValue = null;
     this.selectedIndex = 0;
-    // The selection is bubbled up
     this.dispatchEvent(new ComboboxSelectEvent(selectedValue));
   }
 
@@ -138,6 +137,10 @@ export class ComboboxElement extends LitElement {
     const filteredOptions = this.options.filter(({ value }) =>
       value.includes(this.searchString)
     );
+
+    if (filteredOptions.length === 0) {
+      this.onClose();
+    }
     return html`
       <ul class="combobox">
         ${filteredOptions.map(

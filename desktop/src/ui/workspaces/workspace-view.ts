@@ -90,6 +90,7 @@ export class WorkspaceView extends HTMLElement {
   }
 
   async handleCommandSubmit(e: CommandSubmitEvent) {
+    if (this.getInputContent().trim().length === 0) return;
     try {
       await this.kernel.handleInput(this.workspaceId, e.input);
     } catch (error) {
