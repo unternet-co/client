@@ -82,7 +82,7 @@ export class WorkspaceModel {
     const workspaceRecords = await this.workspaceDatabase.all();
 
     if (!workspaceRecords.length) {
-      this.create(DEFAULT_WORKSPACE_NAME);
+      await this.create(DEFAULT_WORKSPACE_NAME);
     }
 
     for (const record of workspaceRecords) {
@@ -94,12 +94,13 @@ export class WorkspaceModel {
     // Restore activeWorkspaceId (if saved previously)
     let activeWorkspaceId: Workspace['id'];
     const storedId = this.configModel.get('activeWorkspaceId');
+
     if (storedId && this.workspaces.has(storedId)) {
       activeWorkspaceId = storedId;
     } else if (!this.activeWorkspaceId && this.workspaces.size > 0) {
       activeWorkspaceId = Array.from(this.workspaces.keys())[0];
     } else {
-      throw new Error(`No workspaces exist!`);
+      activeWorkspaceId = this.activeWorkspaceId;
     }
 
     // Load the messages & update
@@ -114,6 +115,7 @@ export class WorkspaceModel {
     if (id === this.activeWorkspace?.id) return;
     this.activeWorkspaceId = id;
     this.notifier.notify({ workspaceId: id });
+    this.configModel.updateActiveWorkspaceId(id);
   }
 
   all(): WorkspaceRecord[] {
@@ -169,7 +171,7 @@ export class WorkspaceModel {
     this.notifier.notify({ workspaceId: id });
   }
 
-  create(title?: string): Workspace {
+  async create(title?: string): Promise<Workspace> {
     // Create workspace record & add to database
     const now = Date.now();
     const record: WorkspaceRecord = {
@@ -179,7 +181,8 @@ export class WorkspaceModel {
       accessed: now,
       modified: now,
     };
-    this.workspaceDatabase.create(record);
+
+    await this.workspaceDatabase.create(record);
 
     // Create workspace
     const workspace = {
@@ -189,8 +192,10 @@ export class WorkspaceModel {
       showArchived: false,
       scrollPosition: null,
     };
+
     this.workspaces.set(workspace.id, workspace);
-    this.activate(workspace.id);
+    await this.activate(workspace.id);
+
     return workspace;
   }
 

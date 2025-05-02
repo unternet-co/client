@@ -68,6 +68,16 @@ export class SelectElement extends LitElement {
     this._mutationObserver?.disconnect();
   }
 
+  updated() {
+    const selectElement = this.shadowRoot.querySelector('select');
+    if (!selectElement) return;
+
+    const options = Array.from(selectElement.querySelectorAll('option'));
+    const idx = options.findIndex((opt) => opt.value === this.value);
+
+    selectElement.selectedIndex = idx;
+  }
+
   private handleChange(e: Event) {
     const select = e.target as HTMLSelectElement;
     this.value = select.value;
