@@ -134,7 +134,8 @@ export class WorkspaceModel {
   setTitle(title: string, id?: WorkspaceRecord['id']) {
     const workspace = this.get(id);
     workspace.title = title;
-    this.workspaceDatabase.update(id, { title });
+    console.log('Setting title!!!');
+    this.workspaceDatabase.update(workspace.id, { title });
     this.notifier.notify({ workspaceId: id });
   }
 
@@ -197,6 +198,7 @@ export class WorkspaceModel {
   async hydrate(record: WorkspaceRecord) {
     const activeMessages = [];
     const inactiveMessages = [];
+    console.log('archive up to', record.archiveUpToId);
 
     // Get all message records, hydrate them & add to appropriate bucket (active vs. inactive)
     const messageRecords = await this.messageDatabase.where({
@@ -204,7 +206,8 @@ export class WorkspaceModel {
     });
     for (const messageRecord of messageRecords) {
       const message = this.hydrateMessage(messageRecord);
-      if (!record.archiveUpToId || message.id > messageRecord.archiveUpToId) {
+      if (!record.archiveUpToId || message.id > record.archiveUpToId) {
+        console.log('active message', message.id);
         activeMessages.push(message);
       } else {
         inactiveMessages.push(message);
