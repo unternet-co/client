@@ -161,7 +161,7 @@
       <div class="app-icons">
         <div class="icon-item">
           <img
-            src="src/electron/app-icons/client-icon-macOS.png"
+            src="build/app-icons/client-icon-macOS.png"
             alt="macOS Icon"
             width="128"
             height="128"
@@ -170,7 +170,7 @@
         </div>
         <div class="icon-item">
           <img
-            src="src/electron/app-icons/client-icon-macOS@2x.png"
+            src="build/app-icons/client-icon-macOS@2x.png"
             alt="macOS Icon 2x"
             width="128"
             height="128"
@@ -179,7 +179,7 @@
         </div>
         <div class="icon-item">
           <img
-            src="src/electron/app-icons/client-icon-windows.ico"
+            src="build/app-icons/client-icon-windows.ico"
             alt="Windows Icon"
             width="128"
             height="128"
@@ -275,6 +275,104 @@ return "Hello, World!";
     </div>
     <div class="theme-block">
       <h2>Elements</h2>
+
+      <!-- un-popover showcase example -->
+      <script type="module" src="src/ui/common/elements/popover.ts"></script>
+      <div>
+        <style>
+          .locked-to-cursor {
+            position: fixed !important;
+            z-index: 9999;
+            pointer-events: auto;
+            transition: none;
+          }
+        </style>
+        <script type="module">
+          // Attach cursor-locking behavior to all <un-button> with command="show-popover"
+          document
+            .querySelectorAll('un-button[command="show-popover"]')
+            .forEach((anchor) => {
+              let locked = false;
+              let moveHandler = null;
+              function moveButton(e) {
+                anchor.classList.add('locked-to-cursor');
+                const rect = anchor.getBoundingClientRect();
+                anchor.style.left = `${e.clientX - rect.width / 2}px`;
+                anchor.style.top = `${e.clientY - rect.height / 2}px`;
+              }
+              anchor.addEventListener('click', (ev) => {
+                locked = !locked;
+                if (locked) {
+                  moveHandler = moveButton;
+                  window.addEventListener('mousemove', moveHandler);
+                } else {
+                  anchor.classList.remove('locked-to-cursor');
+                  window.removeEventListener('mousemove', moveHandler);
+                  moveHandler = null;
+                }
+                ev.stopPropagation();
+              });
+            });
+        </script>
+        <div style="display: flex; justify-content: space-between">
+          <un-button
+            id="anchor-id-right"
+            text="Right Popover"
+            command="show-popover"
+            commandfor="popover-id-right"
+          ></un-button>
+          <un-popover
+            id="popover-id-right"
+            anchor="anchor-id-right"
+            position="right"
+          >
+            <strong>This is a popover!</strong>
+            <p>You can put any content here.</p>
+          </un-popover>
+
+          <un-button
+            id="anchor-id-top"
+            text="Top Popover"
+            command="show-popover"
+            commandfor="popover-id-top"
+          ></un-button>
+          <un-popover id="popover-id-top" anchor="anchor-id-top" position="top">
+            <strong>This is a popover!</strong>
+            <p>You can put any content here.</p>
+          </un-popover>
+
+          <un-button
+            id="anchor-id-bottom"
+            text="Bottom Popover"
+            command="show-popover"
+            commandfor="popover-id-bottom"
+          ></un-button>
+          <un-popover
+            id="popover-id-bottom"
+            anchor="anchor-id-bottom"
+            position="bottom"
+          >
+            <strong>This is a popover!</strong>
+            <p>You can put any content here.</p>
+          </un-popover>
+
+          <un-button
+            id="anchor-id-left"
+            text="Left Popover"
+            command="show-popover"
+            commandfor="popover-id-left"
+          ></un-button>
+          <un-popover
+            id="popover-id-left"
+            anchor="anchor-id-left"
+            position="left"
+          >
+            <strong>This is a popover!</strong>
+            <p>You can put any content here.</p>
+          </un-popover>
+        </div>
+      </div>
+
       <div>
         <a href="#">Link</a>
       </div>
@@ -637,153 +735,6 @@ return "Hello, World!";
       </div>
     </div>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        // Get all CSS variables from the document
-        const colorGroups = {
-          'Brand Colors': {
-            Neutral: /^--color-neutral-/,
-            Action: /^--color-action-/,
-            Reaction: /^--color-reaction-/,
-          },
-          'Utility Colors': {
-            Success: /^--color-success-/,
-            Error: /^--color-error-/,
-            Highlight: /^--color-highlight-/,
-          },
-          'UI Color Aliases': {
-            Text: /^--color-text-/,
-            Background: /^--color-bg-/,
-            Border: /^--color-border-/,
-          },
-        };
-
-        const colorSwatchesContainer =
-          document.getElementById('color-swatches');
-
-        // Get all computed styles
-        const styles = getComputedStyle(document.documentElement);
-        const cssVars = Array.from(document.styleSheets)
-          .filter((sheet) => {
-            try {
-              // Filter out cross-origin stylesheets
-              return (
-                sheet.href === null ||
-                sheet.href.startsWith(window.location.origin)
-              );
-            } catch (e) {
-              return false;
-            }
-          })
-          .reduce((acc, sheet) => {
-            try {
-              // Get all CSS rules that contain variable declarations
-              const rules = Array.from(sheet.cssRules || []);
-              rules.forEach((rule) => {
-                if (rule.style) {
-                  for (let i = 0; i < rule.style.length; i++) {
-                    const prop = rule.style[i];
-                    if (prop.startsWith('--color-')) {
-                      acc.push(prop);
-                    }
-                  }
-                }
-              });
-            } catch (e) {
-              console.error('Error accessing CSS rules:', e);
-            }
-            return acc;
-          }, []);
-
-        // Remove duplicates
-        const uniqueVars = [...new Set(cssVars)];
-
-        // Create swatches for each group
-        for (const [groupName, colorTypes] of Object.entries(colorGroups)) {
-          const groupDiv = document.createElement('div');
-          groupDiv.className = 'color-group';
-          groupDiv.innerHTML = `<h3>${groupName}</h3>`;
-
-          let hasColors = false;
-
-          for (const [typeName, regex] of Object.entries(colorTypes)) {
-            const typeDiv = document.createElement('div');
-            typeDiv.innerHTML = `<h4>${typeName}</h4>`;
-
-            const swatchesDiv = document.createElement('div');
-            swatchesDiv.className = 'swatches';
-
-            const matchingVars = uniqueVars.filter((v) => regex.test(v));
-
-            // Sort variables numerically if they end with numbers
-            matchingVars.sort((a, b) => {
-              const aMatch = a.match(/(\d+)$/);
-              const bMatch = b.match(/(\d+)$/);
-
-              if (aMatch && bMatch) {
-                return parseInt(aMatch[1]) - parseInt(bMatch[1]);
-              }
-              return a.localeCompare(b);
-            });
-
-            if (matchingVars.length > 0) {
-              hasColors = true;
-
-              matchingVars.forEach((varName) => {
-                const value = styles.getPropertyValue(varName).trim();
-
-                // Skip if the value is empty or references another var
-                if (!value || value.includes('var(--')) {
-                  return;
-                }
-
-                const swatch = document.createElement('div');
-                swatch.className = 'swatch';
-                swatch.style.backgroundColor = `var(${varName})`;
-                swatchesDiv.appendChild(swatch);
-              });
-
-              typeDiv.appendChild(swatchesDiv);
-              groupDiv.appendChild(typeDiv);
-            }
-          }
-
-          if (hasColors) {
-            colorSwatchesContainer.appendChild(groupDiv);
-          }
-        }
-      });
-    </script>
-    <script type="module">
-      import { ICON } from './src/ui/common/icon.ts';
-
-      // Function to generate icon grid
-      function generateIconGrid() {
-        const iconGrid = document.getElementById('icon-grid');
-
-        // Build HTML for all icons from ICON
-        let iconsHtml = Object.entries(ICON)
-          .map(
-            ([key, value]) => `
-          <div class="icon-item" title="${key}${key !== value ? ` (${value})` : ''}">
-            <un-icon name="${key}"></un-icon>
-          </div>
-        `
-          )
-          .join('');
-
-        // Set the HTML content
-        iconGrid.innerHTML = iconsHtml;
-      }
-
-      // Generate the icon grid when the DOM is loaded
-      document.addEventListener('DOMContentLoaded', generateIconGrid);
-      if (
-        document.readyState === 'complete' ||
-        document.readyState === 'interactive'
-      ) {
-        setTimeout(generateIconGrid, 1);
-      }
-    </script>
+    <script type="module" src="./theme-demo.js"></script>
   </body>
 </html>

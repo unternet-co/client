@@ -11,7 +11,6 @@ export type ButtonType =
   | 'ghost';
 
 export type ButtonSize = 'small' | 'medium' | 'large';
-
 export type IconPosition = 'start' | 'end';
 
 export class ButtonElement extends LitElement {
@@ -23,6 +22,8 @@ export class ButtonElement extends LitElement {
   disabled: boolean;
   loading: boolean;
   title: string;
+  command?: string;
+  commandfor?: string;
   private buttonElement: HTMLButtonElement | null = null;
 
   static get properties() {
@@ -35,6 +36,8 @@ export class ButtonElement extends LitElement {
       disabled: { type: Boolean },
       loading: { type: Boolean },
       title: { type: String },
+      command: { type: String, attribute: 'command' },
+      commandfor: { type: String, attribute: 'commandfor' },
     };
   }
 
@@ -52,22 +55,49 @@ export class ButtonElement extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    this.addEventListener('keydown', this.handleKeyDown);
+    this.addEventListener('keydown', this.#handleKeyDown);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.removeEventListener('keydown', this.handleKeyDown);
+    this.removeEventListener('keydown', this.#handleKeyDown);
   }
 
   firstUpdated() {
     this.buttonElement = this.shadowRoot?.querySelector('button') || null;
+    this.#assignPopoverTarget();
+  }
+
+  updated(changedProps: Map<string, any>) {
+    if (changedProps.has('commandfor')) {
+      this.#assignPopoverTarget();
+    }
+  }
+
+  /*
+   * Assigns the popover target to the button element
+   * because the shadowRoot doesn't have access to the document
+   */
+  #assignPopoverTarget() {
+    if (!this.buttonElement || !this.commandfor) return;
+    const root = this.getRootNode();
+    let popover: HTMLElement | null = null;
+    if (root instanceof ShadowRoot && root.host) {
+      popover =
+        root.host.ownerDocument?.getElementById(this.commandfor) || null;
+    }
+    if (!popover) {
+      popover = document.getElementById(this.commandfor);
+    }
+    if (popover) {
+      (this.buttonElement as any).popoverTargetElement = popover;
+    }
   }
 
   /**
    * For keyboard accessibility, fire a click when enter is pressed
    */
-  private handleKeyDown = (e: KeyboardEvent) => {
+  #handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' && !this.disabled && !this.loading) {
       e.preventDefault();
       this.buttonElement?.click();
@@ -100,17 +130,22 @@ export class ButtonElement extends LitElement {
         title=${this.title}
         aria-busy=${this.loading ? 'true' : 'false'}
         aria-disabled=${this.disabled ? 'true' : 'false'}
+        command=${this.command ?? ''}
+        commandfor=${this.commandfor ?? ''}
       >
         ${this.icon && this.iconPosition === 'start'
           ? html`
               <span class="icon-container icon-start">
                 ${this.loading
-                  ? html`
-                      <un-icon name="loading" size=${this.size} spin></un-icon>
-                    `
-                  : html`
-                      <un-icon name=${this.icon} size=${this.size}></un-icon>
-                    `}
+                  ? html`<un-icon
+                      name="loading"
+                      size=${this.size}
+                      spin
+                    ></un-icon>`
+                  : html`<un-icon
+                      name=${this.icon}
+                      size=${this.size}
+                    ></un-icon>`}
               </span>
             `
           : ''}
@@ -119,17 +154,20 @@ export class ButtonElement extends LitElement {
           ? html`
               <span class="icon-container icon-end">
                 ${this.loading
-                  ? html`
-                      <un-icon name="loading" size=${this.size} spin></un-icon>
-                    `
-                  : html`
-                      <un-icon name=${this.icon} size=${this.size}></un-icon>
-                    `}
+                  ? html`<un-icon
+                      name="loading"
+                      size=${this.size}
+                      spin
+                    ></un-icon>`
+                  : html`<un-icon
+                      name=${this.icon}
+                      size=${this.size}
+                    ></un-icon>`}
               </span>
             `
           : ''}
         ${this.loading && !this.icon
-          ? html` <un-icon name="loading" spin size=${this.size}></un-icon> `
+          ? html`<un-icon name="loading" spin size=${this.size}></un-icon>`
           : ''}
       </button>
     `;
