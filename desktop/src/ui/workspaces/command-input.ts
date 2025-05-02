@@ -2,6 +2,9 @@ import { LitElement, html, css } from 'lit';
 import { KernelInput } from '../../ai/kernel';
 import '../common/elements/input';
 import '../common/elements/button';
+import { ShortcutService } from '../../shortcuts/shortcut-service';
+import { dependencies } from '../../common/dependencies';
+import { ComboboxOpenEvent } from '../common/elements/combobox';
 
 export class CommandSubmitEvent extends Event {
   input: KernelInput;
@@ -36,7 +39,7 @@ export class CommandInputElement extends LitElement {
   }
 
   focus() {
-    const input = this.shadowRoot?.querySelector('un-input');
+    const input = this.shadowRoot?.querySelector('.command-input');
     if (input) {
       (input as any).focus();
     }
@@ -45,11 +48,14 @@ export class CommandInputElement extends LitElement {
   private handleKeyDown(e: KeyboardEvent) {
     if (this.disabled) return;
 
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (this.value && this.value.trim()) {
-        this.handleSubmit();
-      }
+    // if (e.key === 'Enter') {
+    //   e.preventDefault();
+    //   if (this.value && this.value.trim()) {
+    //     this.handleSubmit();
+    //   }
+    // }
+    if (e.key === '@') {
+      this.dispatchEvent(new ComboboxOpenEvent());
     }
   }
 
@@ -69,14 +75,15 @@ export class CommandInputElement extends LitElement {
   render() {
     return html`
       <div class="command-input-wrapper">
-        <un-input
+        <div
+          class="command-input"
           .value=${this.value || ''}
-          variant="ghost"
           ?disabled=${this.disabled}
           placeholder=${this.placeholder}
           @keydown=${this.handleKeyDown}
           @input=${this.handleInput}
-        ></un-input>
+          contenteditable
+        ></div>
         <un-button
           class="submit-button"
           size="small"
@@ -113,6 +120,10 @@ export class CommandInputElement extends LitElement {
     .command-input-wrapper:focus-within {
       outline-color: var(--color-action-800);
       background: var(--color-neutral-0);
+    }
+
+    .command-input {
+      outline: none;
     }
 
     un-input {

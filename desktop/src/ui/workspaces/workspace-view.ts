@@ -3,17 +3,26 @@ import './command-input';
 import './thread-view';
 import './workspace-view.css';
 import './resource-bar';
+import '../common/elements/combobox';
 import { html, render } from 'lit';
 import { WorkspaceRecord, WorkspaceModel } from '../../workspaces';
 import { Kernel, KernelNotInitializedError } from '../../ai/kernel';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
+import { ResourceModel } from '../../protocols/resources';
 
 export class WorkspaceView extends HTMLElement {
+  constructor() {
+    super();
+    this.openToolsMenu = this.openToolsMenu.bind(this);
+    this.closeToolsMenu = this.closeToolsMenu.bind(this);
+  }
   private _workspaceId: WorkspaceRecord['id'];
   private workspaceModel: WorkspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   private visibilityObserver: IntersectionObserver;
+  private isToolsMenuOpen = false;
 
   set workspaceId(id: WorkspaceRecord['id']) {
     if (this._workspaceId !== id) {
@@ -91,6 +100,48 @@ export class WorkspaceView extends HTMLElement {
     this.workspaceModel.setArchiveVisibility(!ws.showArchived);
   };
 
+  get toolsMenuOptions() {
+    return this.resourceModel
+      .all()
+      .map((resource) => ({
+        label: resource.name.toLowerCase(),
+        value: resource.name,
+      }))
+      .concat([
+        { label: 'calculator', value: 'Calculator' },
+        { label: 'maps', value: 'Maps' },
+      ]);
+  }
+
+  openToolsMenu() {
+    this.isToolsMenuOpen = true;
+    render(this.template, this);
+  }
+
+  closeToolsMenu() {
+    this.isToolsMenuOpen = false;
+    render(this.template, this);
+  }
+
+  selectTool(tool: string) {
+    const commandInput = this.querySelector('command-input') as HTMLElement;
+    const shadowRoot = commandInput.shadowRoot;
+    const commandInputDiv = shadowRoot.querySelector('.command-input');
+
+    commandInputDiv.innerHTML += `${tool}`;
+    const spaceNode = document.createTextNode('\u00A0');
+    commandInputDiv.appendChild(spaceNode);
+
+    const range = document.createRange();
+    const selection = window.getSelection();
+    range.selectNodeContents(commandInputDiv);
+    range.collapse(false);
+
+    selection.removeAllRanges();
+    selection.addRange(range);
+    this.isToolsMenuOpen = false;
+    render(this.template, this);
+  }
   get template() {
     return html`
       <!-- <div class="workspace-toolbar">
@@ -106,10 +157,23 @@ export class WorkspaceView extends HTMLElement {
         <thread-view for=${this.workspaceId}></thread-view>
       </div>
       <div class="bottom-bar">
+        <div class="tools-menu ${this.isToolsMenuOpen ? 'visible' : 'hidden'}">
+          <un-combobox
+            class="combobox"
+            .options=${this.toolsMenuOptions}
+            @select=${(e) => {
+              console.log('Selected:', e.input.text);
+              this.selectTool(e.input.text);
+            }}
+            @close=${this.closeToolsMenu}
+            searchString=""
+            selectedValue=${this.toolsMenuOptions[0].value}
+          ></un-combobox>
+        </div>
         <div class="command-bar">
-          <div></div>
           <command-input
             @submit=${this.handleCommandSubmit.bind(this)}
+            @open=${this.openToolsMenu}
           ></command-input>
           <un-button
             class="archive-button"

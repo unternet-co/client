@@ -16,6 +16,24 @@ export class ComboboxSelectEvent extends Event {
   }
 }
 
+export class ComboboxCloseEvent extends Event {
+  constructor() {
+    super('close', {
+      bubbles: true,
+      composed: true,
+    });
+  }
+}
+
+export class ComboboxOpenEvent extends Event {
+  constructor() {
+    super('open', {
+      bubbles: true,
+      composed: true,
+    });
+  }
+}
+
 export class ComboboxElement extends LitElement {
   static properties = {
     options: { type: Array },
@@ -42,9 +60,12 @@ export class ComboboxElement extends LitElement {
     this.registerShortcuts();
   }
 
-  private onSelect(value: string) {
-    this.selectedValue = value;
-    this.dispatchEvent(new ComboboxSelectEvent(value));
+  private onSelect(selectedValue: string) {
+    // This resets the selection for next time it is rendered
+    this.selectedValue = null;
+    this.selectedIndex = 0;
+    // The selection is bubbled up
+    this.dispatchEvent(new ComboboxSelectEvent(selectedValue));
   }
 
   selectNextOption() {
@@ -59,16 +80,23 @@ export class ComboboxElement extends LitElement {
   }
 
   selectOption() {
-    const selectedOption = this.options[this.selectedIndex];
+    const selectedOption =
+      this.options[this.selectedIndex] ||
+      this.options.find(({ value }) => value === this.selectedValue);
     if (selectedOption) {
-      this.onSelect(selectedOption.value);
+      this.onSelect(selectedOption.label);
     }
+  }
+
+  onClose() {
+    this.dispatchEvent(new ComboboxCloseEvent());
   }
 
   closeOptions() {
     this.selectedValue = null;
+    this.selectedIndex = 0;
     this.searchString = '';
-    // this.emitClose();
+    this.onClose();
   }
 
   registerShortcuts() {
@@ -87,6 +115,13 @@ export class ComboboxElement extends LitElement {
     this.shortcutService.deregister('Escape', this.closeOptions);
   }
 
+  shouldSelect(value: string, index: number) {
+    return (
+      this.selectedValue === value ||
+      (this.selectedValue === null && index === 0)
+    );
+  }
+
   render() {
     const filteredOptions = this.options.filter(({ value }) =>
       value.includes(this.searchString)
@@ -94,9 +129,9 @@ export class ComboboxElement extends LitElement {
     return html`
       <ul class="combobox">
         ${filteredOptions.map(
-          ({ value, label }) => html`
+          ({ value, label }, index) => html`
             <li
-              class="combobox-option ${this.selectedValue === value
+              class="combobox-option ${this.shouldSelect(value, index)
                 ? 'selected'
                 : ''}"
               @click=${() => this.onSelect(value)}
@@ -115,11 +150,14 @@ export class ComboboxElement extends LitElement {
         list-style: none;
         padding: 0;
         margin: 0;
+        display: block;
+        width: 100%;
       }
 
       .combobox-option {
         padding: 4px;
         cursor: pointer;
+        display: block;
       }
       .combobox-option:hover,
       .combobox-option.selected {
