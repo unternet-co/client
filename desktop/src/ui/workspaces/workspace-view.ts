@@ -16,6 +16,7 @@ export class WorkspaceView extends HTMLElement {
     super();
     this.openToolsMenu = this.openToolsMenu.bind(this);
     this.closeToolsMenu = this.closeToolsMenu.bind(this);
+    this.monitorCommandInput = this.monitorCommandInput.bind(this);
   }
   private _workspaceId: WorkspaceRecord['id'];
   private workspaceModel: WorkspaceModel =
@@ -51,6 +52,12 @@ export class WorkspaceView extends HTMLElement {
 
     // Set up visibility observer to focus when tab is switched back to this view
     this.setupVisibilityObserver();
+    setTimeout(() => {
+      const inputDiv = this.getCommandInput();
+      inputDiv.addEventListener('input', () => {
+        this.monitorCommandInput();
+      });
+    }, 0);
   }
 
   disconnectedCallback() {
@@ -134,8 +141,12 @@ export class WorkspaceView extends HTMLElement {
   }
 
   normalizeInputContent(inputContent: string) {
-    // Normalize the input content by replaceing non-breaking spaces with regular spaces
-    return inputContent.replace(/\u00A0/g, ' ');
+    // Normalize the input content by replacing non-breaking spaces with regular spaces
+    return inputContent.replace(/\u00A0/g, ' ').replace(/[\u00A0\u200B]/g, ' ');
+  }
+
+  getNormalizedInputContent() {
+    return this.normalizeInputContent(this.getInputContent());
   }
 
   isBeginningOfInput(inputContent: string) {
@@ -151,7 +162,7 @@ export class WorkspaceView extends HTMLElement {
   }
 
   shouldOpenToolsMenu() {
-    const inputContent = this.normalizeInputContent(this.getInputContent());
+    const inputContent = this.getNormalizedInputContent();
     return (
       this.isBeginningOfInput(inputContent) ||
       this.isAfterSpace(inputContent) ||
@@ -171,24 +182,42 @@ export class WorkspaceView extends HTMLElement {
     render(this.template, this);
   }
 
-  selectTool(tool: string) {
-    const commandInput = this.querySelector('command-input') as HTMLElement;
-    const shadowRoot = commandInput.shadowRoot;
-    const commandInputDiv = shadowRoot.querySelector('.command-input');
-    // Append the selected tool
-    commandInputDiv.innerHTML += `${tool}`;
-
-    // Manually Reset cursor to end of command input
+  setCaretToEnd() {
+    const commandInputDiv = this.getCommandInput();
     const range = document.createRange();
     const selection = window.getSelection();
     range.selectNodeContents(commandInputDiv);
     range.collapse(false);
     selection.removeAllRanges();
     selection.addRange(range);
-    // Close the tools menu
+  }
+
+  selectTool(tool: string) {
+    const commandInput = this.querySelector('command-input') as HTMLElement;
+    const shadowRoot = commandInput.shadowRoot;
+    const commandInputDiv = shadowRoot.querySelector('.command-input');
+    // Append the selected tool
+    commandInputDiv.innerHTML += `${tool}`;
+    this.appendSpace();
+    this.setCaretToEnd();
     this.isToolsMenuOpen = false;
     render(this.template, this);
   }
+
+  isInputEmpty() {
+    const inputContent = this.getNormalizedInputContent();
+    const cleaned = inputContent.replace(/[\u200B\u00A0\n\r]/g, '');
+    return cleaned.length === 0;
+  }
+
+  monitorCommandInput() {
+    // Close the tools menu if the input content is empty
+    if (this.isInputEmpty()) {
+      this.isToolsMenuOpen = false;
+      render(this.template, this);
+    }
+  }
+
   get template() {
     return html`
       <!-- <div class="workspace-toolbar">
