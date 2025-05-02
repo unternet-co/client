@@ -34,6 +34,15 @@ export class ComboboxOpenEvent extends Event {
   }
 }
 
+export class ComboboxSpaceEvent extends Event {
+  constructor() {
+    super(' ', {
+      bubbles: true,
+      composed: true,
+    });
+  }
+}
+
 export class ComboboxElement extends LitElement {
   static properties = {
     options: { type: Array },
@@ -57,6 +66,14 @@ export class ComboboxElement extends LitElement {
     this.selectPrevOption = this.selectPrevOption.bind(this);
     this.selectOption = this.selectOption.bind(this);
     this.closeOptions = this.closeOptions.bind(this);
+    this.insertSpaceAndClose = this.insertSpaceAndClose.bind(this);
+    this.onClose = this.onClose.bind(this);
+    this.shouldSelect = this.shouldSelect.bind(this);
+    this.registerShortcuts = this.registerShortcuts.bind(this);
+    this.deregisterShortcuts = this.deregisterShortcuts.bind(this);
+    this.render = this.render.bind(this);
+    this.focus = this.focus.bind(this);
+    this.deregisterShortcuts = this.deregisterShortcuts.bind(this);
     this.registerShortcuts();
   }
 
@@ -99,12 +116,18 @@ export class ComboboxElement extends LitElement {
     this.onClose();
   }
 
+  insertSpaceAndClose() {
+    this.onClose();
+    this.dispatchEvent(new ComboboxSpaceEvent());
+  }
+
   registerShortcuts() {
     this.shortcutService.register('ArrowDown', this.selectNextOption);
     this.shortcutService.register('ArrowUp', this.selectPrevOption);
     this.shortcutService.register('Enter', this.selectOption);
     this.shortcutService.register('Tab', this.selectOption);
     this.shortcutService.register('Escape', this.closeOptions);
+    this.shortcutService.register(' ', this.insertSpaceAndClose);
   }
 
   deregisterShortcuts() {
@@ -113,6 +136,7 @@ export class ComboboxElement extends LitElement {
     this.shortcutService.deregister('Enter', this.selectOption);
     this.shortcutService.deregister('Tab', this.selectOption);
     this.shortcutService.deregister('Escape', this.closeOptions);
+    this.shortcutService.register(' ', this.insertSpaceAndClose);
   }
 
   shouldSelect(value: string, index: number) {

@@ -124,6 +124,7 @@ export class CommandInputElement extends LitElement {
 
     .command-input {
       outline: none;
+      padding: var(--space-2) var(--space-4);
     }
 
     un-input {

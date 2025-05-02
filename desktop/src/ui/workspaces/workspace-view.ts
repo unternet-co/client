@@ -113,9 +113,57 @@ export class WorkspaceView extends HTMLElement {
       ]);
   }
 
+  getCommandInput() {
+    const commandInput = this.querySelector('command-input');
+    const shadowRoot = commandInput.shadowRoot;
+    const commandInputDiv = shadowRoot.querySelector(
+      '.command-input'
+    ) as HTMLElement;
+    return commandInputDiv;
+  }
+
+  appendSpace() {
+    const commandInputDiv = this.getCommandInput();
+    const spaceNode = document.createTextNode('\u00A0');
+    commandInputDiv.appendChild(spaceNode);
+  }
+
+  getInputContent() {
+    const commandInputDiv = this.getCommandInput();
+    return commandInputDiv.innerText;
+  }
+
+  normalizeInputContent(inputContent: string) {
+    // Normalize the input content by replaceing non-breaking spaces with regular spaces
+    return inputContent.replace(/\u00A0/g, ' ');
+  }
+
+  isBeginningOfInput(inputContent: string) {
+    return inputContent.length === 0;
+  }
+
+  isAfterSpace(inputContent: string) {
+    return inputContent.endsWith(' ');
+  }
+
+  isAfterNewline(inputContent: string) {
+    return inputContent.endsWith('\n');
+  }
+
+  shouldOpenToolsMenu() {
+    const inputContent = this.normalizeInputContent(this.getInputContent());
+    return (
+      this.isBeginningOfInput(inputContent) ||
+      this.isAfterSpace(inputContent) ||
+      this.isAfterNewline(inputContent)
+    );
+  }
+
   openToolsMenu() {
-    this.isToolsMenuOpen = true;
-    render(this.template, this);
+    if (this.shouldOpenToolsMenu()) {
+      this.isToolsMenuOpen = true;
+      render(this.template, this);
+    }
   }
 
   closeToolsMenu() {
@@ -127,18 +175,17 @@ export class WorkspaceView extends HTMLElement {
     const commandInput = this.querySelector('command-input') as HTMLElement;
     const shadowRoot = commandInput.shadowRoot;
     const commandInputDiv = shadowRoot.querySelector('.command-input');
-
+    // Append the selected tool
     commandInputDiv.innerHTML += `${tool}`;
-    const spaceNode = document.createTextNode('\u00A0');
-    commandInputDiv.appendChild(spaceNode);
 
+    // Manually Reset cursor to end of command input
     const range = document.createRange();
     const selection = window.getSelection();
     range.selectNodeContents(commandInputDiv);
     range.collapse(false);
-
     selection.removeAllRanges();
     selection.addRange(range);
+    // Close the tools menu
     this.isToolsMenuOpen = false;
     render(this.template, this);
   }
@@ -166,6 +213,7 @@ export class WorkspaceView extends HTMLElement {
               this.selectTool(e.input.text);
             }}
             @close=${this.closeToolsMenu}
+            @space=${this.appendSpace}
             searchString=""
             selectedValue=${this.toolsMenuOptions[0].value}
           ></un-combobox>
