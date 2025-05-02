@@ -19,8 +19,6 @@ export class PopoverElement extends HTMLElement {
   static observedAttributes = ['anchor', 'position'];
 
   #shadow: ShadowRoot;
-  #position: PopoverPosition = 'top';
-  #anchor?: string;
 
   constructor() {
     super();
@@ -29,32 +27,13 @@ export class PopoverElement extends HTMLElement {
     this.setAttribute('popover', '');
   }
 
-  connectedCallback() {
-    if (this.hasAttribute('anchor'))
-      this.#anchor = this.getAttribute('anchor') || undefined;
-    if (this.hasAttribute('position'))
-      this.#position =
-        (this.getAttribute('position') as PopoverPosition) || 'top';
-
-    this.#updateAnchorPositioning();
-
-    render(this.template, this.#shadow);
-  }
-
   attributeChangedCallback(
     name: string,
     oldValue: string | null,
     newValue: string | null
   ) {
     if (oldValue === newValue) return;
-    switch (name) {
-      case 'anchor':
-        this.anchor = newValue || undefined;
-        break;
-      case 'position':
-        this.position = (newValue as PopoverPosition) || 'top';
-        break;
-    }
+    this.#render();
   }
 
   /**
@@ -62,58 +41,28 @@ export class PopoverElement extends HTMLElement {
    * Throws if the anchor id is defined, but no element with that id is found.
    */
   #updateAnchorPositioning() {
-    if (!this.anchor) return;
-    const anchorEl = document.getElementById(this.anchor);
+    const anchor = this.getAttribute('anchor');
+    const position = this.getAttribute('position');
+
+    if (!anchor) return;
+    const anchorEl = document.getElementById(anchor);
     if (!anchorEl) {
-      const msg = `[un-popover] Anchor element with id "${this.anchor}" not found.`;
+      const msg = `[un-popover] Anchor element with id "${anchor}" not found.`;
       console.error(msg);
       throw new Error(msg);
     }
-    const anchorNameValue = `--${this.anchor}`;
+    const anchorNameValue = `--${anchor}`;
     const style = anchorEl.style as CSSStyleDeclaration & {
       anchorName?: string;
     };
     style.anchorName = anchorNameValue;
     (this.style as any).positionAnchor = anchorNameValue;
-    this.setAttribute('data-position', this.position);
+    this.setAttribute('data-position', position);
   }
 
-  /**
-   * The id of the anchor element this popover is positioned against.
-   */
-  get anchor(): string | undefined {
-    return this.#anchor;
-  }
-  set anchor(val: string | undefined) {
-    if (val !== this.#anchor) {
-      this.#anchor = val;
-      if (val !== undefined) {
-        this.setAttribute('anchor', val);
-      } else {
-        this.removeAttribute('anchor');
-      }
-      this.#updateAnchorPositioning();
-      render(this.template, this.#shadow);
-    }
-  }
-
-  /**
-   * The position of the popover relative to the anchor.
-   */
-  get position(): PopoverPosition {
-    return this.#position;
-  }
-  set position(val: PopoverPosition) {
-    if (val !== this.#position) {
-      this.#position = val;
-      this.setAttribute('position', val);
-      this.#updateAnchorPositioning();
-      render(this.template, this.#shadow);
-    }
-  }
-
-  get template() {
-    return html`<slot></slot>`;
+  #render() {
+    this.#updateAnchorPositioning();
+    render(html`<slot></slot>`, this.#shadow);
   }
 
   get styles() {
