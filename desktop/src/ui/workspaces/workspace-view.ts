@@ -18,6 +18,7 @@ export class WorkspaceView extends HTMLElement {
     this.openToolsMenu = this.openToolsMenu.bind(this);
     this.closeToolsMenu = this.closeToolsMenu.bind(this);
     this.appendSpace = this.appendSpace.bind(this);
+    this.captureSearchString = this.captureSearchString.bind(this);
   }
   private _workspaceId: WorkspaceRecord['id'];
   private workspaceModel: WorkspaceModel =
@@ -25,6 +26,7 @@ export class WorkspaceView extends HTMLElement {
   private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   private visibilityObserver: IntersectionObserver;
   private isToolsMenuOpen = false;
+  private searchString = '';
 
   set workspaceId(id: WorkspaceRecord['id']) {
     if (this._workspaceId !== id) {
@@ -158,15 +160,24 @@ export class WorkspaceView extends HTMLElement {
     );
   }
 
+  captureSearchString(e: KeyboardEvent) {
+    this.searchString += e.key;
+  }
+
   openToolsMenu() {
     if (this.shouldOpenToolsMenu()) {
       this.isToolsMenuOpen = true;
+      setTimeout(() => {
+        document.addEventListener('keydown', this.captureSearchString);
+      }, 0);
       render(this.template, this);
     }
   }
 
   closeToolsMenu() {
     this.isToolsMenuOpen = false;
+    this.searchString = '';
+    document.removeEventListener('keydown', this.captureSearchString);
     render(this.template, this);
   }
 
