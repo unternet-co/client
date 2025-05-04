@@ -117,11 +117,11 @@ export class WorkspaceView extends HTMLElement {
       .all()
       .map((resource) => ({
         label: resource.name.toLowerCase(),
-        value: resource.name,
+        value: resource.name.toLowerCase(),
       }))
       .concat([
-        { label: 'calculator', value: 'Calculator' },
-        { label: 'maps', value: 'Maps' },
+        { label: 'calculator', value: 'calculator' },
+        { label: 'maps', value: 'maps' },
       ]);
   }
 
