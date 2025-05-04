@@ -138,9 +138,6 @@ export class ComboboxElement extends LitElement {
       value.includes(this.searchString)
     );
 
-    if (filteredOptions.length === 0) {
-      this.onClose();
-    }
     return html`
       <ul class="combobox">
         ${filteredOptions.map(
