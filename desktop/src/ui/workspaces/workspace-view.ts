@@ -161,7 +161,17 @@ export class WorkspaceView extends HTMLElement {
   }
 
   captureSearchString(e: KeyboardEvent) {
-    this.searchString += e.key;
+    if (e.key === 'Backspace' && e.metaKey) {
+      // deletes everything in the input
+      this.searchString = '';
+      this.closeToolsMenu();
+    } else if (e.key === 'Backspace') {
+      this.searchString = this.searchString.slice(0, -1);
+    } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      this.searchString += e.key;
+    }
+
+    render(this.template, this);
   }
 
   openToolsMenu() {
@@ -197,7 +207,7 @@ export class WorkspaceView extends HTMLElement {
     commandInputDiv.appendChild(document.createTextNode(tool));
     this.appendSpace();
     this.setCaretToEnd();
-    this.isToolsMenuOpen = false;
+    this.closeToolsMenu();
     render(this.template, this);
   }
 
@@ -213,7 +223,7 @@ export class WorkspaceView extends HTMLElement {
   monitorCommandInput() {
     // Close the tools menu if the input content is empty
     if (this.isInputEmpty()) {
-      this.isToolsMenuOpen = false;
+      this.closeToolsMenu();
       render(this.template, this);
     }
   }
@@ -244,7 +254,7 @@ export class WorkspaceView extends HTMLElement {
             }}
             @close=${this.closeToolsMenu}
             @space=${this.appendSpace}
-            searchString=""
+            .searchString=${this.searchString}
             selectedValue=${this.toolsMenuOptions[0].value}
           ></un-combobox>
         </div>
