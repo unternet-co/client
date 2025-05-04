@@ -125,15 +125,6 @@ export class CommandInputElement extends LitElement {
       padding: var(--space-2) var(--space-4);
     }
 
-    un-input {
-      width: 100%;
-      margin: 1px;
-    }
-
-    un-input::part(input) {
-      outline: none;
-    }
-
     .submit-button {
       position: absolute;
       right: 4px;
