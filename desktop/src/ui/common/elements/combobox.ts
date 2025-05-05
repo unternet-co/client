@@ -37,22 +37,21 @@ export class ComboboxOpenEvent extends Event {
 export class ComboboxElement extends LitElement {
   static properties = {
     options: { type: Array },
-    selectedValue: { type: String, reflect: true },
     searchString: { type: String },
     visible: { type: Boolean, reflect: true },
   };
 
   options: { label: string; value: string }[] = [];
-  selectedValue: string | null;
   searchString: string;
   selectedIndex: number = 0;
   visible: boolean = false;
   private shortcutService =
     dependencies.resolve<ShortcutService>('ShortcutService');
+  private selectedValue: string | null = null;
+  private filteredOptions: { label: string; value: string }[] = [];
 
   constructor() {
     super();
-    this.selectedValue = this.selectedValue || this.options?.[0]?.value;
     this.searchString = this.searchString || '';
     this.selectNextOption = this.selectNextOption.bind(this);
     this.selectPrevOption = this.selectPrevOption.bind(this);
@@ -69,30 +68,40 @@ export class ComboboxElement extends LitElement {
         this.deregisterShortcuts();
       }
     }
+    if (changedProps.has('searchString')) {
+      this.filteredOptions = this.options.filter(({ label }) =>
+        label.toLowerCase().includes(this.searchString.toLowerCase())
+      );
+      this.selectedIndex = 0;
+      this.selectedValue = this.filteredOptions[0]?.value || null;
+      this.requestUpdate();
+      this.render();
+    }
   }
 
   private onSelect(selectedValue: string) {
     // This resets the selection for next time it is rendered
+    this.dispatchEvent(new ComboboxSelectEvent(selectedValue));
     this.selectedValue = null;
     this.selectedIndex = 0;
-    this.dispatchEvent(new ComboboxSelectEvent(selectedValue));
   }
 
   selectNextOption() {
-    this.selectedIndex = (this.selectedIndex + 1) % this.options.length;
-    this.selectedValue = this.options[this.selectedIndex].value;
+    this.selectedIndex = (this.selectedIndex + 1) % this.filteredOptions.length;
+    this.selectedValue = this.filteredOptions[this.selectedIndex].value;
   }
 
   selectPrevOption() {
     this.selectedIndex =
-      (this.selectedIndex - 1 + this.options.length) % this.options.length;
-    this.selectedValue = this.options[this.selectedIndex].value;
+      (this.selectedIndex - 1 + this.filteredOptions.length) %
+      this.filteredOptions.length;
+    this.selectedValue = this.filteredOptions[this.selectedIndex].value;
   }
 
   selectOption() {
     const selectedOption =
-      this.options[this.selectedIndex] ||
-      this.options.find(({ value }) => value === this.selectedValue);
+      this.filteredOptions[this.selectedIndex] ||
+      this.filteredOptions.find(({ value }) => value === this.selectedValue);
     if (selectedOption) {
       this.onSelect(selectedOption.label);
     }
@@ -126,7 +135,7 @@ export class ComboboxElement extends LitElement {
     this.shortcutService.deregister('Escape', this.closeOptions);
   }
 
-  shouldSelect(value: string, index: number) {
+  shouldHighlight(value: string, index: number) {
     return (
       this.selectedValue === value ||
       (this.selectedValue === null && index === 0)
@@ -134,16 +143,12 @@ export class ComboboxElement extends LitElement {
   }
 
   render() {
-    const filteredOptions = this.options.filter(({ value }) =>
-      value.includes(this.searchString)
-    );
-
     return html`
       <ul class="combobox">
-        ${filteredOptions.map(
+        ${this.filteredOptions.map(
           ({ value, label }, index) => html`
             <li
-              class="combobox-option ${this.shouldSelect(value, index)
+              class="combobox-option ${this.shouldHighlight(value, index)
                 ? 'selected'
                 : ''}"
               @click=${() => this.onSelect(value)}

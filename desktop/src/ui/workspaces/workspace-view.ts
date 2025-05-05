@@ -203,6 +203,10 @@ export class WorkspaceView extends HTMLElement {
 
   selectTool(tool: string) {
     const commandInputDiv = this.getCommandInput();
+    const inputContent = this.getInputContent();
+    const index = inputContent.lastIndexOf(this.searchString);
+    // Remove search query from input before appending the selected tool
+    commandInputDiv.innerText = inputContent.slice(0, index);
     // Append the selected tool
     commandInputDiv.appendChild(document.createTextNode(tool));
     this.appendSpace();
@@ -255,7 +259,6 @@ export class WorkspaceView extends HTMLElement {
             @close=${this.closeToolsMenu}
             @space=${this.appendSpace}
             .searchString=${this.searchString}
-            selectedValue=${this.toolsMenuOptions[0].value}
           ></un-combobox>
         </div>
         <div class="command-bar">
