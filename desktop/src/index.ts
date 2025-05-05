@@ -14,14 +14,14 @@ import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
 import { AIModelService } from './ai/ai-models';
 import { ResourceModel, initialResources } from './resources';
+import { ProcessModel, SerializedProcess } from './processes';
+import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols/protocols';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
-import { ProcessModel, SerializedProcess } from './processes';
-import { ProcessRuntime, Resource } from '@unternet/kernel';
 import './modals/global/bug-modal';
 import './ui/workspaces/workspace-settings-modal';
 import './ui/workspaces/workspace-delete-modal';
@@ -45,7 +45,7 @@ const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
 /* Initialize model dependencies */
 
-const runtime = new ProcessRuntime(protocols);
+const runtime = new ProcessRuntime(protocols, { processLimit: 1 });
 
 /* Initialize models */
 

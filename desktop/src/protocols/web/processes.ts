@@ -28,7 +28,6 @@ export class WebProcess extends Process {
   static async create(url: string) {
     const process = new WebProcess(url);
     const metadata = await getMetadata(url);
-    console.log(metadata);
     process.title = metadata.title;
     process.description = metadata.description;
     process.icons = metadata.icons;
@@ -36,7 +35,6 @@ export class WebProcess extends Process {
   }
 
   static hydrate(state: WebProcessState) {
-    console.log('hydrate', state.url);
     const process = new WebProcess(state.url);
     process.data = state.data;
     return process;
@@ -60,7 +58,6 @@ export class WebProcess extends Process {
   }
 
   async handleAction(action: ActionProposal) {
-    console.log('handleAction');
     const applet = await this.connectApplet(hiddenContainer);
     await applet.sendAction(action.actionId, action.args);
     this.data = applet.data;

@@ -53,7 +53,6 @@ export function actionResultResponse(init: {
   process?: ProcessContainer;
   content?: any;
 }): ActionResultResponse {
-  console.log('parsing action result', init.process.describe());
   return {
     type: 'actionresult',
     process: init.process,
