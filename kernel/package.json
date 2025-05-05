@@ -1,6 +1,6 @@
 {
   "name": "@unternet/kernel",
-  "version": "0.9.4",
+  "version": "0.9.6",
   "description": "",
   "license": "ISC",
   "author": "",
@@ -10,7 +10,7 @@
     "example": "example"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "dev": "chokidar 'src/**/*' -c 'npm run build'",
     "docs": "typedoc",
     "example": "cd example && npx tsx src/index.ts",
@@ -34,6 +34,7 @@
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
     "mime-types": "^3.0.1",
+    "rimraf": "^6.0.1",
     "typedoc": "^0.28.2",
     "typescript": "^5.8.2",
     "vitest": "^3.1.1"

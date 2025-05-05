@@ -116,14 +116,14 @@ export class TabModel extends Disposable {
     }
   }
 
-  create(id?: WorkspaceRecord['id']) {
+  async create(id?: WorkspaceRecord['id']) {
     let workspace: WorkspaceRecord;
 
     if (id) {
-      workspace = this.workspaceModel.get(id)!;
+      workspace = this.workspaceModel.get(id);
       this.workspaceModel.activate(id);
     } else {
-      workspace = this.workspaceModel.create();
+      workspace = await this.workspaceModel.create();
     }
 
     const tab = {
@@ -152,10 +152,6 @@ export class TabModel extends Disposable {
     const tab = this.tabs[index];
     const wasActive = this.activeTabId === id;
     this.tabs.splice(index, 1);
-
-    if (tab.type === 'workspace') {
-      this.workspaceModel.deactivate(id);
-    }
 
     if (wasActive && this.tabs.length > 0) {
       this.activeTabId = this.tabs[index]

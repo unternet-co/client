@@ -1,6 +1,6 @@
 {
   "name": "@unternet/client",
-  "version": "0.9.4",
+  "version": "0.9.6",
   "description": "Unternet Client",
   "author": {
     "name": "Rupert Manfredi",
@@ -61,6 +61,7 @@
     "build": "npm run build:kernel && npm run build:desktop",
     "build:desktop": "cd desktop && rimraf dist && cross-env NODE_ENV=production npm run build",
     "build:kernel": "cd kernel && npm run build",
+    "release": "npm run sync-version && git add . && git commit --message 'release' && git push --tags",
     "clean": "rimraf desktop/dist && rimraf kernel/dist && rm -rf dist",
     "dev": "npm run dev:desktop",
     "dev:desktop": "cd desktop && npm run dev",

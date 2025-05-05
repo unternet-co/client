@@ -121,8 +121,9 @@ export class TopBar extends HTMLElement {
         placeholder="Select workspace"
         @change=${(e: CustomEvent) => {
           const newId = e.detail.value;
-          if (newId === '+') this.workspaceModel.create();
-          if (newId && newId !== activeWorkspaceId) {
+          if (newId === '+') {
+            this.workspaceModel.create();
+          } else if (newId && newId !== activeWorkspaceId) {
             this.workspaceModel.activate(newId);
           }
         }}

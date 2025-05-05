@@ -28,6 +28,7 @@ workspace-view .workspace-content {
 } */
 
 .bottom-bar {
+  position: relative;
   background: var(--color-bg-chrome);
   border-top: 1px solid var(--color-border);
   display: flex;
@@ -61,4 +62,19 @@ workspace-view .workspace-content {
 
 resource-bar {
   align-self: stretch;
+}
+
+.tools-menu {
+  position: absolute;
+  bottom: 100%;
+  width: 72ch;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+}
+
+.tools-menu.visible {
+  display: block;
+}
+.tools-menu.hidden {
+  display: none;
 }
