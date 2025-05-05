@@ -32,3 +32,7 @@ ollama run qwen2.5-coder:3b
 ### Windows
 
 Windows builds are currently unsigned. Signing can be enabled by adding `windows-certs.pfx` and setting the `WINDOWS_CERTS_PASSWORD` secret in GitHub Actions and updating the `certificateFile` and `certificatePassword` fields in `package.json` under the `"win"` section.
+
+## Unternet API
+
+You can optionally add the Unternet API to enable features like web search. In order to do this, add your Unternet API key (don't have one? email us!). For now, this will only work when you build as the API is expected to be local.
