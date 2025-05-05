@@ -101,6 +101,7 @@ export class WorkspaceView extends HTMLElement {
   }
 
   async handleCommandSubmit() {
+    if (this.isToolsMenuOpen) return;
     const inputText = this.getInputContent().trim();
     if (inputText.length === 0) return;
     // All tool names in the model start with a capital letter but in the UI they are lowercase
@@ -246,15 +247,6 @@ export class WorkspaceView extends HTMLElement {
 
   get template() {
     return html`
-      <!-- <div class="workspace-toolbar">
-        <un-button
-          class="archive-button"
-          type="ghost"
-          size="small"
-          icon="archive"
-          @click=${this.handleArchive}
-        >Archive</un-button>
-      </div> -->
       <div class="workspace-content">
         <thread-view for=${this.workspaceId}></thread-view>
       </div>
@@ -264,10 +256,7 @@ export class WorkspaceView extends HTMLElement {
             class="combobox"
             .options=${this.toolsMenuOptions}
             .visible=${this.isToolsMenuOpen}
-            @select=${(e) => {
-              console.log('Selected:', e.input.text);
-              this.selectTool(e.input.text);
-            }}
+            @select=${(e) => this.selectTool(e.input.text)}
             @close=${this.closeToolsMenu}
             @space=${this.appendSpace}
             .searchString=${this.searchString}

@@ -98,7 +98,7 @@ export class ComboboxElement extends LitElement {
     this.selectedValue = this.filteredOptions[this.selectedIndex].value;
   }
 
-  selectOption() {
+  selectOption(e: KeyboardEvent) {
     const selectedOption =
       this.filteredOptions[this.selectedIndex] ||
       this.filteredOptions.find(({ value }) => value === this.selectedValue);

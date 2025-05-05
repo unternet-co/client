@@ -67,7 +67,7 @@ resource-bar {
 .tools-menu {
   position: absolute;
   bottom: 100%;
-  width: 100%;
+  width: 72ch;
   padding: var(--space-2);
   border: 1px solid var(--color-border);
 }
