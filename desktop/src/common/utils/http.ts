@@ -47,7 +47,7 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
       metadata = manifest;
       if (manifest.icons) {
         metadata.icons = manifest.icons.map((icon) => {
-          icon.src = new URL(icon.src, manifestUrl).href;
+          icon.src = new URL(`../${icon.src}`, manifestUrl).href;
           return icon;
         });
       }
