@@ -30,6 +30,12 @@ export class SettingsModal extends ModalElement {
   private selectedModel: AIModelDescriptor;
   private isLoadingModels: boolean = false;
   private modelError: string | null = null;
+  // Restrict to a subset of models for now
+  private allowedModels: Array<String> = [
+    'gpt-4o-mini',
+    'gpt-4-turbo',
+    'gpt-3.5-turbo',
+  ];
 
   constructor() {
     super({
@@ -122,9 +128,12 @@ export class SettingsModal extends ModalElement {
       this.isLoadingModels = true;
       this.render();
 
-      this.availableModels = await this.aiModelService.getAvailableModels(
+      const allAvailableModels = await this.aiModelService.getAvailableModels(
         this.selectedProvider,
         this.selectedProviderConfig
+      );
+      this.availableModels = allAvailableModels.filter((model) =>
+        this.allowedModels.includes(model.name)
       );
 
       this.modelError = null;
