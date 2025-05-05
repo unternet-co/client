@@ -70,15 +70,22 @@ export abstract class Process {
   }
 }
 
+type RuntimeStatus = 'idle' | 'running' | 'suspended';
+
+/**
+ * ProcessContainer is the system-level object that wraps a Process, and manages things we want to protect like the URI, tag (used when a protocol has multiple processes), states, etc.
+ */
 export class ProcessContainer {
   readonly protocol = 'process';
   readonly pid: string;
   readonly source: string;
   readonly tag: string;
+  private processConstructor: ProcessConstructor;
   private process: Process;
+  private snapshot: string | null;
   readonly createdAt = Date.now();
-  updatedAt = Date.now();
-  state: any;
+  discardable: boolean = true;
+  status: RuntimeStatus = 'running';
 
   get uri() {
     return `process:${this.pid}`;
@@ -87,6 +94,7 @@ export class ProcessContainer {
   get title() {
     return this.process.title;
   }
+
   get icons() {
     return this.process.icons;
   }
@@ -95,7 +103,31 @@ export class ProcessContainer {
     this.pid = ulid();
     this.tag = process.tag;
     this.source = process.source;
+    this.processConstructor = process.constructor as ProcessConstructor;
     this.process = process;
+  }
+
+  suspend() {
+    if (!this.discardable || this.status !== 'running') return;
+    this.snapshot = JSON.stringify(this.serialize());
+    this.process.unmount();
+    this.process = null;
+    this.status = 'suspended';
+  }
+
+  resume() {
+    if (this.status === 'running') return;
+    if (this.status !== 'suspended') {
+      throw new Error('Tried to resume a process with an invalid status.');
+    }
+    if (!this.snapshot) {
+      throw new Error('Tried to resume a process with no snapshot.');
+    }
+
+    const state = JSON.parse(this.snapshot);
+    this.process = this.processConstructor.hydrate(state);
+    this.snapshot = null;
+    this.status = 'running';
   }
 
   describe() {

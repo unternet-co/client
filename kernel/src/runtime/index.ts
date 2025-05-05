@@ -5,8 +5,17 @@ import mitt from 'mitt';
 import { listener } from '../shared/utils';
 import { actionResultResponse, ActionResultResponse } from '../response-types';
 
+// Must remain a "type" else typescript is sad
 type RuntimeEvents = {
   processcreated: ProcessContainer;
+};
+
+interface RuntimeConfig {
+  processLimit?: number | null;
+}
+
+const defaultConfig: RuntimeConfig = {
+  processLimit: 50,
 };
 
 /**
@@ -19,14 +28,23 @@ type RuntimeEvents = {
 export class ProcessRuntime {
   protocols = new Map<string, Protocol>();
   processes = new Map<string, ProcessContainer>();
+  processLimit: number;
   private emitter = mitt<RuntimeEvents>();
   readonly on = listener<RuntimeEvents>(this.emitter);
 
-  constructor(protocols?: Array<Protocol>) {
+  constructor(protocols: Array<Protocol>, config: RuntimeConfig = {}) {
+    const mergedConfig = { ...defaultConfig, ...config };
+    this.processLimit = mergedConfig.processLimit;
+
     for (const protocol of protocols) {
       this.registerProtocol(protocol);
     }
-    if (!protocols) console.warn('No protocols provided to Dispatcher');
+  }
+
+  get runningProcesses(): Array<ProcessContainer> {
+    return Array.from(this.processes.values()).filter(
+      (process) => process.status === 'running'
+    );
   }
 
   registerProtocol(protocol: Protocol) {
@@ -74,7 +92,7 @@ export class ProcessRuntime {
       processConstructor
     );
 
-    this.processes.set(serializedProcess.pid, process);
+    this.addProcess(process);
   }
 
   async dispatch(directive: ActionProposal): Promise<ActionResultResponse> {
@@ -96,12 +114,33 @@ export class ProcessRuntime {
 
     if (result instanceof Process) {
       const process = new ProcessContainer(result);
-      this.processes.set(process.pid, process);
-      this.emitter.emit('processcreated', process);
+      this.addProcess(process);
       return actionResultResponse({ process });
     }
 
     return actionResultResponse({ content: result });
+  }
+
+  addProcess(process: ProcessContainer) {
+    this.processes.set(process.pid, process);
+    if (this.processLimit) this.suspendExcessProcesses();
+    this.emitter.emit('processcreated', process);
+  }
+
+  suspendExcessProcesses() {
+    const numRunningProcesses = this.runningProcesses.length;
+    let numExcessProcesses = numRunningProcesses - this.processLimit;
+
+    for (const runningProcess of this.runningProcesses) {
+      if (numExcessProcesses <= 0) break;
+      this.suspendProcess(runningProcess);
+      numExcessProcesses--;
+    }
+  }
+
+  suspendProcess(process: ProcessContainer) {
+    // TODO: Emit an event?
+    process.suspend();
   }
 
   getProcess(pid: ProcessContainer['pid']) {
