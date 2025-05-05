@@ -104,17 +104,18 @@ export class WorkspaceView extends HTMLElement {
     const inputText = this.getInputContent().trim();
     if (inputText.length === 0) return;
     // All tool names in the model start with a capital letter but in the UI they are lowercase
+    const commandInputDiv = this.getCommandInput();
     const updatedInputText = this.replaceToolNames(inputText);
+    const storedInputText = this.getInputContent();
 
     try {
+      commandInputDiv.innerText = '';
       await this.kernel.handleInput(this.workspaceId, {
         text: updatedInputText,
       });
-      const commandInputDiv = this.getCommandInput();
-      commandInputDiv.innerText = '';
     } catch (error) {
       console.error('Error handling command input:', error);
-
+      commandInputDiv.innerText = storedInputText;
       if (error instanceof KernelNotInitializedError) {
         const modalService = dependencies.resolve<ModalService>('ModalService');
         modalService.open('settings');
