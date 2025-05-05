@@ -7,7 +7,6 @@
 /* Modal-like presentation */
 .un-popover {
   border: 1px solid var(--color-border-default);
-  max-width: 320px;
   background: var(--color-bg-content);
   border-radius: var(--rounded-lg);
   box-shadow: var(--shadow);
@@ -18,17 +17,20 @@
 /* Positioning logic */
 .un-popover:popover-open {
   position-try-fallbacks: flip-block, flip-inline;
-  position-try: flip-block, flip-inline;
 }
 .un-popover[data-position='top'] {
   position-area: top;
+  justify-self: anchor-center;
 }
 .un-popover[data-position='right'] {
   position-area: right;
+  align-self: anchor-center;
 }
 .un-popover[data-position='bottom'] {
   position-area: bottom;
+  justify-self: anchor-center;
 }
 .un-popover[data-position='left'] {
   position-area: left;
+  align-self: anchor-center;
 }
