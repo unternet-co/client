@@ -91,10 +91,27 @@ export class WorkspaceView extends HTMLElement {
     this.visibilityObserver.observe(this);
   }
 
-  async handleCommandSubmit(e: CommandSubmitEvent) {
-    if (this.getInputContent().trim().length === 0) return;
+  replaceToolNames(inputText: string) {
+    const updatedContent = inputText.replace(
+      /(\s)@([a-zA-Z0-9]+)/g,
+      (_, space, toolname) =>
+        `${space}@${toolname.charAt(0).toUpperCase()}${toolname.slice(1)}`
+    );
+    return updatedContent;
+  }
+
+  async handleCommandSubmit() {
+    const inputText = this.getInputContent().trim();
+    if (inputText.length === 0) return;
+    // All tool names in the model start with a capital letter but in the UI they are lowercase
+    const updatedInputText = this.replaceToolNames(inputText);
+
     try {
-      await this.kernel.handleInput(this.workspaceId, e.input);
+      await this.kernel.handleInput(this.workspaceId, {
+        text: updatedInputText,
+      });
+      const commandInputDiv = this.getCommandInput();
+      commandInputDiv.innerText = '';
     } catch (error) {
       console.error('Error handling command input:', error);
 
@@ -113,16 +130,10 @@ export class WorkspaceView extends HTMLElement {
   };
 
   get toolsMenuOptions() {
-    return this.resourceModel
-      .all()
-      .map((resource) => ({
-        label: resource.name.toLowerCase(),
-        value: resource.name.toLowerCase(),
-      }))
-      .concat([
-        { label: 'calculator', value: 'calculator' },
-        { label: 'maps', value: 'maps' },
-      ]);
+    return this.resourceModel.all().map((resource) => ({
+      label: resource.name.toLowerCase(),
+      value: resource.name.toLowerCase(),
+    }));
   }
 
   getCommandInput() {

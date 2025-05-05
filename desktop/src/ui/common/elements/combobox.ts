@@ -70,7 +70,7 @@ export class ComboboxElement extends LitElement {
     }
     if (changedProps.has('searchString')) {
       this.filteredOptions = this.options.filter(({ label }) =>
-        label.toLowerCase().includes(this.searchString.toLowerCase())
+        label.toLowerCase().startsWith(this.searchString.toLowerCase())
       );
       this.selectedIndex = 0;
       this.selectedValue = this.filteredOptions[0]?.value || null;
