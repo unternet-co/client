@@ -2,6 +2,9 @@ import { LitElement, html, css } from 'lit';
 import { KernelInput } from '../../ai/kernel';
 import '../common/elements/input';
 import '../common/elements/button';
+import { ShortcutService } from '../../shortcuts/shortcut-service';
+import { dependencies } from '../../common/dependencies';
+import { ComboboxOpenEvent } from '../common/elements/combobox';
 
 export class CommandSubmitEvent extends Event {
   input: KernelInput;
@@ -36,7 +39,7 @@ export class CommandInputElement extends LitElement {
   }
 
   focus() {
-    const input = this.shadowRoot?.querySelector('un-input');
+    const input = this.shadowRoot?.querySelector('.command-input');
     if (input) {
       (input as any).focus();
     }
@@ -45,16 +48,17 @@ export class CommandInputElement extends LitElement {
   private handleKeyDown(e: KeyboardEvent) {
     if (this.disabled) return;
 
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if (this.value && this.value.trim()) {
-        this.handleSubmit();
-      }
+      this.handleSubmit();
+    }
+    if (e.key === '@') {
+      this.dispatchEvent(new ComboboxOpenEvent());
     }
   }
 
   private handleSubmit() {
-    if (this.disabled || !this.value || !this.value.trim()) return;
+    if (this.disabled) return;
 
     this.dispatchEvent(new CommandSubmitEvent(this.value));
     this.value = '';
@@ -69,14 +73,15 @@ export class CommandInputElement extends LitElement {
   render() {
     return html`
       <div class="command-input-wrapper">
-        <un-input
+        <div
+          class="command-input"
           .value=${this.value || ''}
-          variant="ghost"
           ?disabled=${this.disabled}
           placeholder=${this.placeholder}
           @keydown=${this.handleKeyDown}
           @input=${this.handleInput}
-        ></un-input>
+          contenteditable
+        ></div>
         <un-button
           class="submit-button"
           size="small"
@@ -115,13 +120,9 @@ export class CommandInputElement extends LitElement {
       background: var(--color-neutral-0);
     }
 
-    un-input {
-      width: 100%;
-      margin: 1px;
-    }
-
-    un-input::part(input) {
+    .command-input {
       outline: none;
+      padding: var(--space-2) var(--space-4);
     }
 
     .submit-button {
