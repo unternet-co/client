@@ -116,8 +116,9 @@ export class ProcessContainer {
 
   suspend() {
     if (!this.discardable || this.status !== 'running') return;
-
     this.snapshot = JSON.stringify(this.serialize());
+    this.metadata.title = this.process.title;
+    this.metadata.icons = this.process.icons;
     this.process.unmount();
     this.process = null;
     this.status = 'suspended';
