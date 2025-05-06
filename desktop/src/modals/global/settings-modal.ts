@@ -30,13 +30,6 @@ export class SettingsModal extends ModalElement {
   private selectedModel: AIModelDescriptor;
   private isLoadingModels: boolean = false;
   private modelError: string | null = null;
-  // Restrict to a subset of models for now
-  private allowedModels: Array<String> = [
-    'gpt-4o-mini',
-    'gpt-4-turbo',
-    'gpt-3.5-turbo',
-    'gpt-4o',
-  ];
 
   constructor() {
     super({
@@ -71,7 +64,6 @@ export class SettingsModal extends ModalElement {
   }
 
   private handleSubmit() {
-    console.log('here');
     this.configModel.updateGlobalHint(this.globalHint);
     this.configModel.updateModelProvider(
       this.selectedProvider,
@@ -136,7 +128,7 @@ export class SettingsModal extends ModalElement {
       this.availableModels =
         this.selectedProvider === 'openai'
           ? allAvailableModels.filter((model) =>
-              this.allowedModels.includes(model.name)
+              this.aiModelService.getAllowedOpenAiModels().includes(model.name)
             )
           : allAvailableModels;
 
