@@ -1,14 +1,27 @@
 import { ulid } from 'ulid';
 import { ActionMap, ResourceIcon } from './resources';
 import { ActionProposal } from './actions';
+import { ProcessRuntime } from '.';
 
-export interface SerializedProcess {
+// These are properties that all processes are expected to implement
+// ...but they're optional because this is the web after all. Do what you want.
+export interface ProcessMetadata {
+  title?: string;
+  icons?: ResourceIcon[];
+  actions?: ActionMap;
+}
+
+// This is what a ProcessContainer will save & rehydrate from.
+// The inner process just sees & savees what's inside 'state'
+export interface ProcessSnapshot extends ProcessMetadata {
   pid: string;
   source: string;
   tag: string;
   state: any;
 }
 
+// Helper to detail the static properties of a Process class definition, when we pass around
+// the constructor.
 export interface ProcessConstructor {
   tag: string;
   source: string;
@@ -24,7 +37,7 @@ export interface ProcessConstructor {
  * Processes are like resources, except they are designed to be extended & customized,
  * and they are uniquely identified with a `pid` instead of a URI.
  */
-export abstract class Process {
+export abstract class Process implements ProcessMetadata {
   static tag: string;
   static source: string;
   tag: string;
@@ -72,10 +85,8 @@ export abstract class Process {
 
 type RuntimeStatus = 'idle' | 'running' | 'suspended';
 
-export interface ProcessMetadata {
-  title?: string;
-  icons?: ResourceIcon[];
-  actions?: ActionMap;
+export interface ProcessInstantiationOpts {
+  pid?: string;
 }
 
 /**
@@ -86,28 +97,41 @@ export class ProcessContainer {
   readonly pid: string;
   readonly source: string;
   readonly tag: string;
+  private runtime?: ProcessRuntime;
   private processConstructor: ProcessConstructor;
   private process: Process;
-  private snapshot: string | null;
+  private _snapshot: string | null;
   private metadata: ProcessMetadata = {};
   readonly createdAt = Date.now();
   discardable: boolean = true;
   status: RuntimeStatus = 'running';
 
+  set snapshot(data: ProcessSnapshot) {
+    this._snapshot = JSON.stringify(data);
+  }
+  get snapshot(): ProcessSnapshot {
+    return JSON.parse(this._snapshot) as ProcessSnapshot;
+  }
   get uri() {
     return `process:${this.pid}`;
   }
-
   get title() {
     return this.process?.title || this.metadata.title;
   }
-
   get icons() {
     return this.process?.icons || this.metadata.icons;
   }
+  get actions() {
+    return this.process?.actions || this.metadata.actions;
+  }
 
-  constructor(process: Process, pid?: string) {
-    this.pid = pid ?? ulid();
+  constructor(
+    runtime: ProcessRuntime,
+    process: Process,
+    opts: Partial<ProcessContainer>
+  ) {
+    this.runtime = runtime;
+    this.pid = opts.pid ?? ulid();
     this.tag = process.tag;
     this.source = process.source;
     this.processConstructor = process.constructor as ProcessConstructor;
@@ -115,28 +139,17 @@ export class ProcessContainer {
   }
 
   suspend() {
-    if (!this.discardable || this.status !== 'running') return;
-    this.snapshot = JSON.stringify(this.serialize());
-    this.metadata.title = this.process.title;
-    this.metadata.icons = this.process.icons;
-    this.process.unmount();
-    this.process = null;
-    this.status = 'suspended';
+    this.runtime.suspend(this.pid);
   }
 
   resume() {
-    if (this.status === 'running') return;
-    if (this.status !== 'suspended') {
-      throw new Error('Tried to resume a process with an invalid status.');
-    }
-    if (!this.snapshot) {
-      throw new Error('Tried to resume a process with no snapshot.');
-    }
+    this.runtime.resume(this.pid);
+  }
 
-    const state = JSON.parse(this.snapshot);
-    this.process = this.processConstructor.hydrate(state);
-    this.snapshot = null;
-    this.status = 'running';
+  updateMetadata() {
+    this.metadata.title = this.process?.title;
+    this.metadata.icons = this.process?.icons;
+    this.metadata.actions = this.process?.actions;
   }
 
   describe() {
@@ -159,24 +172,30 @@ export class ProcessContainer {
     this.process?.renderText();
   }
 
-  static hydrate(
-    serializedProcess: SerializedProcess,
-    constructor: ProcessConstructor
-  ) {
-    const process = constructor.hydrate(serializedProcess.state);
-    const containedProcess = new ProcessContainer(
-      process,
-      serializedProcess.pid
-    );
-    return containedProcess;
+  // Used in the suspension process
+  disconnect() {
+    this.unmount();
+    this.process = null;
   }
 
-  serialize(): SerializedProcess {
+  saveSnapshot() {
+    this.snapshot = this.serialize();
+  }
+
+  loadSnapshot() {
+    this.process = this.processConstructor.hydrate(this.snapshot);
+    this.snapshot = null;
+  }
+
+  serialize(): ProcessSnapshot {
     return {
       pid: this.pid,
       source: this.source,
       tag: this.tag,
-      state: this.process.serialize(),
+      title: this.title,
+      icons: this.icons,
+      actions: this.actions,
+      state: this.process ? this.process.serialize() : this,
     };
   }
 }

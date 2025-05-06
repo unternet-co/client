@@ -1,13 +1,15 @@
 import { ActionProposal } from './actions';
 import { Protocol } from './protocols';
-import { Process, ProcessContainer, SerializedProcess } from './processes';
+import { Process, ProcessContainer, ProcessSnapshot } from './processes';
 import mitt from 'mitt';
 import { listener } from '../shared/utils';
 import { actionResultResponse, ActionResultResponse } from '../response-types';
+import { ProcessInstantiationOpts } from './processes';
 
 // Must remain a "type" else typescript is sad
 type RuntimeEvents = {
   processcreated: ProcessContainer;
+  processremoved: ProcessContainer['pid'];
 };
 
 interface RuntimeConfig {
@@ -28,6 +30,7 @@ const defaultConfig: RuntimeConfig = {
 export class ProcessRuntime {
   protocols = new Map<string, Protocol>();
   processes = new Map<string, ProcessContainer>();
+  snapshots = new Map<string, string>();
   processLimit: number;
   private emitter = mitt<RuntimeEvents>();
   readonly on = listener<RuntimeEvents>(this.emitter);
@@ -41,11 +44,7 @@ export class ProcessRuntime {
     }
   }
 
-  get runningProcesses(): Array<ProcessContainer> {
-    return Array.from(this.processes.values()).filter(
-      (process) => process.status === 'running'
-    );
-  }
+  /* === Protocols === */
 
   registerProtocol(protocol: Protocol) {
     if (typeof protocol.scheme === 'string') {
@@ -70,30 +69,7 @@ export class ProcessRuntime {
     }
   }
 
-  instantiateProcess(serializedProcess: SerializedProcess) {
-    const protocol = this.protocols.get(serializedProcess.source);
-    if (!protocol) {
-      throw new Error(
-        `Tried to instantiate process ${serializedProcess.pid} with source protocol '${serializedProcess.source}', but that protocol hasn't been registered.`
-      );
-    }
-
-    const processConstructor = protocol.getProcessConstructor(
-      serializedProcess.tag
-    );
-    if (!processConstructor) {
-      throw new Error(
-        `Tried to instantiate process ${serializedProcess.pid} with source protocol '${serializedProcess.source}, but no process tag matches "${serializedProcess.tag}".`
-      );
-    }
-
-    const process = ProcessContainer.hydrate(
-      serializedProcess,
-      processConstructor
-    );
-
-    this.addProcess(process);
-  }
+  /* === Action dispatching === */
 
   async dispatch(directive: ActionProposal): Promise<ActionResultResponse> {
     const [scheme, ...restParts] = directive.uri.split(':');
@@ -112,39 +88,93 @@ export class ProcessRuntime {
 
     const result = await this.protocols.get(scheme).handleAction(directive);
 
-    if (result instanceof Process) {
-      const process = new ProcessContainer(result);
-      this.addProcess(process);
-      this.emitter.emit('processcreated', process);
-      return actionResultResponse({ process });
+    if (process instanceof Process) {
+      const container = this.registerProcess(process);
+      return actionResultResponse({ process: container });
     }
 
     return actionResultResponse({ content: result });
   }
 
-  addProcess(process: ProcessContainer) {
-    this.processes.set(process.pid, process);
-    if (this.processLimit) this.suspendExcessProcesses();
+  /* === Process management === */
+
+  spawn(process: Process) {
+    const container = this.registerProcess(process);
+    this.emitter.emit('processcreated', container);
   }
 
-  suspendExcessProcesses() {
+  hydrate(ProcessSnapshot: ProcessSnapshot) {
+    const protocol = this.protocols.get(ProcessSnapshot.source);
+    if (!protocol) {
+      throw new Error(
+        `Tried to instantiate process ${ProcessSnapshot.pid} with source protocol '${ProcessSnapshot.source}', but that protocol hasn't been registered.`
+      );
+    }
+
+    const processConstructor = protocol.getProcessConstructor(
+      ProcessSnapshot.tag
+    );
+    if (!processConstructor) {
+      throw new Error(
+        `Tried to instantiate process ${ProcessSnapshot.pid} with source protocol '${ProcessSnapshot.source}, but no process tag matches "${ProcessSnapshot.tag}".`
+      );
+    }
+
+    const process = processConstructor.hydrate(ProcessSnapshot.state);
+    this.registerProcess(process);
+  }
+
+  get runningProcesses(): Array<ProcessContainer> {
+    return Array.from(this.processes.values()).filter(
+      (process) => process.status === 'running'
+    );
+  }
+
+  suspend(pid: ProcessContainer['pid']) {
+    const process = this.processes.get(pid);
+    if (!process.discardable || process.status !== 'running') return;
+    process.saveSnapshot();
+    process.disconnect();
+    process.status = 'suspended';
+  }
+
+  resume(pid: ProcessContainer['pid']) {
+    const process = this.processes.get(pid);
+    if (process.status === 'running') return;
+    if (process.status !== 'suspended') {
+      throw new Error('Tried to resume a process with an invalid status.');
+    }
+
+    process.loadSnapshot();
+    process.status = 'running';
+  }
+
+  find(pid: ProcessContainer['pid']) {
+    return this.processes.get(pid);
+  }
+
+  // Private, because we only want to expose spawning or hydrating
+  private registerProcess(
+    process: Process,
+    opts: ProcessInstantiationOpts = {}
+  ) {
+    const container = new ProcessContainer(this, process, opts);
+    this.processes.set(container.pid, container);
+    this.pruneProcesses();
+    return container;
+  }
+
+  private pruneProcesses() {
+    if (!this.processLimit) return;
+
     const numRunningProcesses = this.runningProcesses.length;
     let numExcessProcesses = numRunningProcesses - this.processLimit;
 
     for (const runningProcess of this.runningProcesses) {
       if (numExcessProcesses <= 0) break;
       console.log('suspending', runningProcess.pid);
-      this.suspendProcess(runningProcess);
+      this.suspend(runningProcess.pid);
       numExcessProcesses--;
     }
-  }
-
-  suspendProcess(process: ProcessContainer) {
-    // TODO: Emit an event?
-    process.suspend();
-  }
-
-  getProcess(pid: ProcessContainer['pid']) {
-    return this.processes.get(pid);
   }
 }

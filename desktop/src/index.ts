@@ -14,7 +14,7 @@ import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
 import { AIModelService } from './ai/ai-models';
 import { ResourceModel, initialResources } from './resources';
-import { ProcessModel, SerializedProcess } from './processes';
+import { ProcessModel, ProcessSnapshot } from './processes';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols/protocols';
 import './ui/common/styles/global.css';
@@ -31,7 +31,7 @@ import './ui/workspaces/workspace-delete-modal';
 const workspaceDatabaseService = new DatabaseService<string, WorkspaceRecord>(
   'workspaces'
 );
-const processDatabaseService = new DatabaseService<string, SerializedProcess>(
+const processDatabaseService = new DatabaseService<string, ProcessSnapshot>(
   'processes'
 );
 const messageDatabaseService = new DatabaseService<string, MessageRecord>(

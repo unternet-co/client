@@ -136,7 +136,6 @@ export class WorkspaceModel {
   setTitle(title: string, id?: WorkspaceRecord['id']) {
     const workspace = this.get(id);
     workspace.title = title;
-    console.log('Setting title!!!');
     this.workspaceDatabase.update(workspace.id, { title });
     this.notifier.notify({ workspaceId: id });
   }
@@ -321,8 +320,6 @@ export class WorkspaceModel {
   hydrateMessage(record: MessageRecord): Message {
     if (record.type === 'action' && record.pid) {
       const { pid, ...rest } = record;
-      console.log(pid);
-      console.log(this.processModel.get(record.pid));
       return {
         ...rest,
         process: this.processModel.get(record.pid),
