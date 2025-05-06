@@ -26,7 +26,7 @@ export class WebProcess extends Process {
   data?: any;
 
   static async create(url: string) {
-    const process = new WebProcess(url);
+    const process = new WebProcess({ url });
     const metadata = await getMetadata(url);
     process.title = metadata.title;
     process.description = metadata.description;
@@ -35,16 +35,16 @@ export class WebProcess extends Process {
   }
 
   static hydrate(state: WebProcessState) {
-    const process = new WebProcess(state.url);
+    const process = new WebProcess(state);
     process.data = state.data;
     return process;
   }
 
-  constructor(url: string) {
+  constructor(state: WebProcessState) {
     super();
-    this.url = url;
+    this.url = state.url;
     this.webview = document.createElement('iframe');
-    this.webview.src = url;
+    this.webview.src = state.url;
     this.icons = [
       {
         src: iconSrc,

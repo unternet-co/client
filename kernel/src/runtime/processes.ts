@@ -72,6 +72,12 @@ export abstract class Process {
 
 type RuntimeStatus = 'idle' | 'running' | 'suspended';
 
+export interface ProcessMetadata {
+  title?: string;
+  icons?: ResourceIcon[];
+  actions?: ActionMap;
+}
+
 /**
  * ProcessContainer is the system-level object that wraps a Process, and manages things we want to protect like the URI, tag (used when a protocol has multiple processes), states, etc.
  */
@@ -83,6 +89,7 @@ export class ProcessContainer {
   private processConstructor: ProcessConstructor;
   private process: Process;
   private snapshot: string | null;
+  private metadata: ProcessMetadata = {};
   readonly createdAt = Date.now();
   discardable: boolean = true;
   status: RuntimeStatus = 'running';
@@ -92,11 +99,11 @@ export class ProcessContainer {
   }
 
   get title() {
-    return this.process.title;
+    return this.process?.title || this.metadata.title;
   }
 
   get icons() {
-    return this.process.icons;
+    return this.process?.icons || this.metadata.icons;
   }
 
   constructor(process: Process) {
@@ -109,6 +116,7 @@ export class ProcessContainer {
 
   suspend() {
     if (!this.discardable || this.status !== 'running') return;
+
     this.snapshot = JSON.stringify(this.serialize());
     this.process.unmount();
     this.process = null;
