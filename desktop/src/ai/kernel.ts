@@ -97,7 +97,6 @@ export class Kernel {
 
   updateResources() {
     const resources = this.resourceModel.all();
-    console.log('updating res', resources);
     this.interpreter.updateResources(resources);
   }
 
