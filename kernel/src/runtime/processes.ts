@@ -106,8 +106,8 @@ export class ProcessContainer {
     return this.process?.icons || this.metadata.icons;
   }
 
-  constructor(process: Process) {
-    this.pid = ulid();
+  constructor(process: Process, pid?: string) {
+    this.pid = pid ?? ulid();
     this.tag = process.tag;
     this.source = process.source;
     this.processConstructor = process.constructor as ProcessConstructor;
@@ -139,6 +139,7 @@ export class ProcessContainer {
   }
 
   describe() {
+    if (!this.process) return '';
     const process = this.process as any;
     if (typeof process.describe === 'function') {
       return process.describe();
@@ -146,15 +147,15 @@ export class ProcessContainer {
   }
 
   mount(el: HTMLElement) {
-    this.process.mount(el);
+    this.process?.mount(el);
   }
 
   unmount() {
-    this.process.unmount();
+    this.process?.unmount();
   }
 
   renderText() {
-    this.process.renderText();
+    this.process?.renderText();
   }
 
   static hydrate(
@@ -162,7 +163,10 @@ export class ProcessContainer {
     constructor: ProcessConstructor
   ) {
     const process = constructor.hydrate(serializedProcess.state);
-    const containedProcess = new ProcessContainer(process);
+    const containedProcess = new ProcessContainer(
+      process,
+      serializedProcess.pid
+    );
     return containedProcess;
   }
 

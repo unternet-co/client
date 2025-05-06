@@ -36,6 +36,7 @@ export class ProcessModel {
   }
 
   get(pid: ProcessContainer['pid']) {
+    console.log(this.runtime.processes);
     return this.runtime.getProcess(pid);
   }
 

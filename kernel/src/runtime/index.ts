@@ -115,6 +115,7 @@ export class ProcessRuntime {
     if (result instanceof Process) {
       const process = new ProcessContainer(result);
       this.addProcess(process);
+      this.emitter.emit('processcreated', process);
       return actionResultResponse({ process });
     }
 
@@ -124,7 +125,6 @@ export class ProcessRuntime {
   addProcess(process: ProcessContainer) {
     this.processes.set(process.pid, process);
     if (this.processLimit) this.suspendExcessProcesses();
-    this.emitter.emit('processcreated', process);
   }
 
   suspendExcessProcesses() {
@@ -133,6 +133,7 @@ export class ProcessRuntime {
 
     for (const runningProcess of this.runningProcesses) {
       if (numExcessProcesses <= 0) break;
+      console.log('suspending', runningProcess.pid);
       this.suspendProcess(runningProcess);
       numExcessProcesses--;
     }

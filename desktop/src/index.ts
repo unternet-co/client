@@ -140,4 +140,3 @@ if (
 
 resourceModel.register('https://ruperts.world');
 resourceModel.register('https://applets.unternet.co/calculator');
-console.log('initialized');

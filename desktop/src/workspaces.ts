@@ -203,7 +203,6 @@ export class WorkspaceModel {
   async hydrate(record: WorkspaceRecord) {
     const activeMessages = [];
     const inactiveMessages = [];
-    console.log('archive up to', record.archiveUpToId);
 
     // Get all message records, hydrate them & add to appropriate bucket (active vs. inactive)
     const messageRecords = await this.messageDatabase.where({
@@ -212,7 +211,6 @@ export class WorkspaceModel {
     for (const messageRecord of messageRecords) {
       const message = this.hydrateMessage(messageRecord);
       if (!record.archiveUpToId || message.id > record.archiveUpToId) {
-        console.log('active message', message.id);
         activeMessages.push(message);
       } else {
         inactiveMessages.push(message);
@@ -323,6 +321,8 @@ export class WorkspaceModel {
   hydrateMessage(record: MessageRecord): Message {
     if (record.type === 'action' && record.pid) {
       const { pid, ...rest } = record;
+      console.log(pid);
+      console.log(this.processModel.get(record.pid));
       return {
         ...rest,
         process: this.processModel.get(record.pid),
