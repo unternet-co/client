@@ -1,5 +1,6 @@
-import { html, css, render } from 'lit';
+import { html, render } from 'lit';
 import { attachStyles } from '../../../common/utils/dom';
+import './popover.css';
 
 export type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';
 
@@ -18,13 +19,10 @@ export type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';
 export class PopoverElement extends HTMLElement {
   static observedAttributes = ['anchor', 'position'];
 
-  #shadow: ShadowRoot;
-
   constructor() {
     super();
-    this.#shadow = this.attachShadow({ mode: 'open' });
-    attachStyles(this.#shadow, this.styles.toString());
     this.setAttribute('popover', '');
+    this.classList.add('un-popover');
   }
 
   attributeChangedCallback(
@@ -33,7 +31,7 @@ export class PopoverElement extends HTMLElement {
     newValue: string | null
   ) {
     if (oldValue === newValue) return;
-    this.#render();
+    this.render();
   }
 
   /**
@@ -49,7 +47,7 @@ export class PopoverElement extends HTMLElement {
     if (!anchorEl) {
       const msg = `[un-popover] Anchor element with id "${anchor}" not found.`;
       console.error(msg);
-      throw new Error(msg);
+      return;
     }
     const anchorNameValue = `--${anchor}`;
     const style = anchorEl.style as CSSStyleDeclaration & {
@@ -60,54 +58,13 @@ export class PopoverElement extends HTMLElement {
     this.setAttribute('data-position', position);
   }
 
-  #render() {
+  render() {
     this.#updateAnchorPositioning();
-    render(html`<slot></slot>`, this.#shadow);
+    render(this.template, this);
   }
 
-  get styles() {
-    return css`
-      /** 
-      * Resets
-      **/
-      :host {
-        margin: 0;
-        inset: unset;
-      }
-
-      /**
-      * Default "modal" styles
-      **/
-      :host {
-        border: 1px solid var(--color-border-default);
-        max-width: 320px;
-        background: var(--color-bg-content);
-        border-radius: var(--rounded-lg);
-        box-shadow: var(--shadow);
-        padding: var(--space-6);
-        margin: var(--space-6);
-      }
-
-      /** 
-      * Positioning logic
-      **/
-      :host {
-        position-try-fallbacks: flip-block, flip-inline;
-        position-try: flip-block, flip-inline;
-      }
-      :host([data-position='top']) {
-        position-area: top;
-      }
-      :host([data-position='right']) {
-        position-area: right;
-      }
-      :host([data-position='bottom']) {
-        position-area: bottom;
-      }
-      :host([data-position='left']) {
-        position-area: left;
-      }
-    `;
+  get template() {
+    return html`<section class="content"><slot></slot></section>`;
   }
 }
 
