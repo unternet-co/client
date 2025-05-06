@@ -27,6 +27,15 @@ class ResourceModel {
   }: ResourceModelInit) {
     this.db = resourceDatabaseService;
     initialResources.map(this.add.bind(this));
+    this.load();
+  }
+
+  async load() {
+    const allResources = await this.db.all();
+    for (const resource of allResources) {
+      this.resources.set(resource.uri, resource);
+    }
+    this.notifier.notify();
   }
 
   all() {
