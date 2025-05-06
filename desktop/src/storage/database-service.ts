@@ -44,7 +44,6 @@ export class DatabaseService<Id, T> {
   }
 
   async update(id: Id, item: Partial<T>): Promise<void> {
-    console.log(id, item);
     await this.table.update(id, item);
   }
 
