@@ -35,6 +35,7 @@ export class SettingsModal extends ModalElement {
     'gpt-4o-mini',
     'gpt-4-turbo',
     'gpt-3.5-turbo',
+    'gpt-4o',
   ];
 
   constructor() {
