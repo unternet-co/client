@@ -33,6 +33,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/untildify": "^4.0.0",
     "chokidar-cli": "^3.0.0",
     "mime-types": "^3.0.1",
     "rimraf": "^6.0.1",

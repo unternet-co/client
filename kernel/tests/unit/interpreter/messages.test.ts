@@ -2,13 +2,25 @@ import { readFile } from 'node:fs/promises';
 import mime from 'mime-types';
 
 import { describe, expect, it } from '#tests/tooling';
-import { fileMessage } from '#src/interpreter/messages.ts';
+import {
+  FileInput,
+  inputMessage,
+  toModelMessages,
+} from '#src/interpreter/messages.ts';
 
 describe('Interpreter | Messages', () => {
   /**
-   * fileMessage
+   * Files
    */
-  describe('fileMessage', () => {
+  describe('Files', () => {
+    function contentPart(file: FileInput) {
+      const [msg] = toModelMessages([inputMessage({ files: [file] })]);
+      if (typeof msg.content === 'string')
+        throw new Error('Did not expect msg.content to be a string');
+      const part = msg.content[0];
+      return part;
+    }
+
     it('creates a TextPart for a file with a text encoding', () => {
       const text = '📝';
 
@@ -17,7 +29,7 @@ describe('Interpreter | Messages', () => {
         mimeType: 'text/markdown; charset=UTF-8',
       };
 
-      const part = fileMessage(file);
+      const part = contentPart(file);
       expect(part.type).toBe('text');
       expect('text' in part && part.text).toBe(text);
     });
@@ -32,7 +44,7 @@ describe('Interpreter | Messages', () => {
         mimeType: mime.lookup(imgPath),
       };
 
-      const part = fileMessage(file);
+      const part = contentPart(file);
       expect(part.type).toBe('image');
       expect('image' in part && part.image).toBe(imgBytes);
     });
@@ -47,7 +59,7 @@ describe('Interpreter | Messages', () => {
         mimeType: mime.lookup(filePath) || undefined,
       };
 
-      const part = fileMessage(file);
+      const part = contentPart(file);
       expect(part.type).toBe('file');
       expect('data' in part && part.data).toBe(fileBytes);
     });
