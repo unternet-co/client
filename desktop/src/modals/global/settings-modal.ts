@@ -133,9 +133,12 @@ export class SettingsModal extends ModalElement {
         this.selectedProvider,
         this.selectedProviderConfig
       );
-      this.availableModels = allAvailableModels.filter((model) =>
-        this.allowedModels.includes(model.name)
-      );
+      this.availableModels =
+        this.selectedProvider === 'openai'
+          ? allAvailableModels.filter((model) =>
+              this.allowedModels.includes(model.name)
+            )
+          : allAvailableModels;
 
       this.modelError = null;
     } catch (error) {
