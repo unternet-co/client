@@ -48,7 +48,6 @@ export class PopoverElement extends HTMLElement {
       const msg = `[un-popover] Anchor element with id "${anchor}" not found.`;
       console.error(msg);
       return;
-      // throw new Error(msg);
     }
     const anchorNameValue = `--${anchor}`;
     const style = anchorEl.style as CSSStyleDeclaration & {
