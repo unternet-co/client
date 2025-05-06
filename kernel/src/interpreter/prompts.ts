@@ -8,12 +8,12 @@ function chooseStrategy(strategies: Record<string, Strategy>) {
     .join('|');
   return dedent`
     Choose from one of the following available strategies to use in order to best respond to the user's query. (This is not your actual response, but will determine the type of response you give).
-    Available strategies are: ${possibleOutputs}
+    Available strategies are listed below in a discriminated union format with the name Strategy.
+    type Strategy = ${possibleOutputs};
     Your response should take the form of a JSON object that adheres to this interface:
     interface Response {
       strategy: Strategy;
-    };
-    type Strategy = ${possibleOutputs};
+    };    
     Where the response is an object with key "strategy" and values one of the allowed strings in the discriminated union ${possibleOutputs}. 
     Respond with the strategy you think is best for the user query in the JSON format mentioned above.
   `;
