@@ -137,3 +137,43 @@ input.error {
 .error-text {
   color: var(--color-error);
 }
+
+/* Text utility classes */
+
+.text-xs {
+  font-size: var(--text-xs);
+}
+.text-sm {
+  font-size: var(--text-sm);
+}
+.text-base {
+  font-size: var(--text-base);
+}
+.text-lg {
+  font-size: var(--text-lg);
+}
+.text-xl {
+  font-size: var(--text-xl);
+}
+.text-2xl {
+  font-size: var(--text-2xl);
+}
+.text-3xl {
+  font-size: var(--text-3xl);
+}
+.text-4xl {
+  font-size: var(--text-4xl);
+}
+.text-5xl {
+  font-size: var(--text-5xl);
+}
+
+.text-disabled {
+  color: var(--color-text-disabled);
+}
+.text-muted {
+  color: var(--color-text-muted);
+}
+.text-strong {
+  color: var(--color-text-strong);
+}
