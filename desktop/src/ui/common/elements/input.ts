@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import { classMap } from 'lit/directives/class-map.js';
 import './icon';
 
@@ -7,20 +8,20 @@ export type InputVariant = 'default' | 'ghost' | 'flat';
 export type IconPosition = 'start' | 'end';
 
 export class InputElement extends LitElement {
-  value: string = '';
   type: string = 'text';
-  placeholder: string = '';
-  disabled: boolean = false;
-  readonly: boolean = false;
-  required: boolean = false;
-  minlength: number = -1;
-  maxlength: number = -1;
-  min: string = '';
-  max: string = '';
-  step: string = '';
-  pattern: string = '';
-  name: string = '';
-  autocomplete: string = '';
+  value: string;
+  placeholder: string;
+  disabled: boolean;
+  readonly: boolean;
+  required: boolean;
+  minlength: number;
+  maxlength: number;
+  min: string;
+  max: string;
+  step: string;
+  pattern: string;
+  name: string;
+  autocomplete: string;
   size: InputSize = 'medium';
   variant: InputVariant = 'default';
   loading: boolean = false;
@@ -133,6 +134,16 @@ export class InputElement extends LitElement {
     }
   }
 
+  public get validity(): ValidityState | undefined {
+    const input = this.shadowRoot?.querySelector('input');
+    return input?.validity;
+  }
+
+  public checkValidity(): boolean {
+    const input = this.shadowRoot?.querySelector('input');
+    return input ? input.checkValidity() : false;
+  }
+
   render() {
     const showClearButton = this.type === 'search' && this.value;
     const inputClasses = {
@@ -165,14 +176,14 @@ export class InputElement extends LitElement {
           ?disabled=${this.disabled || this.loading}
           ?readonly=${this.readonly}
           ?required=${this.required}
-          minlength=${this.minlength > 0 ? this.minlength : ''}
-          maxlength=${this.maxlength > 0 ? this.maxlength : ''}
-          min=${this.min}
-          max=${this.max}
-          step=${this.step}
-          pattern=${this.pattern}
-          name=${this.name}
-          autocomplete=${this.autocomplete}
+          autocomplete=${ifDefined(this.autocomplete)}
+          minlength=${ifDefined(this.minlength)}
+          maxlength=${ifDefined(this.maxlength)}
+          min=${ifDefined(this.min)}
+          max=${ifDefined(this.max)}
+          step=${ifDefined(this.step)}
+          pattern=${ifDefined(this.pattern)}
+          name=${ifDefined(this.name)}
           @input=${this.handleInput}
           @change=${this.handleChange}
           aria-busy=${this.loading ? 'true' : 'false'}
