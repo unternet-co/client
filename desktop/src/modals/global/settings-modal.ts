@@ -121,10 +121,16 @@ export class SettingsModal extends ModalElement {
       this.isLoadingModels = true;
       this.render();
 
-      this.availableModels = await this.aiModelService.getAvailableModels(
+      const allAvailableModels = await this.aiModelService.getAvailableModels(
         this.selectedProvider,
         this.selectedProviderConfig
       );
+      this.availableModels =
+        this.selectedProvider === 'openai'
+          ? allAvailableModels.filter((model) =>
+              this.aiModelService.getAllowedOpenAiModels().includes(model.name)
+            )
+          : allAvailableModels;
 
       this.modelError = null;
     } catch (error) {

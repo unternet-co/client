@@ -43,6 +43,13 @@ type AIModelProviderMap = { [key in AIModelProviderName]: AIModelProvider };
 
 export class AIModelService {
   private providers: AIModelProviderMap;
+  // Restrict to a subset of models for now
+  private allowedOpenAiModels: Array<String> = [
+    'gpt-4o-mini',
+    'gpt-4-turbo',
+    'gpt-3.5-turbo',
+    'gpt-4o',
+  ];
 
   constructor(providers: AIModelProviderMap) {
     this.providers = providers;
@@ -80,5 +87,9 @@ export class AIModelService {
       };
     }
     return this.providers[providerName].validateConfig(providerConfig);
+  }
+
+  getAllowedOpenAiModels() {
+    return this.allowedOpenAiModels;
   }
 }

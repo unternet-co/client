@@ -1,0 +1,147 @@
+resource-management-popover {
+  margin: var(--space-2);
+  width: 320px;
+  &:popover-open {
+    display: flex;
+    flex-direction: column;
+  }
+
+  footer {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  un-input {
+    flex-grow: 1;
+  }
+
+  .resource-icon {
+    width: 16px;
+    height: 16px;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &.placeholder {
+      border-radius: var(--rounded-sm);
+      background: var(--color-bg-chrome);
+    }
+  }
+
+  .resource-name {
+    flex-grow: 1;
+  }
+
+  .resource-row {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-2);
+  }
+
+  .no-resources {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin: var(--space-6);
+  }
+
+  .applet-card {
+    background-color: var(--color-bg-chrome);
+    border-radius: var(--rounded-lg);
+    border: 1px solid var(--color-border-muted);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+
+    &.loading {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  .applet-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4, 16px);
+    margin-bottom: var(--space-2, 8px);
+  }
+
+  .applet-card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--rounded-lg);
+    background: var(--color-bg-content);
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .applet-card-icon-placeholder {
+    background: var(--color-bg-content);
+    width: 32px;
+    height: 32px;
+  }
+
+  .applet-card-title-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 2px;
+  }
+  .applet-card-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--color-text-default);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .applet-card-type {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .applet-card-description {
+    color: var(--color-text-default);
+    word-break: break-word;
+  }
+
+  .applet-card-actions-label {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+  .applet-card-actions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .applet-card-action {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    color: var(--color-text-default);
+  }
+  .applet-card-action-name {
+    font-weight: 600;
+  }
+}
