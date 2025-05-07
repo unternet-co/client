@@ -42,8 +42,7 @@ export class ResourceBar extends HTMLElement {
         id="resource-management-button"
         command="toggle-popover"
         commandfor="resource-management-popover"
-        >Manage Resources</un-button
-      >
+      ></un-button>
       <resource-management-popover
         id="resource-management-popover"
         anchor="resource-management-button"
