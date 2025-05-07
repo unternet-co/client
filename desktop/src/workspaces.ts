@@ -108,12 +108,13 @@ export class WorkspaceModel {
     this.notifier.notify({ workspaceId: this.activeWorkspaceId });
   }
 
-  /**
-   * Activates a given workspace. This loads all the active messages into memory.
-   */
   async activate(id: WorkspaceRecord['id']): Promise<void> {
     if (id === this.activeWorkspace?.id) return;
     this.activeWorkspaceId = id;
+    for (const message of this.activeWorkspace.activeMessages) {
+      if (message.type === 'action' && message.process)
+        message.process.resume();
+    }
     this.notifier.notify({ workspaceId: id });
     this.configModel.updateActiveWorkspaceId(id);
   }
@@ -136,7 +137,6 @@ export class WorkspaceModel {
   setTitle(title: string, id?: WorkspaceRecord['id']) {
     const workspace = this.get(id);
     workspace.title = title;
-    console.log('Setting title!!!');
     this.workspaceDatabase.update(workspace.id, { title });
     this.notifier.notify({ workspaceId: id });
   }
@@ -149,6 +149,10 @@ export class WorkspaceModel {
 
   archiveMessages(workspaceId?: WorkspaceRecord['id']) {
     const workspace = this.get(workspaceId);
+    for (const message of workspace.activeMessages) {
+      if (message.type === 'action' && message.process)
+        message.process.suspend();
+    }
     if (workspace.activeMessages.length) {
       workspace.archiveUpToId = workspace.activeMessages.at(-1).id;
       workspace.inactiveMessages = [
@@ -230,6 +234,7 @@ export class WorkspaceModel {
     this.workspaces.delete(id);
     this.workspaceDatabase.delete(id);
     this.messageDatabase.deleteWhere({ workspaceId: id });
+    this.processModel.deleteWhere({ workspaceId: id });
     if (this.workspaces.size) {
       const lastWorkspace = [...this.workspaces.values()].pop();
       this.activate(lastWorkspace.id);
@@ -320,7 +325,9 @@ export class WorkspaceModel {
 
   hydrateMessage(record: MessageRecord): Message {
     if (record.type === 'action' && record.pid) {
+      console.log('hydrating', this.processModel.processes);
       const { pid, ...rest } = record;
+      console.log(pid, this.processModel.get(record.pid));
       return {
         ...rest,
         process: this.processModel.get(record.pid),

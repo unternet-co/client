@@ -1,47 +1,66 @@
 import {
+  Process,
   ProcessContainer,
   ProcessRuntime,
-  type SerializedProcess,
+  type ProcessSnapshot,
 } from '@unternet/kernel';
 import { Notifier } from './common/notifier';
 import { DatabaseService } from './storage/database-service';
+import { Workspace } from './workspaces';
+
+export interface ProcessRecord extends ProcessSnapshot {
+  workspaceId: string;
+}
 
 export class ProcessModel {
-  private processDatabase: DatabaseService<
-    SerializedProcess['pid'],
-    SerializedProcess
-  >;
+  private processDatabase: DatabaseService<ProcessRecord['pid'], ProcessRecord>;
   private runtime: ProcessRuntime;
   private notifier = new Notifier();
   readonly subscribe = this.notifier.subscribe;
 
+  get processes() {
+    return this.runtime.processes;
+  }
+
   constructor(
-    processDatabase: DatabaseService<
-      SerializedProcess['pid'],
-      SerializedProcess
-    >,
+    processDatabase: DatabaseService<ProcessRecord['pid'], ProcessRecord>,
     runtime: ProcessRuntime
   ) {
     this.processDatabase = processDatabase;
     this.runtime = runtime;
-    this.runtime.on('processcreated', this.save.bind(this));
-    this.load();
+    this.loadAll();
   }
 
-  async load() {
-    const serializedProcesses = await this.processDatabase.all();
-    for (const p of serializedProcesses) {
-      this.runtime.instantiateProcess(p);
-    }
+  async loadAll() {
+    const snapshots = await this.processDatabase.all();
+    for (const p of snapshots) this.runtime.hydrate(p);
   }
 
   get(pid: ProcessContainer['pid']) {
-    return this.runtime.getProcess(pid);
+    return this.runtime.find(pid);
   }
 
-  save(process: ProcessContainer) {
-    this.processDatabase.put(process.serialize());
+  delete(pid: ProcessContainer['pid']) {
+    this.processDatabase.delete(pid);
+  }
+
+  async deleteWhere(opts: { workspaceId: Workspace['id'] }) {
+    console.log('deleting', opts.workspaceId);
+    console.log(
+      await this.processDatabase.where({ workspaceId: opts.workspaceId })
+    );
+    this.processDatabase.deleteWhere({ workspaceId: opts.workspaceId });
+  }
+
+  create(process: Process, workspaceId: Workspace['id']) {
+    const container = this.runtime.spawn(process);
+    const snapshot = container.serialize();
+    this.processDatabase.create({
+      workspaceId,
+      ...snapshot,
+    });
+    return container;
   }
 }
 
-export { SerializedProcess };
+export { ProcessSnapshot };

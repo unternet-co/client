@@ -11,7 +11,6 @@ import {
 } from '../../src';
 import { Command } from './types';
 import { protocols } from './protocols';
-import * as commands from './commands';
 import resources from './resources';
 import {
   actionMessage,

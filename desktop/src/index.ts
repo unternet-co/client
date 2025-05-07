@@ -13,25 +13,26 @@ import { Kernel } from './ai/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
 import { AIModelService } from './ai/ai-models';
-import { ResourceModel, initialResources } from './protocols/resources';
+import { ResourceModel, initialResources } from './resources';
+import { ProcessModel, ProcessRecord } from './processes';
+import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols/protocols';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './modals/global/settings-modal';
 import './ui/app-root';
-import { ProcessModel, SerializedProcess } from './processes';
-import { ProcessRuntime, Resource } from '@unternet/kernel';
 import './modals/global/bug-modal';
 import './ui/workspaces/workspace-settings-modal';
 import './ui/workspaces/workspace-delete-modal';
+import { NUM_CONCURRENT_PROCESSES } from './constants';
 
 /* Initialize databases & stores */
 
 const workspaceDatabaseService = new DatabaseService<string, WorkspaceRecord>(
   'workspaces'
 );
-const processDatabaseService = new DatabaseService<string, SerializedProcess>(
+const processDatabaseService = new DatabaseService<string, ProcessRecord>(
   'processes'
 );
 const messageDatabaseService = new DatabaseService<string, MessageRecord>(
@@ -45,7 +46,9 @@ const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
 /* Initialize model dependencies */
 
-const runtime = new ProcessRuntime(protocols);
+const runtime = new ProcessRuntime(protocols, {
+  processLimit: NUM_CONCURRENT_PROCESSES,
+});
 
 /* Initialize models */
 
@@ -88,6 +91,7 @@ const kernel = new Kernel({
   aiModelService,
   resourceModel,
   runtime,
+  processModel,
 });
 dependencies.registerSingleton('Kernel', kernel);
 
@@ -135,3 +139,8 @@ if (
   console.warn('Primary model not defined in config, opening settings modal');
   modalService.open('settings');
 }
+
+/* Add web applets */
+
+resourceModel.register('https://ruperts.world');
+resourceModel.register('https://applets.unternet.co/calculator');

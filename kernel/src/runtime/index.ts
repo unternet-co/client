@@ -1,12 +1,23 @@
 import { ActionProposal } from './actions';
 import { Protocol } from './protocols';
-import { Process, ProcessContainer, SerializedProcess } from './processes';
+import { Process, ProcessContainer, ProcessSnapshot } from './processes';
 import mitt from 'mitt';
 import { listener } from '../shared/utils';
 import { actionResultResponse, ActionResultResponse } from '../response-types';
+import { ProcessInstantiationOpts } from './processes';
 
+// Must remain a "type" else typescript is sad
 type RuntimeEvents = {
   processcreated: ProcessContainer;
+  processremoved: ProcessContainer['pid'];
+};
+
+interface RuntimeConfig {
+  processLimit?: number | null;
+}
+
+const defaultConfig: RuntimeConfig = {
+  processLimit: 50,
 };
 
 /**
@@ -19,15 +30,20 @@ type RuntimeEvents = {
 export class ProcessRuntime {
   protocols = new Map<string, Protocol>();
   processes = new Map<string, ProcessContainer>();
+  processLimit: number;
   private emitter = mitt<RuntimeEvents>();
   readonly on = listener<RuntimeEvents>(this.emitter);
 
-  constructor(protocols?: Array<Protocol>) {
+  constructor(protocols: Array<Protocol>, config: RuntimeConfig = {}) {
+    const mergedConfig = { ...defaultConfig, ...config };
+    this.processLimit = mergedConfig.processLimit;
+
     for (const protocol of protocols) {
       this.registerProtocol(protocol);
     }
-    if (!protocols) console.warn('No protocols provided to Dispatcher');
   }
+
+  /* === Protocols === */
 
   registerProtocol(protocol: Protocol) {
     if (typeof protocol.scheme === 'string') {
@@ -52,30 +68,7 @@ export class ProcessRuntime {
     }
   }
 
-  instantiateProcess(serializedProcess: SerializedProcess) {
-    const protocol = this.protocols.get(serializedProcess.source);
-    if (!protocol) {
-      throw new Error(
-        `Tried to instantiate process ${serializedProcess.pid} with source protocol '${serializedProcess.source}', but that protocol hasn't been registered.`
-      );
-    }
-
-    const processConstructor = protocol.getProcessConstructor(
-      serializedProcess.tag
-    );
-    if (!processConstructor) {
-      throw new Error(
-        `Tried to instantiate process ${serializedProcess.pid} with source protocol '${serializedProcess.source}, but no process tag matches "${serializedProcess.tag}".`
-      );
-    }
-
-    const process = ProcessContainer.hydrate(
-      serializedProcess,
-      processConstructor
-    );
-
-    this.processes.set(serializedProcess.pid, process);
-  }
+  /* === Action dispatching === */
 
   async dispatch(directive: ActionProposal): Promise<ActionResultResponse> {
     const [scheme, ...restParts] = directive.uri.split(':');
@@ -95,16 +88,97 @@ export class ProcessRuntime {
     const result = await this.protocols.get(scheme).handleAction(directive);
 
     if (result instanceof Process) {
-      const process = new ProcessContainer(result);
-      this.processes.set(process.pid, process);
-      this.emitter.emit('processcreated', process);
-      return actionResultResponse({ process });
+      return actionResultResponse({ process: result });
+    } else {
+      return actionResultResponse({ content: result });
     }
-
-    return actionResultResponse({ content: result });
   }
 
-  getProcess(pid: ProcessContainer['pid']) {
+  /* === Process management === */
+
+  spawn(process: Process) {
+    // TODO: Consider modifying this so all processes start by providing a snapshot instead of live class?
+    const container = ProcessContainer.fromImpl(this, process);
+    this.processes.set(container.pid, container);
+    this.pruneProcesses();
+    this.emitter.emit('processcreated', container);
+    return container;
+  }
+
+  hydrate(snapshot: ProcessSnapshot) {
+    const protocol = this.protocols.get(snapshot.source);
+    if (!protocol) {
+      throw new Error(
+        `Tried to instantiate process ${snapshot.pid} with source protocol '${snapshot.source}', but that protocol hasn't been registered.`
+      );
+    }
+
+    const processConstructor = protocol.getProcessConstructor(snapshot.tag);
+    if (!processConstructor) {
+      throw new Error(
+        `Tried to instantiate process ${snapshot.pid} with source protocol '${snapshot.source}, but no process tag matches "${snapshot.tag}".`
+      );
+    }
+
+    // Note: this is in 'suspended' status
+    const container = ProcessContainer.fromSnapshot(
+      this,
+      snapshot,
+      processConstructor
+    );
+    this.processes.set(container.pid, container);
+  }
+
+  get runningProcesses(): Array<ProcessContainer> {
+    return Array.from(this.processes.values()).filter(
+      (process) => process.status === 'running'
+    );
+  }
+
+  suspend(pid: ProcessContainer['pid']) {
+    const process = this.processes.get(pid);
+    process.onSuspend();
+  }
+
+  resume(pid: ProcessContainer['pid']) {
+    const process = this.processes.get(pid);
+    if (process.status === 'running') return;
+    if (process.status !== 'suspended') {
+      throw new Error('Tried to resume a process with an invalid status.');
+    }
+
+    process.onResume();
+    console.log('resumed', process.pid);
+    this.processes.delete(process.pid);
+    this.processes.set(process.pid, process);
+    this.pruneProcesses();
+  }
+
+  kill(pid: ProcessContainer['pid']) {
+    const process = this.processes.get(pid);
+    process.suspend();
+    this.processes.delete(pid);
+  }
+
+  killall() {
+    for (const pid of this.processes.keys()) this.kill(pid);
+  }
+
+  find(pid: ProcessContainer['pid']) {
     return this.processes.get(pid);
+  }
+
+  private pruneProcesses() {
+    if (!this.processLimit) return;
+
+    const numRunningProcesses = this.runningProcesses.length;
+    let numExcessProcesses = numRunningProcesses - this.processLimit;
+
+    for (const runningProcess of this.runningProcesses) {
+      if (numExcessProcesses <= 0) break;
+      console.log('suspending', runningProcess.pid);
+      this.suspend(runningProcess.pid);
+      numExcessProcesses--;
+    }
   }
 }

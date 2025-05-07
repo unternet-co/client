@@ -8,7 +8,7 @@ import './thread-view.css';
 import './process-frame';
 import { repeat } from 'lit/directives/repeat.js';
 import pluralize from 'pluralize';
-import { ResourceModel } from '../../protocols/resources';
+import { ResourceModel } from '../../resources';
 import './process-view';
 import { ActionMessage, InputMessage, ResponseMessage } from '@unternet/kernel';
 import { Kernel, KernelStatus } from '../../ai/kernel';
@@ -121,7 +121,6 @@ class ThreadView extends HTMLElement {
 
   toggleArchivedMessages = () => {
     const ws = this.workspaceModel.activeWorkspace;
-    console.log(ws.showArchived);
     this.workspaceModel.setArchiveVisibility(!ws.showArchived);
     this.render();
   };

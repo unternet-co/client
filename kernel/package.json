@@ -19,7 +19,6 @@
   },
   "imports": {
     "#src/*": "./src/*",
-    "#tests/tooling": "./tests/common/tooling.ts",
     "#tests/*": "./tests/*"
   },
   "dependencies": {

@@ -8,7 +8,11 @@ import {
 import defaultPrompts, { InterpreterPrompts } from './prompts';
 import { actionChoiceSchema, schemas } from './schemas';
 import { defaultStrategies, Strategy } from './strategies';
-import { createActionDict, decodeActionHandle } from '../runtime/actions';
+import {
+  createActionDict,
+  decodeActionHandle,
+  ProcessDisplayMode,
+} from '../runtime/actions';
 import { ActionDefinition, Resource } from '../runtime/resources';
 import { KernelMessage, modelMsg, toModelMessages } from './messages';
 import {
@@ -32,6 +36,10 @@ interface GenerateOpts<T = unknown> {
   schema?: Schema<T>;
   system?: string;
   think?: true;
+}
+
+interface ActionGenerationOpts {
+  display: ProcessDisplayMode;
 }
 
 export class Interpreter {
@@ -118,9 +126,10 @@ export class Interpreter {
   }
 
   async generateActionResponse(
-    messages: Array<KernelMessage>
+    messages: Array<KernelMessage>,
+    opts?: ActionGenerationOpts
   ): Promise<ActionProposalResponse> {
-    const responses = await this.generateActionResponses(messages);
+    const responses = await this.generateActionResponses(messages, opts);
     return responses[0];
   }
 
@@ -130,7 +139,8 @@ export class Interpreter {
    * @returns An ActionResponse containing the action proposal.
    */
   async generateActionResponses(
-    messages: Array<KernelMessage>
+    messages: Array<KernelMessage>,
+    opts?: ActionGenerationOpts
   ): Promise<ActionProposalResponse[]> {
     const { tools } = await this.generateObject({
       messages,
@@ -145,6 +155,7 @@ export class Interpreter {
         uri,
         actionId,
         args: tool.args,
+        display: opts.display,
       });
     });
   }

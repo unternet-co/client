@@ -2,7 +2,7 @@ import { html, render } from 'lit';
 import './resource-management-popover';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../protocols/resources';
+import { ResourceModel } from '../../resources';
 import { ModalService } from '../../modals/modal-service';
 
 export class ResourceBar extends HTMLElement {

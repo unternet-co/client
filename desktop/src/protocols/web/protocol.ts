@@ -4,9 +4,14 @@ import { WebProcess } from './processes';
 export class WebProtocol extends Protocol {
   scheme = ['http', 'https'];
 
-  handleAction(action: ActionProposal) {
-    console.log(action);
-    return 'The calculator is broken. Tell that to the user!';
+  // TODO: Make this a standard part of the kernel
+  static createResource() {}
+
+  async handleAction(action: ActionProposal) {
+    const process = await WebProcess.create(action.uri);
+    await process.handleAction(action);
+    if (action.display === 'snippet') return process.data;
+    return process;
   }
 }
 

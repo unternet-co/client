@@ -1,13 +1,13 @@
 import { Dexie, Table } from 'dexie';
 import { WorkspaceRecord } from '../workspaces';
 import { MessageRecord } from '../messages';
-import { SerializedProcess } from '../processes';
+import { ProcessSnapshot } from '../processes';
 import { Resource } from '@unternet/kernel';
 
 export class IndexedDB extends Dexie {
   workspaces!: Table<WorkspaceRecord, string>;
   messages!: Table<MessageRecord, string>;
-  processes!: Table<SerializedProcess, string>;
+  processes!: Table<ProcessSnapshot, string>;
   resources!: Table<Resource, string>;
 
   constructor() {
@@ -16,7 +16,7 @@ export class IndexedDB extends Dexie {
     this.version(1).stores({
       workspaces: 'id',
       messages: 'id,workspaceId,active',
-      processes: 'pid',
+      processes: 'pid,workspaceId',
       resources: 'uri',
     });
   }

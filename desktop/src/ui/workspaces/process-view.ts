@@ -1,9 +1,10 @@
-import { Process } from '@unternet/kernel';
+import { ProcessContainer } from '@unternet/kernel';
+import './process-view.css';
 
 class ProcessView extends HTMLElement {
-  #process: Process | null = null;
+  #process: ProcessContainer | null = null;
 
-  set process(process: Process | null) {
+  set process(process: ProcessContainer | null) {
     if (this.#process && this.#process.unmount) {
       this.#process.unmount();
     }

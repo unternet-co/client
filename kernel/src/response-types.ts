@@ -1,5 +1,5 @@
-import { ActionProposal } from './runtime/actions';
-import { ProcessContainer } from './runtime/processes';
+import { ActionProposal, ProcessDisplayMode } from './runtime/actions';
+import { Process, ProcessContainer } from './runtime/processes';
 
 export type KernelResponse =
   | DirectResponse
@@ -34,28 +34,30 @@ export function actionProposalResponse(init: {
   uri: string;
   actionId: string;
   args?: Record<string, any>;
+  display?: ProcessDisplayMode;
 }): ActionProposalResponse {
   return {
     type: 'actionproposal',
     uri: init.uri,
     actionId: init.actionId,
     args: init.args,
+    display: init.display || 'auto',
   };
 }
 
 export interface ActionResultResponse {
   type: 'actionresult';
-  process?: ProcessContainer;
+  process?: Process;
   content?: any;
 }
 
 export function actionResultResponse(init: {
-  process?: ProcessContainer;
+  process?: Process;
   content?: any;
 }): ActionResultResponse {
   return {
     type: 'actionresult',
     process: init.process,
-    content: init.content,
+    content: init.content || init.process.describe(),
   };
 }

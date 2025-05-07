@@ -6,7 +6,11 @@ import {
   ImagePart,
   TextPart,
 } from 'ai';
-import { ActionProposal, encodeActionHandle } from '../runtime/actions';
+import {
+  ActionProposal,
+  encodeActionHandle,
+  ProcessDisplayMode,
+} from '../runtime/actions';
 import { ProcessContainer } from '../runtime/processes';
 import { ulid } from 'ulid';
 
@@ -90,6 +94,7 @@ export function actionMessage(init: {
   process?: ProcessContainer;
   content?: any;
   correlationId?: string;
+  display?: ProcessDisplayMode;
 }): ActionMessage {
   return {
     ...baseMessage(init),
@@ -99,6 +104,7 @@ export function actionMessage(init: {
     args: init.args,
     process: init.process,
     content: init.content,
+    display: init.display || 'auto',
   };
 }
 
