@@ -14,6 +14,7 @@ import { protocols } from './protocols';
 import resources from './resources';
 import {
   actionMessage,
+  InputMessage,
   inputMessage,
   KernelMessage,
   responseMessage,
@@ -46,32 +47,32 @@ const rl = readline.createInterface({
  * Supports interaction reuse, hence the function currying.
  */
 async function handleInput(userInput: string) {
+  let message: InputMessage;
+
   // Execute a command if one was provided,
   // and ensure an interaction.
-  // switch (command(userInput)) {
-  //   case 'exit':
-  //     console.log(chalk.bold('\nGoodbye!'));
-  //     rl.close();
-  //     return;
+  switch (command(userInput)) {
+    case 'exit':
+      console.log(chalk.bold('\nGoodbye!'));
+      rl.close();
+      return;
 
-  //   case 'file':
-  //     message = commands.file.interaction(userInput, interaction);
-  //     break;
+    case 'file':
+      message = commands.file.message(userInput);
+      break;
 
-  //   default:
-  //     interaction = interaction || { input: {}, outputs: [] };
-  //     interaction.input.text = userInput;
-  // }
+    default:
+      message = inputMessage({
+        text: userInput,
+      });
+  }
 
-  // If no text was assigned to the interaction input,
+  messages.push(message);
+
+  // If no text was assigned to the last input message,
   // stop here and initiate another user prompt.
-  // if (!inputMessage.text) return promptUser(inputMessage);
+  if (!message.text) return promptUser();
 
-  // Add interaction to stack
-  const inputMsg = inputMessage({
-    text: userInput,
-  });
-  messages.push(inputMsg);
   console.log(chalk.bold(`\nKernel`));
 
   // Interpret the interaction

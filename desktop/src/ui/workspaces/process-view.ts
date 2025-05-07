@@ -1,12 +1,11 @@
 import { ProcessContainer } from '@unternet/kernel';
+import './process-view.css';
 
 class ProcessView extends HTMLElement {
   #process: ProcessContainer | null = null;
 
   set process(process: ProcessContainer | null) {
-    console.log('setting process');
     if (this.#process && this.#process.unmount) {
-      console.log('unmounting');
       this.#process.unmount();
     }
 
@@ -19,7 +18,6 @@ class ProcessView extends HTMLElement {
   }
 
   disconnectedCallback() {
-    console.log('unmountin');
     if (this.#process?.unmount) {
       this.#process.unmount();
     }

@@ -1,4 +1,6 @@
 import { ProcessContainer } from '@unternet/kernel';
+import { guard } from 'lit/directives/guard.js';
+
 import './process-frame.css';
 import './process-view';
 import { getResourceIcon } from '../../common/utils';
@@ -18,10 +20,6 @@ class ProcessFrame extends HTMLElement {
     const iconSrc = getResourceIcon(process);
     const iconTemplate = html`<img src=${iconSrc} />`;
 
-    const headerTemplate = html`
-      <div class="process-header">${iconTemplate} ${process.title}</div>
-    `;
-
     let bodyTemplate: HTMLTemplateResult;
 
     if (process.status === 'running') {
@@ -32,7 +30,13 @@ class ProcessFrame extends HTMLElement {
       </button>`;
     }
 
-    const template = [headerTemplate, bodyTemplate];
+    const template = guard(
+      [process.pid, process.status],
+      () => html`
+        <div class="process-header">${iconTemplate} ${process.title}</div>
+        ${bodyTemplate}
+      `
+    );
 
     render(template, this);
   }

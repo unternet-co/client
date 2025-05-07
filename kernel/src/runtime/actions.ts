@@ -1,5 +1,6 @@
-import { Process } from './processes';
 import { ActionDict, Resource } from './resources';
+
+export type ProcessDisplayMode = 'inline' | 'snippet' | 'auto';
 
 /**
  * An instruction of how an action should be consumed.
@@ -8,6 +9,7 @@ export interface ActionProposal {
   uri: string;
   actionId: string;
   args?: Record<string, any>;
+  display: ProcessDisplayMode;
 }
 
 /**

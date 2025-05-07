@@ -7,7 +7,6 @@ import { getMetadata } from '../../common/utils/http';
 interface WebProcessState {
   url: string;
   title?: string;
-  description?: string;
   icons?: ResourceIcon[];
   data?: any;
 }
@@ -36,6 +35,8 @@ export class WebProcess extends Process {
 
   static resume(state: WebProcessState) {
     const process = new WebProcess(state);
+    process.icons = state.icons;
+    process.title = state.title;
     process.data = state.data;
     return process;
   }
@@ -51,7 +52,6 @@ export class WebProcess extends Process {
       },
     ];
     this.title = 'Web view';
-    this.webview.style.height = '400px';
     this.webview.style.border = 'none';
     this.webview.style.width = '100%';
     this.webview.style.background = 'var(--color-bg-content)';
@@ -61,7 +61,6 @@ export class WebProcess extends Process {
     const applet = await this.connectApplet(hiddenContainer);
     await applet.sendAction(action.actionId, action.args);
     this.data = applet.data;
-    this.disconnectApplet(hiddenContainer);
   }
 
   describe() {
@@ -79,7 +78,6 @@ export class WebProcess extends Process {
       const applet = await applets.connect(this.webview.contentWindow);
       applet.data = this.data;
     }, 0);
-    // this.connectApplet(host);
   }
 
   unmount(): void {
@@ -100,10 +98,9 @@ export class WebProcess extends Process {
   get snapshot(): WebProcessState {
     return {
       url: this.url,
-      data: this.data,
       title: this.title,
-      description: this.description,
       icons: this.icons,
+      data: this.data,
     };
   }
 }

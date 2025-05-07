@@ -86,6 +86,10 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
     metadata.actions = {};
   }
 
+  if (!metadata.title) {
+    metadata.title = metadata.name;
+  }
+
   return metadata;
   // dom.querySelector('meta[name="description"]').getAttribute('content');
 }

@@ -12,7 +12,7 @@ export interface ProcessMetadata {
 }
 
 // This is what a ProcessContainer will save & rehydrate from.
-// The inner process just sees & savees what's inside 'state'
+// The inner process just sees & saves what's inside 'state'
 export interface ProcessSnapshot extends ProcessMetadata {
   pid: string;
   source: string;
@@ -190,7 +190,7 @@ export class ProcessContainer {
 
   onResume() {
     this.process = this.processConstructor.resume(this.snapshot.state);
-    this.snapshot = null;
+    console.log('icons', this.snapshot.icons);
     this.status = 'running';
   }
 

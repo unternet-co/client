@@ -10,6 +10,7 @@ export class WebProtocol extends Protocol {
   async handleAction(action: ActionProposal) {
     const process = await WebProcess.create(action.uri);
     await process.handleAction(action);
+    if (action.display === 'snippet') return process.data;
     return process;
   }
 }

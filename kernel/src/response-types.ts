@@ -1,4 +1,4 @@
-import { ActionProposal } from './runtime/actions';
+import { ActionProposal, ProcessDisplayMode } from './runtime/actions';
 import { Process, ProcessContainer } from './runtime/processes';
 
 export type KernelResponse =
@@ -34,12 +34,14 @@ export function actionProposalResponse(init: {
   uri: string;
   actionId: string;
   args?: Record<string, any>;
+  display?: ProcessDisplayMode;
 }): ActionProposalResponse {
   return {
     type: 'actionproposal',
     uri: init.uri,
     actionId: init.actionId,
     args: init.args,
+    display: init.display || 'auto',
   };
 }
 

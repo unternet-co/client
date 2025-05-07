@@ -30,14 +30,30 @@ defaultStrategies.RESEARCH = {
     messages: Array<KernelMessage>
   ) {
     // Get all actions, then execute them
-    const actionResponses = await interpreter.generateActionResponses(messages);
+    const actionResponses = await interpreter.generateActionResponses(
+      messages,
+      { display: 'snippet' }
+    );
+
     for (const response of actionResponses) {
       messages = yield response;
     }
 
     // Finally, respond with some text
     yield await interpreter.generateTextResponse(messages);
-    return;
+  },
+};
+
+defaultStrategies.DISPLAY = {
+  description: `Use one tool, then show the output of that tool directly to the user. Use this in situations where the user most likely wants to directly view the UI of the tool in question, instead of a summary.`,
+  method: async function* (
+    interpreter: Interpreter,
+    messages: Array<KernelMessage>
+  ) {
+    // Get all actions, then execute them
+    yield await interpreter.generateActionResponse(messages, {
+      display: 'inline',
+    });
   },
 };
 

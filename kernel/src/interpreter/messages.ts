@@ -6,7 +6,11 @@ import {
   ImagePart,
   TextPart,
 } from 'ai';
-import { ActionProposal, encodeActionHandle } from '../runtime/actions';
+import {
+  ActionProposal,
+  encodeActionHandle,
+  ProcessDisplayMode,
+} from '../runtime/actions';
 import { ProcessContainer } from '../runtime/processes';
 import { ulid } from 'ulid';
 
@@ -90,6 +94,7 @@ export function actionMessage(init: {
   process?: ProcessContainer;
   content?: any;
   correlationId?: string;
+  display?: ProcessDisplayMode;
 }): ActionMessage {
   return {
     ...baseMessage(init),
@@ -99,6 +104,7 @@ export function actionMessage(init: {
     args: init.args,
     process: init.process,
     content: init.content,
+    display: init.display || 'auto',
   };
 }
 
@@ -136,11 +142,11 @@ export function assistantMessage(content: string) {
 }
 
 /**
- * Translates a set of interactions and prompts into messages.
- * These messages can be used with the `ai` SDK.
+ * Translates a set of kernel messages into model messages.
+ * These model messages can be used with the `ai` SDK.
  *
  * @param kernelMsgs The kernel messages to translate.
- * @returns An array of messages.
+ * @returns An array of model messages.
  */
 export function toModelMessages(kernelMsgs: KernelMessage[]): ModelMessage[] {
   const modelMsgs: ModelMessage[] = [];
@@ -217,7 +223,7 @@ function fileToPart(file: FileInput): TextPart | ImagePart | FilePart {
     };
   }
 
-  if (file.mimeType.startsWith('image/')) {
+  if (file.mimeType?.startsWith('image/')) {
     return {
       type: 'image',
       image: file.data,
