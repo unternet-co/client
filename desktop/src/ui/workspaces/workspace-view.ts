@@ -9,7 +9,7 @@ import { WorkspaceRecord, WorkspaceModel } from '../../workspaces';
 import { Kernel, KernelNotInitializedError } from '../../ai/kernel';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
-import { ResourceModel } from '../../protocols/resources';
+import { ResourceModel } from '../../resources';
 
 export class WorkspaceView extends HTMLElement {
   constructor() {

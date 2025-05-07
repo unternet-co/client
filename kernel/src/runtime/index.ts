@@ -30,7 +30,6 @@ const defaultConfig: RuntimeConfig = {
 export class ProcessRuntime {
   protocols = new Map<string, Protocol>();
   processes = new Map<string, ProcessContainer>();
-  snapshots = new Map<string, string>();
   processLimit: number;
   private emitter = mitt<RuntimeEvents>();
   readonly on = listener<RuntimeEvents>(this.emitter);
@@ -88,40 +87,46 @@ export class ProcessRuntime {
 
     const result = await this.protocols.get(scheme).handleAction(directive);
 
-    if (process instanceof Process) {
-      const container = this.registerProcess(process);
-      return actionResultResponse({ process: container });
+    if (result instanceof Process) {
+      return actionResultResponse({ process: result });
+    } else {
+      return actionResultResponse({ content: result });
     }
-
-    return actionResultResponse({ content: result });
   }
 
   /* === Process management === */
 
   spawn(process: Process) {
-    const container = this.registerProcess(process);
+    // TODO: Consider modifying this so all processes start by providing a snapshot instead of live class?
+    const container = ProcessContainer.fromImpl(this, process);
+    this.processes.set(container.pid, container);
+    this.pruneProcesses();
     this.emitter.emit('processcreated', container);
+    return container;
   }
 
-  hydrate(ProcessSnapshot: ProcessSnapshot) {
-    const protocol = this.protocols.get(ProcessSnapshot.source);
+  hydrate(snapshot: ProcessSnapshot) {
+    const protocol = this.protocols.get(snapshot.source);
     if (!protocol) {
       throw new Error(
-        `Tried to instantiate process ${ProcessSnapshot.pid} with source protocol '${ProcessSnapshot.source}', but that protocol hasn't been registered.`
+        `Tried to instantiate process ${snapshot.pid} with source protocol '${snapshot.source}', but that protocol hasn't been registered.`
       );
     }
 
-    const processConstructor = protocol.getProcessConstructor(
-      ProcessSnapshot.tag
-    );
+    const processConstructor = protocol.getProcessConstructor(snapshot.tag);
     if (!processConstructor) {
       throw new Error(
-        `Tried to instantiate process ${ProcessSnapshot.pid} with source protocol '${ProcessSnapshot.source}, but no process tag matches "${ProcessSnapshot.tag}".`
+        `Tried to instantiate process ${snapshot.pid} with source protocol '${snapshot.source}, but no process tag matches "${snapshot.tag}".`
       );
     }
 
-    const process = processConstructor.hydrate(ProcessSnapshot.state);
-    this.registerProcess(process);
+    // Note: this is in 'suspended' status
+    const container = ProcessContainer.fromSnapshot(
+      this,
+      snapshot,
+      processConstructor
+    );
+    this.processes.set(container.pid, container);
   }
 
   get runningProcesses(): Array<ProcessContainer> {
@@ -132,10 +137,7 @@ export class ProcessRuntime {
 
   suspend(pid: ProcessContainer['pid']) {
     const process = this.processes.get(pid);
-    if (!process.discardable || process.status !== 'running') return;
-    process.saveSnapshot();
-    process.disconnect();
-    process.status = 'suspended';
+    process.onSuspend();
   }
 
   resume(pid: ProcessContainer['pid']) {
@@ -145,23 +147,25 @@ export class ProcessRuntime {
       throw new Error('Tried to resume a process with an invalid status.');
     }
 
-    process.loadSnapshot();
-    process.status = 'running';
+    process.onResume();
+    console.log('resumed', process.pid);
+    this.processes.delete(process.pid);
+    this.processes.set(process.pid, process);
+    this.pruneProcesses();
+  }
+
+  kill(pid: ProcessContainer['pid']) {
+    const process = this.processes.get(pid);
+    process.suspend();
+    this.processes.delete(pid);
+  }
+
+  killall() {
+    for (const pid of this.processes.keys()) this.kill(pid);
   }
 
   find(pid: ProcessContainer['pid']) {
     return this.processes.get(pid);
-  }
-
-  // Private, because we only want to expose spawning or hydrating
-  private registerProcess(
-    process: Process,
-    opts: ProcessInstantiationOpts = {}
-  ) {
-    const container = new ProcessContainer(this, process, opts);
-    this.processes.set(container.pid, container);
-    this.pruneProcesses();
-    return container;
   }
 
   private pruneProcesses() {

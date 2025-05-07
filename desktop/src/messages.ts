@@ -1,7 +1,6 @@
 import {
   ActionMessage as KernelActionMessage,
   InputMessage as KernelInputMessage,
-  KernelMessage,
   ResponseMessage as KernelResponseMessage,
 } from '@unternet/kernel';
 

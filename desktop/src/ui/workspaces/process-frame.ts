@@ -28,7 +28,7 @@ class ProcessFrame extends HTMLElement {
       bodyTemplate = html`<process-view .process=${process}></process-view>`;
     } else {
       bodyTemplate = html`<button @click=${() => this.handleResume(process)}>
-        Click to restart
+        Click to resume
       </button>`;
     }
 

@@ -25,7 +25,7 @@ export interface ProcessSnapshot extends ProcessMetadata {
 export interface ProcessConstructor {
   tag: string;
   source: string;
-  hydrate(state: any): Process | undefined;
+  resume(state: any): Process;
   new (state?: any): Process;
 }
 
@@ -75,10 +75,10 @@ export abstract class Process implements ProcessMetadata {
     throw new Error('No action handler implemented.');
   }
 
-  abstract serialize(): any;
-  static hydrate(state: any): Process {
+  abstract get snapshot(): any;
+  static resume(state: any): Process {
     throw new Error(
-      "Static method 'hydrate' must be implemented in a derived Process class."
+      "Static method 'resume' must be implemented in a derived Process class."
     );
   }
 }
@@ -87,6 +87,7 @@ type RuntimeStatus = 'idle' | 'running' | 'suspended';
 
 export interface ProcessInstantiationOpts {
   pid?: string;
+  status?: RuntimeStatus;
 }
 
 /**
@@ -94,62 +95,103 @@ export interface ProcessInstantiationOpts {
  */
 export class ProcessContainer {
   readonly protocol = 'process';
-  readonly pid: string;
-  readonly source: string;
-  readonly tag: string;
-  private runtime?: ProcessRuntime;
+  private _pid: string;
+  private _source: string;
+  private _tag: string;
+  private _snapshot: string | null;
+  private runtime: ProcessRuntime;
   private processConstructor: ProcessConstructor;
   private process: Process;
-  private _snapshot: string | null;
-  private metadata: ProcessMetadata = {};
   readonly createdAt = Date.now();
   discardable: boolean = true;
   status: RuntimeStatus = 'running';
 
-  set snapshot(data: ProcessSnapshot) {
+  private set snapshot(data: ProcessSnapshot) {
     this._snapshot = JSON.stringify(data);
   }
   get snapshot(): ProcessSnapshot {
-    return JSON.parse(this._snapshot) as ProcessSnapshot;
+    if (this._snapshot) {
+      return JSON.parse(this._snapshot);
+    } else {
+      return {
+        pid: this._pid,
+        tag: this._tag,
+        source: this._source,
+        state: null,
+      };
+    }
   }
   get uri() {
     return `process:${this.pid}`;
   }
   get title() {
-    return this.process?.title || this.metadata.title;
+    return this.process?.title || this.snapshot?.title;
   }
   get icons() {
-    return this.process?.icons || this.metadata.icons;
+    return this.process?.icons || this.snapshot?.icons;
   }
   get actions() {
-    return this.process?.actions || this.metadata.actions;
+    return this.process?.actions || this.snapshot?.actions;
+  }
+  get pid() {
+    return this._pid;
+  }
+  get tag() {
+    return this._tag;
+  }
+  get source() {
+    return this._source;
   }
 
-  constructor(
-    runtime: ProcessRuntime,
-    process: Process,
-    opts: Partial<ProcessContainer>
-  ) {
+  constructor(runtime: ProcessRuntime) {
     this.runtime = runtime;
-    this.pid = opts.pid ?? ulid();
-    this.tag = process.tag;
-    this.source = process.source;
-    this.processConstructor = process.constructor as ProcessConstructor;
-    this.process = process;
+  }
+
+  static fromImpl(runtime: ProcessRuntime, process: Process) {
+    const container = new ProcessContainer(runtime);
+    container._pid = ulid();
+    container._tag = process.tag;
+    container._source = process.source;
+    container.processConstructor = process.constructor as ProcessConstructor;
+    container.process = process;
+    return container;
+  }
+
+  static fromSnapshot(
+    runtime: ProcessRuntime,
+    snapshot: ProcessSnapshot,
+    constructor: ProcessConstructor
+  ) {
+    const container = new ProcessContainer(runtime);
+    container.processConstructor = constructor;
+    container._pid = snapshot.pid;
+    container._tag = snapshot.tag;
+    container._source = snapshot.source;
+    container.snapshot = snapshot;
+    container.status = 'suspended';
+    return container;
   }
 
   suspend() {
     this.runtime.suspend(this.pid);
   }
 
+  onSuspend() {
+    if (!this.discardable || this.status !== 'running') return;
+    this.snapshot = this.serialize();
+    this.unmount();
+    this.process = null;
+    this.status = 'suspended';
+  }
+
   resume() {
     this.runtime.resume(this.pid);
   }
 
-  updateMetadata() {
-    this.metadata.title = this.process?.title;
-    this.metadata.icons = this.process?.icons;
-    this.metadata.actions = this.process?.actions;
+  onResume() {
+    this.process = this.processConstructor.resume(this.snapshot.state);
+    this.snapshot = null;
+    this.status = 'running';
   }
 
   describe() {
@@ -172,21 +214,6 @@ export class ProcessContainer {
     this.process?.renderText();
   }
 
-  // Used in the suspension process
-  disconnect() {
-    this.unmount();
-    this.process = null;
-  }
-
-  saveSnapshot() {
-    this.snapshot = this.serialize();
-  }
-
-  loadSnapshot() {
-    this.process = this.processConstructor.hydrate(this.snapshot);
-    this.snapshot = null;
-  }
-
   serialize(): ProcessSnapshot {
     return {
       pid: this.pid,
@@ -195,7 +222,7 @@ export class ProcessContainer {
       title: this.title,
       icons: this.icons,
       actions: this.actions,
-      state: this.process ? this.process.serialize() : this,
+      state: this.process ? this.process.snapshot : this.snapshot,
     };
   }
 }

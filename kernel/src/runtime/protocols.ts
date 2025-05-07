@@ -25,8 +25,8 @@ export abstract class Protocol {
   }
 
   registerProcess?(constructor: ProcessConstructor, tag?: string) {
-    if (typeof constructor.hydrate !== 'function') {
-      throw new Error('All processes must implement static hydrate().');
+    if (typeof constructor.resume !== 'function') {
+      throw new Error('All processes must implement static resume().');
     }
 
     if (!tag) tag = 'default';

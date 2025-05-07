@@ -2,8 +2,6 @@ import { LitElement, html, css } from 'lit';
 import { KernelInput } from '../../ai/kernel';
 import '../common/elements/input';
 import '../common/elements/button';
-import { ShortcutService } from '../../shortcuts/shortcut-service';
-import { dependencies } from '../../common/dependencies';
 import { ComboboxOpenEvent } from '../common/elements/combobox';
 
 export class CommandSubmitEvent extends Event {

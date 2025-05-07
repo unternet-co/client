@@ -16,7 +16,7 @@ export class IndexedDB extends Dexie {
     this.version(1).stores({
       workspaces: 'id',
       messages: 'id,workspaceId,active',
-      processes: 'pid',
+      processes: 'pid,workspaceId',
       resources: 'uri',
     });
   }

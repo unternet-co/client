@@ -1,5 +1,5 @@
 import { ActionProposal } from './runtime/actions';
-import { ProcessContainer } from './runtime/processes';
+import { Process, ProcessContainer } from './runtime/processes';
 
 export type KernelResponse =
   | DirectResponse
@@ -45,12 +45,12 @@ export function actionProposalResponse(init: {
 
 export interface ActionResultResponse {
   type: 'actionresult';
-  process?: ProcessContainer;
+  process?: Process;
   content?: any;
 }
 
 export function actionResultResponse(init: {
-  process?: ProcessContainer;
+  process?: Process;
   content?: any;
 }): ActionResultResponse {
   return {

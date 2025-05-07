@@ -34,7 +34,7 @@ export class WebProcess extends Process {
     return process;
   }
 
-  static hydrate(state: WebProcessState) {
+  static resume(state: WebProcessState) {
     const process = new WebProcess(state);
     process.data = state.data;
     return process;
@@ -97,7 +97,7 @@ export class WebProcess extends Process {
     this.webview.remove();
   }
 
-  serialize(): WebProcessState {
+  get snapshot(): WebProcessState {
     return {
       url: this.url,
       data: this.data,
