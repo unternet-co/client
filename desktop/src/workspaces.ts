@@ -149,6 +149,10 @@ export class WorkspaceModel {
 
   archiveMessages(workspaceId?: WorkspaceRecord['id']) {
     const workspace = this.get(workspaceId);
+    for (const message of workspace.activeMessages) {
+      if (message.type === 'action' && message.process)
+        message.process.suspend();
+    }
     if (workspace.activeMessages.length) {
       workspace.archiveUpToId = workspace.activeMessages.at(-1).id;
       workspace.inactiveMessages = [
