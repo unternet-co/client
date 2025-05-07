@@ -78,7 +78,7 @@ export class WebProcess extends Process {
     setTimeout(async () => {
       const applet = await applets.connect(this.webview.contentWindow);
       applet.data = this.data;
-    }, 10);
+    }, 0);
     // this.connectApplet(host);
   }
 
