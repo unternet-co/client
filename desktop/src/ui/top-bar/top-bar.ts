@@ -9,30 +9,6 @@ import './tab-handle';
 import './top-bar.css';
 import { ModalService } from '../../modals/modal-service';
 
-// Define electronAPI type for TypeScript
-declare global {
-  interface Window {
-    electronAPI?: {
-      onWindowStateChange: (callback: (isFullscreen: boolean) => void) => void;
-      removeWindowStateListeners: () => void;
-      platform: string;
-      isFullScreen: () => Promise<boolean>;
-    };
-  }
-}
-
-// Define electronAPI type for TypeScript
-declare global {
-  interface Window {
-    electronAPI?: {
-      onWindowStateChange: (callback: (isFullscreen: boolean) => void) => void;
-      removeWindowStateListeners: () => void;
-      platform: string;
-      isFullScreen: () => Promise<boolean>;
-    };
-  }
-}
-
 export class TopBar extends HTMLElement {
   modalService = dependencies.resolve<ModalService>('ModalService');
   workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
