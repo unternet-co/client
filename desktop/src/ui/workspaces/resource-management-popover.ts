@@ -2,9 +2,10 @@ import { html } from 'lit';
 import { PopoverElement } from '../common/elements/popover';
 import './resource-management-popover.css';
 import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../protocols/resources';
+import { ResourceModel } from '../../resources';
 import { getMetadata, uriWithScheme } from '../../common/utils/http';
 import { InputElement } from '../common/elements/input';
+import { DisposableGroup } from '../../common/disposable';
 
 type AppletAction = { description?: string; [key: string]: any };
 
@@ -12,22 +13,19 @@ export class ResourceManagementPopover extends PopoverElement {
   resourceUrl: string = '';
   resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   activeView: 'list' | 'add' | 'preview' = 'list';
-  unsubscribe?: { dispose: () => void } | (() => void);
+  disposables: DisposableGroup;
   previewResource: any = null;
   previewLoading: boolean = false;
 
   connectedCallback() {
-    this.unsubscribe = this.resourceModel.subscribe(() => this.render());
+    const resourceModelSubscription = this.resourceModel.subscribe(() =>
+      this.render()
+    );
+    this.disposables.add(resourceModelSubscription);
   }
 
   disconnectedCallback() {
-    if (this.unsubscribe) {
-      if (typeof this.unsubscribe === 'function') {
-        this.unsubscribe();
-      } else if (typeof this.unsubscribe.dispose === 'function') {
-        this.unsubscribe.dispose();
-      }
-    }
+    this.disposables.dispose();
   }
 
   goToView = (view: 'list' | 'add' | 'preview') => {
@@ -120,7 +118,7 @@ export class ResourceManagementPopover extends PopoverElement {
             icon="plus"
             id="resource-management-button"
             @click="${() => this.goToView('add')}"
-            >Add a Resource</un-button
+            >Add</un-button
           >
         </footer>
       </div>
@@ -147,7 +145,7 @@ export class ResourceManagementPopover extends PopoverElement {
           </p>
         </fieldset>
         <footer>
-          <un-button type="secondary" @click=${() => this.close()}
+          <un-button type="secondary" @click=${() => this.goToView('list')}
             >Cancel</un-button
           >
           <un-button
