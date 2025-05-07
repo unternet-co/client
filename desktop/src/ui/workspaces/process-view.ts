@@ -12,7 +12,6 @@ class ProcessView extends HTMLElement {
     this.#process = process;
 
     if (this.#process && this.#process.mount) {
-      console.log('mounting');
       this.#process.mount(this);
     }
   }
