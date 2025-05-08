@@ -13,6 +13,10 @@ export class SelectElement extends HTMLElement {
   #selectNativeMenu?: SelectNativeMenu;
   #disposables = new DisposableGroup();
 
+  static get observedAttributes() {
+    return ['value'];
+  }
+
   constructor() {
     super();
     this.attachShadow({ mode: 'open', delegatesFocus: true });
@@ -45,6 +49,12 @@ export class SelectElement extends HTMLElement {
     }
   }
 
+  attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+    if (name === 'value' && oldValue !== newValue) {
+      render(this.#template, this.shadowRoot!);
+    }
+  }
+
   #registerNativeMenuEvents() {
     if (!this.#selectNativeMenu) {
       this.#selectNativeMenu = new SelectNativeMenu();
@@ -72,6 +82,15 @@ export class SelectElement extends HTMLElement {
   }
   get options(): any[] {
     return (this as any)._options;
+  }
+
+  set value(val: string) {
+    if (val !== this.getAttribute('value')) {
+      this.setAttribute('value', val);
+    }
+  }
+  get value(): string {
+    return this.getAttribute('value') ?? '';
   }
 
   get #wrapperClasses() {
