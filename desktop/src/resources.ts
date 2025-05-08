@@ -1,8 +1,9 @@
 import { resource, Resource } from '@unternet/kernel';
-import webResource from './protocols/builtin/resources';
+import webResource from './protocols/buitin/resources';
 import { Notifier } from './common/notifier';
 import { getMetadata, uriWithScheme } from './common/utils/http';
 import { DatabaseService } from './storage/database-service';
+import { WebProtocol } from './protocols/http/protocol';
 
 const initialResources: Array<Resource> = new Array();
 
@@ -56,12 +57,7 @@ class ResourceModel {
       console.error(`Error registering resource '${uri}': ${e.message}`);
     }
 
-    const metadata = await getMetadata(uri);
-    const newResource = resource({
-      uri,
-      ...metadata,
-    });
-
+    const newResource = await WebProtocol.createResource(uri);
     this.add(newResource);
   }
 

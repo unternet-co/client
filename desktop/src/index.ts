@@ -16,7 +16,7 @@ import { AIModelService } from './ai/ai-models';
 import { ResourceModel, initialResources } from './resources';
 import { ProcessModel, ProcessRecord } from './processes';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
-import { protocols } from './protocols/protocols';
+import { protocols } from './protocols';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
@@ -139,8 +139,3 @@ if (
   console.warn('Primary model not defined in config, opening settings modal');
   modalService.open('settings');
 }
-
-/* Add web applets */
-
-resourceModel.register('https://ruperts.world');
-resourceModel.register('https://applets.unternet.co/calculator');

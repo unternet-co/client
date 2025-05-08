@@ -185,6 +185,7 @@ export class Kernel {
       actionId: proposal.actionId,
       args: proposal.args,
       process: container,
+      display: proposal.display,
       content,
     });
 

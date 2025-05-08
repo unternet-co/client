@@ -162,7 +162,6 @@ export class Interpreter {
       }
 
       let display: ProcessDisplayMode;
-      console.log('tool', tool);
       if (action.display && action.display !== 'auto') {
         display = action.display;
       } else {

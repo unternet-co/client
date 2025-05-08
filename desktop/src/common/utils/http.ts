@@ -27,7 +27,7 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
   let metadata = {} as WebsiteMetadata;
 
   url = new URL(url).href;
-  // TODO: Allow importer of kernel to specify fetch function, i.e. use a proxy
+
   const html = await system.fetch(url);
   const parser = new DOMParser();
   const dom = parser.parseFromString(html, 'text/html');
@@ -80,10 +80,6 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
     metadata.description = dom
       .querySelector('meta[name="description"]')
       ?.getAttribute('content');
-  }
-
-  if (!metadata.actions) {
-    metadata.actions = {};
   }
 
   if (!metadata.title) {

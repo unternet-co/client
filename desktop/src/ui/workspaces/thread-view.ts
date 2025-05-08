@@ -135,11 +135,12 @@ class ThreadView extends HTMLElement {
       return this.inputMessageTemplate(message);
     } else if (message.type === 'response') {
       return this.responseMessageTemplate(message);
-    } else if (message.type === 'action' && message.process) {
-      return this.processMessageTemplate(message);
-    } else if (message.type === 'action') {
-      return this.actionMessageTemplate(message);
+    } else if (message.type === 'action' && message.display === 'inline') {
+      return this.processInlineTemplate(message);
+    } else if (message.type === 'action' && message.display === 'snippet') {
+      return this.processSnippetTemplate(message);
     }
+    console.log('no template!', message);
   }
 
   inputMessageTemplate(message: InputMessage) {
@@ -152,7 +153,7 @@ class ThreadView extends HTMLElement {
     </div>`;
   }
 
-  actionMessageTemplate(message: ActionMessage) {
+  processSnippetTemplate(message: ActionMessage) {
     const resource = this.resourceModel.get(message.uri);
 
     let icon = html``;
@@ -166,7 +167,7 @@ class ThreadView extends HTMLElement {
     </div>`;
   }
 
-  processMessageTemplate(message: ActionMessage) {
+  processInlineTemplate(message: ActionMessage) {
     return html`
       <div class="message" data-type="process">
         <process-frame .process=${message.process}></process-frame>
