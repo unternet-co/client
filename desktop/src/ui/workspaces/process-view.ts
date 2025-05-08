@@ -1,5 +1,5 @@
 import { ProcessContainer } from '@unternet/kernel';
-import './process-view.css';
+// import './process-view.css';
 
 class ProcessView extends HTMLElement {
   #process: ProcessContainer | null = null;
