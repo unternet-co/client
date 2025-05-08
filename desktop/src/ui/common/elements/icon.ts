@@ -1,43 +1,7 @@
-import { LitElement, html, css } from 'lit';
-import { ref, createRef } from 'lit/directives/ref.js';
-import { createElement, icons } from 'lucide';
-import { broom } from '@lucide/lab';
-
-const LAB_ICONS = {
-  broom,
-};
-
-export const ICON = {
-  close: 'x',
-  home: 'home',
-  plus: 'plus',
-  bug: 'bug',
-  toolbox: 'shapes',
-  settings: 'settings',
-  pencil: 'pencil',
-  sliders: 'settings-2',
-  check: 'check',
-  dropdown: 'chevrons-up-down',
-  enter: 'corner-down-left',
-  handle: 'grip-horizontal',
-  delete: 'trash',
-  history: 'history',
-  refresh: 'refresh-cw',
-  error: 'alert-triangle',
-  loading: 'loader',
-  info: 'info',
-  shapes: 'shapes',
-  external: 'external-link',
-  download: 'download',
-  left: 'arrow-left',
-  right: 'arrow-right',
-  up: 'arrow-up',
-  down: 'arrow-down',
-  search: 'search',
-  upload: 'upload',
-  attachment: 'paperclip',
-  archive: 'check-check',
-} as const;
+import { html, css, render } from 'lit';
+import { createElement } from 'lucide';
+import { getIcon } from './icon-registry';
+import { attachStyles } from '../../../common/utils/dom';
 
 export type IconSize = 'small' | 'medium' | 'large';
 const sizeMap = {
@@ -46,75 +10,83 @@ const sizeMap = {
   large: '18',
 };
 
-export class IconElement extends LitElement {
-  name: string | null = null;
-  size: IconSize = 'medium';
-  spin: string | null = null;
-
-  iconContainer = createRef<HTMLDivElement>();
-
-  static get properties() {
-    return {
-      name: { type: String },
-      size: { type: String },
-      spin: { type: String, reflect: true },
-    };
+export class IconElement extends HTMLElement {
+  static get observedAttributes() {
+    return ['name', 'size', 'spin'];
   }
+
+  #name: string | null = null;
+  #size: IconSize = 'medium';
+  #spin: string | null = null;
+  #shadow: ShadowRoot;
 
   constructor() {
     super();
+    this.#shadow = this.attachShadow({ mode: 'open' });
   }
 
-  private getIconAttributes() {
+  attributeChangedCallback(
+    attr: string,
+    oldVal: string | null,
+    newVal: string | null
+  ) {
+    if (oldVal === newVal) return;
+    switch (attr) {
+      case 'name':
+        this.#name = newVal;
+        break;
+      case 'size':
+        if (newVal === 'small' || newVal === 'medium' || newVal === 'large') {
+          this.#size = newVal;
+        } else {
+          this.#size = 'medium';
+        }
+        break;
+      case 'spin':
+        this.#spin = newVal;
+        break;
+    }
+    render(this.#template, this.#shadow);
+  }
+
+  connectedCallback() {
+    attachStyles(this.#shadow, IconElement.styles.toString());
+    render(this.#template, this.#shadow);
+  }
+
+  get #iconAttributes() {
     return {
       stroke: 'currentColor',
       'stroke-linecap': 'round',
       'stroke-linejoin': 'round',
-      width: sizeMap[this.size || 'medium'],
-      height: sizeMap[this.size || 'medium'],
+      width: sizeMap[this.#size || 'medium'],
+      height: sizeMap[this.#size || 'medium'],
       fill: 'none',
     };
   }
 
-  /**
-   * Gets the Lucide icon based on the provided icon name
-   * @param iconName The name of the icon to get, defaults to 'help-circle'
-   * @returns SVG element for the icon
-   */
-  private getIcon(iconName: string | null): SVGElement {
-    const mappedName = ICON[iconName as keyof typeof ICON] || 'help-circle';
+  get #template() {
+    const iconFactory = getIcon(this.#name || 'HelpCircle');
+    const attrs = this.#iconAttributes;
+    const svgNode = iconFactory(attrs);
+    const spin = this.#spin !== null && this.#spin !== undefined;
+    const spinClass = spin ? 'spin' : '';
+    const svgElement = createElement(svgNode);
 
-    // Convert kebab-case to PascalCase for Lucide icons
-    const pascalCaseName = mappedName
-      .split('-')
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join('');
+    if (spinClass && svgElement instanceof SVGElement) {
+      svgElement.classList.add('spin');
+    }
 
-    const iconData =
-      icons[pascalCaseName as keyof typeof icons] ||
-      LAB_ICONS[mappedName as keyof typeof LAB_ICONS] ||
-      icons.HelpCircle;
-    return createElement(iconData, this.getIconAttributes()) as SVGElement;
-  }
-
-  render() {
-    const spinClass = this.spin !== null ? 'spin' : '';
-    const spinStyle =
-      this.spin && this.spin !== '' ? `--spin-duration: ${this.spin};` : '';
+    if (svgElement instanceof SVGElement) {
+      svgElement.setAttribute('width', attrs.width);
+      svgElement.setAttribute('height', attrs.height);
+    }
 
     return html`
-      <div class="${spinClass}" style="${spinStyle}">
-        <div class="icon-container" ${ref(this.iconContainer)}></div>
-      </div>
+      <span class="container ${spinClass}" part="container">
+        ${svgElement}
+      </span>
     `;
-  }
-
-  updated() {
-    if (this.iconContainer.value) {
-      this.iconContainer.value.innerHTML = '';
-      const iconElement = this.getIcon(this.name);
-      this.iconContainer.value.appendChild(iconElement);
-    }
   }
 
   static get styles() {
@@ -125,7 +97,7 @@ export class IconElement extends LitElement {
         color: inherit;
       }
 
-      .icon-container svg {
+      .container svg {
         display: block;
       }
 
@@ -139,9 +111,8 @@ export class IconElement extends LitElement {
       }
 
       .spin {
-        --spin-duration: 2s;
+        --spin-duration: 3s;
         animation: spin var(--spin-duration) linear infinite;
-        transform-origin: center;
       }
     `;
   }

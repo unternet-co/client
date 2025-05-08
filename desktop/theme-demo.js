@@ -1,16 +1,24 @@
 // theme-demo.js
-import { ICON } from './src/ui/common/elements/icon.ts';
+import { icons } from './src/ui/common/elements/icon-registry.ts';
+
+function pascalToKebab(str) {
+  return str
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase();
+}
 
 function generateIconGrid() {
   const iconGrid = document.getElementById('icon-grid');
-  let iconsHtml = Object.entries(ICON)
-    .map(
-      ([key, value]) => `
-        <div class="icon-item" title="${key}${key !== value ? ` (${value})` : ''}">
-          <un-icon name="${key}"></un-icon>
+  let iconsHtml = Object.entries(icons)
+    .map(([key]) => {
+      const kebabName = pascalToKebab(key);
+      return `
+        <div class="icon-item" title="${key}">
+          <un-icon name="${kebabName}"></un-icon>
         </div>
-      `
-    )
+      `;
+    })
     .join('');
   iconGrid.innerHTML = iconsHtml;
 }

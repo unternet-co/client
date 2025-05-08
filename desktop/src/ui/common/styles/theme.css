@@ -4,7 +4,7 @@
   *******************************************************/
 
   --color-grey-0: oklch(99.1% 0.002 271.4);
-  --color-gray-25: oklch(97.8% 0.005 260.7);
+  --color-grey-25: oklch(97.8% 0.005 260.7);
   --color-grey-50: oklch(95.2% 0.005 271.3);
   --color-grey-100: oklch(92.7% 0.005 258.3);
   --color-grey-150: oklch(89.7% 0.008 267.4);
@@ -15,7 +15,7 @@
   --color-grey-600: oklch(54.9% 0.008 261.8);
   --color-grey-700: oklch(48.4% 0.008 267.3);
   --color-grey-800: oklch(41.2% 0.008 261.8);
-  --color-grey-850: oklch(42.2% 0.008 261.8);
+  --color-grey-850: oklch(37.4% 0.013 261.7);
   --color-grey-900: oklch(34.3% 0.008 258.4);
   --color-grey-950: oklch(31.3% 0.008 264.3);
   --color-grey-975: oklch(28% 0.01 261.7);

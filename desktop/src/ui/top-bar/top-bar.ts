@@ -9,30 +9,6 @@ import './tab-handle';
 import './top-bar.css';
 import { ModalService } from '../../modals/modal-service';
 
-// Define electronAPI type for TypeScript
-declare global {
-  interface Window {
-    electronAPI?: {
-      onWindowStateChange: (callback: (isFullscreen: boolean) => void) => void;
-      removeWindowStateListeners: () => void;
-      platform: string;
-      isFullScreen: () => Promise<boolean>;
-    };
-  }
-}
-
-// Define electronAPI type for TypeScript
-declare global {
-  interface Window {
-    electronAPI?: {
-      onWindowStateChange: (callback: (isFullscreen: boolean) => void) => void;
-      removeWindowStateListeners: () => void;
-      platform: string;
-      isFullScreen: () => Promise<boolean>;
-    };
-  }
-}
-
 export class TopBar extends HTMLElement {
   modalService = dependencies.resolve<ModalService>('ModalService');
   workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
@@ -107,17 +83,17 @@ export class TopBar extends HTMLElement {
     const activeWorkspaceId =
       this.workspaceModel.activeWorkspaceId || (workspaces[0]?.id ?? '');
 
+    const workspaceOptions = [
+      ...workspaces.map((ws) => ({ value: ws.id, label: ws.title })),
+      { value: '+', label: 'New workspace...' },
+    ];
+
     const selectTemplate = html`
-      <un-button
-        type="ghost"
-        icon="info"
-        class="settings-button"
-        @click=${() => this.modalService.open('workspace-settings')}
-      >
-      </un-button>
       <un-select
+        usenativemenu
         variant="ghost"
         .value=${activeWorkspaceId}
+        .options=${workspaceOptions}
         placeholder="Select workspace"
         @change=${(e: CustomEvent) => {
           const newId = e.detail.value;
@@ -128,13 +104,14 @@ export class TopBar extends HTMLElement {
           }
         }}
       >
-        ${repeat(
-          workspaces,
-          (ws) => ws.id,
-          (ws) => html`<option value=${ws.id}>${ws.title}</option>`
-        )}
-        <option value="+">New workspace...</option>
       </un-select>
+      <un-button
+        type="ghost"
+        icon="pencil"
+        class="settings-button"
+        @click=${() => this.modalService.open('workspace-settings')}
+      >
+      </un-button>
     `;
 
     render(selectTemplate, this.workspaceSelectContainer!);
