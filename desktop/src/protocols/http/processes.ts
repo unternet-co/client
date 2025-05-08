@@ -1,6 +1,4 @@
 import { ActionProposal, Process, ResourceIcon } from '@unternet/kernel';
-import { WebviewTag } from 'electron';
-import iconSrc from '../builtin/icon-128x128.png';
 import { Applet, applets } from '@web-applets/sdk';
 import { getMetadata } from '../../common/utils/http';
 
@@ -46,14 +44,9 @@ export class WebProcess extends Process {
     this.url = state.url;
     this.webview = document.createElement('iframe');
     this.webview.src = state.url;
-    this.icons = [
-      {
-        src: iconSrc,
-      },
-    ];
-    this.title = 'Web view';
     this.webview.style.border = 'none';
     this.webview.style.width = '100%';
+    this.webview.style.height = '350px';
     this.webview.style.background = 'var(--color-bg-content)';
   }
 

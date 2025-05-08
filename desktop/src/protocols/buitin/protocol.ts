@@ -1,19 +1,14 @@
-import Unternet from '@unternet/sdk';
 import { ActionProposal, Protocol } from '@unternet/kernel';
-import { WebProcess } from '../web/processes';
+import { WebProcess } from '../http/processes';
+import { unternet } from '../../common/unternet';
 
 export class BuiltinProtocol extends Protocol {
   scheme = 'builtin';
 
-  connection = new Unternet({
-    apiKey: import.meta.env.APP_UNTERNET_API_KEY,
-    isDev: import.meta.env.DEV,
-  });
-
   async handleAction(directive: ActionProposal) {
     switch (directive.actionId) {
       case 'search':
-        const results = await this.connection.lookup.query({
+        const results = await unternet.lookup.query({
           q: directive.args.q,
         });
         return results;

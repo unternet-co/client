@@ -1,6 +1,6 @@
 import { ulid } from 'ulid';
-import { ActionMap, ResourceIcon } from './resources';
-import { ActionProposal } from './actions';
+import { ResourceIcon } from './resources';
+import { ActionProposal, ActionDict } from './actions';
 import { ProcessRuntime } from '.';
 
 // These are properties that all processes are expected to implement
@@ -8,7 +8,7 @@ import { ProcessRuntime } from '.';
 export interface ProcessMetadata {
   title?: string;
   icons?: ResourceIcon[];
-  actions?: ActionMap;
+  actions?: ActionDict;
 }
 
 // This is what a ProcessContainer will save & rehydrate from.
@@ -44,7 +44,7 @@ export abstract class Process implements ProcessMetadata {
   source: string;
   title?: string;
   icons?: ResourceIcon[];
-  actions?: ActionMap;
+  actions?: ActionDict;
 
   constructor() {
     const constructor = this.constructor as typeof Process;
