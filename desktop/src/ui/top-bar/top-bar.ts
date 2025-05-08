@@ -83,6 +83,11 @@ export class TopBar extends HTMLElement {
     const activeWorkspaceId =
       this.workspaceModel.activeWorkspaceId || (workspaces[0]?.id ?? '');
 
+    const workspaceOptions = [
+      ...workspaces.map((ws) => ({ value: ws.id, label: ws.title })),
+      { value: '+', label: 'New workspace...' },
+    ];
+
     const selectTemplate = html`
       <un-button
         type="ghost"
@@ -92,8 +97,10 @@ export class TopBar extends HTMLElement {
       >
       </un-button>
       <un-select
+        usenativemenu
         variant="ghost"
         .value=${activeWorkspaceId}
+        .options=${workspaceOptions}
         placeholder="Select workspace"
         @change=${(e: CustomEvent) => {
           const newId = e.detail.value;
@@ -104,12 +111,6 @@ export class TopBar extends HTMLElement {
           }
         }}
       >
-        ${repeat(
-          workspaces,
-          (ws) => ws.id,
-          (ws) => html`<option value=${ws.id}>${ws.title}</option>`
-        )}
-        <option value="+">New workspace...</option>
       </un-select>
     `;
 

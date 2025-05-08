@@ -1,83 +1,80 @@
 import { html, css, render } from 'lit';
 import './icon';
-
-export interface SelectOption {
-  value: string;
-  label: string;
-  disabled?: boolean;
-}
+import { SelectNativeMenu } from './select-native-menu';
+import { Disposable, DisposableGroup } from '../../../common/disposable';
+import { attachStyles } from '../../../common/utils/dom';
 
 export type SelectSize = 'small' | 'medium' | 'large';
 export type SelectVariant = 'default' | 'ghost' | 'flat';
 export type IconPosition = 'start' | 'end';
 
 export class SelectElement extends HTMLElement {
-  private _mutationObserver?: MutationObserver;
-  private _selectEl?: HTMLSelectElement;
-
-  static get observedAttributes() {
-    return [
-      'value',
-      'placeholder',
-      'disabled',
-      'required',
-      'name',
-      'size',
-      'variant',
-      'loading',
-      'icon',
-      'icon-position',
-    ];
-  }
+  #mutationObserver?: MutationObserver;
+  #selectNativeMenu?: SelectNativeMenu;
+  #disposables = new DisposableGroup();
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: 'open', delegatesFocus: true });
   }
 
   connectedCallback() {
-    this._mutationObserver = new MutationObserver(() => this.render());
-    this._mutationObserver.observe(this, {
+    this.#mutationObserver = new MutationObserver(() =>
+      render(this.#template, this.shadowRoot!)
+    );
+    this.#mutationObserver.observe(this, {
       childList: true,
       subtree: true,
       characterData: true,
+      attributes: true,
     });
-    this.render();
-  }
-
-  disconnectedCallback() {
-    this._mutationObserver?.disconnect();
-    if (this._selectEl) {
-      this._selectEl.removeEventListener('change', this.handleChange);
+    this.#disposables.add(
+      new Disposable(() => this.#mutationObserver?.disconnect())
+    );
+    attachStyles(this.shadowRoot!, SelectElement.styles.toString());
+    render(this.#template, this.shadowRoot!);
+    if (this.#useNativeMenu) {
+      this.#registerNativeMenuEvents();
     }
   }
 
-  attributeChangedCallback() {
-    this.render();
+  disconnectedCallback() {
+    this.#disposables.dispose();
+    if (this.#selectNativeMenu && this.#useNativeMenu) {
+      this.#selectNativeMenu.unregisterEvents(this);
+    }
   }
 
-  /**
-   * Focuses the select input.
-   */
-  focus() {
-    this._selectEl?.focus();
-  }
-  blur() {
-    this._selectEl?.blur();
-  }
-
-  /**
-   * Returns the options derived from child elements.
-   */
-  private get options(): SelectOption[] {
-    return Array.from(this.children).map((el) => ({
-      value: el.getAttribute('value') || '',
-      label: el.textContent || '',
-      disabled: el.hasAttribute('disabled'),
-    }));
+  #registerNativeMenuEvents() {
+    if (!this.#selectNativeMenu) {
+      this.#selectNativeMenu = new SelectNativeMenu();
+    }
+    this.#selectNativeMenu.registerEvents(
+      this,
+      () => {
+        const opts = this.options;
+        return opts;
+      },
+      () => this.getAttribute('value'),
+      (value: string) => this.setAttribute('value', value)
+    );
   }
 
-  private get wrapperClasses() {
+  get #useNativeMenu() {
+    return (
+      this.hasAttribute('usenativemenu') && window.electronAPI?.showNativeMenu
+    );
+  }
+
+  set options(val: any[]) {
+    (this as any)._options = val;
+    render(this.#template, this.shadowRoot!);
+  }
+  get options(): any[] {
+    return (this as any)._options;
+  }
+
+  get #wrapperClasses() {
     const size = this.getAttribute('size');
     const icon = this.getAttribute('icon');
     const iconPosition = this.getAttribute('icon-position');
@@ -90,7 +87,7 @@ export class SelectElement extends HTMLElement {
       .join(' ');
   }
 
-  private get selectClasses() {
+  get #selectClasses() {
     const size = this.getAttribute('size');
     const variant = this.getAttribute('variant');
     const loading = this.hasAttribute('loading');
@@ -104,32 +101,7 @@ export class SelectElement extends HTMLElement {
       .join(' ');
   }
 
-  private renderOptions() {
-    const nodes = [];
-    const placeholder = this.getAttribute('placeholder');
-    const value = this.getAttribute('value');
-    if (placeholder) {
-      nodes.push(
-        html`<option value="" disabled ?selected=${!value}>
-          ${placeholder}
-        </option>`
-      );
-    }
-    this.options.forEach((opt) => {
-      nodes.push(
-        html`<option
-          value=${opt.value}
-          ?disabled=${opt.disabled}
-          ?selected=${value === opt.value}
-        >
-          ${opt.label}
-        </option>`
-      );
-    });
-    return nodes;
-  }
-
-  private renderIcon(position: IconPosition) {
+  #valueIcon(position: IconPosition) {
     const icon = this.getAttribute('icon');
     const iconPosition = this.getAttribute('icon-position');
     const size = this.getAttribute('size') || 'medium';
@@ -141,7 +113,7 @@ export class SelectElement extends HTMLElement {
     ></un-icon>`;
   }
 
-  private renderDropdownIcon() {
+  #handleIcon() {
     const loading = this.hasAttribute('loading');
     const size = this.getAttribute('size') || 'medium';
     return loading
@@ -154,10 +126,7 @@ export class SelectElement extends HTMLElement {
       : html`<un-icon class="dropdown-icon" name="dropdown"></un-icon>`;
   }
 
-  /**
-   * Handles select value change.
-   */
-  private handleChange = (e: Event) => {
+  #handleChange = (e: Event) => {
     const select = e.target as HTMLSelectElement;
     this.setAttribute('value', select.value);
     this.dispatchEvent(
@@ -169,44 +138,70 @@ export class SelectElement extends HTMLElement {
     );
   };
 
-  /**
-   * Renders the component template.
-   */
-  render() {
+  get #template() {
+    return this.#useNativeMenu ? this.#nativeTemplate : this.#standardTemplate;
+  }
+
+  get #nativeTemplate() {
+    const value = this.getAttribute('value');
+    const disabled =
+      this.hasAttribute('disabled') || this.hasAttribute('loading');
+    const loading = this.hasAttribute('loading');
+    return html`
+      <div class="${this.#wrapperClasses}">
+        ${this.#valueIcon('start')}
+        <button
+          class=${this.#selectClasses}
+          part="select"
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-disabled="${disabled}"
+          aria-busy="${loading ? 'true' : 'false'}"
+          ?disabled=${disabled}
+          tabindex="0"
+        >
+          ${SelectNativeMenu.findLabelForValue(this.options, value) ||
+          this.getAttribute('placeholder') ||
+          ''}
+        </button>
+        ${this.#valueIcon('end')} ${this.#handleIcon()}
+      </div>
+    `;
+  }
+
+  get #standardTemplate() {
     const value = this.getAttribute('value');
     const disabled =
       this.hasAttribute('disabled') || this.hasAttribute('loading');
     const required = this.hasAttribute('required');
     const name = this.getAttribute('name') ?? '';
     const loading = this.hasAttribute('loading');
-    render(
-      html`
-        <style>
-          ${SelectElement.styles}
-        </style>
-        <div class="${this.wrapperClasses}">
-          ${this.renderIcon('start')}
-          <select
-            class=${this.selectClasses}
-            .value=${value}
-            ?disabled=${disabled}
-            ?required=${required}
-            name=${name}
-            aria-busy=${loading ? 'true' : 'false'}
-          >
-            ${this.renderOptions()}
-          </select>
-          ${this.renderIcon('end')} ${this.renderDropdownIcon()}
-        </div>
-      `,
-      this.shadowRoot!
-    );
-    // Attach event listener after render
-    this._selectEl = this.shadowRoot!.querySelector('select')!;
-    if (this._selectEl) {
-      this._selectEl.removeEventListener('change', this.handleChange);
-      this._selectEl.addEventListener('change', this.handleChange);
-    }
+    return html`
+      <div class="${this.#wrapperClasses}">
+        ${this.#valueIcon('start')}
+        <select
+          class=${this.#selectClasses}
+          part="select"
+          .value=${value}
+          ?disabled=${disabled}
+          ?required=${required}
+          name=${name}
+          aria-busy=${loading ? 'true' : 'false'}
+          @change=${this.#handleChange}
+        >
+          <option value="" disabled ?selected=${!value}>
+            ${this.getAttribute('placeholder')}
+          </option>
+          ${Array.from(this.children)
+            .filter(
+              (node) => node.tagName === 'OPTION' || node.tagName === 'OPTGROUP'
+            )
+            .map((node) => html`${node.cloneNode(true)}`)}
+        </select>
+        ${this.#valueIcon('end')} ${this.#handleIcon()}
+      </div>
+    `;
   }
 
   static get styles() {
@@ -229,7 +224,7 @@ export class SelectElement extends HTMLElement {
         color: var(--input-text-color);
         font-family: inherit;
         font-size: inherit;
-        line-height: var(--select-height);
+        /* line-height: var(--select-height); */
         appearance: none;
         box-sizing: border-box;
         border: 1px solid var(--input-border-color);
@@ -239,22 +234,40 @@ export class SelectElement extends HTMLElement {
           transparent 50%
         );
         box-shadow: var(--button-shadows);
+
+        &:focus {
+          outline: var(--outline);
+          outline-offset: var(--outline-offset-inputs);
+        }
       }
-      .select:focus {
-        outline: var(--outline);
-        outline-offset: var(--outline-offset-inputs);
+
+      /* --- Shared variant styles --- */
+      .select--ghost,
+      .select--flat {
+        border-color: transparent;
+        box-shadow: none;
       }
+      .select--ghost {
+        background-color: transparent;
+        padding-right: var(--space-7);
+      }
+      .select--flat {
+        background-color: var(--input-bg-color-flat);
+      }
+
+      /* --- Disabled & loading states --- */
       .select:disabled,
-      .select.loading {
+      .select--loading {
         opacity: 0.5;
         cursor: not-allowed;
-      }
-      .loading {
         pointer-events: none;
       }
+
       .select option:disabled {
         color: var(--input-placeholder-color);
       }
+
+      /* --- Size variants --- */
       .select--small {
         --select-height: 18px;
         font-size: var(--text-sm);
@@ -262,28 +275,8 @@ export class SelectElement extends HTMLElement {
       .select--large {
         --select-height: 28px;
       }
-      .select--ghost {
-        border-color: transparent;
-        background-color: transparent;
-        box-shadow: none;
-        /* font-weight: 500; */
-        /* font-size: var(--text-sm); */
-        padding-right: var(--space-6);
-        /* margin-bottom: 2px; */
-      }
-      .select-wrapper:has(.select--ghost):hover un-icon.dropdown-icon {
-        opacity: 1;
-      }
-      .select--flat {
-        border-color: transparent;
-        box-shadow: none;
-        mix-blend-mode: multiply;
-        background-color: var(--input-bg-color-flat);
-      }
-      .select--flat + un-icon.dropdown-icon,
-      .select--flat ~ un-icon.dropdown-icon {
-        border-left-color: transparent;
-      }
+
+      /* --- Dropdown icon styles --- */
       un-icon.dropdown-icon {
         position: absolute;
         right: 1px;
@@ -299,20 +292,17 @@ export class SelectElement extends HTMLElement {
         align-items: center;
         justify-content: center;
       }
-      .select--ghost + un-icon.dropdown-icon,
-      .select--ghost ~ un-icon.dropdown-icon {
-        border: 1px solid var(--input-border-color);
-        border-top-color: color-mix(
-          in srgb,
-          var(--input-border-color) 100%,
-          transparent 50%
-        );
-        box-shadow: var(--button-shadows);
-        border-radius: var(--rounded);
-        height: 16px;
-        width: 16px;
+      .select--flat + .dropdown-icon {
+        border-left-color: transparent;
+      }
+      .select--ghost + .dropdown-icon {
+        border: unset;
+        border-left-color: transparent;
+        border-top-color: transparent;
+        box-shadow: none;
         right: var(--space-2);
       }
+
       un-icon.value-icon {
         position: absolute;
         top: 50%;
@@ -320,12 +310,13 @@ export class SelectElement extends HTMLElement {
         pointer-events: none;
         color: var(--input-text-color);
         z-index: 1;
-      }
-      un-icon.value-icon-start {
-        left: var(--space-4);
-      }
-      un-icon.value-icon-end {
-        right: calc(20px + var(--space-4));
+
+        &.value-icon-start {
+          left: var(--space-4);
+        }
+        &.value-icon-end {
+          right: calc(20px + var(--space-4));
+        }
       }
       .has-icon.icon-start select {
         padding-left: calc(var(--space-4) + 16px);

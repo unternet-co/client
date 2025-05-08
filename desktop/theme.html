@@ -513,6 +513,133 @@ return "Hello, World!";
           </div>
 
           <div class="form-group">
+            <h4>Select (Native Menu, Simple)</h4>
+            <!-- When using usenativemenu, you must provide options via the 'options' attribute. <option> children are ignored. -->
+            <script>
+              window.demoOptionsSimple = [
+                { label: '-- Please select --', value: '' },
+                { label: 'Short', value: 'short' },
+                {
+                  label:
+                    'This is a very, very, very, very, very, very, very, very, very, very, very, very, very, very long option label to test overflow handling',
+                  value: 'long',
+                },
+                { label: '😀 Emoji Option', value: 'emoji' },
+                {
+                  label: 'Special & Characters: <Test> & "Quotes"',
+                  value: 'specialchars',
+                },
+                { label: 'Disabled Option', value: 'disabled', disabled: true },
+                { label: ' ', value: 'empty' },
+                { label: 'Unicode: 你好, мир, مرحبا', value: 'unicode' },
+                { type: 'separator' },
+                { label: 'After separator', value: 'aftersep' },
+              ];
+            </script>
+            <un-select
+              id="demo-select-simple"
+              usenativemenu
+              placeholder="Choose..."
+            ></un-select>
+          </div>
+
+          <div class="form-group">
+            <h4>Select (Native Menu, options attribute)</h4>
+            <script>
+              window.demoOptionsComplex = [
+                { label: 'Simple Option', value: 'simple' },
+                { type: 'separator' },
+                {
+                  label: 'Checkbox Option',
+                  type: 'checkbox',
+                  checked: true,
+                  value: 'cb1',
+                },
+                {
+                  label: 'Checkbox Option 2',
+                  type: 'checkbox',
+                  checked: false,
+                  value: 'cb2',
+                  disabled: true,
+                },
+                { type: 'separator' },
+                {
+                  label: 'Radio Group',
+                  type: 'submenu',
+                  submenu: [
+                    {
+                      label: 'Radio 1',
+                      type: 'radio',
+                      checked: true,
+                      value: 'r1',
+                      group: 'group1',
+                    },
+                    {
+                      label: 'Radio 2',
+                      type: 'radio',
+                      checked: false,
+                      value: 'r2',
+                      group: 'group1',
+                    },
+                    {
+                      label: 'Radio 3',
+                      type: 'radio',
+                      checked: false,
+                      value: 'r3',
+                      group: 'group1',
+                    },
+                  ],
+                },
+                {
+                  label: 'Submenu Test',
+                  type: 'submenu',
+                  submenu: [
+                    { label: 'Sub Option 1', value: 'sub1' },
+                    { label: 'Sub Option 2', value: 'sub2', disabled: true },
+                    { type: 'separator' },
+                    { label: 'Sub Option 3', value: 'sub3' },
+                  ],
+                },
+                { type: 'separator' },
+                {
+                  label: 'Option with Icon',
+                  value: 'iconopt',
+                  icon: 'build/app-icons/client-icon-linux-32.png',
+                },
+                {
+                  label: 'Shortcuts',
+                  value: 'accel',
+                  accelerator: 'CommandOrControl+Y',
+                },
+                { label: 'Unicode Option 🌍', value: 'unicode' },
+                { label: 'Special & <Characters>', value: 'specialchars' },
+                {
+                  label: 'Sublabel/Tooltip',
+                  value: 'sublabel',
+                  toolTip: 'unfortunately, sublabel does not work on macOS',
+                  sublabel: 'Sublabel',
+                },
+                { label: 'Disabled Option', value: 'disabled', disabled: true },
+              ];
+            </script>
+            <un-select
+              id="demo-select-complex"
+              usenativemenu
+              placeholder="Choose..."
+            ></un-select>
+            <script>
+              document.addEventListener('DOMContentLoaded', () => {
+                const elSimple = document.getElementById('demo-select-simple');
+                const elComplex = document.getElementById(
+                  'demo-select-complex'
+                );
+                elSimple.options = window.demoOptionsSimple;
+                elComplex.options = window.demoOptionsComplex;
+              });
+            </script>
+          </div>
+
+          <div class="form-group">
             <h4>Textarea</h4>
             <un-textarea
               placeholder="Enter multiple lines of text"
