@@ -11,9 +11,11 @@ import { defaultStrategies, Strategy } from './strategies';
 import {
   createActionDict,
   decodeActionHandle,
+  encodeActionHandle,
   ProcessDisplayMode,
 } from '../runtime/actions';
-import { ActionDefinition, Resource } from '../runtime/resources';
+import { Resource } from '../runtime/resources';
+import { ActionDefinition } from '../runtime/actions';
 import { KernelMessage, modelMsg, toModelMessages } from './messages';
 import {
   actionProposalResponse,
@@ -151,11 +153,27 @@ export class Interpreter {
 
     return tools.map((tool) => {
       const { uri, actionId } = decodeActionHandle(tool.id);
+
+      let action: ActionDefinition;
+      try {
+        action = this.actions[tool.id];
+      } catch {
+        throw new Error('Action returned is not a valid action ID.');
+      }
+
+      let display: ProcessDisplayMode;
+      console.log('tool', tool);
+      if (action.display && action.display !== 'auto') {
+        display = action.display;
+      } else {
+        display = opts?.display ?? tool.display;
+      }
+
       return actionProposalResponse({
         uri,
         actionId,
         args: tool.args,
-        display: opts.display,
+        display: display,
       });
     });
   }
@@ -249,5 +267,9 @@ export class Interpreter {
 
   updateResources(resources: Array<Resource> = []) {
     this.actions = createActionDict(resources);
+  }
+
+  private findAction(uri: string, actionId: string) {
+    return this.actions[encodeActionHandle(uri, actionId)];
   }
 }

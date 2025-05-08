@@ -1,9 +1,10 @@
 import { jsonSchema, Schema } from 'ai';
-import { ActionDefinition } from '../runtime/resources';
+import { ActionDefinition, ProcessDisplayMode } from '../runtime/actions';
 import { Strategy } from './strategies';
+import { ProcessDisplayModes } from '../runtime/actions';
 
 export interface ActionChoiceObject {
-  tools: Array<{ id: string; args?: any }>;
+  tools: Array<{ id: string; args?: any; display: ProcessDisplayMode }>;
 }
 
 export function actionChoiceSchema(
@@ -51,6 +52,14 @@ function actionSchema(actionId: string, action: ActionDefinition) {
     }
     schema.properties.args.additionalProperties = false;
     schema.required.push('args');
+  }
+
+  if (!action.display || action.display === 'auto') {
+    (schema.properties['display'] = {
+      type: 'string',
+      enum: ProcessDisplayModes.filter((x) => x !== 'auto'),
+    }),
+      schema.required.push('display');
   }
 
   return schema;
