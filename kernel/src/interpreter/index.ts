@@ -16,6 +16,8 @@ import {
 } from '../runtime/actions';
 import { Resource } from '../runtime/resources';
 import { ActionDefinition } from '../runtime/actions';
+import { Resource } from '../runtime/resources';
+import { ActionDefinition } from '../runtime/actions';
 import { KernelMessage, modelMsg, toModelMessages } from './messages';
 import {
   actionProposalResponse,
