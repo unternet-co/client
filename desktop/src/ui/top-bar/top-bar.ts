@@ -89,13 +89,6 @@ export class TopBar extends HTMLElement {
     ];
 
     const selectTemplate = html`
-      <un-button
-        type="ghost"
-        icon="info"
-        class="settings-button"
-        @click=${() => this.modalService.open('workspace-settings')}
-      >
-      </un-button>
       <un-select
         usenativemenu
         variant="ghost"
@@ -112,6 +105,13 @@ export class TopBar extends HTMLElement {
         }}
       >
       </un-select>
+      <un-button
+        type="ghost"
+        icon="pencil"
+        class="settings-button"
+        @click=${() => this.modalService.open('workspace-settings')}
+      >
+      </un-button>
     `;
 
     render(selectTemplate, this.workspaceSelectContainer!);
