@@ -1,55 +1,67 @@
-// import { readFile } from 'node:fs/promises';
-// import mime from 'mime-types';
+import { readFile } from 'node:fs/promises';
+import mime from 'mime-types';
 
-// import { describe, expect, it } from '#tests/tooling';
-// import { fileMessage } from '#src/interpreter/messages.ts';
+import { describe, expect, it } from './common/tooling';
+import {
+  FileInput,
+  inputMessage,
+  toModelMessages,
+} from '#src/interpreter/messages.ts';
 
-// describe('Interpreter | Messages', () => {
-//   /**
-//    * fileMessage
-//    */
-//   describe('fileMessage', () => {
-//     it('creates a TextPart for a file with a text encoding', () => {
-//       const text = '📝';
+describe('Interpreter | Messages', () => {
+  /**
+   * Files
+   */
+  describe('Files', () => {
+    function contentPart(file: FileInput) {
+      const [msg] = toModelMessages([inputMessage({ files: [file] })]);
+      if (typeof msg.content === 'string')
+        throw new Error('Did not expect msg.content to be a string');
+      const part = msg.content[0];
+      return part;
+    }
 
-//       const file = {
-//         data: new TextEncoder().encode(text),
-//         mimeType: 'text/markdown; charset=UTF-8',
-//       };
+    it('creates a TextPart for a file with a text encoding', () => {
+      const text = '📝';
 
-//       const part = fileMessage(file);
-//       expect(part.type).toBe('text');
-//       expect('text' in part && part.text).toBe(text);
-//     });
+      const file = {
+        data: new TextEncoder().encode(text),
+        mimeType: 'text/markdown; charset=UTF-8',
+      };
 
-//     it('creates an ImagePart for an image file', async () => {
-//       const imgPath = 'tests/fixtures/sample.png';
-//       const imgBuffer = await readFile(imgPath);
-//       const imgBytes = new Uint8Array(imgBuffer);
+      const part = contentPart(file);
+      expect(part.type).toBe('text');
+      expect('text' in part && part.text).toBe(text);
+    });
 
-//       const file = {
-//         data: imgBytes,
-//         mimeType: mime.lookup(imgPath),
-//       };
+    it('creates an ImagePart for an image file', async () => {
+      const imgPath = 'tests/fixtures/sample.png';
+      const imgBuffer = await readFile(imgPath);
+      const imgBytes = new Uint8Array(imgBuffer);
 
-//       const part = fileMessage(file);
-//       expect(part.type).toBe('image');
-//       expect('image' in part && part.image).toBe(imgBytes);
-//     });
+      const file = {
+        data: imgBytes,
+        mimeType: mime.lookup(imgPath),
+      };
 
-//     it('creates a FilePart for other types of files', async () => {
-//       const filePath = '../node_modules/.bin/esbuild';
-//       const fileBuffer = await readFile(filePath);
-//       const fileBytes = new Uint8Array(fileBuffer);
+      const part = contentPart(file);
+      expect(part.type).toBe('image');
+      expect('image' in part && part.image).toBe(imgBytes);
+    });
 
-//       const file = {
-//         data: fileBytes,
-//         mimeType: mime.lookup(filePath) || undefined,
-//       };
+    it('creates a FilePart for other types of files', async () => {
+      const filePath = '../node_modules/.bin/esbuild';
+      const fileBuffer = await readFile(filePath);
+      const fileBytes = new Uint8Array(fileBuffer);
 
-//       const part = fileMessage(file);
-//       expect(part.type).toBe('file');
-//       expect('data' in part && part.data).toBe(fileBytes);
-//     });
-//   });
-// });
+      const file = {
+        data: fileBytes,
+        mimeType: mime.lookup(filePath) || undefined,
+      };
+
+      const part = contentPart(file);
+      expect(part.type).toBe('file');
+      expect('data' in part && part.data).toBe(fileBytes);
+    });
+  });
+});
