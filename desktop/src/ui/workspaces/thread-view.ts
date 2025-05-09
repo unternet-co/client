@@ -140,7 +140,6 @@ class ThreadView extends HTMLElement {
     } else if (message.type === 'action' && message.display === 'snippet') {
       return this.processSnippetTemplate(message);
     }
-    console.log('no template!', message);
   }
 
   inputMessageTemplate(message: InputMessage) {

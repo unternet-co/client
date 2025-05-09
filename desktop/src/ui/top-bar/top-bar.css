@@ -1,21 +1,24 @@
 top-bar {
-  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 35px;
+  z-index: 1;
   display: flex;
   flex-shrink: 0;
   -webkit-app-region: drag;
-  /* background: var(--color-bg-chrome); */
   overflow: visible;
-  position: relative;
-  /* border-bottom: 1px solid var(--color-border-default); */
+  background: var(--color-bg-page);
+  border-bottom: 1px solid var(--color-border-muted);
+  /* background: color-mix(in srgb, var(--color-bg-page) 50%, transparent); */
+  /* backdrop-filter: blur(20px); */
 }
 
-/* Default padding for macOS traffic lights */
 top-bar.mac {
   padding-left: 76px;
 }
 
-/* When in fullscreen, remove the extra padding since there are no traffic lights */
 top-bar.mac.fullscreen {
   padding-left: 0;
 }
@@ -38,24 +41,15 @@ top-bar .workspace-select-container un-select {
   pointer-events: auto;
 }
 
-top-bar .static-tab-list {
-  display: flex;
-  align-items: stretch;
-  justify-content: flex-start;
-  flex-shrink: 0;
-  margin: 0;
-  height: 100%;
-}
-
-top-bar .settings-button-container {
+top-bar .button-container {
   display: flex;
   align-items: center;
-  margin-left: auto; /* Push to the right */
+  margin-left: auto;
   height: 100%;
   flex-shrink: 0;
   padding: 0 var(--space-2);
 }
 
 top-bar .settings-button {
-  -webkit-app-region: no-drag; /* Make button clickable in draggable area */
+  -webkit-app-region: no-drag;
 }

@@ -1,0 +1,7 @@
+workspace-selector {
+  display: flex;
+}
+
+un-select {
+  font-size: var(--text-sm);
+}

@@ -1,4 +1,5 @@
 import type { MenuItemConstructorOptions } from 'electron';
+import { ChangeEvent } from './select';
 export interface NativeMenuOption extends MenuItemConstructorOptions {
   value: string;
 }
@@ -173,13 +174,7 @@ export class SelectNativeMenu {
       selectedId != null ? this.getValueForId(selectedId) : undefined;
     if (value && value !== getValue()) {
       setValue(value);
-      el.dispatchEvent(
-        new CustomEvent('change', {
-          detail: { value },
-          bubbles: true,
-          composed: true,
-        })
-      );
+      el.dispatchEvent(new ChangeEvent(value));
     }
   }
 }

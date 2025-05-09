@@ -8,6 +8,15 @@ export type SelectSize = 'small' | 'medium' | 'large';
 export type SelectVariant = 'default' | 'ghost' | 'flat';
 export type IconPosition = 'start' | 'end';
 
+export class ChangeEvent extends Event {
+  value: any;
+
+  constructor(value: any) {
+    super('change');
+    this.value = value;
+  }
+}
+
 export class SelectElement extends HTMLElement {
   #mutationObserver?: MutationObserver;
   #selectNativeMenu?: SelectNativeMenu;
@@ -148,13 +157,7 @@ export class SelectElement extends HTMLElement {
   #handleChange = (e: Event) => {
     const select = e.target as HTMLSelectElement;
     this.setAttribute('value', select.value);
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: select.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    this.dispatchEvent(new Event(select.value));
   };
 
   get #template() {
@@ -229,6 +232,7 @@ export class SelectElement extends HTMLElement {
         display: block;
         position: relative;
         --select-height: 24px;
+        --font-size: var(--text-md);
       }
       .select-wrapper {
         position: relative;
@@ -268,7 +272,9 @@ export class SelectElement extends HTMLElement {
       }
       .select--ghost {
         background-color: transparent;
+        padding: 0;
         padding-right: var(--space-7);
+        padding-left: var(--space-3);
       }
       .select--flat {
         background-color: var(--input-bg-color-flat);

@@ -14,19 +14,6 @@ workspace-view .workspace-content {
   overflow: hidden;
 }
 
-/* .workspace-toolbar {
-  padding: var(--space-2);
-  position: absolute;
-  z-index: 100;
-  bottom: 73px;
-  width: 100%;
-}
-
-.archive-button {
-      color: var(--color-neutral-600);
-    background: var(--color-bg-page);
-} */
-
 .bottom-bar {
   position: relative;
   background: var(--color-bg-chrome);
@@ -48,16 +35,6 @@ workspace-view .workspace-content {
   padding: var(--space-4) var(--space-4);
   gap: var(--space-2);
   width: 100%;
-}
-
-.command-bar command-input {
-  margin-right: -28px;
-}
-
-@media screen and (max-width: 720px) {
-  .command-bar command-input {
-    margin-right: 0;
-  }
 }
 
 resource-bar {

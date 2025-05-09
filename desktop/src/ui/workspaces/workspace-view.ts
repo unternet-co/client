@@ -263,6 +263,7 @@ export class WorkspaceView extends HTMLElement {
           ></un-combobox>
         </div>
         <div class="command-bar">
+          <workspace-selector></workspace-selector>
           <command-input
             @submit=${this.handleCommandSubmit.bind(this)}
             @open=${this.openToolsMenu}
