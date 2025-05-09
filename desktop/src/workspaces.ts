@@ -34,7 +34,8 @@ export interface Workspace extends WorkspaceRecord {
 
 export interface WorkspaceNotification {
   workspaceId: WorkspaceRecord['id'];
-  type?: 'delete';
+  type?: 'delete' | 'addmessage' | 'updatemessage';
+  message?: KernelMessage;
 }
 
 export class WorkspaceModel {
@@ -272,7 +273,11 @@ export class WorkspaceModel {
     this.messageDatabase.create(record);
 
     this.updateModified(workspaceId);
-    this.notifier.notify({ workspaceId });
+    this.notifier.notify({
+      workspaceId,
+      type: 'addmessage',
+      message: message,
+    });
 
     return message.id;
   }
@@ -285,7 +290,11 @@ export class WorkspaceModel {
     Object.assign(message, updates);
     this.messageDatabase.update(messageId, message);
     this.updateModified(message.workspaceId);
-    this.notifier.notify({ workspaceId: message.workspaceId });
+    this.notifier.notify({
+      workspaceId: message.workspaceId,
+      type: 'updatemessage',
+      message,
+    });
   }
 
   getMessage(id: MessageRecord['id']): Message {

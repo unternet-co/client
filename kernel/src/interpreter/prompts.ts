@@ -59,7 +59,7 @@ interface SystemInit {
 function system({ actions, hint }: SystemInit) {
   let prompt = '';
 
-  prompt += `You are a helpful assistant. In responding to the user, you can use a tool or respond directly, or some combination of both. If your responses refer to information with links, be sure to cite them using links in the natural flow of text.\n\n`;
+  prompt += `You are a helpful assistant. In responding to the user, you can use a tool or respond directly, or some combination of both. If your responses refer to information with links, be sure to cite them using links in the natural flow of text. If not clear otherwise, use actions to perform a search in response to queries.\n\n`;
 
   if (actions) {
     prompt += dedent`

@@ -1,27 +1,40 @@
+import {
+  ActionMessage,
+  InputMessage,
+  KernelMessage,
+  ResponseMessage,
+} from '@unternet/kernel';
+import { Kernel, KernelStatus } from '../../ai/kernel';
+import { createEl, getResourceIcon } from '../../common/utils';
 import { html, render } from 'lit';
-import { WorkspaceModel, Workspace } from '../../workspaces';
+import {
+  WorkspaceModel,
+  Workspace,
+  WorkspaceNotification,
+} from '../../workspaces';
 import { Message } from '../../messages';
 import { dependencies } from '../../common/dependencies';
+import { repeat } from 'lit/directives/repeat.js';
+import { ResourceModel } from '../../resources';
+import { Disposable } from '../../common/disposable';
 import '../common/elements/scroll-container';
 import '../common/elements/markdown-text';
 import './thread-view.css';
 import './process-frame';
-import { repeat } from 'lit/directives/repeat.js';
-import pluralize from 'pluralize';
-import { ResourceModel } from '../../resources';
 import './process-view';
-import { ActionMessage, InputMessage, ResponseMessage } from '@unternet/kernel';
-import { Kernel, KernelStatus } from '../../ai/kernel';
-import { getResourceIcon } from '../../common/utils';
 
 class ThreadView extends HTMLElement {
-  private workspaceSubscription: { dispose: () => void } | null = null;
   private workspaceModel =
     dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  private workspaceSub = new Disposable();
+  private kernelSub = new Disposable();
   private workspace: Workspace;
   private status: KernelStatus;
   private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   private kernel = dependencies.resolve<Kernel>('Kernel');
+  private messageContainerEl: HTMLDivElement;
+  private idleScreenEl: HTMLDivElement;
+  private messageListEl: HTMLDivElement;
 
   static get observedAttributes() {
     return ['for'];
@@ -29,116 +42,132 @@ class ThreadView extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (name === 'for' && oldValue !== newValue) {
-      this.setActiveWorkspace(newValue);
+      this.updateWorkspace(newValue);
     }
   }
 
   connectedCallback() {
-    this.kernel.subscribe((notification) => {
-      if (notification.status) this.updateKernelStatus(notification.status);
+    this.messageContainerEl = this.createMessageContainer();
+    this.idleScreenEl = createEl('div', {
+      className: 'idle-screen',
     });
-    this.updateKernelStatus(this.kernel.status);
 
+    this.kernelSub = this.kernel.subscribe((notification) => {
+      // if (notification.status) this.updateKernelStatus(notification.status);
+    });
     const workspaceId = this.getAttribute('for') || '';
-    this.setActiveWorkspace(workspaceId);
+    this.updateWorkspace(workspaceId);
   }
 
-  setActiveWorkspace(workspaceId: Workspace['id']) {
-    // Clean up previous subscription
-    if (this.workspaceSubscription) {
-      this.workspaceSubscription.dispose();
+  createMessageContainer() {
+    return createEl<HTMLDivElement>('div', {
+      className: 'message-container',
+    });
+  }
+
+  updateWorkspace(workspaceId: Workspace['id']) {
+    this.workspaceSub.dispose();
+    this.workspaceSub = this.workspaceModel.subscribeToWorkspace(
+      workspaceId,
+      this.handleWorkspaceNotification.bind(this)
+    );
+    this.workspace = this.workspaceModel.get(workspaceId);
+    this.firstRender();
+  }
+
+  handleWorkspaceNotification(notification: WorkspaceNotification) {
+    if (notification.type === 'addmessage') {
+      if (this.idleScreenEl.isConnected) this.idleScreenEl.remove();
+      this.addMessage(notification.message);
+      if (notification.message.type === 'input') {
+        this.scrollTo({
+          top: this.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    } else if (notification.type === 'updatemessage') {
+      this.updateMessage(notification.message);
+    }
+  }
+
+  addMessage(message: KernelMessage) {
+    if (!this.messageContainerEl.isConnected) {
+      this.appendChild(this.messageContainerEl);
     }
 
-    // Subscribe to new workspace
-    this.workspaceSubscription = this.workspaceModel.subscribeToWorkspace(
-      workspaceId,
-      this.render.bind(this)
-    );
+    if (message.type === 'input') {
+      this.messageContainerEl = this.createMessageContainer();
+      this.appendChild(this.messageContainerEl);
+    }
 
-    this.workspace = this.workspaceModel.get(workspaceId);
-    this.render();
+    const fragment = document.createDocumentFragment();
+    render(this.messageTemplate(message), fragment);
+    this.messageContainerEl.appendChild(fragment);
+  }
+
+  updateMessage(message: KernelMessage) {
+    const messageEl = this.querySelector(`[data-id="${message.id}"]`);
+
+    const fragment = document.createDocumentFragment();
+    render(this.messageTemplate(message), fragment);
+
+    messageEl.replaceWith(...fragment.childNodes);
   }
 
   disconnectedCallback() {
-    if (this.workspaceSubscription) {
-      this.workspaceSubscription.dispose();
+    this.workspaceSub.dispose();
+    this.kernelSub.dispose();
+  }
+
+  firstRender() {
+    if (!this.workspace) return;
+
+    for (const message of this.workspace.activeMessages) {
+      this.addMessage(message);
     }
+
+    this.appendChild(this.idleScreenEl);
+    this.scrollTop = this.scrollHeight;
   }
-
-  updateKernelStatus(status: KernelStatus) {
-    this.status = status;
-    this.render();
-  }
-
-  handleScrollPositionChanged = (e: CustomEvent) => {
-    this.workspaceModel.setScrollPosition(e.detail.scrollTop);
-  };
-
-  render() {
-    if (!this.workspace) return html``;
-
-    const messagesTemplate = (msgs: Message[]) =>
-      repeat(msgs, (message) => message.id, this.messageTemplate.bind(this));
-
-    const numArchived = Math.floor(this.workspace.inactiveMessages.length / 2);
-
-    const activeMessagesTemplate = messagesTemplate(
-      this.workspace.activeMessages
-    );
-
-    const inactiveMessagesTemplate = this.workspace.showArchived
-      ? messagesTemplate(this.workspace.inactiveMessages)
-      : [];
-
-    const archivedButton = numArchived
-      ? html` <div class="archived-message">
-          ${numArchived} archived ${pluralize('message', numArchived)}&nbsp;
-          <un-button
-            type="link"
-            size="small"
-            @click=${this.toggleArchivedMessages}
-          >
-            ${this.workspace.showArchived ? 'Hide' : 'Show'}
-          </un-button>
-        </div>`
-      : null;
-
-    const template = html`
-      <message-scroll
-        class="inner"
-        .scrollPosition=${this.workspace.scrollPosition}
-        @scroll-position-changed=${this.handleScrollPositionChanged}
-      >
-        <div class="message-list">
-          ${inactiveMessagesTemplate} ${archivedButton}
-          ${activeMessagesTemplate} ${this.loadingTemplate}
-        </div>
-      </message-scroll>
-    `;
-
-    render(template, this);
-  }
-
-  toggleArchivedMessages = () => {
-    const ws = this.workspaceModel.activeWorkspace;
-    this.workspaceModel.setArchiveVisibility(!ws.showArchived);
-    this.render();
-  };
 
   get loadingTemplate() {
     if (this.status !== 'thinking') return null;
     return html`<un-icon name="loading" spin class="loading"></un-icon>`;
   }
 
-  messageTemplate(message: Message) {
+  messageTemplate(message: KernelMessage) {
     if (message.type === 'input') {
-      return this.inputMessageTemplate(message);
+      return html`<div
+        class="message"
+        data-id="${message.id}"
+        data-type="input"
+      >
+        ${message.text}
+      </div>`;
     } else if (message.type === 'response') {
-      return this.responseMessageTemplate(message);
+      return html`<div
+        class="message"
+        data-id="${message.id}"
+        data-type="response"
+      >
+        <markdown-text>${message.text || html`&nbsp;`}</markdown-text>
+      </div>`;
     } else if (message.type === 'action' && message.display === 'inline') {
-      return this.processInlineTemplate(message);
+      return html`<div
+        class="message"
+        data-id="${message.id}"
+        data-type="process"
+      >
+        <process-frame .process=${message.process}></process-frame>
+      </div>`;
     } else if (message.type === 'action' && message.display === 'snippet') {
-      return this.processSnippetTemplate(message);
+      return html`<div
+        class="message"
+        data-id="${message.id}"
+        data-type="action"
+      >
+        ${this.processSnippetTemplate(message)}
+      </div>`;
     }
   }
 
@@ -160,10 +189,10 @@ class ThreadView extends HTMLElement {
     if (iconSrc) {
       icon = html`<img src=${iconSrc} class="resource-icon" />`;
     }
-    return html`<div class="message" data-type="action">
+    return html`
       ${icon}
       <span class="notification-text">Used ${resource.name}</span>
-    </div>`;
+    `;
   }
 
   processInlineTemplate(message: ActionMessage) {
@@ -172,6 +201,14 @@ class ThreadView extends HTMLElement {
         <process-frame .process=${message.process}></process-frame>
       </div>
     `;
+  }
+
+  clearMessageContainer() {
+    const scrollPosition = this.messageContainerEl.scrollTop;
+    while (this.messageContainerEl.firstChild) {
+      this.messageListEl.appendChild(this.messageContainerEl.firstChild);
+    }
+    this.messageContainerEl.scrollTop = scrollPosition;
   }
 }
 

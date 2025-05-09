@@ -1,30 +1,37 @@
 thread-view {
   width: 100%;
   flex-grow: 1;
+  overflow-y: auto;
+  padding-top: 50px;
 }
 
-thread-view .inner {
+thread-view .idle-screen,
+thread-view .message-container:last-child {
   height: 100%;
-  width: 100%;
 }
 
-thread-view .inner::part(slot) {
-  gap: var(--space-7);
-  padding: var(--space-8) var(--space-4);
+thread-view .idle-screen {
+  height: 105%;
 }
 
-thread-view .loading {
-  position: relative;
-  left: var(--space-5);
-}
-
-thread-view .message-list {
+thread-view .message-container {
+  padding: var(--space-4);
+  border-radius: var(--rounded-lg);
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
-  width: 100%;
+  gap: var(--space-5);
   max-width: 72ch;
-  gap: var(--space-4);
+  margin: 0 auto;
+  margin-top: var(--space-5);
+  border: 1px solid transparent;
+}
+
+thread-view .message-container:hover {
+  border-color: var(--color-border-muted);
+}
+
+thread-view .message-container:last-child:hover {
+  border-color: transparent;
 }
 
 thread-view .archived-message {
@@ -40,16 +47,19 @@ thread-view .archived-message {
 thread-view .message {
   user-select: text;
 }
+thread-view .message:first-child {
+  margin-top: 0;
+}
+
+thread-view .loading {
+  position: relative;
+  left: var(--space-5);
+}
 
 thread-view .message[data-type='input'] {
-  margin-top: var(--space-6);
   padding: 0 var(--space-5);
   align-self: flex-start;
   font-weight: 500;
-}
-
-thread-view .message:first-child {
-  margin-top: 0;
 }
 
 thread-view .message[data-type='response'] {
@@ -60,18 +70,17 @@ thread-view .message[data-type='response'] {
 }
 
 thread-view .message[data-type='action'] {
-  padding: 0 var(--space-5);
-  padding-bottom: var(--space-2);
+  padding: var(--space-3) var(--space-5);
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--rounded-lg);
 }
-
 thread-view .message[data-type='action'] .resource-icon {
   width: 14px;
   height: 14px;
 }
-
 thread-view .message[data-type='action'] .notification-text {
   color: var(--color-text-muted);
   font-size: 13px;
