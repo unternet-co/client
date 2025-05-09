@@ -4,6 +4,7 @@ process-frame {
   flex-direction: column;
   border-radius: var(--rounded);
   overflow: hidden;
+  flex-grow: 1;
 }
 
 process-frame .process-header {

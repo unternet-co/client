@@ -47,6 +47,7 @@ export class WebProcess extends Process {
     this.webview.style.border = 'none';
     this.webview.style.width = '100%';
     this.webview.style.height = '100%';
+    this.webview.style.minHeight = '350px';
     this.webview.style.background = 'var(--color-bg-content)';
   }
 

@@ -1,3 +1,9 @@
 process-view {
   display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+process-view > * {
+  flex-grow: 1;
 }

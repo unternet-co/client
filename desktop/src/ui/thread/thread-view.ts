@@ -20,6 +20,8 @@ import '../common/markdown-text';
 import './thread-view.css';
 import '../processes/process-frame';
 import '../processes/process-view';
+import './idle-screen';
+import { IdleScreenElement } from './idle-screen';
 
 class ThreadView extends HTMLElement {
   private workspaceModel =
@@ -31,7 +33,7 @@ class ThreadView extends HTMLElement {
   private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   private kernel = dependencies.resolve<Kernel>('Kernel');
   private messageContainerEl: HTMLDivElement;
-  private idleScreenEl: HTMLDivElement;
+  private idleScreenEl: IdleScreenElement;
   private messageListEl: HTMLDivElement;
 
   static get observedAttributes() {
@@ -46,9 +48,7 @@ class ThreadView extends HTMLElement {
 
   connectedCallback() {
     this.messageContainerEl = this.createMessageContainer();
-    this.idleScreenEl = createEl('div', {
-      className: 'idle-screen',
-    });
+    this.idleScreenEl = createEl('idle-screen');
 
     this.kernelSub = this.kernel.subscribe((notification) => {
       // if (notification.status) this.updateKernelStatus(notification.status);
@@ -134,6 +134,7 @@ class ThreadView extends HTMLElement {
   }
 
   messageTemplate(message: KernelMessage) {
+    console.log(message);
     if (message.type === 'input') {
       return html`<div
         class="message"

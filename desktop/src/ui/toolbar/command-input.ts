@@ -7,7 +7,7 @@ import { Disposable } from '../../common/disposable';
 import { dependencies } from '../../common/dependencies';
 
 export class CommandInputElement extends HTMLElement {
-  #defaultPlaceholder = 'Type a command...';
+  #defaultPlaceholder = 'Search or type command';
   #inputListener = new Disposable();
   #kernel = dependencies.resolve<Kernel>('Kernel');
 
@@ -110,32 +110,34 @@ export class CommandInputElement extends HTMLElement {
     const value = this.getAttribute('value') || '';
     const focused = this.hasAttribute('focused');
 
-    const inputTemplate = html`
-      <div class="input-container">
-        <div
-          class="input"
-          .value=${value || ''}
-          ?disabled=${disabled}
-          placeholder=${placeholder}
-          @keydown=${this.handleKeyDown.bind(this)}
-          @input=${this.handleInput.bind(this)}
-          contenteditable
-        ></div>
+    const containerTemplate = html`
+      <div class="container">
+        ${focused
+          ? html`
+              <div class="input-container">
+                <div
+                  class="input"
+                  .value=${value || ''}
+                  ?disabled=${disabled}
+                  placeholder=${placeholder}
+                  @keydown=${this.handleKeyDown.bind(this)}
+                  @input=${this.handleInput.bind(this)}
+                  contenteditable
+                ></div>
+              </div>
+            `
+          : html`
+              <div
+                class="target"
+                @mousedown=${this.handleTargetClick.bind(this)}
+              >
+                ${placeholder}
+              </div>
+            `}
       </div>
     `;
 
-    const template = html`
-      <div
-        class="target
-        ${focused ? 'hidden' : ''}"
-        @mousedown=${this.handleTargetClick.bind(this)}
-      >
-        ${placeholder}
-      </div>
-      ${focused ? inputTemplate : null}
-    `;
-
-    render(template, this.shadowRoot);
+    render(containerTemplate, this.shadowRoot);
   }
 
   styles = css`
@@ -143,6 +145,15 @@ export class CommandInputElement extends HTMLElement {
       display: block;
       width: 100%;
       position: relative;
+    }
+
+    .container {
+      width: 100%;
+      position: relative;
+      min-height: calc(1.5em + 2 * var(--space-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .target {
@@ -179,7 +190,7 @@ export class CommandInputElement extends HTMLElement {
     .input {
       outline: none;
       padding: var(--space-2) var(--space-4);
-      max-height: calc(1.5em * 3); /* Cap at 3 lines of text */
+      max-height: calc(1.5em * 3);
       overflow-y: auto;
       line-height: 1.5em;
     }

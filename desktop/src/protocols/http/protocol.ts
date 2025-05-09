@@ -14,6 +14,7 @@ export class WebProtocol extends Protocol {
       metadata.actions = {
         site_search: {
           description: `Search within this website.`,
+          display: 'snippet',
           params_schema: {
             type: 'object',
             properties: {
