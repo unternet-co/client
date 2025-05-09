@@ -1,7 +1,7 @@
 import { Dexie, Table } from 'dexie';
-import { WorkspaceRecord } from '../workspaces';
-import { MessageRecord } from '../messages';
-import { ProcessSnapshot } from '../processes';
+import { WorkspaceRecord } from '../models/workspace-model';
+import { MessageRecord } from '../models/message-model';
+import { ProcessSnapshot } from '../models/process-model';
 import { Resource } from '@unternet/kernel';
 
 export class IndexedDB extends Dexie {

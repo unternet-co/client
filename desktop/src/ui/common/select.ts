@@ -1,8 +1,8 @@
 import { html, css, render } from 'lit';
 import './icon';
 import { SelectNativeMenu } from './select-native-menu';
-import { Disposable, DisposableGroup } from '../../../common/disposable';
-import { attachStyles } from '../../../common/utils/dom';
+import { Disposable, DisposableGroup } from '../../common/disposable';
+import { attachStyles } from '../../common/utils/dom';
 
 export type SelectSize = 'small' | 'medium' | 'large';
 export type SelectVariant = 'default' | 'ghost' | 'flat';

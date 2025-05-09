@@ -1,8 +1,8 @@
 import { html, render } from 'lit';
 import { dependencies } from '../../common/dependencies';
-import { WorkspaceModel } from '../../workspaces';
+import { WorkspaceModel } from '../../models/workspace-model';
 import { ModalService } from '../../modals/modal-service';
-import { ChangeEvent, SelectElement } from '../common/elements/select';
+import { ChangeEvent, SelectElement } from '../common/select';
 import './workspace-selector.css';
 
 export class WorkspaceSelector extends HTMLElement {

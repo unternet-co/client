@@ -1,6 +1,6 @@
-import { initTabStoreData, TabModel, TabStoreData } from './tabs';
-import { MessageRecord } from './messages';
-import { WorkspaceRecord, WorkspaceModel } from './workspaces';
+import { initTabStoreData, TabModel, TabStoreData } from './deprecated/tabs';
+import { MessageRecord } from './models/message-model';
+import { WorkspaceRecord, WorkspaceModel } from './models/workspace-model';
 import { dependencies } from './common/dependencies';
 import { DatabaseService } from './storage/database-service';
 import { KeyStoreService } from './storage/keystore-service';
@@ -8,24 +8,26 @@ import { ShortcutService } from './shortcuts/shortcut-service';
 import { appendEl, createEl } from './common/utils/dom';
 import { registerGlobalShortcuts } from './shortcuts/global-shortcuts';
 import { ModalService } from './modals/modal-service';
-import { ConfigData, ConfigModel, initConfig } from './config';
+import { ConfigData, ConfigModel, initConfig } from './models/config-model';
 import { Kernel } from './ai/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
 import { AIModelService } from './ai/ai-models';
-import { ResourceModel, initialResources } from './resources';
-import { ProcessModel, ProcessRecord } from './processes';
+import { ResourceModel, initialResources } from './models/resource-model';
+import { ProcessModel, ProcessRecord } from './models/process-model';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
-import './modals/global/settings-modal';
+import './ui/modals/settings-modal';
 import './ui/app-root';
-import './modals/global/bug-modal';
-import './ui/workspaces/workspace-settings-modal';
-import './ui/workspaces/workspace-delete-modal';
+import './ui/modals/bug-modal';
+import './ui/modals/workspace-settings-modal';
+import './ui/modals/workspace-delete-modal';
 import { NUM_CONCURRENT_PROCESSES } from './constants';
+
+console.log('hello');
 
 /* Initialize databases & stores */
 

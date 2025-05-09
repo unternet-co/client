@@ -1,8 +1,8 @@
 import { html, render } from 'lit';
-import './resource-management-popover';
+import './resources-popover';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../resources';
+import { ResourceModel } from '../../models/resource-model';
 import { ModalService } from '../../modals/modal-service';
 
 export class ResourceBar extends HTMLElement {

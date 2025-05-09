@@ -1,7 +1,7 @@
 import { html, css, render } from 'lit';
 import { createElement } from 'lucide';
 import { getIcon } from './icon-registry';
-import { attachStyles } from '../../../common/utils/dom';
+import { attachStyles } from '../../common/utils/dom';
 
 export type IconSize = 'small' | 'medium' | 'large';
 const sizeMap = {

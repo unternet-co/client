@@ -1,8 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { KernelInput } from '../../ai/kernel';
-import '../common/elements/input';
-import '../common/elements/button';
-import { ComboboxOpenEvent } from '../common/elements/combobox';
+import '../common/input';
+import '../common/button';
+import { ComboboxOpenEvent } from '../common/combobox';
 
 export class CommandSubmitEvent extends Event {
   input: KernelInput;

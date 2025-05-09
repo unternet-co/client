@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
-import { KernelInput } from '../../../ai/kernel';
-import { ShortcutService } from '../../../shortcuts/shortcut-service';
-import { dependencies } from '../../../common/dependencies';
+import { KernelInput } from '../../ai/kernel';
+import { ShortcutService } from '../../shortcuts/shortcut-service';
+import { dependencies } from '../../common/dependencies';
 
 export class ComboboxSelectEvent extends Event {
   input: KernelInput;

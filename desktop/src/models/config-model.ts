@@ -2,9 +2,9 @@ import {
   AIModelDescriptor,
   AIModelProviderConfig,
   AIModelProviderName,
-} from './ai/ai-models';
-import { Notifier } from './common/notifier';
-import { KeyStoreService } from './storage/keystore-service';
+} from '../ai/ai-models';
+import { Notifier } from '../common/notifier';
+import { KeyStoreService } from '../storage/keystore-service';
 
 export interface ConfigData {
   ai: {

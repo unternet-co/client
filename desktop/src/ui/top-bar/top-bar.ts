@@ -1,11 +1,11 @@
 import { DisposableGroup } from '../../common/disposable';
 import { render, html } from 'lit';
 import { dependencies } from '../../common/dependencies';
-import { WorkspaceModel } from '../../workspaces';
-import './tab-handle';
+import { WorkspaceModel } from '../../models/workspace-model';
+import '../tab-handle';
 import './top-bar.css';
 import { ModalService } from '../../modals/modal-service';
-import './workspace-selector';
+import '../toolbar/workspace-selector';
 
 export class TopBar extends HTMLElement {
   modalService = dependencies.resolve<ModalService>('ModalService');

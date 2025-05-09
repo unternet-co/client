@@ -1,7 +1,7 @@
 import { html, render } from 'lit';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
-import { WorkspaceModel } from '../../workspaces';
+import { WorkspaceModel } from '../../models/workspace-model';
 import { ModalElement, ModalOptions } from '../../modals/modal-element';
 
 export class WorkspaceDeleteModal extends ModalElement {

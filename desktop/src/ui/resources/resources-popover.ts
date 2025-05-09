@@ -1,10 +1,10 @@
 import { html } from 'lit';
-import { PopoverElement } from '../common/elements/popover';
-import './resource-management-popover.css';
+import { PopoverElement } from '../common/popover';
+import './resources-popover.css';
 import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../resources';
+import { ResourceModel } from '../../models/resource-model';
 import { getMetadata, uriWithScheme } from '../../common/utils/http';
-import { InputElement } from '../common/elements/input';
+import { InputElement } from '../common/input';
 import { DisposableGroup } from '../../common/disposable';
 
 type AppletAction = { description?: string; [key: string]: any };

@@ -1,15 +1,14 @@
-import { CommandSubmitEvent } from './command-input';
-import './command-input';
-import './thread-view';
+import '../toolbar/command-input';
+import '../thread/thread-view';
 import './workspace-view.css';
-import './resource-bar';
-import '../common/elements/combobox';
+import '../resources/resource-bar';
+import '../common/combobox';
 import { html, render } from 'lit';
-import { WorkspaceRecord, WorkspaceModel } from '../../workspaces';
+import { WorkspaceRecord, WorkspaceModel } from '../../models/workspace-model';
 import { Kernel, KernelNotInitializedError } from '../../ai/kernel';
 import { dependencies } from '../../common/dependencies';
 import { ModalService } from '../../modals/modal-service';
-import { ResourceModel } from '../../resources';
+import { ResourceModel } from '../../models/resource-model';
 
 export class WorkspaceView extends HTMLElement {
   constructor() {

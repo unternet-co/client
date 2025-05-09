@@ -4,9 +4,9 @@ import {
   ProcessRuntime,
   type ProcessSnapshot,
 } from '@unternet/kernel';
-import { Notifier } from './common/notifier';
-import { DatabaseService } from './storage/database-service';
-import { Workspace } from './workspaces';
+import { Notifier } from '../common/notifier';
+import { DatabaseService } from '../storage/database-service';
+import { Workspace } from './workspace-model';
 
 export interface ProcessRecord extends ProcessSnapshot {
   workspaceId: string;

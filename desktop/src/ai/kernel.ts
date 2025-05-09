@@ -10,12 +10,12 @@ import {
   ActionProposalResponse,
   ProcessContainer,
 } from '@unternet/kernel';
-import { WorkspaceRecord, WorkspaceModel } from '../workspaces';
+import { WorkspaceRecord, WorkspaceModel } from '../models/workspace-model';
 import { ConfigModel, ConfigNotification } from '../config';
 import { AIModelService } from './ai-models';
-import { ResourceModel } from '../resources';
+import { ResourceModel } from '../resources/resource-model';
 import { Notifier } from '../common/notifier';
-import { ProcessModel } from '../processes';
+import { ProcessModel } from '../models/process-model';
 
 export interface KernelInit {
   model?: LanguageModel;

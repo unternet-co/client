@@ -1,6 +1,6 @@
 import { html, render, TemplateResult } from 'lit';
-import { ModalElement, ModalOptions } from '../modal-element';
-import { ConfigModel, ConfigData } from '../../config';
+import { ModalElement, ModalOptions } from '../../modals/modal-element';
+import { ConfigModel, ConfigData } from '../../models/config-model';
 import { dependencies } from '../../common/dependencies';
 import {
   AIModelDescriptor,
@@ -9,10 +9,10 @@ import {
   AIModelService,
   AIModelProviderNames,
 } from '../../ai/ai-models';
-import '../../ui/common/elements/textarea';
-import '../../ui/common/elements/select';
-import '../../ui/common/elements/input';
-import '../../ui/common/elements/label';
+import '../common/textarea';
+import '../common/select';
+import '../common/input';
+import '../common/label';
 import './settings-modal.css';
 import { OLLAMA_BASE_URL } from '../../ai/providers/ollama';
 

@@ -1,11 +1,11 @@
 import { html, render, TemplateResult } from 'lit';
 import { ModalElement, ModalOptions } from '../../modals/modal-element';
 import { dependencies } from '../../common/dependencies';
-import { WorkspaceModel, WorkspaceRecord } from '../../workspaces';
+import { WorkspaceModel, WorkspaceRecord } from '../../models/workspace-model';
 import { ModalService } from '../../modals/modal-service';
-import '../common/elements/input';
-import '../common/elements/button';
-import '../common/elements/label';
+import '../common/input';
+import '../common/button';
+import '../common/label';
 
 export class WorkspaceSettingsModal extends ModalElement {
   #workspaceModel!: WorkspaceModel;

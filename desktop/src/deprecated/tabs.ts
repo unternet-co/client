@@ -1,11 +1,11 @@
-import { Disposable } from './common/disposable';
-import { Notifier } from './common/notifier';
-import { KeyStoreService } from './storage/keystore-service';
+import { Disposable } from '../common/disposable';
+import { Notifier } from '../common/notifier';
+import { KeyStoreService } from '../storage/keystore-service';
 import {
   WorkspaceRecord,
   WorkspaceModel,
   WorkspaceNotification,
-} from './workspaces';
+} from '../models/workspace-model';
 
 export interface Tab {
   type: 'page' | 'workspace';

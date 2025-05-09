@@ -3,7 +3,7 @@ import './top-bar/top-bar';
 import './workspaces/workspace-view';
 import './app-root.css';
 import { dependencies } from '../common/dependencies';
-import { WorkspaceModel } from '../workspaces';
+import { WorkspaceModel } from '../models/workspace-model';
 
 export class AppRoot extends HTMLElement {
   workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');

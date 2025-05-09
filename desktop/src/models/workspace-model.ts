@@ -1,12 +1,12 @@
-import { Notifier } from './common/notifier';
-import { DatabaseService } from './storage/database-service';
+import { Notifier } from '../common/notifier';
+import { DatabaseService } from '../storage/database-service';
 import { ulid } from 'ulid';
 import { KernelMessage } from '@unternet/kernel';
-import { Message, MessageRecord } from './messages';
-import { DisposableGroup } from './common/disposable';
-import { ProcessModel } from './processes';
-import { ConfigModel } from './config';
-import { DEFAULT_WORKSPACE_NAME } from './constants';
+import { Message, MessageRecord } from './message-model';
+import { DisposableGroup } from '../common/disposable';
+import { ProcessModel } from './process-model';
+import { ConfigModel } from './config-model';
+import { DEFAULT_WORKSPACE_NAME } from '../constants';
 
 /**
  * Workspaces, as persisted to the database

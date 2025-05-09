@@ -1,9 +1,9 @@
 import { dependencies } from '../common/dependencies';
-import { TabModel } from '../tabs';
+import { TabModel } from '../deprecated/tabs';
 import { ModalService } from '../modals/modal-service';
 import { ShortcutService } from './shortcut-service';
 
-import { WorkspaceModel } from '../workspaces';
+import { WorkspaceModel } from '../models/workspace-model';
 
 export function registerGlobalShortcuts() {
   const shortcutService =
