@@ -8,6 +8,7 @@ import './workspace-selector.css';
 export class WorkspaceSelector extends HTMLElement {
   workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
   modalService = dependencies.resolve<ModalService>('ModalService');
+  selectedWorkspace: string | null = null;
 
   connectedCallback() {
     this.workspaceModel.subscribe(this.update.bind(this));
@@ -20,9 +21,8 @@ export class WorkspaceSelector extends HTMLElement {
       this.workspaceModel.create();
     } else if (newId === '-') {
       const target = e.target as SelectElement;
-      const prevSelection = target.value;
       this.modalService.open('workspace-settings');
-      // e.target.value =
+      target.value = this.selectedWorkspace;
     } else if (newId && newId !== this.workspaceModel.activeWorkspaceId) {
       this.workspaceModel.activate(newId);
     }
@@ -32,12 +32,13 @@ export class WorkspaceSelector extends HTMLElement {
     const workspaces = this.workspaceModel.all();
     const activeWorkspaceId =
       this.workspaceModel.activeWorkspaceId || (workspaces[0]?.id ?? '');
+    this.selectedWorkspace = activeWorkspaceId;
 
     const workspaceOptions = [
       ...workspaces.map((ws) => ({ value: ws.id, label: ws.title })),
       { type: 'separator' },
       { value: '-', label: 'Edit workspace...' },
-      { value: '+', label: 'New workspace...' },
+      // { value: '+', label: 'New workspace...' },
     ];
 
     const template = html`

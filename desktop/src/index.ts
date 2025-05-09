@@ -27,8 +27,6 @@ import './ui/modals/workspace-settings-modal';
 import './ui/modals/workspace-delete-modal';
 import { NUM_CONCURRENT_PROCESSES } from './constants';
 
-console.log('hello');
-
 /* Initialize databases & stores */
 
 const workspaceDatabaseService = new DatabaseService<string, WorkspaceRecord>(

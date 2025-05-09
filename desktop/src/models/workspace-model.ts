@@ -6,7 +6,7 @@ import { Message, MessageRecord } from './message-model';
 import { DisposableGroup } from '../common/disposable';
 import { ProcessModel } from './process-model';
 import { ConfigModel } from './config-model';
-import { DEFAULT_WORKSPACE_NAME } from '../constants';
+import { DEFAULT_WORKSPACE_NAME, MAX_ACTIVE_MESSAGES } from '../constants';
 
 /**
  * Workspaces, as persisted to the database
@@ -267,7 +267,14 @@ export class WorkspaceModel {
       ...message,
       workspaceId,
     };
-    this.workspaces.get(workspaceId).activeMessages.push(msg);
+    const workspace = this.workspaces.get(workspaceId);
+    workspace.activeMessages.push(msg);
+
+    // Check if active messages exceed MAX_ACTIVE_MESSAGES
+    if (workspace.activeMessages.length > MAX_ACTIVE_MESSAGES) {
+      const removedMessage = workspace.activeMessages.shift();
+      workspace.inactiveMessages.push(removedMessage);
+    }
 
     const record = this.serializeMessage(msg);
     this.messageDatabase.create(record);

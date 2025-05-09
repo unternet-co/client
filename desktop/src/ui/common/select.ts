@@ -59,6 +59,9 @@ export class SelectElement extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+    console.log(
+      `SelectElement attribute changed: ${name}, oldValue: ${oldValue}, newValue: ${newValue}`
+    );
     if (name === 'value' && oldValue !== newValue) {
       render(this.#template, this.shadowRoot!);
     }
@@ -94,6 +97,7 @@ export class SelectElement extends HTMLElement {
   }
 
   set value(val: string) {
+    console.log('set', val);
     if (val !== this.getAttribute('value')) {
       this.setAttribute('value', val);
     }
@@ -157,7 +161,7 @@ export class SelectElement extends HTMLElement {
   #handleChange = (e: Event) => {
     const select = e.target as HTMLSelectElement;
     this.setAttribute('value', select.value);
-    this.dispatchEvent(new Event(select.value));
+    this.dispatchEvent(new ChangeEvent(select.value));
   };
 
   get #template() {

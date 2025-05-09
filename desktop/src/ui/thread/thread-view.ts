@@ -129,7 +129,6 @@ class ThreadView extends HTMLElement {
 
     this.appendChild(this.idleScreenEl);
     setTimeout(() => (this.scrollTop = this.scrollHeight), 0);
-    console.log(this.scrollTop, this.scrollHeight);
   }
 
   get loadingTemplate() {
