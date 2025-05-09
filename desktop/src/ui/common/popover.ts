@@ -1,5 +1,4 @@
 import { html, render } from 'lit';
-import { attachStyles } from '../../../common/utils/dom';
 import './popover.css';
 
 export type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';
@@ -31,7 +30,7 @@ export class PopoverElement extends HTMLElement {
     newValue: string | null
   ) {
     if (oldValue === newValue) return;
-    this.render();
+    setTimeout(() => this.render(), 0);
   }
 
   /**
@@ -47,8 +46,10 @@ export class PopoverElement extends HTMLElement {
     if (!anchorEl) {
       const msg = `[un-popover] Anchor element with id "${anchor}" not found.`;
       console.error(msg);
+      this.removeAttribute('data-position'); // Remove positioning if anchor is missing
       return;
     }
+
     const anchorNameValue = `--${anchor}`;
     const style = anchorEl.style as CSSStyleDeclaration & {
       anchorName?: string;

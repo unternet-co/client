@@ -13,7 +13,7 @@ export class ResourceManagementPopover extends PopoverElement {
   resourceUrl: string = '';
   resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
   activeView: 'list' | 'add' | 'preview' = 'list';
-  disposables: DisposableGroup;
+  disposables = new DisposableGroup();
   previewResource: any = null;
   previewLoading: boolean = false;
 

@@ -49,7 +49,7 @@ export class SelectNativeMenu {
     options: NativeMenuOption[],
     value: string | null | undefined
   ): string | undefined {
-    if (!value) return undefined;
+    if (!value || !Array.isArray(options)) return undefined; // Ensure options is an array
     const flat = this.#flatten(options);
     return flat.find((opt) => opt.value === value)?.label;
   }
