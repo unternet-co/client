@@ -7,8 +7,8 @@
   --font-mono: 'iA Writer Mono', monospace;
 
   /* Font size */
-  --text-scale: 1.125;
-  --text-base: 14px;
+  /* --text-scale: 1.125; */
+  --text-base: 13px;
 }
 
 * {

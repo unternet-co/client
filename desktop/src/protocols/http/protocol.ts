@@ -37,18 +37,14 @@ export class WebProtocol extends Protocol {
   }
 
   async handleAction(action: ActionProposal) {
-    console.log('handling');
     if (action.actionId === 'web_search') {
-      console.log('search action');
       return await unternet.lookup.query({
         q: action.args.q,
         webpages: { sites: [action.uri] },
       });
     }
-    console.log('creating web process');
     const process = await WebProcess.create(action.uri);
     await process.handleAction(action);
-    console.log(action.display);
     if (action.display === 'snippet') return process.data;
     return process;
   }

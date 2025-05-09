@@ -1,46 +1,73 @@
-import { LitElement, html, css } from 'lit';
-import { KernelInput } from '../../ai/kernel';
+import { html, css, render } from 'lit';
+import { Kernel } from '../../ai/kernel';
 import '../common/input';
 import '../common/button';
-import { ComboboxOpenEvent } from '../common/combobox';
+import { attachStyles } from '../../common/utils';
+import { Disposable } from '../../common/disposable';
+import { dependencies } from '../../common/dependencies';
 
-export class CommandSubmitEvent extends Event {
-  input: KernelInput;
+export class CommandInputElement extends HTMLElement {
+  #defaultPlaceholder = 'Type a command...';
+  #inputListener = new Disposable();
+  #kernel = dependencies.resolve<Kernel>('Kernel');
 
-  constructor(value: string) {
-    super('submit', {
-      bubbles: true,
-      composed: true,
-    });
-
-    this.input = { text: value };
+  static get observedAttributes() {
+    return ['value', 'disabled', 'placeholder', 'focused', 'for'];
   }
-}
-
-export class CommandInputElement extends LitElement {
-  static properties = {
-    value: { type: String, reflect: true },
-    disabled: { type: Boolean, reflect: true },
-    placeholder: { type: String },
-  };
-
-  value: string = '';
-  disabled: boolean = false;
-  placeholder: string = 'Ask a question...';
 
   constructor() {
     super();
+    this.attachShadow({ mode: 'open' });
+    attachStyles(this.shadowRoot, this.styles.cssText);
   }
 
-  firstUpdated() {
-    this.focus();
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback(
+    name: string,
+    _: string | null,
+    newValue: string | null
+  ) {
+    this.render();
+    if (name === 'focused' && newValue !== null) {
+      this.focusInput();
+    }
+  }
+
+  set value(newValue: string) {
+    this.setAttribute('value', newValue);
+  }
+  set for(newValue: string) {
+    this.setAttribute('for', newValue);
+  }
+  set disabled(newValue: boolean) {
+    this.setAttribute('disabled', newValue ? '' : null);
+  }
+  set placeholder(newValue: string) {
+    this.setAttribute('placeholder', newValue);
   }
 
   focus() {
-    const input = this.shadowRoot?.querySelector('.command-input');
-    if (input) {
-      (input as any).focus();
-    }
+    this.setAttribute('focused', '');
+  }
+
+  private focusInput() {
+    const input = this.shadowRoot.querySelector('.input') as HTMLDivElement;
+    input.focus();
+    this.#inputListener = Disposable.createEventListener(
+      input,
+      'blur',
+      this.blurInput.bind(this)
+    );
+  }
+
+  private blurInput() {
+    const input = this.shadowRoot.querySelector('.input') as HTMLDivElement;
+    input.blur();
+    this.removeAttribute('focused');
+    this.#inputListener.dispose();
   }
 
   private handleKeyDown(e: KeyboardEvent) {
@@ -50,16 +77,24 @@ export class CommandInputElement extends LitElement {
       e.preventDefault();
       this.handleSubmit();
     }
-    if (e.key === '@') {
-      this.dispatchEvent(new ComboboxOpenEvent());
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.blurInput();
     }
+  }
+
+  private handleTargetClick(e: MouseEvent) {
+    e.preventDefault();
+    this.focus();
   }
 
   private handleSubmit() {
     if (this.disabled) return;
-
-    this.dispatchEvent(new CommandSubmitEvent(this.value));
-    this.value = '';
+    const workspaceId = this.getAttribute('for');
+    const input = this.shadowRoot.querySelector('.input') as HTMLDivElement;
+    this.#kernel.handleInput(workspaceId, { text: input.innerText });
+    input.innerText = '';
   }
 
   private handleInput(e: CustomEvent) {
@@ -69,58 +104,84 @@ export class CommandInputElement extends LitElement {
   }
 
   render() {
-    return html`
-      <div class="command-input-wrapper">
+    const placeholder =
+      this.getAttribute('placeholder') || this.#defaultPlaceholder;
+    const disabled = this.hasAttribute('disabled');
+    const value = this.getAttribute('value') || '';
+    const focused = this.hasAttribute('focused');
+
+    const inputTemplate = html`
+      <div class="input-container">
         <div
-          class="command-input"
-          .value=${this.value || ''}
-          ?disabled=${this.disabled}
-          placeholder=${this.placeholder}
-          @keydown=${this.handleKeyDown}
-          @input=${this.handleInput}
+          class="input"
+          .value=${value || ''}
+          ?disabled=${disabled}
+          placeholder=${placeholder}
+          @keydown=${this.handleKeyDown.bind(this)}
+          @input=${this.handleInput.bind(this)}
           contenteditable
         ></div>
-        <un-button
-          class="submit-button"
-          size="small"
-          type="ghost"
-          icon="enter"
-          @click=${this.handleSubmit}
-        ></un-button>
       </div>
     `;
+
+    const template = html`
+      <div
+        class="target
+        ${focused ? 'hidden' : ''}"
+        @mousedown=${this.handleTargetClick.bind(this)}
+      >
+        ${placeholder}
+      </div>
+      ${focused ? inputTemplate : null}
+    `;
+
+    render(template, this.shadowRoot);
   }
 
-  static styles = css`
+  styles = css`
     :host {
+      display: block;
       width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-
-    .command-input-wrapper {
-      outline: 1px solid var(--color-neutral-300);
-      width: 100%;
-      max-width: 72ch;
       position: relative;
-      background-color: color-mix(
-        in srgb,
-        var(--color-bg-container) 100%,
-        transparent 35%
-      );
-      backdrop-filter: blur(16px);
-      border-radius: var(--rounded);
-      /* border-top: 1px solid var(--color-neutral-0); */
     }
 
-    .command-input-wrapper:focus-within {
+    .target {
+      width: var(--command-target-width, 46ch);
+      max-width: 100%;
+      margin: 0 auto;
+      outline: 1px solid var(--color-border);
+      background: var(--color-neutral-200);
+      border-radius: var(--rounded);
+      padding: var(--space-1) var(--space-4);
+      text-align: center;
+      font-size: var(--text-base);
+      transition: opacity 0.2s ease;
+    }
+
+    .target.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .input-container {
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      border-radius: var(--rounded);
+      outline: 1px solid var(--color-border);
       outline-color: var(--color-action-800);
       background: var(--color-neutral-0);
     }
 
-    .command-input {
+    .input {
       outline: none;
       padding: var(--space-2) var(--space-4);
+      max-height: calc(1.5em * 3); /* Cap at 3 lines of text */
+      overflow-y: auto;
+      line-height: 1.5em;
     }
 
     .submit-button {

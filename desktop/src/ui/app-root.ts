@@ -1,7 +1,8 @@
 import { html, render } from 'lit';
 import './top-bar/top-bar';
-import './workspaces/workspace-view';
+import './toolbar/tool-bar';
 import './app-root.css';
+import './thread/thread-view';
 import { dependencies } from '../common/dependencies';
 import { WorkspaceModel } from '../models/workspace-model';
 
@@ -19,7 +20,12 @@ export class AppRoot extends HTMLElement {
 
     const template = html`
       <top-bar></top-bar>
-      <workspace-view .key=${ws.id} for=${ws.id} active></workspace-view>
+      <div class="stack">
+        <div class="workspace-content">
+          <thread-view for=${ws.id}></thread-view>
+        </div>
+        <tool-bar for=${ws.id}></tool-bar>
+      </div>
     `;
 
     render(template, this);

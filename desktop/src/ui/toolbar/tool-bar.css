@@ -1,0 +1,59 @@
+tool-bar {
+  position: relative;
+  background: var(--color-bg-chrome);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-text-muted);
+}
+
+tool-bar .archive-button {
+  flex-shrink: 0;
+}
+
+tool-bar .command-bar {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-4);
+  gap: var(--space-2);
+  width: 100%;
+  position: relative;
+}
+
+tool-bar .command-bar .left-section,
+tool-bar .command-bar .right-section {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+}
+
+tool-bar .command-bar .right-section {
+  justify-content: flex-end;
+}
+
+tool-bar .command-bar .center-section {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 64ch;
+  max-width: 70%;
+  pointer-events: none;
+}
+
+tool-bar .command-bar .center-section command-input {
+  pointer-events: auto;
+}
+
+tool-bar .command-bar .spacer {
+  justify-self: stretch;
+  flex-grow: 1;
+}
+
+tool-bar resource-bar {
+  align-self: stretch;
+}

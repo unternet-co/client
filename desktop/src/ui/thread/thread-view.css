@@ -2,7 +2,7 @@ thread-view {
   width: 100%;
   flex-grow: 1;
   overflow-y: auto;
-  padding-top: 50px;
+  padding-top: var(--space-9);
 }
 
 thread-view .idle-screen,
@@ -11,7 +11,7 @@ thread-view .message-container:last-child {
 }
 
 thread-view .idle-screen {
-  height: 105%;
+  height: 100%;
 }
 
 thread-view .message-container {

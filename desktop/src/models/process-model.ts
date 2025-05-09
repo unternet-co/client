@@ -45,10 +45,6 @@ export class ProcessModel {
   }
 
   async deleteWhere(opts: { workspaceId: Workspace['id'] }) {
-    console.log('deleting', opts.workspaceId);
-    console.log(
-      await this.processDatabase.where({ workspaceId: opts.workspaceId })
-    );
     this.processDatabase.deleteWhere({ workspaceId: opts.workspaceId });
   }
 

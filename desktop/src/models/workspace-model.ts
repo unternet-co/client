@@ -341,9 +341,7 @@ export class WorkspaceModel {
 
   hydrateMessage(record: MessageRecord): Message {
     if (record.type === 'action' && record.pid) {
-      console.log('hydrating', this.processModel.processes);
       const { pid, ...rest } = record;
-      console.log(pid, this.processModel.get(record.pid));
       return {
         ...rest,
         process: this.processModel.get(record.pid),

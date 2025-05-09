@@ -10,7 +10,7 @@ top-bar {
   -webkit-app-region: drag;
   overflow: visible;
   background: var(--color-bg-page);
-  border-bottom: 1px solid var(--color-border-muted);
+  /* border-bottom: 1px solid var(--color-border-muted); */
   /* background: color-mix(in srgb, var(--color-bg-page) 50%, transparent); */
   /* backdrop-filter: blur(20px); */
 }

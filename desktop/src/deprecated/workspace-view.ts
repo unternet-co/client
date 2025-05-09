@@ -1,14 +1,14 @@
-import '../toolbar/command-input';
-import '../thread/thread-view';
+import '../ui/toolbar/command-input';
+import '../ui/thread/thread-view';
 import './workspace-view.css';
-import '../resources/resource-bar';
-import '../common/combobox';
+import '../ui/resources/resource-bar';
+import '../ui/common/combobox';
 import { html, render } from 'lit';
-import { WorkspaceRecord, WorkspaceModel } from '../../models/workspace-model';
-import { Kernel, KernelNotInitializedError } from '../../ai/kernel';
-import { dependencies } from '../../common/dependencies';
-import { ModalService } from '../../modals/modal-service';
-import { ResourceModel } from '../../models/resource-model';
+import { WorkspaceRecord, WorkspaceModel } from '../models/workspace-model';
+import { Kernel, KernelNotInitializedError } from '../ai/kernel';
+import { dependencies } from '../common/dependencies';
+import { ModalService } from '../modals/modal-service';
+import { ResourceModel } from '../models/resource-model';
 
 export class WorkspaceView extends HTMLElement {
   constructor() {
@@ -31,7 +31,6 @@ export class WorkspaceView extends HTMLElement {
     if (this._workspaceId !== id) {
       this._workspaceId = id;
       render(this.template, this);
-      setTimeout(() => this.focusCommandInput(), 0);
     }
   }
   get workspaceId() {
@@ -52,8 +51,6 @@ export class WorkspaceView extends HTMLElement {
   connectedCallback() {
     this.workspaceId = this.getAttribute('for') || '';
 
-    // Set up visibility observer to focus when tab is switched back to this view
-    this.setupVisibilityObserver();
     // Wait for the DOM to be ready before setting up the input listener
     requestAnimationFrame(() => this.setupInputListener());
   }
@@ -67,27 +64,6 @@ export class WorkspaceView extends HTMLElement {
   private setupInputListener() {
     const inputDiv = this.getCommandInput();
     inputDiv.addEventListener('input', this.monitorCommandInput);
-  }
-
-  private focusCommandInput() {
-    const commandInput = this.querySelector(
-      'command-input'
-    ) as HTMLInputElement;
-    commandInput.focus();
-  }
-
-  private setupVisibilityObserver() {
-    this.visibilityObserver = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-          this.focusCommandInput();
-        }
-      },
-      { threshold: [0.5] }
-    );
-
-    this.visibilityObserver.observe(this);
   }
 
   replaceToolNames(inputText: string) {

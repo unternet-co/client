@@ -49,7 +49,6 @@ class ThreadView extends HTMLElement {
     this.idleScreenEl = createEl('div', {
       className: 'idle-screen',
     });
-    console.log('connected');
 
     this.kernelSub = this.kernel.subscribe((notification) => {
       // if (notification.status) this.updateKernelStatus(notification.status);
@@ -76,7 +75,6 @@ class ThreadView extends HTMLElement {
 
   handleWorkspaceNotification(notification: WorkspaceNotification) {
     if (notification.type === 'addmessage') {
-      console.log('here', this.idleScreenEl);
       if (this.idleScreenEl.isConnected) this.idleScreenEl.remove();
       this.addMessage(notification.message);
       if (notification.message.type === 'input') {
@@ -91,7 +89,6 @@ class ThreadView extends HTMLElement {
   }
 
   addMessage(message: KernelMessage) {
-    console.log('addMessage', this.messageContainerEl);
     if (!this.messageContainerEl.isConnected) {
       this.appendChild(this.messageContainerEl);
     }
