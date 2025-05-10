@@ -1,9 +1,9 @@
 import { html, css, render } from 'lit';
-import './icon';
 import { NativeMenuOption, NativeMenu } from './menu/native-menu';
 import { Disposable, DisposableGroup } from '../../common/disposable';
 import { attachStyles } from '../../common/utils/dom';
 import classNames from 'classnames';
+import './icon';
 
 export type SelectSize = 'small' | 'medium' | 'large';
 export type SelectVariant = 'default' | 'ghost' | 'flat';
@@ -19,7 +19,6 @@ export class ChangeEvent extends Event {
 }
 
 export class SelectElement extends HTMLElement {
-  #select?: HTMLSelectElement;
   #nativeMenu?: NativeMenu;
   #options: NativeMenuOption[];
   #disposables = new DisposableGroup();
@@ -31,9 +30,15 @@ export class SelectElement extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open', delegatesFocus: true });
+  }
 
-    // Watch contents for changes
-    const observer = new MutationObserver(this.#render.bind(this));
+  connectedCallback() {
+    attachStyles(this.shadowRoot, this.styles.toString());
+
+    const observer = new MutationObserver(() => {
+      this.#render();
+    });
+
     observer.observe(this, {
       childList: true,
       subtree: true,
@@ -42,10 +47,8 @@ export class SelectElement extends HTMLElement {
     });
 
     this.#disposables.add(new Disposable(() => observer.disconnect()));
-  }
 
-  connectedCallback() {
-    attachStyles(this.shadowRoot, this.styles.toString());
+    if (this.native) this.#createNativeMenu();
     this.#render();
   }
 
@@ -55,17 +58,20 @@ export class SelectElement extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
     if (name === 'value' && oldValue !== newValue) {
+      console.log('Select value changed:', oldValue, '->', newValue);
+      // Force a re-render when value changes
       this.#render();
     }
-    if (name === 'options' && newValue !== null) {
+    if (name === 'native' && newValue !== null) {
       this.#createNativeMenu();
-    } else if (name === 'options' && newValue === null) {
+    } else if (name === 'native' && newValue === null) {
       this.#removeNativeMenu();
     }
   }
 
   set value(val: string) {
     this.setAttribute('value', val);
+    this.#render();
   }
   get value(): string {
     return this.getAttribute('value') ?? '';
@@ -84,14 +90,13 @@ export class SelectElement extends HTMLElement {
       this.#nativeMenu = new NativeMenu();
     }
 
+    const target = this.shadowRoot.querySelector('button');
+
     this.#nativeMenu.registerEvents(
-      this,
-      () => {
-        const opts = this.options;
-        return opts;
-      },
-      () => this.getAttribute('value'),
-      (value: string) => this.setAttribute('value', value)
+      target,
+      () => this.options,
+      () => this.value,
+      this.#updateValue.bind(this)
     );
 
     this.#disposables.add(new Disposable(() => this.#removeNativeMenu()));
@@ -109,17 +114,22 @@ export class SelectElement extends HTMLElement {
 
   #handleChange = (e: Event) => {
     const select = e.target as HTMLSelectElement;
-    this.setAttribute('value', select.value);
-    this.dispatchEvent(new ChangeEvent(select.value));
+    this.#updateValue(select.value);
   };
+
+  #updateValue(value: string) {
+    console.log('DEBUG', value);
+    this.setAttribute('value', value);
+    this.dispatchEvent(new ChangeEvent(value));
+  }
 
   /* Rendering */
 
   #render() {
     if (this.native) {
-      render(this.#selectNativeTemplate, this);
+      render(this.#selectNativeTemplate, this.shadowRoot);
     } else {
-      render(this.#selectWebTemplate, this);
+      render(this.#selectWebTemplate, this.shadowRoot);
     }
   }
 
@@ -186,19 +196,45 @@ export class SelectElement extends HTMLElement {
   }
 
   get #optionsTemplate() {
+    const value = this.getAttribute('value');
+
     return Array.from(this.children)
       .filter((node) => ['OPTION', 'OPTGROUP'].includes(node.tagName))
-      .map((node) => node.cloneNode(true));
+      .map((node) => {
+        const cloned = node.cloneNode(true) as Element;
+
+        if (cloned.tagName === 'OPTION') {
+          cloned.toggleAttribute(
+            'selected',
+            cloned.getAttribute('value') === value
+          );
+        } else if (cloned.tagName === 'OPTGROUP') {
+          Array.from(cloned.children).forEach((child) => {
+            if (child.tagName === 'OPTION') {
+              child.toggleAttribute(
+                'selected',
+                child.getAttribute('value') === value
+              );
+            }
+          });
+        }
+
+        return cloned;
+      });
   }
 
-  #selectNativeTemplate() {
+  get #selectNativeTemplate() {
     const value = this.getAttribute('value');
     const disabled =
       this.hasAttribute('disabled') || this.hasAttribute('loading');
     const loading = this.hasAttribute('loading');
-    const label =
-      NativeMenu.findLabelForValue(this.options, value) ||
-      this.getAttribute('placeholder');
+
+    let label;
+    if (this.options && Array.isArray(this.options)) {
+      label = NativeMenu.findLabelForValue(this.options, value);
+    }
+
+    label = label || this.getAttribute('placeholder') || value;
 
     return html`
       <div class="${this.#wrapperClasses}" id="select">
@@ -221,7 +257,7 @@ export class SelectElement extends HTMLElement {
     `;
   }
 
-  #selectWebTemplate() {
+  get #selectWebTemplate() {
     const value = this.getAttribute('value');
     const disabled =
       this.hasAttribute('disabled') || this.hasAttribute('loading');
@@ -231,6 +267,7 @@ export class SelectElement extends HTMLElement {
     const placeholder = this.getAttribute('placeholder');
     const options = this.#optionsTemplate;
 
+    // Create placeholder option
     const placeholderTemplate = html`
       <option value="" disabled ?selected=${!value}>${placeholder}</option>
     `;
@@ -241,7 +278,7 @@ export class SelectElement extends HTMLElement {
         <select
           class=${this.#selectClasses}
           part="select"
-          .value=${value}
+          .value=${value || ''}
           ?disabled=${disabled}
           ?required=${required}
           name=${name}

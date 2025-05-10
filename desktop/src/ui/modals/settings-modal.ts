@@ -77,7 +77,6 @@ export class SettingsModal extends ModalElement {
     this.selectedModel = null;
     this.modelError = null;
     const selectedProvider = event.value as AIModelProviderName;
-    console.log(selectedProvider);
     this.selectedProvider = selectedProvider;
 
     // Get the provider API key if one has already been stored
@@ -92,6 +91,17 @@ export class SettingsModal extends ModalElement {
     this.selectedProviderConfig = providerConfig;
 
     this.updateProviderModels();
+  };
+
+  private handleModelChange = (event: ChangeEvent) => {
+    const modelName = event.value;
+    this.selectedModel = this.availableModels.find(
+      (model) => model.name === modelName
+    ) || {
+      provider: this.selectedProvider,
+      name: modelName,
+    };
+    this.render();
   };
 
   async updateProviderModels() {
@@ -115,8 +125,6 @@ export class SettingsModal extends ModalElement {
     }
 
     try {
-      console.log('here!!');
-      console.log(this.selectedProvider);
       this.isLoadingModels = true;
       this.render();
 
@@ -228,13 +236,8 @@ export class SettingsModal extends ModalElement {
         <un-label for="model" text="Model"></un-label>
         <un-select
           id="model"
-          value=${this.selectedModel?.name}
-          @change=${(event: CustomEvent) => {
-            this.selectedModel = this.availableModels.find(
-              (model) => model.name === event.detail.value
-            );
-            this.render();
-          }}
+          value=${this.selectedModel?.name || ''}
+          @change=${this.handleModelChange}
           ?loading=${this.isLoadingModels}
           placeholder="Select a model"
         >
