@@ -7,6 +7,15 @@ export type InputSize = 'small' | 'medium' | 'large';
 export type InputVariant = 'default' | 'ghost' | 'flat';
 export type IconPosition = 'start' | 'end';
 
+export class ChangeEvent extends Event {
+  value: any;
+
+  constructor(value: any) {
+    super('change');
+    this.value = value;
+  }
+}
+
 export class InputElement extends LitElement {
   type: string = 'text';
   value: string;
@@ -78,33 +87,12 @@ export class InputElement extends LitElement {
   private handleChange(e: Event) {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
-
-    // Dispatch a custom event with the new value
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: this.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    this.dispatchEvent(new ChangeEvent(this.value));
   }
 
   private handleClear() {
     this.value = '';
-    this.dispatchEvent(
-      new CustomEvent('input', {
-        detail: { value: this.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
-    this.dispatchEvent(
-      new CustomEvent('change', {
-        detail: { value: this.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    this.dispatchEvent(new ChangeEvent(this.value));
 
     // Focus the input after clearing
     const input = this.shadowRoot?.querySelector('input');
