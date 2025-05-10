@@ -1,0 +1,57 @@
+workspace-view {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+workspace-view .workspace-content {
+  position: relative;
+  flex-grow: 1;
+  background: var(--color-bg-page);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.bottom-bar {
+  position: relative;
+  background: var(--color-bg-chrome);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-text-muted);
+}
+
+.bottom-bar .archive-button {
+  flex-shrink: 0;
+}
+
+.command-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-4);
+  gap: var(--space-2);
+  width: 100%;
+}
+
+resource-bar {
+  align-self: stretch;
+}
+
+.tools-menu {
+  position: absolute;
+  bottom: 100%;
+  width: 72ch;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+}
+
+.tools-menu.visible {
+  display: block;
+}
+.tools-menu.hidden {
+  display: none;
+}
