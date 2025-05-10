@@ -15,15 +15,12 @@ import '../common/input';
 import '../common/label';
 import './settings-modal.css';
 import { OLLAMA_BASE_URL } from '../../ai/providers/ollama';
+import { ChangeEvent } from '../common/select';
 
 export class SettingsModal extends ModalElement {
   private configModel: ConfigModel;
   private aiModelService: AIModelService;
-
-  // Model hint settings
   private globalHint: string = '';
-
-  // Model provider settings
   private selectedProvider?: AIModelProviderName;
   private selectedProviderConfig?: AIModelProviderConfig;
   private availableModels: AIModelDescriptor[] = [];
@@ -32,9 +29,7 @@ export class SettingsModal extends ModalElement {
   private modelError: string | null = null;
 
   constructor() {
-    super({
-      title: 'Global Settings',
-    } as ModalOptions);
+    super({ title: 'Settings' } as ModalOptions);
   }
 
   connectedCallback() {
@@ -78,14 +73,14 @@ export class SettingsModal extends ModalElement {
     this.globalHint = target.value;
   }
 
-  private handleProviderChange = async (event: CustomEvent) => {
+  private handleProviderChange = async (event: ChangeEvent) => {
     this.selectedModel = null;
     this.modelError = null;
-    const selectedProvider = event.detail.value as AIModelProviderName;
+    const selectedProvider = event.value as AIModelProviderName;
+    this.selectedProvider = selectedProvider;
 
     // Get the provider API key if one has already been stored
     const config = this.configModel.get() as ConfigData;
-    this.selectedProvider = selectedProvider;
 
     // Initialize provider config with defaults if not present
     if (!config.ai.providers[selectedProvider]) {
@@ -94,7 +89,19 @@ export class SettingsModal extends ModalElement {
 
     const providerConfig = config.ai.providers[selectedProvider];
     this.selectedProviderConfig = providerConfig;
+
     this.updateProviderModels();
+  };
+
+  private handleModelChange = (event: ChangeEvent) => {
+    const modelName = event.value;
+    this.selectedModel = this.availableModels.find(
+      (model) => model.name === modelName
+    ) || {
+      provider: this.selectedProvider,
+      name: modelName,
+    };
+    this.render();
   };
 
   async updateProviderModels() {
@@ -196,8 +203,8 @@ export class SettingsModal extends ModalElement {
             id="base-url"
             type="url"
             value=${this.selectedProviderConfig.baseUrl}
-            @change=${(e: CustomEvent) => {
-              this.selectedProviderConfig.baseUrl = e.detail.value;
+            @change=${(e: ChangeEvent) => {
+              this.selectedProviderConfig.baseUrl = e.value;
             }}
             @blur=${this.updateProviderModels.bind(this)}
             placeholder=${OLLAMA_BASE_URL}
@@ -213,8 +220,8 @@ export class SettingsModal extends ModalElement {
             id="api-key"
             type="password"
             value=${this.selectedProviderConfig.apiKey}
-            @change=${(e: CustomEvent) => {
-              this.selectedProviderConfig.apiKey = e.detail.value;
+            @change=${(e: ChangeEvent) => {
+              this.selectedProviderConfig.apiKey = e.value;
             }}
             @blur=${this.updateProviderModels.bind(this)}
             placeholder="Enter your API key"
@@ -229,13 +236,8 @@ export class SettingsModal extends ModalElement {
         <un-label for="model" text="Model"></un-label>
         <un-select
           id="model"
-          value=${this.selectedModel?.name}
-          @change=${(event: CustomEvent) => {
-            this.selectedModel = this.availableModels.find(
-              (model) => model.name === event.detail.value
-            );
-            this.render();
-          }}
+          value=${this.selectedModel?.name || ''}
+          @change=${this.handleModelChange}
           ?loading=${this.isLoadingModels}
           placeholder="Select a model"
         >

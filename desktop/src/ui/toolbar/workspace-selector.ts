@@ -17,6 +17,7 @@ export class WorkspaceSelector extends HTMLElement {
 
   handleWorkspaceSelect(e: ChangeEvent) {
     const newId = e.value;
+
     if (newId === '+') {
       this.workspaceModel.create();
     } else if (newId === '-') {
@@ -43,9 +44,9 @@ export class WorkspaceSelector extends HTMLElement {
 
     const template = html`
       <un-select
-        usenativemenu
+        native
         variant="ghost"
-        .value=${activeWorkspaceId}
+        value=${activeWorkspaceId}
         .options=${workspaceOptions}
         placeholder="Select workspace"
         @change=${this.handleWorkspaceSelect.bind(this)}

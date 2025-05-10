@@ -1,5 +1,4 @@
 import type { MenuItemConstructorOptions } from 'electron';
-import { ChangeEvent } from './select';
 export interface NativeMenuOption extends MenuItemConstructorOptions {
   value: string;
 }
@@ -8,7 +7,7 @@ export interface NativeMenuOption extends MenuItemConstructorOptions {
  * Encapsulates the logic for building native menu options, mapping selection IDs to values,
  * and managing native menu event handlers for Electron environments.
  */
-export class SelectNativeMenu {
+export class NativeMenu {
   #idValueMap = new Map<string, string>();
   #idx = 0;
   #handlerMap: WeakMap<HTMLElement, EventListener> = new WeakMap();
@@ -54,7 +53,6 @@ export class SelectNativeMenu {
     return flat.find((opt) => opt.value === value)?.label;
   }
 
-  // Private static flatten helper for NativeMenuOption trees
   static #flatten(opts: NativeMenuOption[]): NativeMenuOption[] {
     return opts.flatMap((opt) =>
       Array.isArray(opt.submenu)
@@ -120,6 +118,7 @@ export class SelectNativeMenu {
     getValue: () => string | null,
     setValue: (value: string) => void
   ) {
+    console.log(el);
     this.unregisterEvents(el); // Always clean up before registering
     const handler = this.#handleNativeMenuClick.bind(
       this,
@@ -128,6 +127,7 @@ export class SelectNativeMenu {
       getValue,
       setValue
     );
+
     el.addEventListener('click', handler);
     this.#handlerMap.set(el, handler);
   }
@@ -152,7 +152,7 @@ export class SelectNativeMenu {
    * @param e MouseEvent
    */
   async #handleNativeMenuClick(
-    el: HTMLElement,
+    target: HTMLElement,
     getOptions: () => NativeMenuOption[],
     getValue: () => string | null,
     setValue: (value: string) => void,
@@ -160,21 +160,21 @@ export class SelectNativeMenu {
   ) {
     e.preventDefault();
     e.stopPropagation();
+
     const showNativeMenu = window.electronAPI?.showNativeMenu;
     if (!showNativeMenu) return;
+
     const menuOptions = this.buildMenuOptions(getOptions());
-    const button = (el.shadowRoot || el).querySelector(
-      'button.select--native'
-    ) as HTMLElement | null;
-    const rect = button?.getBoundingClientRect();
+
+    const rect = target.getBoundingClientRect();
     const x = rect ? Math.round(rect.left) : undefined;
     const y = rect ? Math.round(rect.top) : undefined;
     const selectedId = await showNativeMenu(menuOptions, null, { x, y });
     const value =
       selectedId != null ? this.getValueForId(selectedId) : undefined;
+
     if (value && value !== getValue()) {
       setValue(value);
-      el.dispatchEvent(new ChangeEvent(value));
     }
   }
 }

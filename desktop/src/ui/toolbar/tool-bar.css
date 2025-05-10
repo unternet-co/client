@@ -40,7 +40,7 @@ tool-bar .command-bar .center-section {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  width: 64ch;
+  width: 54ch;
   max-width: 70%;
   pointer-events: none;
 }

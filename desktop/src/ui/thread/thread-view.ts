@@ -42,6 +42,7 @@ class ThreadView extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (this.isConnected && name === 'for' && oldValue !== newValue) {
+      console.log(newValue);
       this.updateWorkspace(newValue);
     }
   }
@@ -119,6 +120,7 @@ class ThreadView extends HTMLElement {
 
   firstRender() {
     if (!this.workspace) return;
+    this.innerHTML = '';
 
     for (const message of this.workspace.activeMessages) {
       this.addMessage(message);
