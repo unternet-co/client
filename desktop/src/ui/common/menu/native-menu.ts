@@ -158,7 +158,6 @@ export class NativeMenu {
     setValue: (value: string) => void,
     e: MouseEvent
   ) {
-    console.log('XCLICK');
     e.preventDefault();
     e.stopPropagation();
 
