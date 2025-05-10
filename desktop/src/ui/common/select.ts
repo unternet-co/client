@@ -58,7 +58,9 @@ export class SelectElement extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
     if (name === 'value' && oldValue !== newValue) {
-      console.log('Select value changed:', oldValue, '->', newValue);
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Select value changed:', oldValue, '->', newValue);
+      }
       // Force a re-render when value changes
       this.#render();
     }
