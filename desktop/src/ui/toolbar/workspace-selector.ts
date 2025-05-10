@@ -38,7 +38,7 @@ export class WorkspaceSelector extends HTMLElement {
       ...workspaces.map((ws) => ({ value: ws.id, label: ws.title })),
       { type: 'separator' },
       { value: '-', label: 'Edit workspace...' },
-      // { value: '+', label: 'New workspace...' },
+      { value: '+', label: 'New workspace...' },
     ];
 
     const template = html`
