@@ -16,7 +16,6 @@ export class WorkspaceSelector extends HTMLElement {
   }
 
   handleWorkspaceSelect(e: ChangeEvent) {
-    console.log(e.value);
     const newId = e.value;
 
     if (newId === '+') {
