@@ -12,7 +12,7 @@ export class WebProtocol extends Protocol {
 
     if (!metadata.actions) {
       metadata.actions = {
-        site_search: {
+        search: {
           description: `Search within this website.`,
           display: 'snippet',
           params_schema: {
@@ -38,7 +38,7 @@ export class WebProtocol extends Protocol {
   }
 
   async handleAction(action: ActionProposal) {
-    if (action.actionId === 'web_search') {
+    if (action.actionId === 'search') {
       return await unternet.lookup.query({
         q: action.args.q,
         webpages: { sites: [action.uri] },
