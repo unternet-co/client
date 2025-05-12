@@ -37,7 +37,9 @@ body {
 body,
 input,
 textarea,
-input {
+input,
+dialog,
+:popover-open {
   color: var(--color-text-default);
   font-family: var(--font-sans);
   font-size: var(--text-base);
