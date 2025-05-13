@@ -136,7 +136,6 @@ class ThreadView extends HTMLElement {
   }
 
   messageTemplate(message: KernelMessage) {
-    console.log(message);
     if (message.type === 'input') {
       return html`<div
         class="message"

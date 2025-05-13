@@ -118,8 +118,8 @@ export class NativeMenu {
     getValue: () => string | null,
     setValue: (value: string) => void
   ) {
-    console.log(el);
-    this.unregisterEvents(el); // Always clean up before registering
+    if (!el) return;
+    this.unregisterEvents(el);
     const handler = this.#handleNativeMenuClick.bind(
       this,
       el,
