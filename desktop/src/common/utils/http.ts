@@ -1,4 +1,4 @@
-import { ActionDict, Resource, ResourceIcon } from '@unternet/kernel';
+import { ActionDict, ResourceIcon } from '@unternet/kernel';
 
 export function uriWithScheme(
   url: string,

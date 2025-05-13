@@ -39,7 +39,11 @@
         "dmg",
         "zip"
       ],
-      "icon": "desktop/build/app-icons/client-icon-macOS.png"
+      "icon": "desktop/build/app-icons/client-icon-macOS.png",
+      "arch": [
+        "x64",
+        "arm64"
+      ]
     },
     "afterSign": "desktop/dist/notarize.js",
     "win": {
@@ -69,7 +73,7 @@
     "package:desktop": "cd desktop && npm run package",
     "package:electron": "npm run package:all",
     "package:all": "electron-builder -mwl",
-    "package:mac": "electron-builder --mac",
+    "package:mac": "electron-builder --mac --universal",
     "package:win": "electron-builder --win",
     "package:linux": "electron-builder --linux",
     "app:dir": "rm -rf dist && electron-builder --dir",

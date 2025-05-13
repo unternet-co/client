@@ -4,8 +4,8 @@ import {
   KernelMessage,
   ResponseMessage,
 } from '@unternet/kernel';
-import { Kernel, KernelStatus } from '../../ai/kernel';
-import { createEl, getResourceIcon } from '../../common/utils';
+import { Kernel, KernelNotification, KernelStatus } from '../../ai/kernel';
+import { createEl, declareEl, getResourceIcon } from '../../common/utils';
 import { html, render } from 'lit';
 import {
   WorkspaceModel,
@@ -34,6 +34,7 @@ class ThreadView extends HTMLElement {
   private kernel = dependencies.resolve<Kernel>('Kernel');
   private messageContainerEl: HTMLDivElement;
   private idleScreenEl: IdleScreenElement;
+  private loadingEl: HTMLElement;
   private messageListEl: HTMLDivElement;
 
   static get observedAttributes() {
@@ -50,9 +51,12 @@ class ThreadView extends HTMLElement {
   connectedCallback() {
     this.messageContainerEl = this.createMessageContainer();
     this.idleScreenEl = createEl('idle-screen');
+    this.loadingEl = declareEl(
+      html`<un-icon name="loading" spin class="loading"></un-icon>`
+    );
 
     this.kernelSub = this.kernel.subscribe((notification) => {
-      // if (notification.status) this.updateKernelStatus(notification.status);
+      if (notification.status) this.updateLoadingStatus(notification.status);
     });
     const workspaceId = this.getAttribute('for') || '';
     this.updateWorkspace(workspaceId);
@@ -113,6 +117,12 @@ class ThreadView extends HTMLElement {
     messageEl.replaceWith(...fragment.childNodes);
   }
 
+  updateLoadingStatus(status: KernelNotification['status']) {
+    if (status === 'thinking') {
+      this.messageContainerEl.appendChild(this.loadingEl);
+    }
+  }
+
   disconnectedCallback() {
     this.workspaceSub.dispose();
     this.kernelSub.dispose();
@@ -136,7 +146,6 @@ class ThreadView extends HTMLElement {
   }
 
   messageTemplate(message: KernelMessage) {
-    console.log(message);
     if (message.type === 'input') {
       return html`<div
         class="message"
@@ -153,7 +162,11 @@ class ThreadView extends HTMLElement {
       >
         <markdown-text>${message.text || html`&nbsp;`}</markdown-text>
       </div>`;
-    } else if (message.type === 'action' && message.display === 'inline') {
+    } else if (
+      message.type === 'action' &&
+      message.display === 'inline' &&
+      message.process
+    ) {
       return html`<div
         class="message"
         data-id="${message.id}"
@@ -161,7 +174,7 @@ class ThreadView extends HTMLElement {
       >
         <process-frame .process=${message.process}></process-frame>
       </div>`;
-    } else if (message.type === 'action' && message.display === 'snippet') {
+    } else if (message.type === 'action') {
       return html`<div
         class="message"
         data-id="${message.id}"
@@ -198,7 +211,7 @@ class ThreadView extends HTMLElement {
 
   processInlineTemplate(message: ActionMessage) {
     return html`
-      <div class="message" data-type="process">
+      <div class="message" data-type="process" data-id="${message.id}">
         <process-frame .process=${message.process}></process-frame>
       </div>
     `;

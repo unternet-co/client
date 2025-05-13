@@ -17,6 +17,7 @@ import { ResourceModel, initialResources } from './models/resource-model';
 import { ProcessModel, ProcessRecord } from './models/process-model';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols';
+import { NUM_CONCURRENT_PROCESSES } from './constants';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
@@ -25,7 +26,6 @@ import './ui/app-root';
 import './ui/modals/bug-modal';
 import './ui/modals/workspace-settings-modal';
 import './ui/modals/workspace-delete-modal';
-import { NUM_CONCURRENT_PROCESSES } from './constants';
 
 /* Initialize databases & stores */
 
@@ -41,7 +41,6 @@ const messageDatabaseService = new DatabaseService<string, MessageRecord>(
 const resourceDatabaseService = new DatabaseService<string, Resource>(
   'resources'
 );
-const tabKeyStore = new KeyStoreService<TabStoreData>('tabs', initTabStoreData);
 const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
 /* Initialize model dependencies */
@@ -53,9 +52,11 @@ const runtime = new ProcessRuntime(protocols, {
 /* Initialize models */
 
 const processModel = new ProcessModel(processDatabaseService, runtime);
+await processModel.load();
 dependencies.registerSingleton('ProcessModel', ProcessModel);
 
 const configModel = new ConfigModel(configStore);
+await configModel.load();
 dependencies.registerSingleton('ConfigModel', configModel);
 
 const workspaceModel = new WorkspaceModel(
@@ -64,15 +65,14 @@ const workspaceModel = new WorkspaceModel(
   processModel,
   configModel
 );
+await workspaceModel.load();
 dependencies.registerSingleton('WorkspaceModel', workspaceModel);
-
-const tabModel = new TabModel(tabKeyStore, workspaceModel);
-dependencies.registerSingleton('TabModel', tabModel);
 
 const resourceModel = new ResourceModel({
   resourceDatabaseService,
   initialResources,
 });
+await resourceModel.load();
 dependencies.registerSingleton('ResourceModel', resourceModel);
 
 /* Initialize kernel & LLMs */

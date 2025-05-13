@@ -85,11 +85,15 @@ export class ProcessRuntime {
       }
     }
 
+    console.log('caloing protocol', scheme, directive);
     const result = await this.protocols.get(scheme).handleAction(directive);
+    console.log(result);
 
     if (result instanceof Process) {
+      console.log('process', result);
       return actionResultResponse({ process: result });
     } else {
+      console.log('result', result);
       return actionResultResponse({ content: result });
     }
   }

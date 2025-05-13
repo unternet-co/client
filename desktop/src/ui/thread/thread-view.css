@@ -2,7 +2,7 @@ thread-view {
   width: 100%;
   flex-grow: 1;
   overflow-y: auto;
-  padding-top: var(--space-9);
+  padding-top: var(--space-8);
 }
 
 thread-view .message-container:last-child {
@@ -21,7 +21,7 @@ thread-view .message-container {
   gap: var(--space-4);
   max-width: 72ch;
   margin: 0 auto;
-  margin-top: var(--space-5);
+  margin-top: var(--space-8);
   border: 1px solid transparent;
 }
 

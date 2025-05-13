@@ -3,7 +3,7 @@ import { NativeMenuOption, NativeMenu } from './menu/native-menu';
 import { Disposable, DisposableGroup } from '../../common/disposable';
 import { attachStyles } from '../../common/utils/dom';
 import classNames from 'classnames';
-import './icon';
+import './icons/icon';
 
 export type SelectSize = 'small' | 'medium' | 'large';
 export type SelectVariant = 'default' | 'ghost' | 'flat';
@@ -58,13 +58,8 @@ export class SelectElement extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
     if (name === 'value' && oldValue !== newValue) {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Select value changed:', oldValue, '->', newValue);
-      }
-      // Force a re-render when value changes
       this.#render();
-    }
-    if (name === 'native' && newValue !== null) {
+    } else if (name === 'native' && newValue !== null) {
       this.#createNativeMenu();
     } else if (name === 'native' && newValue === null) {
       this.#removeNativeMenu();

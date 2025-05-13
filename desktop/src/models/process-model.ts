@@ -28,10 +28,9 @@ export class ProcessModel {
   ) {
     this.processDatabase = processDatabase;
     this.runtime = runtime;
-    this.loadAll();
   }
 
-  async loadAll() {
+  async load() {
     const snapshots = await this.processDatabase.all();
     for (const p of snapshots) this.runtime.hydrate(p);
   }

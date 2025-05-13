@@ -1,6 +1,6 @@
 import { html, TemplateResult } from 'lit';
 import '../ui/common/button';
-import '../ui/common/icon';
+import '../ui/common/icons/icon';
 
 export interface ModalOptions {
   title?: string;
