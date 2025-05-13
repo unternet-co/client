@@ -1,7 +1,7 @@
-import { resource, Resource } from '@unternet/kernel';
+import { Resource } from '@unternet/kernel';
 import webResource from '../protocols/buitin/resources';
 import { Notifier } from '../common/notifier';
-import { getMetadata, uriWithScheme } from '../common/utils/http';
+import { uriWithScheme } from '../common/utils/http';
 import { DatabaseService } from '../storage/database-service';
 import { WebProtocol } from '../protocols/http/protocol';
 

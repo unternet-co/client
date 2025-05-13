@@ -1,11 +1,15 @@
 import { html } from 'lit';
+
 import { PopoverElement } from '../common/popover';
 import './resources-popover.css';
+import '../common/checkbox';
+
 import { dependencies } from '../../common/dependencies';
 import { ResourceModel } from '../../models/resource-model';
 import { getMetadata, uriWithScheme } from '../../common/utils/http';
 import { InputElement } from '../common/input';
 import { DisposableGroup } from '../../common/disposable';
+import { WorkspaceModel } from '../../models/workspace-model';
 
 type AppletAction = { description?: string; [key: string]: any };
 
@@ -16,12 +20,19 @@ export class ResourceManagementPopover extends PopoverElement {
   disposables = new DisposableGroup();
   previewResource: any = null;
   previewLoading: boolean = false;
+  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
 
   connectedCallback() {
     const resourceModelSubscription = this.resourceModel.subscribe(() =>
       this.render()
     );
+
+    const workspaceModelSubscription = this.workspaceModel.subscribe(() =>
+      this.render()
+    );
+
     this.disposables.add(resourceModelSubscription);
+    this.disposables.add(workspaceModelSubscription);
   }
 
   disconnectedCallback() {
@@ -40,14 +51,28 @@ export class ResourceManagementPopover extends PopoverElement {
 
   handleRemove = async (uri: string) => {
     await this.resourceModel.remove(uri);
+    // TODO: Automatically disable resource on workspace?
     this.render();
+  };
+
+  handleToggle = async (uri: string) => {
+    this.workspaceModel.toggleResource(
+      this.workspaceModel.activeWorkspaceId,
+      uri
+    );
   };
 
   handleAddResource = async (e: Event) => {
     e.preventDefault();
     if (!this.previewResource) return;
     await this.resourceModel.register(this.previewResource.uri);
+    await this.workspaceModel.enableResource(
+      this.workspaceModel.activeWorkspaceId,
+      this.previewResource.uri
+    );
+
     this.previewResource = null;
+    this.resourceUrl = '';
     this.goToView('list');
   };
 
@@ -82,11 +107,19 @@ export class ResourceManagementPopover extends PopoverElement {
 
   get currentResourceTemplate() {
     const resources = this.resourceModel.all();
+    const workspace = this.workspaceModel.activeWorkspace || undefined;
+
     const resourcesList =
       resources.length > 0
         ? resources.map((resource) => {
             return html`
               <div class="resource-row">
+                <un-checkbox
+                  .checked=${workspace?.resources[resource.uri]?.enabled
+                    ? true
+                    : false}
+                  @input=${() => this.handleToggle(resource.uri)}
+                ></un-checkbox>
                 ${resource.icons && resource.icons.length > 0
                   ? html`<img
                       class="resource-icon"

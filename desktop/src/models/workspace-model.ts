@@ -19,6 +19,8 @@ export interface WorkspaceRecord {
   modified: number;
   // Messages with an id less than this will be inactive
   archiveUpToId?: string;
+  // Resources added to the workspace + config options
+  resources: Array<WorkspaceResource>;
 }
 
 /**
@@ -36,6 +38,11 @@ export interface WorkspaceNotification {
   workspaceId: WorkspaceRecord['id'];
   type?: 'delete' | 'addmessage' | 'updatemessage';
   message?: KernelMessage;
+}
+
+export interface WorkspaceResource {
+  enabled: boolean;
+  uri: string;
 }
 
 export class WorkspaceModel {
@@ -185,6 +192,7 @@ export class WorkspaceModel {
       created: now,
       accessed: now,
       modified: now,
+      resources: [],
     };
 
     await this.workspaceDatabase.create(record);
@@ -226,6 +234,7 @@ export class WorkspaceModel {
       ...record,
       activeMessages,
       inactiveMessages,
+      resources: record.resources || [],
       showArchived: false,
       scrollPosition: null,
     };
@@ -348,5 +357,40 @@ export class WorkspaceModel {
       };
     }
     return record;
+  }
+
+  /* RESOURCES */
+
+  async enableResource(workspaceId: WorkspaceRecord['id'], uri: string) {
+    const workspace = this.workspaces.get(workspaceId);
+    const resources = { ...workspace.resources };
+    resources[uri] = { enabled: true, uri };
+    await this.updateResources(workspaceId, resources);
+  }
+
+  async disableResource(workspaceId: WorkspaceRecord['id'], uri: string) {
+    const workspace = this.workspaces.get(workspaceId);
+    const resources = { ...workspace.resources };
+    resources[uri] = { enabled: false, uri };
+    await this.updateResources(workspaceId, resources);
+  }
+
+  async toggleResource(workspaceId: WorkspaceRecord['id'], uri: string) {
+    const workspace = this.workspaces.get(workspaceId);
+    const resources = { ...workspace.resources };
+    resources[uri] = { enabled: !resources[uri]?.enabled, uri };
+    await this.updateResources(workspaceId, resources);
+  }
+
+  async updateResources(
+    workspaceId: WorkspaceRecord['id'],
+    resources: WorkspaceRecord['resources']
+  ) {
+    const workspace = this.workspaces.get(workspaceId);
+    workspace.resources = resources;
+    await this.workspaceDatabase.update(workspaceId, {
+      resources: workspace.resources,
+    });
+    this.notifier.notify();
   }
 }

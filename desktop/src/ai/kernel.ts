@@ -10,12 +10,14 @@ import {
   ActionProposalResponse,
   ProcessContainer,
 } from '@unternet/kernel';
+
 import { WorkspaceRecord, WorkspaceModel } from '../models/workspace-model';
-import { ConfigModel, ConfigNotification } from '../config';
+import { ConfigModel, ConfigNotification } from '../models/config-model';
 import { AIModelService } from './ai-models';
-import { ResourceModel } from '../resources/resource-model';
+import { ResourceModel } from '../models/resource-model';
 import { Notifier } from '../common/notifier';
 import { ProcessModel } from '../models/process-model';
+import { enabledResources } from '../common/utils/resources';
 
 export interface KernelInit {
   model?: LanguageModel;
@@ -91,6 +93,7 @@ export class Kernel {
     const hint = config.ai.globalHint;
     const resources = this.resourceModel.all();
     this.resourceModel.subscribe(this.updateResources.bind(this));
+    this.workspaceModel.subscribe(this.updateResources.bind(this));
 
     if (!model) {
       this.initialized = false;
@@ -102,7 +105,7 @@ export class Kernel {
   }
 
   updateResources() {
-    const resources = this.resourceModel.all();
+    const resources = enabledResources(this.resourceModel, this.workspaceModel);
     this.interpreter.updateResources(resources);
   }
 
