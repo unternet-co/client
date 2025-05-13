@@ -69,6 +69,7 @@ class ResourceModel {
 
   get(uri: string) {
     const result = this.resources.get(uri);
+    console.log(this.resources);
     if (!result) {
       throw new Error(`No resource matches this URI: ${JSON.stringify(uri)}`);
     }

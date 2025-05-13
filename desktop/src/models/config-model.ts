@@ -38,7 +38,10 @@ export class ConfigModel {
 
   constructor(store: KeyStoreService<ConfigData>) {
     this.store = store;
-    this.config = store.get();
+  }
+
+  async load() {
+    this.config = this.store.get();
     this.notifier.notify();
   }
 

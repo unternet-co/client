@@ -73,7 +73,6 @@ export class WorkspaceModel {
     this.messageDatabase = messageDatabase;
     this.processModel = processModel;
     this.configModel = configModel;
-    this.load();
   }
 
   /**
@@ -81,6 +80,7 @@ export class WorkspaceModel {
    */
   async load() {
     const workspaceRecords = await this.workspaceDatabase.all();
+    console.log(workspaceRecords);
 
     if (!workspaceRecords.length) {
       await this.create(DEFAULT_WORKSPACE_NAME);

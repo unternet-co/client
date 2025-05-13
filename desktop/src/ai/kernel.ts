@@ -11,9 +11,9 @@ import {
   ProcessContainer,
 } from '@unternet/kernel';
 import { WorkspaceRecord, WorkspaceModel } from '../models/workspace-model';
-import { ConfigModel, ConfigNotification } from '../config';
+import { ConfigModel, ConfigNotification } from '../models/config-model';
 import { AIModelService } from './ai-models';
-import { ResourceModel } from '../resources/resource-model';
+import { ResourceModel } from '../models/resource-model';
 import { Notifier } from '../common/notifier';
 import { ProcessModel } from '../models/process-model';
 
@@ -127,8 +127,6 @@ export class Kernel {
         'Tried to access kernel when not initialized.'
       );
     }
-
-    this.updateStatus('thinking');
 
     const runner = this.interpreter.run(
       this.workspaceModel.get(workspaceId).activeMessages

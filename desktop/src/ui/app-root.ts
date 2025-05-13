@@ -1,6 +1,6 @@
 import { html, render } from 'lit';
 import './top-bar/top-bar';
-import './toolbar/tool-bar';
+import './toolbar/command-bar';
 import './app-root.css';
 import './thread/thread-view';
 import { dependencies } from '../common/dependencies';
@@ -24,7 +24,10 @@ export class AppRoot extends HTMLElement {
         <div class="workspace-content">
           <thread-view for=${ws.id}></thread-view>
         </div>
-        <tool-bar for=${ws.id}></tool-bar>
+        <div class="toolbar">
+          <command-bar for=${ws.id}></command-bar>
+          <resource-bar for=${ws.id}></resource-bar>
+        </div>
       </div>
     `;
 

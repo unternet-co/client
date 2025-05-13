@@ -18,11 +18,11 @@ export interface TabStoreData {
 }
 
 export const initTabStoreData: TabStoreData = {
-  activeTabId: 'home',
+  activeTabId: 'default',
   tabs: [
     {
       type: 'page',
-      id: 'home',
+      id: 'default',
     },
     // Settings is now a standalone button, not a tab
   ],

@@ -1,3 +1,5 @@
+import { HTMLTemplateResult, render } from 'lit';
+
 export function appendEl(parent: Node, child: HTMLElement) {
   parent.appendChild(child);
   return child;
@@ -11,6 +13,13 @@ export function attachStyles(shadow: ShadowRoot, styles: string) {
   const sheet = new CSSStyleSheet();
   sheet.replaceSync(styles);
   shadow.adoptedStyleSheets = [sheet];
+}
+
+export function declareEl<T = ChildNode>(t: HTMLTemplateResult): T {
+  const fragment = document.createDocumentFragment();
+  render(t, fragment);
+  const el = fragment.firstChild as T;
+  return el;
 }
 
 export function createEl<T extends HTMLElement = HTMLElement>(

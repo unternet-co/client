@@ -1,0 +1,36 @@
+command-bar {
+  display: flex;
+  align-items: center;
+  padding: var(--space-4) var(--space-4);
+  gap: var(--space-2);
+  width: 100%;
+  position: relative;
+}
+
+command-bar .left-section,
+command-bar .right-section {
+  flex: 1;
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+}
+
+command-bar .right-section {
+  justify-content: flex-end;
+}
+
+command-bar .center-section {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 54ch;
+  max-width: 70%;
+  pointer-events: none;
+}
+
+command-bar .center-section command-input {
+  pointer-events: auto;
+}

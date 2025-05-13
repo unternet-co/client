@@ -25,22 +25,20 @@ const search = resource({
         required: ['q'],
       },
     },
+    open: {
+      description: 'Show a particular web page, inline in the conversation.',
+      params_schema: {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description: 'The URL of the site to open.',
+          },
+        },
+        required: ['url'],
+      },
+    },
   },
 });
 
 export default search;
-
-// open: {
-//   description: 'Show a particular web page, inline in the conversation.',
-//     params_schema: {
-//     type: 'object',
-//       properties: {
-//       url: {
-//         type: 'string',
-//           description: 'The URL of the site to open.',
-//           },
-//     },
-//     required: ['url'],
-//       },
-// },
-//   },

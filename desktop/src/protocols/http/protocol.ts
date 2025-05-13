@@ -5,6 +5,7 @@ import { unternet } from '../../common/unternet';
 
 export class WebProtocol extends Protocol {
   scheme = ['http', 'https'];
+  searchEnabledResources: Array<string> = [];
 
   // TODO: Make this a standard part of the kernel
   static async createResource(url: string): Promise<Resource> {
@@ -12,7 +13,7 @@ export class WebProtocol extends Protocol {
 
     if (!metadata.actions) {
       metadata.actions = {
-        search: {
+        __search__: {
           description: `Search within this website.`,
           display: 'snippet',
           params_schema: {
@@ -38,7 +39,7 @@ export class WebProtocol extends Protocol {
   }
 
   async handleAction(action: ActionProposal) {
-    if (action.actionId === 'search') {
+    if (action.actionId === '__search__') {
       return await unternet.lookup.query({
         q: action.args.q,
         webpages: { sites: [action.uri] },
@@ -46,7 +47,9 @@ export class WebProtocol extends Protocol {
     }
     const process = await WebProcess.create(action.uri);
     await process.handleAction(action);
+    console.log('Handling action', action, process);
     if (action.display === 'snippet') return process.data;
+    console.log('Returning process');
     return process;
   }
 }

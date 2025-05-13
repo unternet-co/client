@@ -168,12 +168,15 @@ export class Interpreter {
         display = opts?.display ?? tool.display;
       }
 
-      return actionProposalResponse({
+      const response = actionProposalResponse({
         uri,
         actionId,
         args: tool.args,
         display: display,
       });
+
+      console.log('[INTERPRETER] Action proposal: ', response);
+      return response;
     });
   }
 
@@ -246,6 +249,7 @@ export class Interpreter {
         system,
         prompt: this.prompts.think(prompt),
       });
+      console.log('[INTERPRETER] Thought: ', thought);
       modelMsgs.push(modelMsg('assistant', thought));
     }
     if (prompt) modelMsgs.push(modelMsg('user', prompt));

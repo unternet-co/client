@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
-import './icon'; // Import icon component to ensure it's registered
+import './icons/icon'; // Import icon component to ensure it's registered
 
 export type ButtonType =
   | 'primary'

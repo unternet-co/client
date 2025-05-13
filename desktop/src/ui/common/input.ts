@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { classMap } from 'lit/directives/class-map.js';
-import './icon';
+import './icons/icon';
 
 export type InputSize = 'small' | 'medium' | 'large';
 export type InputVariant = 'default' | 'ghost' | 'flat';
