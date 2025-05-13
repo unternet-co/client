@@ -1,5 +1,5 @@
 // theme-demo.js
-import { icons } from './src/ui/common/elements/icon-registry.ts';
+import { icons } from './src/ui/common/icon-registry.ts';
 
 function pascalToKebab(str) {
   return str
