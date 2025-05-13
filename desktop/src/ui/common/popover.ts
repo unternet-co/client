@@ -56,7 +56,7 @@ export class PopoverElement extends HTMLElement {
     };
     style.anchorName = anchorNameValue;
     (this.style as any).positionAnchor = anchorNameValue;
-    this.setAttribute('data-position', position);
+    this.setAttribute('data-position', position ?? 'top');
   }
 
   render() {

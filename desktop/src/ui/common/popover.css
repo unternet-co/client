@@ -38,7 +38,6 @@
 .un-popover:popover-open {
   position-try-fallbacks: flip-block, flip-inline;
 }
-.un-popover,
 .un-popover[data-position='top'] {
   position-area: top;
   justify-self: anchor-center;
