@@ -1,7 +1,8 @@
-import { LitElement, html, css } from 'lit';
+import { html, render } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { classMap } from 'lit/directives/class-map.js';
 import './icons/icon';
+import './input.css';
+import './button';
 
 export type InputSize = 'small' | 'medium' | 'large';
 export type InputVariant = 'default' | 'ghost' | 'flat';
@@ -9,369 +10,180 @@ export type IconPosition = 'start' | 'end';
 
 export class ChangeEvent extends Event {
   value: any;
-
   constructor(value: any) {
     super('change');
     this.value = value;
   }
 }
 
-export class InputElement extends LitElement {
-  type: string = 'text';
-  value: string;
-  placeholder: string;
-  disabled: boolean;
-  readonly: boolean;
-  required: boolean;
-  minlength: number;
-  maxlength: number;
-  min: string;
-  max: string;
-  step: string;
-  pattern: string;
-  name: string;
-  autocomplete: string;
-  size: InputSize = 'medium';
-  variant: InputVariant = 'default';
-  loading: boolean = false;
-  icon?: string;
-  iconPosition: IconPosition = 'end';
+const ATTRS_TO_UPDATE = new Set([
+  'value',
+  'type',
+  'placeholder',
+  'disabled',
+  'readonly',
+  'required',
+  'minlength',
+  'maxlength',
+  'min',
+  'max',
+  'step',
+  'pattern',
+  'name',
+  'autocomplete',
+  'size',
+  'variant',
+  'loading',
+  'icon',
+  'icon-position',
+]);
 
-  static get properties() {
-    return {
-      value: { type: String },
-      type: { type: String },
-      placeholder: { type: String },
-      disabled: { type: Boolean },
-      readonly: { type: Boolean },
-      required: { type: Boolean },
-      minlength: { type: Number },
-      maxlength: { type: Number },
-      min: { type: String },
-      max: { type: String },
-      step: { type: String },
-      pattern: { type: String },
-      name: { type: String },
-      autocomplete: { type: String },
-      size: { type: String },
-      variant: { type: String },
-      loading: { type: Boolean },
-      icon: { type: String },
-      iconPosition: { type: String, attribute: 'icon-position' },
-    };
+export class InputElement extends HTMLElement {
+  #input!: HTMLInputElement;
+  #wrapper!: HTMLDivElement;
+  static get observedAttributes() {
+    return Array.from(ATTRS_TO_UPDATE);
   }
 
-  constructor() {
-    super();
-    this.size = 'medium';
-    this.variant = 'default';
-    this.loading = false;
-    this.icon = undefined;
-    this.iconPosition = 'end';
+  connectedCallback() {
+    if (!this.#wrapper) this.#createInput();
+    this.#render();
   }
 
-  private handleInput(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.value = input.value;
+  attributeChangedCallback(
+    name: string,
+    _old: string | null,
+    _new: string | null
+  ) {
+    this.#render();
+    if (name === 'value' && this.#input) {
+      this.#input.value = _new ?? '';
+    }
+  }
 
-    // Dispatch a custom event with the new value
+  #handleInput = (e: Event) => {
+    this.setAttribute('value', this.#input.value);
     this.dispatchEvent(
       new CustomEvent('input', {
-        detail: { value: this.value },
+        detail: { value: this.#input.value },
         bubbles: true,
         composed: true,
       })
     );
+  };
+
+  #handleChange = (e: Event) => {
+    this.setAttribute('value', this.#input.value);
+    this.dispatchEvent(new ChangeEvent(this.#input.value));
+  };
+
+  #createInput() {
+    this.#wrapper = document.createElement('div');
+    this.#wrapper.className = 'input-wrapper';
+    this.appendChild(this.#wrapper);
   }
 
-  private handleChange(e: Event) {
-    const input = e.target as HTMLInputElement;
-    this.value = input.value;
-    this.dispatchEvent(new ChangeEvent(this.value));
+  #handleClear = (e: Event) => {
+    this.#input.value = '';
+    this.setAttribute('value', '');
+    this.dispatchEvent(new ChangeEvent(''));
+    this.#input.focus();
+    this.#render();
+  };
+
+  get value() {
+    return this.#input?.value ?? this.getAttribute('value') ?? '';
+  }
+  set value(val: string) {
+    this.setAttribute('value', val);
+    if (this.#input) this.#input.value = val;
   }
 
-  private handleClear() {
-    this.value = '';
-    this.dispatchEvent(new ChangeEvent(this.value));
+  get validity(): ValidityState | undefined {
+    return this.#input?.validity;
+  }
+  checkValidity(): boolean {
+    return this.#input ? this.#input.checkValidity() : false;
+  }
 
-    // Focus the input after clearing
-    const input = this.shadowRoot?.querySelector('input');
-    if (input) {
-      input.focus();
+  #render() {
+    if (!this.#wrapper) return;
+
+    const icon = this.getAttribute('icon');
+    const iconPosition = this.getAttribute('icon-position') ?? 'end';
+    const loading = this.hasAttribute('loading');
+    const size = this.getAttribute('size') ?? 'medium';
+    const variant = this.getAttribute('variant') ?? 'default';
+    const showClearButton =
+      this.hasAttribute('clearable') && this.value && !this.#input?.disabled;
+
+    const inputClass = [
+      'input',
+      size !== 'medium' ? size : '',
+      variant !== 'default' ? variant : '',
+      loading ? 'loading' : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    if (icon || loading) {
+      this.#wrapper.setAttribute('data-icon', iconPosition);
+    } else {
+      this.#wrapper.removeAttribute('data-icon');
     }
-  }
 
-  focus() {
-    const input = this.shadowRoot?.querySelector('input');
-    if (input) {
-      input.focus();
-    }
-  }
+    const showIcon = !!icon || loading;
+    const iconName = loading ? 'loading' : icon;
+    const iconSpin = !!loading;
 
-  blur() {
-    const input = this.shadowRoot?.querySelector('input');
-    if (input) {
-      input.blur();
-    }
-  }
-
-  select() {
-    const input = this.shadowRoot?.querySelector('input');
-    if (input) {
-      input.select();
-    }
-  }
-
-  public get validity(): ValidityState | undefined {
-    const input = this.shadowRoot?.querySelector('input');
-    return input?.validity;
-  }
-
-  public checkValidity(): boolean {
-    const input = this.shadowRoot?.querySelector('input');
-    return input ? input.checkValidity() : false;
-  }
-
-  render() {
-    const showClearButton = this.type === 'search' && this.value;
-    const inputClasses = {
-      input: true,
-      [`input--${this.size}`]: this.size !== 'medium',
-      [`input--${this.variant}`]: this.variant !== 'default',
-      loading: this.loading,
-    };
-
-    return html`
-      <div
-        class="input-wrapper ${this.size !== 'medium'
-          ? `input-wrapper--${this.size}`
-          : ''} ${this.icon ? `has-icon icon-${this.iconPosition}` : ''}"
-      >
-        ${this.icon && this.iconPosition === 'start'
-          ? html`<un-icon
-              class="input-icon input-icon-start"
-              name=${this.loading ? 'loading' : this.icon}
-              size=${this.size}
-              ?spin=${this.loading}
-            ></un-icon>`
+    render(
+      html`
+        ${showIcon
+          ? html`
+              <un-icon
+                class="input-icon"
+                name=${iconName}
+                size=${size}
+                ?spin=${iconSpin}
+              ></un-icon>
+            `
           : ''}
         <input
-          part="input"
-          class=${classMap(inputClasses)}
+          class=${inputClass}
+          type=${this.getAttribute('type') ?? 'text'}
           .value=${this.value}
-          type=${this.type}
-          placeholder=${this.placeholder}
-          ?disabled=${this.disabled || this.loading}
-          ?readonly=${this.readonly}
-          ?required=${this.required}
-          autocomplete=${ifDefined(this.autocomplete)}
-          minlength=${ifDefined(this.minlength)}
-          maxlength=${ifDefined(this.maxlength)}
-          min=${ifDefined(this.min)}
-          max=${ifDefined(this.max)}
-          step=${ifDefined(this.step)}
-          pattern=${ifDefined(this.pattern)}
-          name=${ifDefined(this.name)}
-          @input=${this.handleInput}
-          @change=${this.handleChange}
-          aria-busy=${this.loading ? 'true' : 'false'}
+          placeholder=${ifDefined(this.getAttribute('placeholder'))}
+          ?disabled=${this.hasAttribute('disabled') || loading}
+          ?readonly=${this.hasAttribute('readonly')}
+          ?required=${this.hasAttribute('required')}
+          autocomplete=${ifDefined(this.getAttribute('autocomplete'))}
+          minlength=${ifDefined(this.getAttribute('minlength'))}
+          maxlength=${ifDefined(this.getAttribute('maxlength'))}
+          min=${ifDefined(this.getAttribute('min'))}
+          max=${ifDefined(this.getAttribute('max'))}
+          step=${ifDefined(this.getAttribute('step'))}
+          pattern=${ifDefined(this.getAttribute('pattern'))}
+          name=${ifDefined(this.getAttribute('name'))}
+          aria-busy=${loading ? 'true' : 'false'}
+          @input=${this.#handleInput}
+          @change=${this.#handleChange}
         />
-        ${this.icon && this.iconPosition === 'end'
-          ? html`<un-icon
-              class="input-icon input-icon-end"
-              name=${this.loading ? 'loading' : this.icon}
-              size=${this.size}
-              ?spin=${this.loading}
-            ></un-icon>`
-          : ''}
-        ${showClearButton && !this.loading
+        ${showClearButton
           ? html`
               <un-button
                 class="clear-button"
                 variant="ghost"
-                size=${this.size}
+                size=${size}
                 icon="close"
                 aria-label="Clear search"
-                @click=${this.handleClear}
-              >
-              </un-button>
+                @click=${this.#handleClear}
+              ></un-button>
             `
           : ''}
-        ${this.loading && !this.icon
-          ? html`<un-icon
-              class="loading-icon"
-              name="loading"
-              spin
-              size=${this.size}
-            ></un-icon>`
-          : ''}
-      </div>
-    `;
-  }
-
-  static get styles() {
-    return css`
-      :host {
-        display: block;
-        position: relative;
-      }
-
-      .input-wrapper {
-        position: relative;
-        width: 100%;
-      }
-
-      .input {
-        --input-height: 24px;
-        width: 100%;
-        height: var(--input-height);
-        padding: 0 var(--space-4);
-        border-radius: var(--rounded);
-        border: 1px solid var(--input-border-color);
-        border-bottom-color: color-mix(
-          in srgb,
-          var(--input-border-color) 100%,
-          transparent 25%
-        );
-        background-color: var(--input-bg-color);
-        color: var(--input-text-color);
-        font-family: inherit;
-        font-size: inherit;
-        line-height: var(--input-height);
-        box-sizing: border-box;
-        box-shadow: var(--input-shadows);
-      }
-
-      .input:focus {
-        outline: var(--outline);
-        outline-offset: var(--outline-offset-inputs);
-      }
-
-      .input:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      .input::placeholder {
-        color: var(--input-placeholder-color);
-      }
-
-      .input[type='number'] {
-        -moz-appearance: textfield;
-      }
-
-      .input[type='number']::-webkit-outer-spin-button,
-      .input[type='number']::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
-
-      .input--small {
-        --input-height: 18px;
-        font-size: var(--text-sm);
-      }
-
-      .input--large {
-        --input-height: 28px;
-      }
-
-      .input--ghost {
-        border-color: transparent;
-        background-color: transparent;
-        box-shadow: none;
-      }
-
-      .input--flat {
-        border-color: transparent;
-        box-shadow: none;
-        background-color: var(--input-bg-color-flat);
-      }
-
-      .input[type='search'] {
-        border-radius: 16px;
-        padding-left: var(--space-5);
-        padding-right: var(--space-8);
-      }
-
-      .input[type='search']::-webkit-search-decoration,
-      .input[type='search']::-webkit-search-cancel-button,
-      .input[type='search']::-webkit-search-results-button,
-      .input[type='search']::-webkit-search-results-decoration {
-        -webkit-appearance: none;
-      }
-
-      /* Icon positioning */
-      .has-icon.icon-start .input {
-        padding-left: calc(var(--space-4) * 2 + 16px);
-      }
-
-      .has-icon.icon-end .input {
-        padding-right: calc(var(--space-4) * 2 + 16px);
-      }
-
-      .input-icon,
-      .loading-icon {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--color-text-default);
-        pointer-events: none;
-      }
-
-      .input-icon-start {
-        left: var(--space-4);
-      }
-
-      .input-icon-end {
-        right: var(--space-4);
-      }
-
-      .loading-icon {
-        right: var(--space-4);
-      }
-
-      /* Adjust clear button position when there's an end icon */
-      .has-icon.icon-end .clear-button {
-        right: calc(var(--space-4) * 2 + 16px);
-      }
-
-      .input-wrapper--small .clear-button {
-        --button-height: 18px;
-      }
-
-      .input-wrapper--large .clear-button {
-        --button-height: 28px;
-      }
-
-      .clear-button {
-        position: absolute;
-        right: var(--space-4);
-        top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        border: none;
-        background: none;
-        color: var(--color-text-default);
-        transition: opacity 0.2s ease;
-        cursor: pointer;
-      }
-
-      .clear-button:hover {
-        opacity: 1;
-      }
-
-      .clear-button:disabled {
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      input:disabled + .clear-button {
-        display: none;
-      }
-    `;
+      `,
+      this.#wrapper
+    );
+    this.#input = this.#wrapper.querySelector('input')!;
   }
 }
 
