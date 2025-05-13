@@ -52,7 +52,7 @@ export class TopBar extends HTMLElement {
       </div> -->
       <div class="button-container">
         <un-button
-          type="ghost"
+          variant="ghost"
           icon="bug"
           class="settings-button"
           @click=${() => this.modalService.open('bug')}
@@ -60,7 +60,7 @@ export class TopBar extends HTMLElement {
         </un-button>
 
         <un-button
-          type="ghost"
+          variant="ghost"
           icon="settings"
           class="settings-button"
           @click=${() => this.modalService.open('settings')}

@@ -188,7 +188,7 @@ export class InputElement extends LitElement {
           ? html`
               <un-button
                 class="clear-button"
-                type="ghost"
+                variant="ghost"
                 size=${this.size}
                 icon="close"
                 aria-label="Clear search"

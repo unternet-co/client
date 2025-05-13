@@ -78,13 +78,13 @@ export class WorkspaceSettingsModal extends ModalElement {
         </fieldset>
         <footer>
           <un-button
-            type="secondary"
+            variant="secondary"
             @click=${this.#handleCancel}
             ?disabled=${this.#saving}
             >Cancel</un-button
           >
           <un-button
-            type="primary"
+            variant="primary"
             @click=${this.#handleSave}
             .loading=${this.#saving}
             ?disabled=${!this.#newName.trim() || this.#saving}
@@ -95,7 +95,7 @@ export class WorkspaceSettingsModal extends ModalElement {
       <hr />
       <un-button
         size="small"
-        type="outline"
+        variant="outline"
         icon="delete"
         @click=${this.#handleDelete}
         >Delete Workspace</un-button

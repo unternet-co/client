@@ -153,7 +153,7 @@ function createWindow() {
 
   console.log('Dev mode: ', isDev);
   if (isDev) {
-    win.loadURL('http://localhost:5173');
+    win.loadURL('http://localhost:5173/theme');
     win.webContents.openDevTools();
   } else {
     win.loadFile(path.join(__dirname, '../../dist/www/index.html'));

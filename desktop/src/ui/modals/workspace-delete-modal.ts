@@ -57,10 +57,10 @@ export class WorkspaceDeleteModal extends ModalElement {
           <strong>${this.workspaceTitle}</strong>? This action cannot be undone.
         </p>
         <footer>
-          <un-button type="secondary" @click=${this.#handleCancel}>
+          <un-button variant="secondary" @click=${this.#handleCancel}>
             Cancel
           </un-button>
-          <un-button type="negative" @click=${this.#handleDelete}>
+          <un-button variant="negative" @click=${this.#handleDelete}>
             Delete
           </un-button>
         </footer>

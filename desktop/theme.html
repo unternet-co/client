@@ -288,9 +288,9 @@ return "Hello, World!";
           }
         </style>
         <script type="module">
-          // Attach cursor-locking behavior to all <un-button> with command="show-popover"
+          // Attach cursor-locking behavior to all <un-button> with popovertarget
           document
-            .querySelectorAll('un-button[command="show-popover"]')
+            .querySelectorAll('un-button[popovertarget]')
             .forEach((anchor) => {
               let locked = false;
               let moveHandler = null;
@@ -315,12 +315,9 @@ return "Hello, World!";
             });
         </script>
         <div style="display: flex; justify-content: space-between">
-          <un-button
-            id="anchor-id-right"
-            text="Right Popover"
-            command="show-popover"
-            commandfor="popover-id-right"
-          ></un-button>
+          <un-button id="anchor-id-right" popovertarget="popover-id-right">
+            Right Popover
+          </un-button>
           <un-popover
             id="popover-id-right"
             anchor="anchor-id-right"
@@ -330,23 +327,17 @@ return "Hello, World!";
             <p>You can put any content here.</p>
           </un-popover>
 
-          <un-button
-            id="anchor-id-top"
-            text="Top Popover"
-            command="show-popover"
-            commandfor="popover-id-top"
-          ></un-button>
+          <un-button id="anchor-id-top" popovertarget="popover-id-top">
+            Top Popover
+          </un-button>
           <un-popover id="popover-id-top" anchor="anchor-id-top" position="top">
             <strong>This is a popover!</strong>
             <p>You can put any content here.</p>
           </un-popover>
 
-          <un-button
-            id="anchor-id-bottom"
-            text="Bottom Popover"
-            command="show-popover"
-            commandfor="popover-id-bottom"
-          ></un-button>
+          <un-button id="anchor-id-bottom" popovertarget="popover-id-bottom">
+            Bottom Popover
+          </un-button>
           <un-popover
             id="popover-id-bottom"
             anchor="anchor-id-bottom"
@@ -356,12 +347,9 @@ return "Hello, World!";
             <p>You can put any content here.</p>
           </un-popover>
 
-          <un-button
-            id="anchor-id-left"
-            text="Left Popover"
-            command="show-popover"
-            commandfor="popover-id-left"
-          ></un-button>
+          <un-button id="anchor-id-left" popovertarget="popover-id-left">
+            Left Popover
+          </un-button>
           <un-popover
             id="popover-id-left"
             anchor="anchor-id-left"
@@ -682,36 +670,28 @@ return "Hello, World!";
       <div class="button-showcase">
         <div class="button-group">
           <h4>Primary</h4>
-          <un-button type="primary" text="Primary Button"></un-button>
-          <un-button type="primary" text="Disabled" disabled="true"></un-button>
+          <un-button variant="primary">Primary Button</un-button>
+          <un-button variant="primary" disabled>Disabled</un-button>
         </div>
         <div class="button-group">
           <h4>Secondary</h4>
-          <un-button type="secondary" text="Secondary Button"></un-button>
-          <un-button
-            type="secondary"
-            text="Disabled"
-            disabled="true"
-          ></un-button>
+          <un-button variant="secondary">Secondary Button</un-button>
+          <un-button variant="secondary" disabled>Disabled</un-button>
         </div>
         <div class="button-group">
           <h4>Negative</h4>
-          <un-button type="negative" text="Negative Button"></un-button>
-          <un-button
-            type="negative"
-            text="Disabled"
-            disabled="true"
-          ></un-button>
+          <un-button variant="negative">Negative Button</un-button>
+          <un-button variant="negative" disabled>Disabled</un-button>
         </div>
         <div class="button-group">
           <h4>Outline</h4>
-          <un-button type="outline" text="Outline Button"></un-button>
-          <un-button type="outline" text="Disabled" disabled="true"></un-button>
+          <un-button variant="outline">Outline Button</un-button>
+          <un-button variant="outline" disabled>Disabled</un-button>
         </div>
         <div class="button-group">
           <h4>Ghost</h4>
-          <un-button type="ghost" text="Ghost Button"></un-button>
-          <un-button type="ghost" text="Disabled" disabled="true"></un-button>
+          <un-button variant="ghost">Ghost Button</un-button>
+          <un-button variant="ghost" disabled>Disabled</un-button>
         </div>
       </div>
 
@@ -719,48 +699,24 @@ return "Hello, World!";
       <div class="button-showcase">
         <div class="button-group">
           <h4>Small</h4>
-          <un-button
-            type="primary"
-            size="small"
-            text="Small Button"
-          ></un-button>
-          <un-button
-            type="secondary"
-            size="small"
-            text="Small Button"
-          ></un-button>
-          <un-button
-            type="outline"
-            size="small"
-            text="Small Button"
-          ></un-button>
-          <un-button type="ghost" size="small" text="Small Button"></un-button>
+          <un-button variant="primary" size="small">Small Button</un-button>
+          <un-button variant="secondary" size="small">Small Button</un-button>
+          <un-button variant="outline" size="small">Small Button</un-button>
+          <un-button variant="ghost" size="small">Small Button</un-button>
         </div>
         <div class="button-group">
           <h4>Medium</h4>
-          <un-button type="primary" text="Medium Button"></un-button>
-          <un-button type="secondary" text="Medium Button"></un-button>
-          <un-button type="outline" text="Medium Button"></un-button>
-          <un-button type="ghost" text="Medium Button"></un-button>
+          <un-button variant="primary">Medium Button</un-button>
+          <un-button variant="secondary">Medium Button</un-button>
+          <un-button variant="outline">Medium Button</un-button>
+          <un-button variant="ghost">Medium Button</un-button>
         </div>
         <div class="button-group">
           <h4>Large</h4>
-          <un-button
-            type="primary"
-            size="large"
-            text="Large Button"
-          ></un-button>
-          <un-button
-            type="secondary"
-            size="large"
-            text="Large Button"
-          ></un-button>
-          <un-button
-            type="outline"
-            size="large"
-            text="Large Button"
-          ></un-button>
-          <un-button type="ghost" size="large" text="Large Button"></un-button>
+          <un-button variant="primary" size="large">Large Button</un-button>
+          <un-button variant="secondary" size="large">Large Button</un-button>
+          <un-button variant="outline" size="large">Large Button</un-button>
+          <un-button variant="ghost" size="large">Large Button</un-button>
         </div>
       </div>
 
@@ -768,26 +724,22 @@ return "Hello, World!";
       <div class="button-showcase">
         <div class="button-group">
           <h4>Loading</h4>
-          <un-button type="primary" text="Loading" loading></un-button>
-          <un-button type="secondary" text="Loading" loading></un-button>
-          <un-button type="negative" text="Loading" loading></un-button>
-          <un-button type="outline" text="Loading" loading></un-button>
+          <un-button variant="primary" loading>Primary Button</un-button>
+          <un-button variant="secondary" loading>Secondary Button</un-button>
+          <un-button variant="negative" loading>Negative Button</un-button>
+          <un-button variant="outline" loading>Outline Button</un-button>
         </div>
         <div class="button-group">
           <h4>Sizes</h4>
-          <un-button
-            type="primary"
-            size="small"
-            text="Small"
-            loading
-          ></un-button>
-          <un-button type="primary" text="Medium" loading></un-button>
-          <un-button
-            type="primary"
-            size="large"
-            text="Large"
-            loading
-          ></un-button>
+          <un-button variant="primary" size="small" loading
+            >Small Button</un-button
+          >
+          <un-button variant="primary" size="medium" loading
+            >Medium Button</un-button
+          >
+          <un-button variant="primary" size="large" loading
+            >Large Button</un-button
+          >
         </div>
       </div>
 
@@ -795,62 +747,43 @@ return "Hello, World!";
       <div class="button-showcase">
         <div class="button-group">
           <h4>Icon Start</h4>
-          <un-button type="primary" text="Add" icon="plus"></un-button>
-          <un-button type="secondary" text="Search" icon="search"></un-button>
-          <un-button type="outline" text="Settings" icon="settings"></un-button>
-          <un-button type="ghost" text="Delete" icon="delete"></un-button>
+          <un-button variant="primary" icon="plus">Add</un-button>
+          <un-button variant="secondary" icon="search">Search</un-button>
+          <un-button variant="outline" icon="settings">Settings</un-button>
+          <un-button variant="ghost" icon="delete">Delete</un-button>
         </div>
         <div class="button-group">
           <h4>Icon End</h4>
-          <un-button
-            type="primary"
-            text="Next"
-            icon="right"
-            icon-position="end"
-          ></un-button>
-          <un-button
-            type="secondary"
-            text="Download"
-            icon="download"
-            icon-position="end"
-          ></un-button>
-          <un-button
-            type="outline"
-            text="External"
-            icon="external"
-            icon-position="end"
-          ></un-button>
+          <un-button variant="primary" icon="right" icon-position="end"
+            >Next</un-button
+          >
+          <un-button variant="secondary" icon="download" icon-position="end"
+            >Download</un-button
+          >
+          <un-button variant="outline" icon="external" icon-position="end"
+            >External</un-button
+          >
         </div>
         <div class="button-group">
           <h4>Sizes with Icons</h4>
-          <un-button
-            type="primary"
-            text="Small"
-            size="small"
-            icon="plus"
-          ></un-button>
-          <un-button type="primary" text="Medium" icon="plus"></un-button>
-          <un-button
-            type="primary"
-            text="Large"
-            size="large"
-            icon="plus"
-          ></un-button>
+          <un-button variant="primary" size="small" icon="plus"
+            >Small</un-button
+          >
+          <un-button variant="primary" size="medium" icon="plus"
+            >Medium</un-button
+          >
+          <un-button variant="primary" size="large" icon="plus"
+            >Large</un-button
+          >
         </div>
         <div class="button-group">
           <h4>Loading with Icons</h4>
-          <un-button
-            type="primary"
-            text="Loading"
-            icon="refresh"
-            loading
-          ></un-button>
-          <un-button
-            type="secondary"
-            text="Loading"
-            icon="upload"
-            loading
-          ></un-button>
+          <un-button variant="primary" icon="refresh" loading
+            >Primary</un-button
+          >
+          <un-button variant="secondary" icon="upload" loading
+            >Secondary</un-button
+          >
         </div>
       </div>
     </div>
