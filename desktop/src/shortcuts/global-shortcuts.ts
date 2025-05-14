@@ -15,7 +15,7 @@ export function registerGlobalShortcuts() {
   shortcutService.register({
     keys: 'Meta+N',
     callback: () => {
-      workspaceModel.create();
+      modalService.open('new-workspace');
     },
     description: 'Create new workspace',
   });

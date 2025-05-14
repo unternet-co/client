@@ -19,7 +19,7 @@ export class WorkspaceSelector extends HTMLElement {
     const newId = e.value;
 
     if (newId === '+') {
-      this.workspaceModel.create();
+      this.modalService.open('new-workspace');
     } else if (newId === '-') {
       const target = e.target as SelectElement;
       this.modalService.open('settings');

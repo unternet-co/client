@@ -23,8 +23,10 @@ import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
 import './ui/modals/settings-modal/index';
 import './ui/app-root';
+
 import './ui/modals/bug-modal';
 import './ui/modals/workspace-delete-modal';
+import './ui/modals/new-workspace-modal';
 
 async function init() {
   /* Initialize databases & stores */
@@ -115,6 +117,10 @@ async function init() {
 
   modalService.register('workspace-delete', {
     element: 'workspace-delete-modal',
+  });
+
+  modalService.register('new-workspace', {
+    element: 'new-workspace-modal',
   });
 
   /* Register keyboard shortcuts */
