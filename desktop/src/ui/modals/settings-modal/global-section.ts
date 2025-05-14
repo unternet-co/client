@@ -61,7 +61,9 @@ export class GlobalSection extends HTMLElement {
     };
   }
 
-  #handleHintInput = () => {
+  #handleHintChange = (event: CustomEvent) => {
+    const value = event.detail?.value;
+    this.#globalHint = value;
     this.#configModel.updateGlobalHint(this.#globalHint);
   };
 
@@ -70,12 +72,23 @@ export class GlobalSection extends HTMLElement {
     this.#modelError = null;
     const selectedProvider = event.value as AIModelProviderName;
     this.#selectedProvider = selectedProvider;
-    const config = this.#configModel.get() as ConfigData;
+
+    // Always get the latest config from the model
+    let config = this.#configModel.get() as ConfigData;
     if (!config.ai.providers[selectedProvider]) {
       config.ai.providers[selectedProvider] = { apiKey: '', baseUrl: '' };
+      // Save the new provider config
+      this.#configModel.updateModelProvider(
+        selectedProvider,
+        config.ai.providers[selectedProvider]
+      );
+      // Re-fetch after update
+      config = this.#configModel.get() as ConfigData;
     }
     this.#selectedProviderConfig = config.ai.providers[selectedProvider];
+
     await this.#updateProviderModels();
+    this.render();
   };
 
   #handleModelChange = (event: ChangeEvent) => {
@@ -86,10 +99,11 @@ export class GlobalSection extends HTMLElement {
       provider: this.#selectedProvider,
       name: modelName,
     };
+    this.#configModel.updatePrimaryModel(this.#selectedModel);
     this.render();
   };
 
-  async #updateProviderModels() {
+  #updateProviderModels = async () => {
     if (!this.#selectedProvider || !this.#selectedProviderConfig) {
       this.#isLoadingModels = false;
       this.render();
@@ -128,31 +142,19 @@ export class GlobalSection extends HTMLElement {
       this.#isLoadingModels = false;
       this.render();
     }
-  }
+  };
 
   #handleProviderConfigChange = (
     field: 'apiKey' | 'baseUrl',
     value: string
   ) => {
-    this.#selectedProviderConfig[field] = value;
-  };
-
-  #handleProviderConfigBlur = () => {
+    const newConfig = { ...this.#selectedProviderConfig, [field]: value };
+    this.#configModel.updateModelProvider(this.#selectedProvider, newConfig);
+    const config = this.#configModel.get() as ConfigData;
+    this.#selectedProviderConfig = config.ai.providers[this.#selectedProvider];
     this.#updateProviderModels();
-  };
-
-  #handleSave = () => {
-    this.#configModel.updateGlobalHint(this.#globalHint);
-    this.#configModel.updateModelProvider(
-      this.#selectedProvider,
-      this.#selectedProviderConfig
-    );
-    this.#configModel.updatePrimaryModel(this.#selectedModel);
-  };
-
-  public rerender() {
     this.render();
-  }
+  };
 
   get #globalHintTemplate() {
     return html`
@@ -164,7 +166,7 @@ export class GlobalSection extends HTMLElement {
         </p>
         <un-textarea
           .value=${this.#globalHint}
-          @change=${this.#handleHintInput}
+          @change=${this.#handleHintChange}
           rows="4"
         ></un-textarea>
       </fieldset>
@@ -191,7 +193,7 @@ export class GlobalSection extends HTMLElement {
       </div>
     `;
     sections.push(providerSelection);
-    // Model base URL / API key details
+
     if (this.#selectedProvider === 'ollama') {
       const ollamaDetails = html`
         <div class="setting-row">
@@ -204,9 +206,10 @@ export class GlobalSection extends HTMLElement {
             id="base-url"
             type="url"
             .value=${this.#selectedProviderConfig.baseUrl}
-            @change=${(e: ChangeEvent) =>
-              this.#handleProviderConfigChange('baseUrl', e.value)}
-            @blur=${this.#handleProviderConfigBlur}
+            @change=${(e: ChangeEvent) => {
+              if (e.value === undefined) return;
+              this.#handleProviderConfigChange('baseUrl', e.value);
+            }}
             placeholder=${OLLAMA_BASE_URL}
           ></un-input>
         </div>
@@ -220,9 +223,10 @@ export class GlobalSection extends HTMLElement {
             id="api-key"
             type="password"
             .value=${this.#selectedProviderConfig.apiKey}
-            @change=${(e: ChangeEvent) =>
-              this.#handleProviderConfigChange('apiKey', e.value)}
-            @blur=${this.#handleProviderConfigBlur}
+            @change=${(e: ChangeEvent) => {
+              if (e.value === undefined) return;
+              this.#handleProviderConfigChange('apiKey', e.value);
+            }}
             placeholder="Enter your API key"
           ></un-input>
         </div>
