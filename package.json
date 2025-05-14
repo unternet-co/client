@@ -39,11 +39,7 @@
         "dmg",
         "zip"
       ],
-      "icon": "desktop/build/app-icons/client-icon-macOS.png",
-      "arch": [
-        "x64",
-        "arm64"
-      ]
+      "icon": "desktop/build/app-icons/client-icon-macOS.png"
     },
     "afterSign": "desktop/dist/notarize.js",
     "win": {
