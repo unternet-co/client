@@ -88,6 +88,7 @@ export class SelectElement extends HTMLElement {
     }
 
     const target = this.shadowRoot.querySelector('button');
+    if (!target) return; // Guard: don't register if button not present
 
     this.#nativeMenu.registerEvents(
       target,
