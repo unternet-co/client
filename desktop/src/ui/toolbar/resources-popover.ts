@@ -153,8 +153,9 @@ export class ResourceManagementPopover extends PopoverElement {
             variant="primary"
             @click=${this.handlePreviewResource}
             ?disabled=${!this.isValidResourceUrl}
-            >Preview</un-button
+            label="Preview"
           >
+          </un-button>
         </footer>
       </form>
     `;

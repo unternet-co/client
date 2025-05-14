@@ -70,24 +70,19 @@ export class NewWorkspaceModal extends ModalElement {
             id="ws-name"
             .value=${this.#workspaceName}
             @input=${this.#handleInput}
-            ?disabled=${this.#saving}
             autofocus
           ></un-input>
         </fieldset>
         <footer>
-          <un-button
-            variant="secondary"
-            @click=${this.close}
-            ?disabled=${this.#saving}
-            >Cancel</un-button
-          >
+          <un-button variant="secondary" @click=${this.close} label="Cancel">
+          </un-button>
           <un-button
             variant="primary"
             type="submit"
-            .loading=${this.#saving}
-            ?disabled=${!this.#workspaceName.trim() || this.#saving}
-            >Save</un-button
+            label="Save"
+            ?disabled=${!this.#workspaceName.trim()}
           >
+          </un-button>
         </footer>
       </form>
     `;
