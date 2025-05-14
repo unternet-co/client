@@ -28,6 +28,7 @@ const ATTRS_TO_UPDATE = new Set([
   'icon-position',
   'loading',
   'title',
+  'label',
   'popovertarget',
   'popovertargetaction',
 ]);
@@ -130,7 +131,20 @@ export class UnButton extends HTMLElement {
   }
 
   #render() {
-    const label = this.textContent?.trim() ?? '';
+    // Remove all text nodes from the light DOM before rendering
+    const textNodes = Array.from(this.childNodes).filter(
+      (n) => n.nodeType === Node.TEXT_NODE
+    );
+    let label = '';
+    if (textNodes.length) {
+      label = textNodes[textNodes.length - 1].textContent?.trim() ?? '';
+    }
+    textNodes.forEach((node) => this.removeChild(node));
+
+    // Fallback: if no label from text node, use label attribute
+    if (!label) {
+      label = this.getAttribute('label') ?? '';
+    }
 
     const nodesToRemove = Array.from(this.childNodes).filter((node) =>
       this.#shouldRemoveNode(node)
