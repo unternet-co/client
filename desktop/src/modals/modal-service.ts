@@ -130,7 +130,8 @@ export class ModalService {
   close(key: string): void {
     const modal = this.modals.get(key);
     if (!modal) {
-      throw new Error(`No modal found with the ID "${key}".`);
+      console.warn(`No modal found with the ID "${key}".`);
+      return;
     }
 
     modal.close();
