@@ -12,7 +12,11 @@ export class ModelSelector extends HTMLElement {
 
   connectedCallback() {
     this.#syncWithConfig();
-    this.configModel.subscribe(() => this.#syncWithConfig());
+    this.configModel.subscribe((notification) => {
+      if (notification?.type === 'model') {
+        this.#syncWithConfig();
+      }
+    });
     this.render();
   }
 
@@ -27,17 +31,18 @@ export class ModelSelector extends HTMLElement {
     const providerLabel =
       AIModelProviderNames[this.#selectedProvider] || this.#selectedProvider;
     const modelLabel = this.#selectedModel;
+    const buttonLabel = `${providerLabel ? providerLabel : ''}${
+      providerLabel && modelLabel ? '/' : ''
+    }${modelLabel ? modelLabel : 'No model'}`;
     render(
       html`
         <un-button
           variant="ghost"
           class="settings-button"
+          label=${buttonLabel}
           @click=${() =>
             this.modalService.open('settings', { section: 'global' })}
         >
-          ${providerLabel ? html`${providerLabel}` : ''}
-          ${providerLabel && modelLabel ? html`/` : ''}
-          ${modelLabel ? html`${modelLabel}` : html`No model`}
         </un-button>
       `,
       this
