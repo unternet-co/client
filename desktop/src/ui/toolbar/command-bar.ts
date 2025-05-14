@@ -34,7 +34,7 @@ export class CommandBar extends HTMLElement {
       <div class="right-section">
         <un-button
           icon="home"
-          type="ghost"
+          variant="ghost"
           @mousedown=${this.handleHome.bind(this)}
         ></un-button>
       </div>
