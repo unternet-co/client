@@ -21,10 +21,9 @@ import { NUM_CONCURRENT_PROCESSES } from './constants';
 import './ui/common/styles/global.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
-import './ui/modals/settings-modal';
+import './ui/modals/settings-modal/index';
 import './ui/app-root';
 import './ui/modals/bug-modal';
-import './ui/modals/workspace-settings-modal';
 import './ui/modals/workspace-delete-modal';
 
 async function init() {
@@ -112,10 +111,6 @@ async function init() {
 
   modalService.register('bug', {
     element: 'bug-modal',
-  });
-
-  modalService.register('workspace-settings', {
-    element: 'workspace-settings-modal',
   });
 
   modalService.register('workspace-delete', {

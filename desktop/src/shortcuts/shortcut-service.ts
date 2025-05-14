@@ -1,9 +1,24 @@
 type Shortcut = {
   keys: string; // e.g., "Meta+Shift+T"
   callback: (e: KeyboardEvent) => void;
+  description?: string; // Optional, for UI display
 };
 
 export class ShortcutService {
+  /**
+   * Returns a list of all registered shortcuts as { keys, description } objects.
+   * Note: Only the keys are available unless descriptions are added to registration.
+   */
+  public listShortcuts(): { keys: string }[] {
+    const result: { keys: string }[] = [];
+    for (const [keys, stack] of this.shortcuts.entries()) {
+      // Only show the top-most shortcut for each key combination
+      if (stack.length > 0) {
+        result.push({ keys });
+      }
+    }
+    return result;
+  }
   private shortcuts: Map<string, Shortcut[]> = new Map();
 
   constructor() {

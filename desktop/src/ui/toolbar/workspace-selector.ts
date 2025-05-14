@@ -22,7 +22,7 @@ export class WorkspaceSelector extends HTMLElement {
       this.workspaceModel.create();
     } else if (newId === '-') {
       const target = e.target as SelectElement;
-      this.modalService.open('workspace-settings');
+      this.modalService.open('settings');
       target.value = this.selectedWorkspace;
     } else if (newId && newId !== this.workspaceModel.activeWorkspaceId) {
       this.workspaceModel.activate(newId);
