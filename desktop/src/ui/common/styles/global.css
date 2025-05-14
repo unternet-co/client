@@ -69,6 +69,18 @@ hr {
   margin: var(--space-3) 0;
 }
 
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-bg-container);
+  border: 1px solid var(--color-border-default);
+  border-bottom-width: 2px;
+  border-radius: var(--rounded);
+}
+
 form {
   display: flex;
   flex-direction: column;

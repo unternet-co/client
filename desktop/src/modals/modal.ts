@@ -58,7 +58,10 @@ export class Modal {
       this.#closeCallback();
     });
 
-    this.#shortcutService.register('Escape', this.#closeCallback);
+    this.#shortcutService.register({
+      keys: 'Escape',
+      callback: this.#closeCallback,
+    });
   }
 
   closeOnBackdropClick = (event: MouseEvent) => {
@@ -72,7 +75,10 @@ export class Modal {
     this.#dialog.removeEventListener('close', this.#closeCallback);
     this.#dialog.close();
     this.#dialog.remove();
-    this.#shortcutService.deregister('Escape', this.#closeCallback);
+    this.#shortcutService.deregister({
+      keys: 'Escape',
+      callback: this.#closeCallback,
+    });
   }
 
   get template() {

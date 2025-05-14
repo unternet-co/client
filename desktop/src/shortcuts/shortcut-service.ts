@@ -1,20 +1,18 @@
 type Shortcut = {
   keys: string; // e.g., "Meta+Shift+T"
   callback: (e: KeyboardEvent) => void;
-  description?: string; // Optional, for UI display
+  description?: string; // Optional, for UI display in @shortcuts-section
 };
 
 export class ShortcutService {
   /**
-   * Returns a list of all registered shortcuts as { keys, description } objects.
-   * Note: Only the keys are available unless descriptions are added to registration.
+   * Returns a list of all registered shortcuts (top-most for each key combination).
    */
-  public listShortcuts(): { keys: string }[] {
-    const result: { keys: string }[] = [];
-    for (const [keys, stack] of this.shortcuts.entries()) {
-      // Only show the top-most shortcut for each key combination
+  public listShortcuts(): Shortcut[] {
+    const result: Shortcut[] = [];
+    for (const stack of this.shortcuts.values()) {
       if (stack.length > 0) {
-        result.push({ keys });
+        result.push(stack[stack.length - 1]); // top-most shortcut for this key
       }
     }
     return result;
@@ -27,8 +25,9 @@ export class ShortcutService {
     );
   }
 
-  register(keys: string, callback: (e: KeyboardEvent) => void): void {
-    const normalizedKeys = this.normalizeKeys(keys);
+  register(shortcut: Shortcut): void {
+    const normalizedKeys = this.normalizeKeys(shortcut.keys);
+    const shortcutWithNormalizedKeys = { ...shortcut, keys: normalizedKeys };
 
     if (!this.shortcuts.has(normalizedKeys)) {
       this.shortcuts.set(normalizedKeys, []);
@@ -37,11 +36,11 @@ export class ShortcutService {
     }
 
     const shortcutStack = this.shortcuts.get(normalizedKeys)!;
-    shortcutStack.push({ keys: normalizedKeys, callback });
+    shortcutStack.push(shortcutWithNormalizedKeys);
   }
 
-  deregister(keys: string, callback: (e: KeyboardEvent) => void): void {
-    const normalizedKeys = this.normalizeKeys(keys);
+  deregister(shortcut: Shortcut): void {
+    const normalizedKeys = this.normalizeKeys(shortcut.keys);
 
     if (!this.shortcuts.has(normalizedKeys)) {
       console.warn(`Shortcut for "${normalizedKeys}" is not registered.`);
@@ -50,7 +49,7 @@ export class ShortcutService {
 
     const shortcutStack = this.shortcuts.get(normalizedKeys)!;
     const index = shortcutStack.findIndex(
-      (shortcut) => shortcut.callback === callback
+      (s) => s.callback === shortcut.callback
     );
 
     if (index === -1) {
@@ -87,6 +86,11 @@ export class ShortcutService {
   }
 
   private normalizeKeys(keys: string): string {
+    if (typeof keys !== 'string' || !keys) {
+      throw new Error(
+        `ShortcutService.normalizeKeys: 'keys' must be a non-empty string, got: ${JSON.stringify(keys)}`
+      );
+    }
     return keys
       .split('+')
       .map((key) => key.trim().toUpperCase())
