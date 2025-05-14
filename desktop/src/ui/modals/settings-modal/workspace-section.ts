@@ -55,14 +55,10 @@ export class WorkspaceSection extends HTMLElement {
     if (!this.#workspace) return;
     const wsTitle = this.#workspace.title;
     const wsId = this.#workspace.id;
-    setTimeout(() => {
-      const modalEl = document.querySelector('workspace-delete-modal');
-      if (modalEl) {
-        modalEl.setAttribute('workspace-id', wsId);
-        modalEl.setAttribute('workspace-title', wsTitle);
-      }
-    }, 0);
-    this.#modalService.open('workspace-delete');
+    this.#modalService.open('workspace-delete', {
+      'workspace-id': wsId,
+      'workspace-title': wsTitle,
+    });
   };
 
   render() {
