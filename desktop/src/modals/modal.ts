@@ -35,13 +35,19 @@ export class Modal {
     this.#dialog.style.zIndex = String(300 + stackPosition);
   }
 
-  open(stackPosition: number) {
+  open(stackPosition: number, options?: Record<string, unknown>) {
     if (!this.#elementName) return null;
     this.#contents = document.createElement(this.#elementName) as ModalElement;
     this.configureDialog(stackPosition);
 
     render(this.template, this.#dialog);
     document.body.appendChild(this.#dialog);
+
+    this.#contents.dispatchEvent(
+      new CustomEvent('modal-open', {
+        detail: { options },
+      })
+    );
 
     if (this.#contents.options.blocking) {
       this.#dialog.showModal();

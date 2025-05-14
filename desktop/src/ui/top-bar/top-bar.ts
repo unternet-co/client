@@ -1,19 +1,15 @@
-import { DisposableGroup } from '../../common/disposable';
 import { render, html } from 'lit';
 import { dependencies } from '../../common/dependencies';
-import { WorkspaceModel } from '../../models/workspace-model';
+import './model-selector';
 import '../tab-handle';
+import '../common/select';
 import './top-bar.css';
 import { ModalService } from '../../modals/modal-service';
 import '../toolbar/workspace-selector';
 
 export class TopBar extends HTMLElement {
   modalService = dependencies.resolve<ModalService>('ModalService');
-  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
-  staticTabsContainer?: HTMLElement;
-  workspaceSelectContainer?: HTMLElement;
   settingsButtonContainer?: HTMLElement;
-  private disposables = new DisposableGroup();
 
   connectedCallback() {
     this.initializeWindowStateListeners();
@@ -46,11 +42,10 @@ export class TopBar extends HTMLElement {
   }
 
   render() {
+    // Use the new <model-selector> component
     const template = html`
-      <!-- <div class="workspace-select-container">
-        <workspace-selector></workspace-selector>
-      </div> -->
       <div class="button-container">
+        <model-selector></model-selector>
         <un-button
           variant="ghost"
           icon="bug"
@@ -58,7 +53,6 @@ export class TopBar extends HTMLElement {
           @click=${() => this.modalService.open('bug')}
         >
         </un-button>
-
         <un-button
           variant="ghost"
           icon="settings"
@@ -69,7 +63,6 @@ export class TopBar extends HTMLElement {
         <div></div>
       </div>
     `;
-
     render(template, this);
   }
 }

@@ -29,8 +29,25 @@ export class SettingsModal extends ModalElement {
   }
 
   connectedCallback() {
+    this.addEventListener('modal-open', this.#onModalOpen);
     this.render();
   }
+
+  disconnectedCallback() {
+    this.removeEventListener('modal-open', this.#onModalOpen);
+  }
+
+  #onModalOpen = (event: CustomEvent) => {
+    const options = event.detail?.options;
+    if (
+      options &&
+      typeof options.section === 'string' &&
+      SettingsModal.#sectionMap.has(options.section)
+    ) {
+      this.#section = options.section;
+      this.render();
+    }
+  };
 
   #handleMenuClick = (section: SectionKey) => {
     this.#section = section;
@@ -38,7 +55,6 @@ export class SettingsModal extends ModalElement {
   };
 
   get template() {
-    console.log('template');
     const section = SettingsModal.#sectionMap.get(this.#section);
     return html`
       <div class="settings-modal-layout">

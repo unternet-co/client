@@ -80,16 +80,16 @@ export class ModalService {
   /**
    * Opens a modal by key. Creates the modal if it doesn't exist.
    * @param key The key of the modal to open.
-   * @param attributes Optional attributes to pass to the modal.
+   * @param options Options to passed to the model's open method for eg. deep linking to a section.
    * @returns The opened modal.
    */
-  open(key: string): Modal {
+  open(key: string, options?: Record<string, unknown>): Modal {
     if (this.modals.has(key)) return this.modals.get(key)!;
     if (!this.definitions.has(key))
       throw new Error(`Modal with key "${key}" has not been registered.`);
     const definition = this.definitions.get(key)!;
     const modal = new Modal(key, definition);
-    modal.open(this.modals.size);
+    modal.open(this.modals.size, options);
     this.modals.set(key, modal);
     return modal;
   }
