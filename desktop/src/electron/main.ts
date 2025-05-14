@@ -9,7 +9,7 @@ import {
 import path from 'path';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import { registerNativeMenuHandler } from '../ui/common/menu/menu';
+import { registerNativeMenuHandler } from './menu';
 
 const isDev = !app.isPackaged;
 const AUTOUPDATE_INTERVAL = 3_600_000; // 60 * 60 * 1000
