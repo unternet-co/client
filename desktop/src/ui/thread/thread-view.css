@@ -2,7 +2,6 @@ thread-view {
   width: 100%;
   flex-grow: 1;
   overflow-y: auto;
-  padding-top: var(--space-8);
 }
 
 thread-view .message-container:last-child {
@@ -11,6 +10,7 @@ thread-view .message-container:last-child {
 
 thread-view idle-screen {
   height: 100%;
+  flex-grow: 1;
 }
 
 thread-view .message-container {
