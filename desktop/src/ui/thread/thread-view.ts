@@ -43,7 +43,6 @@ class ThreadView extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (this.isConnected && name === 'for' && oldValue !== newValue) {
-      console.log(newValue);
       this.updateWorkspace(newValue);
     }
   }
@@ -94,18 +93,27 @@ class ThreadView extends HTMLElement {
   }
 
   addMessage(message: KernelMessage) {
-    if (!this.messageContainerEl.isConnected) {
-      this.appendChild(this.messageContainerEl);
-    }
+    let currentMessageContainer;
 
     if (message.type === 'input') {
-      this.messageContainerEl = this.createMessageContainer();
-      this.appendChild(this.messageContainerEl);
+      // Create a new message container for input messages
+      currentMessageContainer = this.createMessageContainer();
+      this.appendChild(currentMessageContainer);
+    } else {
+      // Find the last message container to add to
+      const containers = this.querySelectorAll('.message-container');
+      currentMessageContainer = containers[containers.length - 1];
+
+      // If no container exists yet (shouldn't happen), create one
+      if (!currentMessageContainer) {
+        currentMessageContainer = this.createMessageContainer();
+        this.appendChild(currentMessageContainer);
+      }
     }
 
     const fragment = document.createDocumentFragment();
     render(this.messageTemplate(message), fragment);
-    this.messageContainerEl.appendChild(fragment);
+    currentMessageContainer.appendChild(fragment);
   }
 
   updateMessage(message: KernelMessage) {
@@ -119,7 +127,15 @@ class ThreadView extends HTMLElement {
 
   updateLoadingStatus(status: KernelNotification['status']) {
     if (status === 'thinking') {
-      this.messageContainerEl.appendChild(this.loadingEl);
+      // Find the last message container
+      const containers = this.querySelectorAll('.message-container');
+      const lastContainer = containers[containers.length - 1];
+
+      if (lastContainer && !this.loadingEl.isConnected) {
+        lastContainer.appendChild(this.loadingEl);
+      }
+    } else if (this.loadingEl.isConnected) {
+      this.loadingEl.remove();
     }
   }
 
@@ -130,13 +146,21 @@ class ThreadView extends HTMLElement {
 
   firstRender() {
     if (!this.workspace) return;
+
+    // Clear everything
     this.innerHTML = '';
 
+    // Remove loading indicator if it exists in the DOM
+    if (this.loadingEl.isConnected) {
+      this.loadingEl.remove();
+    }
+
+    // Add all active messages for this workspace
     for (const message of this.workspace.activeMessages) {
       this.addMessage(message);
     }
-
     this.appendChild(this.idleScreenEl);
+
     setTimeout(() => (this.scrollTop = this.scrollHeight), 0);
   }
 
