@@ -28,7 +28,18 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
 
   url = new URL(url).href;
 
-  const html = await system.fetch(url);
+  const fetchFn = (uri: string) => {
+    const [scheme] = uri.split(':', 1);
+
+    switch (scheme) {
+      case 'applet+local':
+        return fetch(uri).then((r) => r.text());
+      default:
+        return system.fetch(uri);
+    }
+  };
+
+  const html = await fetchFn(url);
   const parser = new DOMParser();
   const dom = parser.parseFromString(html, 'text/html');
   const manifestLink = dom.querySelector(
@@ -38,16 +49,17 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
   metadata.title = dom.querySelector('title')?.innerText;
 
   if (manifestLink) {
-    const baseUrl = new URL(url).origin;
+    const baseUrl = new URL(url);
     const manifestUrl = new URL(manifestLink.getAttribute('href'), baseUrl)
       .href;
-    const manifestText = await system.fetch(manifestUrl);
+    const manifestText = await fetchFn(manifestUrl);
+
     if (manifestText) {
       const manifest = JSON.parse(manifestText);
       metadata = manifest;
       if (manifest.icons) {
         metadata.icons = manifest.icons.map((icon) => {
-          icon.src = new URL(`../${icon.src}`, manifestUrl).href;
+          icon.src = new URL(icon.src, manifestUrl).href;
           return icon;
         });
       }
@@ -61,7 +73,7 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
     if (metaAppName) {
       metadata.name = metaAppName.content;
     } else {
-      const title = dom.querySelector('title')?.innerText;
+      const title = dom.querySelector('title')?.innerText ?? '';
       metadata.name = title.split(' - ')[0].split(' | ')[0];
     }
   }

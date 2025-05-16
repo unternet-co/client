@@ -3,6 +3,7 @@ import { ModalElement, ModalOptions } from '../../../modals/modal-element';
 
 import './index.css';
 
+import { appletsSectionDef } from './applets-section';
 import { workspaceSectionDef } from './workspace-section';
 import { globalSectionDef } from './global-section';
 import { shortcutsSectionDef } from './shortcuts-section';
@@ -11,6 +12,7 @@ const settingsSections = [
   workspaceSectionDef,
   globalSectionDef,
   shortcutsSectionDef,
+  appletsSectionDef,
 ] as const;
 
 type SectionKey = (typeof settingsSections)[number]['key'];

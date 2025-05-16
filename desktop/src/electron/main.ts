@@ -4,6 +4,7 @@ import log from 'electron-log';
 
 import { registerNativeMenuHandler } from './menu';
 import { setup as setupAutoUpdater } from './auto-update';
+import { setup as setupLocalApplets } from './local-applets';
 
 const isDev = !app.isPackaged;
 
@@ -54,6 +55,7 @@ function createWindow() {
     shell.openExternal(url); // Open the URL in the default system browser
     return { action: 'deny' };
   });
+
   win.webContents.on('will-navigate', (event, url) => {
     if (url !== win.webContents.getURL()) {
       event.preventDefault(); // Prevent navigation
@@ -118,32 +120,11 @@ ipcMain.handle('isFullScreen', (event) => {
 // Native menu
 registerNativeMenuHandler(ipcMain);
 
-// ipcMain.on('request-applets', async (event) => {
-//   const appletsPath = app.getPath('userData') + '/applets';
-
-//   if (!fs.existsSync(appletsPath)) {
-//     fs.mkdirSync(appletsPath, { recursive: true });
-//     console.log(`Folder created: ${appletsPath}`);
-//   }
-
-//   const filenames = await fs.readdirSync(appletsPath);
-//   const appletData = [];
-
-//   for (let filename of filenames) {
-//     const fileData = await fs.readFileSync(
-//       `${appletsPath}/${filename}`,
-//       'utf8'
-//     );
-//     appletData.push(fileData);
-//   }
-//   console.log(appletData);
-//   mainWindow.webContents.send('applets', appletData);
-// });
-
 /* === APP EVENTS === */
 
 app.on('ready', () => {
   createWindow();
+  setupLocalApplets();
   setupAutoUpdater();
 });
 
