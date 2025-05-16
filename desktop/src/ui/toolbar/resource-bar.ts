@@ -36,12 +36,11 @@ export class ResourceBar extends HTMLElement {
         ${resourceTemplate}
       </ul>
       <un-button
-        type="ghost"
+        variant="ghost"
         icon="toolbox"
         icon-position="end"
         id="resource-management-button"
-        command="toggle-popover"
-        commandfor="resource-management-popover"
+        popovertarget="resource-management-popover"
       ></un-button>
       <resource-management-popover
         id="resource-management-popover"

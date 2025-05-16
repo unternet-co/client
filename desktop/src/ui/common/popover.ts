@@ -12,7 +12,7 @@ export type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';
  * @slot - Default slot for popover content.
  *
  * Usage example:
- *   <button id="popover-button" command="toggle-popover" commandfor="my-popover">Open</button>
+ *   <button id="popover-button" popovertarget="my-popover">Open</button>
  *   <un-popover id="my-popover" anchor="popover-button" position="top"> ... </un-popover>
  */
 export class PopoverElement extends HTMLElement {
@@ -56,7 +56,7 @@ export class PopoverElement extends HTMLElement {
     };
     style.anchorName = anchorNameValue;
     (this.style as any).positionAnchor = anchorNameValue;
-    this.setAttribute('data-position', position);
+    this.setAttribute('data-position', position ?? 'top');
   }
 
   render() {

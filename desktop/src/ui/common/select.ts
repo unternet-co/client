@@ -24,7 +24,7 @@ export class SelectElement extends HTMLElement {
   #disposables = new DisposableGroup();
 
   static get observedAttributes() {
-    return ['value', 'native'];
+    return ['value', 'native', 'loading'];
   }
 
   constructor() {
@@ -63,6 +63,8 @@ export class SelectElement extends HTMLElement {
       this.#createNativeMenu();
     } else if (name === 'native' && newValue === null) {
       this.#removeNativeMenu();
+    } else if (name === 'loading' && oldValue !== newValue) {
+      this.#render();
     }
   }
 
@@ -82,12 +84,25 @@ export class SelectElement extends HTMLElement {
     return this.#options;
   }
 
+  set loading(val: boolean) {
+    if (val) {
+      this.setAttribute('loading', '');
+    } else {
+      this.removeAttribute('loading');
+    }
+    this.#render();
+  }
+  get loading(): boolean {
+    return this.hasAttribute('loading');
+  }
+
   #createNativeMenu() {
     if (!this.#nativeMenu) {
       this.#nativeMenu = new NativeMenu();
     }
 
     const target = this.shadowRoot.querySelector('button');
+    if (!target) return; // Guard: don't register if button not present
 
     this.#nativeMenu.registerEvents(
       target,

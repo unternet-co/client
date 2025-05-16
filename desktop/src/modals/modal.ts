@@ -35,13 +35,19 @@ export class Modal {
     this.#dialog.style.zIndex = String(300 + stackPosition);
   }
 
-  open(stackPosition: number) {
+  open(stackPosition: number, options?: Record<string, unknown>) {
     if (!this.#elementName) return null;
     this.#contents = document.createElement(this.#elementName) as ModalElement;
     this.configureDialog(stackPosition);
 
     render(this.template, this.#dialog);
     document.body.appendChild(this.#dialog);
+
+    this.#contents.dispatchEvent(
+      new CustomEvent('modal-open', {
+        detail: { options },
+      })
+    );
 
     if (this.#contents.options.blocking) {
       this.#dialog.showModal();
@@ -58,7 +64,10 @@ export class Modal {
       this.#closeCallback();
     });
 
-    this.#shortcutService.register('Escape', this.#closeCallback);
+    this.#shortcutService.register({
+      keys: 'Escape',
+      callback: this.#closeCallback,
+    });
   }
 
   closeOnBackdropClick = (event: MouseEvent) => {
@@ -72,7 +81,10 @@ export class Modal {
     this.#dialog.removeEventListener('close', this.#closeCallback);
     this.#dialog.close();
     this.#dialog.remove();
-    this.#shortcutService.deregister('Escape', this.#closeCallback);
+    this.#shortcutService.deregister({
+      keys: 'Escape',
+      callback: this.#closeCallback,
+    });
   }
 
   get template() {

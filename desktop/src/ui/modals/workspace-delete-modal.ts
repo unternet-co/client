@@ -5,10 +5,6 @@ import { WorkspaceModel } from '../../models/workspace-model';
 import { ModalElement, ModalOptions } from '../../modals/modal-element';
 
 export class WorkspaceDeleteModal extends ModalElement {
-  static get observedAttributes() {
-    return ['workspace-id', 'workspace-title'];
-  }
-
   workspaceId = '';
   workspaceTitle = '';
 
@@ -23,30 +19,32 @@ export class WorkspaceDeleteModal extends ModalElement {
       blocking: true,
       position: 'center',
     } as ModalOptions);
+    this.addEventListener('modal-open', this.#handleOpen);
   }
 
-  attributeChangedCallback(
-    name: string,
-    oldValue: string | null,
-    newValue: string | null
-  ) {
-    if (oldValue === newValue) return;
-    if (name === 'workspace-id') {
-      this.workspaceId = newValue || '';
-    } else if (name === 'workspace-title') {
-      this.workspaceTitle = newValue || '';
+  disconnectedCallback() {
+    this.removeEventListener('modal-open', this.#handleOpen);
+  }
+
+  #handleOpen = (e: CustomEvent) => {
+    const { options } = e.detail || {};
+    if (options['workspace-id']) {
+      this.workspaceId = options['workspace-id'];
+    }
+    if (options['workspace-title']) {
+      this.workspaceTitle = options['workspace-title'];
     }
     this.render();
-  }
+  };
 
   #handleCancel = () => {
-    this.#modalService.close('workspace-delete');
+    this.close();
   };
 
   #handleDelete = () => {
     this.#workspaceModel.delete(this.workspaceId);
-    this.#modalService.close('workspace-delete');
-    this.#modalService.close('workspace-settings');
+    this.close();
+    this.#modalService.close('settings');
   };
 
   render() {
@@ -57,10 +55,10 @@ export class WorkspaceDeleteModal extends ModalElement {
           <strong>${this.workspaceTitle}</strong>? This action cannot be undone.
         </p>
         <footer>
-          <un-button type="secondary" @click=${this.#handleCancel}>
+          <un-button variant="secondary" @click=${this.#handleCancel}>
             Cancel
           </un-button>
-          <un-button type="negative" @click=${this.#handleDelete}>
+          <un-button variant="negative" @click=${this.#handleDelete}>
             Delete
           </un-button>
         </footer>

@@ -12,8 +12,12 @@ export function registerGlobalShortcuts() {
   const modalService = dependencies.resolve<ModalService>('ModalService');
   const workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
 
-  shortcutService.register('Meta+N', () => {
-    workspaceModel.create();
+  shortcutService.register({
+    keys: 'Meta+N',
+    callback: () => {
+      modalService.open('new-workspace');
+    },
+    description: 'Create new workspace',
   });
 
   // shortcutService.register('Meta+Shift+]', () => {
@@ -25,30 +29,36 @@ export function registerGlobalShortcuts() {
   // });
 
   // Ctrl+, or Meta+, to open settings
-  shortcutService.register('Meta+,', () => {
-    modalService.open('settings');
+  shortcutService.register({
+    keys: 'Meta+,',
+    callback: () => {
+      modalService.open('settings');
+    },
+    description: 'Open settings',
   });
 
-  shortcutService.register('Ctrl+,', () => {
-    modalService.open('settings');
-  });
-
-  shortcutService.register('Meta+Shift+,', () => {
-    modalService.open('workspace-settings');
-  });
-
-  shortcutService.register('Ctrl+Shift+,', () => {
-    modalService.open('workspace-settings');
+  shortcutService.register({
+    keys: 'Ctrl+,',
+    callback: () => {
+      modalService.open('settings');
+    },
+    description: 'Open settings',
   });
 
   // Meta+K: Archive messages up to the most recent message in the active workspace
-  shortcutService.register('Meta+K', () => {
-    workspaceModel.setArchivedMessageId();
-    workspaceModel.setArchiveVisibility(false);
+  shortcutService.register({
+    keys: 'Meta+K',
+    callback: () => {
+      workspaceModel.archiveMessages();
+    },
+    description: 'Archive messages in active workspace',
   });
 
-  shortcutService.register('Meta+Shift+L', () => {
-    workspaceModel.setArchivedMessageId();
-    workspaceModel.setArchiveVisibility(false);
+  shortcutService.register({
+    keys: 'Meta+Shift+L',
+    callback: () => {
+      workspaceModel.archiveMessages();
+    },
+    description: 'Archive messages in active workspace',
   });
 }

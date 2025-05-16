@@ -47,6 +47,7 @@ export class ComboboxElement extends LitElement {
   visible: boolean = false;
   private shortcutService =
     dependencies.resolve<ShortcutService>('ShortcutService');
+  // Note: All register/deregister calls now use the Shortcut object format.
   private selectedValue: string | null = null;
   private filteredOptions: { label: string; value: string }[] = [];
 
@@ -120,19 +121,49 @@ export class ComboboxElement extends LitElement {
   }
 
   registerShortcuts() {
-    this.shortcutService.register('ArrowDown', this.selectNextOption);
-    this.shortcutService.register('ArrowUp', this.selectPrevOption);
-    this.shortcutService.register('Enter', this.selectOption);
-    this.shortcutService.register('Tab', this.selectOption);
-    this.shortcutService.register('Escape', this.closeOptions);
+    this.shortcutService.register({
+      keys: 'ArrowDown',
+      callback: this.selectNextOption.bind(this),
+    });
+    this.shortcutService.register({
+      keys: 'ArrowUp',
+      callback: this.selectPrevOption.bind(this),
+    });
+    this.shortcutService.register({
+      keys: 'Enter',
+      callback: this.selectOption.bind(this),
+    });
+    this.shortcutService.register({
+      keys: 'Tab',
+      callback: this.selectOption.bind(this),
+    });
+    this.shortcutService.register({
+      keys: 'Escape',
+      callback: this.closeOptions.bind(this),
+    });
   }
 
   deregisterShortcuts() {
-    this.shortcutService.deregister('ArrowDown', this.selectNextOption);
-    this.shortcutService.deregister('ArrowUp', this.selectPrevOption);
-    this.shortcutService.deregister('Enter', this.selectOption);
-    this.shortcutService.deregister('Tab', this.selectOption);
-    this.shortcutService.deregister('Escape', this.closeOptions);
+    this.shortcutService.deregister({
+      keys: 'ArrowDown',
+      callback: this.selectNextOption.bind(this),
+    });
+    this.shortcutService.deregister({
+      keys: 'ArrowUp',
+      callback: this.selectPrevOption.bind(this),
+    });
+    this.shortcutService.deregister({
+      keys: 'Enter',
+      callback: this.selectOption.bind(this),
+    });
+    this.shortcutService.deregister({
+      keys: 'Tab',
+      callback: this.selectOption.bind(this),
+    });
+    this.shortcutService.deregister({
+      keys: 'Escape',
+      callback: this.closeOptions.bind(this),
+    });
   }
 
   shouldHighlight(value: string, index: number) {

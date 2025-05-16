@@ -4,7 +4,7 @@ import '../ui/common/icons/icon';
 
 export interface ModalOptions {
   title?: string;
-  size?: 'full' | 'auto';
+  size?: 'full' | 'full-height' | 'auto';
   padding?: 'none' | 'auto';
   blocking?: boolean;
   position?: 'right' | 'left' | 'bottom' | 'top' | 'center' | 'full';
@@ -33,7 +33,7 @@ export class ModalElement extends HTMLElement {
       <header class="modal-header">
         <span id="modal-title">${title ?? this.options.title}</span>
         <un-button
-          type="ghost"
+          variant="ghost"
           icon="close"
           aria-label="Close"
           @click="${this.close}"

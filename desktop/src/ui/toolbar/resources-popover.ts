@@ -97,7 +97,7 @@ export class ResourceManagementPopover extends PopoverElement {
                 <span class="resource-name"> ${resource.name} </span>
                 <un-button
                   icon="delete"
-                  type="ghost"
+                  variant="ghost"
                   aria-label="Remove Resource"
                   title="Remove Resource"
                   @click=${() => this.handleRemove(resource.uri)}
@@ -117,6 +117,7 @@ export class ResourceManagementPopover extends PopoverElement {
           <un-button
             icon="plus"
             id="resource-management-button"
+            variant="primary"
             @click="${() => this.goToView('add')}"
             >Add</un-button
           >
@@ -145,15 +146,16 @@ export class ResourceManagementPopover extends PopoverElement {
           </p>
         </fieldset>
         <footer>
-          <un-button type="secondary" @click=${() => this.goToView('list')}
+          <un-button variant="secondary" @click=${() => this.goToView('list')}
             >Cancel</un-button
           >
           <un-button
-            type="primary"
+            variant="primary"
             @click=${this.handlePreviewResource}
             ?disabled=${!this.isValidResourceUrl}
-            >Preview</un-button
+            label="Preview"
           >
+          </un-button>
         </footer>
       </form>
     `;
@@ -228,10 +230,10 @@ export class ResourceManagementPopover extends PopoverElement {
             : ''}
         </div>
         <footer class="applet-card-footer">
-          <un-button type="secondary" @click=${() => this.goToView('add')}
+          <un-button variant="secondary" @click=${() => this.goToView('add')}
             >Back</un-button
           >
-          <un-button type="primary" @click=${this.handleAddResource}
+          <un-button variant="primary" @click=${this.handleAddResource}
             >Add Resource</un-button
           >
         </footer>

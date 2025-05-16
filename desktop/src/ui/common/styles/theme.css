@@ -444,5 +444,7 @@
 
     /* highlight */
     --glow-color: color-mix(in srgb, var(--color-grey-0) 10%, transparent 100%);
+
+    --color-overlay: #111112;
   }
 }
