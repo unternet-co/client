@@ -11,6 +11,19 @@ if (import.meta.env.APP_UNTERNET_API_KEY) {
   initialResources.push(webResource);
 }
 
+// TODO: Load local resources (applet+local://APPLET_NAME/)
+initialResources.push(
+  resource({
+    uri: 'applet+local://back-to-the-future',
+    name: 'Back to the future',
+    actions: {
+      goToFuture: {
+        description: 'Go to the future',
+      },
+    },
+  })
+);
+
 interface ResourceModelInit {
   initialResources: Array<Resource>;
   resourceDatabaseService: DatabaseService<string, Resource>;
