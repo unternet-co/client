@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "rimraf dist && tsc",
-    "dev": "chokidar 'src/**/*' -c 'npm run build'",
+    "dev": "npm run build && chokidar 'src/**/*' -c 'npm run build'",
     "docs": "typedoc",
     "example": "cd example && npx tsx src/index.ts",
     "test": "vitest --root tests --watch=false",
