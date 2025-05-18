@@ -12,7 +12,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+          - os: windows-latest
+          - os: macos-13 # Intel/x64 runner
+            mac_arch: x64
+          - os: macos-14 # Apple Silicon/arm64 runner
+            mac_arch: arm64
 
     steps:
       - name: Install dependencies (Ubuntu)
@@ -35,21 +41,21 @@ jobs:
           npm install
 
       - name: Build and release (macOS)
-        if: matrix.os == 'macos-latest'
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: true
-          mac_certs: ${{ secrets.mac_certs }}
-          mac_certs_password: ${{ secrets.mac_certs_password }}
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          npm run build
+          npx electron-builder --mac --${{ matrix.mac_arch }} --publish always
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.mac_certs }}
+          CSC_KEY_PASSWORD: ${{ secrets.mac_certs_password }}
           APPLE_ID: ${{ secrets.apple_id }}
           APPLE_TEAM_ID: ${{ secrets.apple_team_id }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APP_UNTERNET_API_KEY: ${{ secrets.APP_UNTERNET_API_KEY }}
 
       - name: Build and release (Windows/Linux)
-        if: matrix.os != 'macos-latest'
+        if: matrix.os != 'macos-13' && matrix.os != 'macos-14'
         uses: samuelmeuli/action-electron-builder@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
