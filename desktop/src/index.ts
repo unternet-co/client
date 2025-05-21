@@ -7,7 +7,7 @@ import { KeyStoreService } from './storage/keystore-service';
 import { ShortcutService } from './shortcuts/shortcut-service';
 import { appendEl, createEl } from './common/utils/dom';
 import { registerGlobalShortcuts } from './shortcuts/global-shortcuts';
-import { ModalService } from './modals/modal-service';
+import { ModalService } from './ui/common/modals/modal-service';
 import { ConfigData, ConfigModel, initConfig } from './models/config-model';
 import { Kernel } from './ai/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';

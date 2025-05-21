@@ -7,7 +7,7 @@ import { html, render } from 'lit';
 import { WorkspaceRecord, WorkspaceModel } from '../models/workspace-model';
 import { Kernel, KernelNotInitializedError } from '../ai/kernel';
 import { dependencies } from '../common/dependencies';
-import { ModalService } from '../modals/modal-service';
+import { ModalService } from '../ui/common/modals/modal-service';
 import { ResourceModel } from '../models/resource-model';
 
 export class WorkspaceView extends HTMLElement {

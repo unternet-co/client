@@ -10,7 +10,7 @@ process-frame {
 process-frame .process-header {
   display: flex;
   gap: var(--space-4);
-  padding: var(--space-2) var(--space-5);
+  padding: var(--space-3) var(--space-5);
   align-items: center;
   font-weight: 500;
   font-size: var(--text-sm);

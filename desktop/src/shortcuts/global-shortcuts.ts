@@ -1,6 +1,6 @@
 import { dependencies } from '../common/dependencies';
 import { TabModel } from '../deprecated/tabs';
-import { ModalService } from '../modals/modal-service';
+import { ModalService } from '../ui/common/modals/modal-service';
 import { ShortcutService } from './shortcut-service';
 
 import { WorkspaceModel } from '../models/workspace-model';

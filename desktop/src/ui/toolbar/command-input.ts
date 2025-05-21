@@ -160,10 +160,9 @@ export class CommandInputElement extends HTMLElement {
       width: var(--command-target-width, 46ch);
       max-width: 100%;
       margin: 0 auto;
-      outline: 1px solid var(--color-border);
       background: var(--color-neutral-200);
       border-radius: var(--rounded);
-      padding: var(--space-1) var(--space-4);
+      padding: 3px var(--space-4);
       text-align: center;
       font-size: var(--text-base);
       transition: opacity 0.2s ease;

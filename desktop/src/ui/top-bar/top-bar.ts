@@ -4,7 +4,7 @@ import './model-selector';
 import '../tab-handle';
 import '../common/select';
 import './top-bar.css';
-import { ModalService } from '../../modals/modal-service';
+import { ModalService } from '../common/modals/modal-service';
 import '../toolbar/workspace-selector';
 
 export class TopBar extends HTMLElement {

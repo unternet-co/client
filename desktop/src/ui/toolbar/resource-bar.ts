@@ -3,7 +3,7 @@ import './resources-popover';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
 import { ResourceModel } from '../../models/resource-model';
-import { ModalService } from '../../modals/modal-service';
+import { ModalService } from '../common/modals/modal-service';
 import { enabledResources } from '../../common/utils/resources';
 import { WorkspaceModel } from '../../models/workspace-model';
 
@@ -39,6 +39,11 @@ export class ResourceBar extends HTMLElement {
       <ul class="resources-list">
         ${resourceTemplate}
       </ul>
+      <resource-management-popover
+        id="resource-management-popover"
+        anchor="resource-management-button"
+        position="top"
+      ></resource-management-popover>
       <un-button
         variant="ghost"
         icon="toolbox"
@@ -46,11 +51,6 @@ export class ResourceBar extends HTMLElement {
         id="resource-management-button"
         popovertarget="resource-management-popover"
       ></un-button>
-      <resource-management-popover
-        id="resource-management-popover"
-        anchor="resource-management-button"
-        position="top"
-      ></resource-management-popover>
     `;
 
     render(template, this);

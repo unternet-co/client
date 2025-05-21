@@ -102,7 +102,7 @@ function createWindow() {
     ...(process.platform === 'darwin'
       ? {
           titleBarStyle: 'hidden',
-          trafficLightPosition: { x: 12, y: 9 },
+          trafficLightPosition: { x: 12, y: 7 },
         }
       : {}),
   });
@@ -148,6 +148,8 @@ function createWindow() {
   win.on('leave-full-screen', () => {
     win.webContents.send('window:leave-fullscreen');
   });
+
+  // win.setWindowButtonVisibility(false);
 
   /* Load web content */
 

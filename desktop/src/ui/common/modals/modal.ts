@@ -1,7 +1,7 @@
 import { html, render } from 'lit';
 import { ModalDefinition, ModalService } from './modal-service';
-import { dependencies } from '../common/dependencies';
-import { ShortcutService } from '../shortcuts/shortcut-service';
+import { dependencies } from '../../../common/dependencies';
+import { ShortcutService } from '../../../shortcuts/shortcut-service';
 import './modal.css';
 import { ModalElement } from './modal-element';
 

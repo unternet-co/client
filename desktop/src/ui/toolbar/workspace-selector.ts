@@ -1,7 +1,7 @@
 import { html, render } from 'lit';
 import { dependencies } from '../../common/dependencies';
 import { WorkspaceModel } from '../../models/workspace-model';
-import { ModalService } from '../../modals/modal-service';
+import { ModalService } from '../common/modals/modal-service';
 import { ChangeEvent, SelectElement } from '../common/select';
 import { attachContextMenu } from '../common/context-menu';
 import './workspace-selector.css';

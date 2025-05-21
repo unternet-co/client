@@ -1,5 +1,5 @@
 import { html, render } from 'lit';
-import { ModalElement, ModalOptions } from '../../../modals/modal-element';
+import { ModalElement, ModalOptions } from '../../common/modals/modal-element';
 
 import './index.css';
 

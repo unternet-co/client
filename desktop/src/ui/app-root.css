@@ -22,7 +22,7 @@ app-root .workspace-content {
   overflow: hidden;
 }
 
-app-root .toolbar {
+.toolbar {
   position: relative;
   background: var(--color-bg-chrome);
   border-top: 1px solid var(--color-border);

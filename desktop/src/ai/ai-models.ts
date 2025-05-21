@@ -1,6 +1,4 @@
 import { LanguageModel } from '@unternet/kernel';
-import { OpenAIModelProvider } from './providers/openai';
-import { OllamaModelProvider } from './providers/ollama';
 
 export interface ConfigValidationResult {
   valid: boolean;

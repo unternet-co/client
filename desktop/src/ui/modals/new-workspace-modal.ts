@@ -1,5 +1,5 @@
 import { html, render, TemplateResult } from 'lit';
-import { ModalElement, ModalOptions } from '../../modals/modal-element';
+import { ModalElement, ModalOptions } from '../common/modals/modal-element';
 import { dependencies } from '../../common/dependencies';
 import { WorkspaceModel } from '../../models/workspace-model';
 import '../common/input';

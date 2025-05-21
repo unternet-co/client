@@ -3,7 +3,7 @@ resource-bar {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--space-4) var(--space-2) var(--space-4);
+  padding: 0 var(--space-4) var(--space-3) var(--space-5);
   justify-content: space-between;
 }
 
@@ -11,7 +11,7 @@ ul.resources-list {
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex-grow: 1;
   padding: 0;
   overflow-x: hidden;
@@ -24,17 +24,17 @@ resource-bar .add-applet-container {
 
 resource-bar .applet-item {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   align-items: center;
   flex-shrink: 0;
 }
 
 resource-bar .applet-icon {
-  width: 16px;
+  width: 13px;
 }
 
 resource-bar .applet-name {
   display: block;
-  font-weight: 500;
-  font-size: 12px;
+  /* font-weight: 400; */
+  font-size: 11.5px;
 }

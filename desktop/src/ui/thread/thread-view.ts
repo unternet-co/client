@@ -34,7 +34,7 @@ class ThreadView extends HTMLElement {
   private kernel = dependencies.resolve<Kernel>('Kernel');
   private messageContainerEl: HTMLDivElement;
   private idleScreenEl: IdleScreenElement;
-  private loadingEl: HTMLElement;
+  private loadingEl: Element;
   private messageListEl: HTMLDivElement;
 
   static get observedAttributes() {
@@ -50,9 +50,15 @@ class ThreadView extends HTMLElement {
   connectedCallback() {
     this.messageContainerEl = this.createMessageContainer();
     this.idleScreenEl = createEl('idle-screen');
-    this.loadingEl = declareEl(
-      html`<un-icon name="loading" spin class="loading"></un-icon>`
+
+    // Create the loading element as a real DOM element
+    const loadingTemp = document.createElement('div');
+    loadingTemp.className = 'loading-container';
+    render(
+      html`<un-icon name="loading" spin class="loading"></un-icon>`,
+      loadingTemp
     );
+    this.loadingEl = loadingTemp.firstElementChild;
 
     this.kernelSub = this.kernel.subscribe((notification) => {
       if (notification.status) this.updateLoadingStatus(notification.status);
@@ -124,19 +130,40 @@ class ThreadView extends HTMLElement {
 
     messageEl.replaceWith(...fragment.childNodes);
   }
-
   updateLoadingStatus(status: KernelNotification['status']) {
+    console.log('Status changed:', status); // Debug log
+
     if (status === 'thinking') {
       // Find the last message container
       const containers = this.querySelectorAll('.message-container');
       const lastContainer = containers[containers.length - 1];
 
       if (lastContainer && !this.loadingEl.isConnected) {
+        console.log('Adding loading indicator'); // Debug log
+
+        // Check if the loading element is properly constructed
+        if (!(this.loadingEl instanceof Element)) {
+          console.log('Recreating loading element'); // Debug log
+          // Recreate the loading element if needed
+          const loadingTemp = document.createElement('div');
+          loadingTemp.className = 'loading-container';
+          render(
+            html`<un-icon name="loading" spin class="loading"></un-icon>`,
+            loadingTemp
+          );
+          this.loadingEl = loadingTemp.firstElementChild;
+        }
+
+        // Always append directly to the last container for visibility
         lastContainer.appendChild(this.loadingEl);
+        console.log('Loading indicator added to DOM'); // Debug log
       }
     } else if (this.loadingEl.isConnected) {
+      console.log('Removing loading indicator'); // Debug log
       this.loadingEl.remove();
     }
+
+    this.status = status;
   }
 
   disconnectedCallback() {
