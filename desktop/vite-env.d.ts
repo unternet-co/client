@@ -1,7 +1,12 @@
 /// <reference types="vite/client" />
 
+import { Resource } from '@unternet/kernel';
+
 interface System {
   fetch: (url: string) => Promise<string>;
+  listLocalApplets: () => Promise<Array<string>>;
+  localAppletsDirectory: () => Promise<string>;
+  openLocalAppletsDirectory: () => Promise<void>;
 }
 
 declare global {

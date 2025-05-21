@@ -2,6 +2,9 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('system', {
   fetch: (url: string) => ipcRenderer.invoke('fetch', url),
+  listLocalApplets: () => ipcRenderer.invoke('list-local-applets'),
+  localAppletsDirectory: () => ipcRenderer.invoke('local-applets-dir'),
+  openLocalAppletsDirectory: () => ipcRenderer.invoke('open-local-applets-dir'),
 });
 
 // Expose simplified electron API for window state

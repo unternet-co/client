@@ -1,81 +1,18 @@
-import {
-  app,
-  BrowserWindow,
-  shell,
-  ipcMain,
-  dialog,
-  MessageBoxOptions,
-} from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import path from 'path';
 import log from 'electron-log';
-import { autoUpdater } from 'electron-updater';
+
 import { registerNativeMenuHandler } from './menu';
+import { setup as setupAutoUpdater } from './auto-update';
+import { setup as setupLocalApplets } from './local-applets';
 
 const isDev = !app.isPackaged;
-const AUTOUPDATE_INTERVAL = 3_600_000; // 60 * 60 * 1000
 
-// Configure logging
+/* === LOGGING === */
+
 log.transports.file.level = isDev ? 'debug' : 'info';
-autoUpdater.logger = log;
 
-function formatReleaseNotes(
-  notes: string | { note: string }[] | undefined
-): string {
-  if (typeof notes === 'string') return notes;
-  if (Array.isArray(notes)) return notes.map((n) => n.note).join('\n\n');
-  return '';
-}
-
-// Configure auto-updater
-function setupAutoUpdater() {
-  if (isDev) {
-    return;
-  }
-
-  autoUpdater.setFeedURL({
-    provider: 'github',
-    owner: 'unternet-co',
-    repo: 'client',
-  });
-
-  // Check for updates
-  autoUpdater.on('update-downloaded', (info) => {
-    const releaseNotes =
-      typeof info.releaseNotes === 'string'
-        ? info.releaseNotes
-        : Array.isArray(info.releaseNotes)
-          ? info.releaseNotes.map((note) => note.note).join('\n\n')
-          : '';
-
-    const dialogOpts: MessageBoxOptions = {
-      type: 'info',
-      buttons: ['Restart', 'Later'],
-      title: 'Application Update',
-      message: process.platform === 'win32' ? releaseNotes : info.releaseName,
-      detail:
-        'A new version has been downloaded. Restart the application to apply the updates.',
-    };
-
-    dialog.showMessageBox(dialogOpts).then((returnValue) => {
-      if (returnValue.response === 0) autoUpdater.quitAndInstall();
-    });
-  });
-
-  autoUpdater.on('error', (error) => {
-    log.error('Error in auto-updater:', error);
-  });
-
-  // Store the interval ID so we can clear it if needed
-  let autoUpdateIntervalId: NodeJS.Timeout | null = null;
-
-  // Check for updates every hour
-  autoUpdateIntervalId = setInterval(() => {
-    autoUpdater.checkForUpdates();
-  }, AUTOUPDATE_INTERVAL);
-
-  // Initial check
-  autoUpdater.checkForUpdates();
-}
+/* === WINDOW === */
 
 function createWindow() {
   /* Create the browser window. */
@@ -118,6 +55,7 @@ function createWindow() {
     shell.openExternal(url); // Open the URL in the default system browser
     return { action: 'deny' };
   });
+
   win.webContents.on('will-navigate', (event, url) => {
     if (url !== win.webContents.getURL()) {
       event.preventDefault(); // Prevent navigation
@@ -160,6 +98,8 @@ function createWindow() {
   }
 }
 
+/* === IPC MISC === */
+
 ipcMain.handle('fetch', async (event, url) => {
   try {
     const response = await fetch(url);
@@ -177,32 +117,14 @@ ipcMain.handle('isFullScreen', (event) => {
   return win ? win.isFullScreen() : false;
 });
 
+// Native menu
 registerNativeMenuHandler(ipcMain);
 
-// ipcMain.on('request-applets', async (event) => {
-//   const appletsPath = app.getPath('userData') + '/applets';
-
-//   if (!fs.existsSync(appletsPath)) {
-//     fs.mkdirSync(appletsPath, { recursive: true });
-//     console.log(`Folder created: ${appletsPath}`);
-//   }
-
-//   const filenames = await fs.readdirSync(appletsPath);
-//   const appletData = [];
-
-//   for (let filename of filenames) {
-//     const fileData = await fs.readFileSync(
-//       `${appletsPath}/${filename}`,
-//       'utf8'
-//     );
-//     appletData.push(fileData);
-//   }
-//   console.log(appletData);
-//   mainWindow.webContents.send('applets', appletData);
-// });
+/* === APP EVENTS === */
 
 app.on('ready', () => {
   createWindow();
+  setupLocalApplets();
   setupAutoUpdater();
 });
 
