@@ -2,10 +2,10 @@ import { html, render } from 'lit';
 import './resources-popover';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../models/resource-model';
+import { ResourceModel } from '../../resources/resource-service';
 import { ModalService } from '../common/modals/modal-service';
 import { enabledResources } from '../../common/utils/resources';
-import { WorkspaceModel } from '../../models/workspace-model';
+import { WorkspaceModel } from '../../deprecated/workspace-service';
 
 export class ResourceBar extends HTMLElement {
   resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');

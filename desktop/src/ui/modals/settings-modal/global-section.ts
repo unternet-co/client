@@ -1,13 +1,13 @@
 import { html, render, TemplateResult } from 'lit';
 import { dependencies } from '../../../common/dependencies';
-import { ConfigModel, ConfigData } from '../../../models/config-model';
+import { ConfigModel, ConfigData } from '../../../config/config-service';
 import {
   AIModelDescriptor,
   AIModelProviderConfig,
   AIModelProviderName,
   AIModelService,
   AIModelProviderNames,
-} from '../../../ai/ai-models';
+} from '../../../ai/models';
 import { OLLAMA_BASE_URL } from '../../../ai/providers/ollama';
 import '../../common/textarea';
 import '../../common/select';

@@ -1,6 +1,5 @@
 import { initTabStoreData, TabModel, TabStoreData } from './deprecated/tabs';
-import { MessageRecord } from './models/message-model';
-import { WorkspaceRecord, WorkspaceModel } from './models/workspace-model';
+import { MessageRecord } from './messages/types';
 import { dependencies } from './common/dependencies';
 import { DatabaseService } from './storage/database-service';
 import { KeyStoreService } from './storage/keystore-service';
@@ -8,13 +7,10 @@ import { ShortcutService } from './shortcuts/shortcut-service';
 import { appendEl, createEl } from './common/utils/dom';
 import { registerGlobalShortcuts } from './shortcuts/global-shortcuts';
 import { ModalService } from './ui/common/modals/modal-service';
-import { ConfigData, ConfigModel, initConfig } from './models/config-model';
-import { Kernel } from './ai/kernel';
+import { Kernel } from './kernel/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
-import { AIModelService } from './ai/ai-models';
-import { ResourceModel, initialResources } from './models/resource-model';
-import { ProcessModel, ProcessRecord } from './models/process-model';
+import { AIModelService } from './ai/models';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols';
 import { NUM_CONCURRENT_PROCESSES } from './constants';
@@ -27,6 +23,11 @@ import './ui/app-root';
 import './ui/modals/bug-modal';
 import './ui/modals/workspace-delete-modal';
 import './ui/modals/new-workspace-modal';
+import { WorkspaceRecord } from './workspaces/types';
+import { ProcessRecord, ProcessService } from './processes/process-service';
+import { ConfigData, ConfigService, initConfig } from './config/config-service';
+import { WorkspaceService } from './workspaces/workspace-service';
+import { MessageService } from './messages/message-service';
 
 async function init() {
   /* Initialize databases & stores */
@@ -34,15 +35,15 @@ async function init() {
   const workspaceDatabaseService = new DatabaseService<string, WorkspaceRecord>(
     'workspaces'
   );
-  const processDatabaseService = new DatabaseService<string, ProcessRecord>(
-    'processes'
-  );
+  // const processDatabaseService = new DatabaseService<string, ProcessRecord>(
+  //   'processes'
+  // );
   const messageDatabaseService = new DatabaseService<string, MessageRecord>(
     'messages'
   );
-  const resourceDatabaseService = new DatabaseService<string, Resource>(
-    'resources'
-  );
+  // const resourceDatabaseService = new DatabaseService<string, Resource>(
+  //   'resources'
+  // );
   const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
   /* Initialize model dependencies */
@@ -53,29 +54,30 @@ async function init() {
 
   /* Initialize models */
 
-  const processModel = new ProcessModel(processDatabaseService, runtime);
-  await processModel.load();
-  dependencies.registerSingleton('ProcessModel', ProcessModel);
+  // const processService = new ProcessService(processDatabaseService, runtime);
+  // await processService.load();
+  // dependencies.registerSingleton('ProcessService', processService);
 
-  const configModel = new ConfigModel(configStore);
-  await configModel.load();
-  dependencies.registerSingleton('ConfigModel', configModel);
+  const configService = new ConfigService(configStore);
+  await configService.load();
+  dependencies.registerSingleton('ConfigService', configService);
 
-  const workspaceModel = new WorkspaceModel(
+  const messageService = new MessageService(messageDatabaseService);
+
+  const workspaceService = new WorkspaceService(
     workspaceDatabaseService,
-    messageDatabaseService,
-    processModel,
-    configModel
+    messageService,
+    configService
   );
-  await workspaceModel.load();
-  dependencies.registerSingleton('WorkspaceModel', workspaceModel);
+  await workspaceService.load();
+  dependencies.registerSingleton('WorkspaceService', workspaceService);
 
-  const resourceModel = new ResourceModel({
-    resourceDatabaseService,
-    initialResources,
-  });
-  await resourceModel.load();
-  dependencies.registerSingleton('ResourceModel', resourceModel);
+  // const resourceModel = new ResourceModel({
+  //   resourceDatabaseService,
+  //   initialResources,
+  // });
+  // await resourceModel.load();
+  // dependencies.registerSingleton('ResourceModel', resourceModel);
 
   /* Initialize kernel & LLMs */
 
@@ -87,14 +89,13 @@ async function init() {
   });
   dependencies.registerSingleton('AIModelService', aiModelService);
 
-  const kernel = new Kernel({
-    workspaceModel,
-    configModel,
+  const kernel = new Kernel(
+    workspaceService,
+    messageService,
+    configService,
     aiModelService,
-    resourceModel,
-    runtime,
-    processModel,
-  });
+    runtime
+  );
   dependencies.registerSingleton('Kernel', kernel);
 
   /* Initialize other services */
@@ -132,7 +133,7 @@ async function init() {
   appendEl(document.body, createEl('app-root'));
 
   // Open settings if no model defined
-  const config = configModel.get();
+  const config = configService.get();
   if (
     !config.ai.primaryModel ||
     !config.ai.primaryModel.provider ||

@@ -1,7 +1,6 @@
 import { html, render, TemplateResult } from 'lit';
 import { ModalElement, ModalOptions } from '../common/modals/modal-element';
 import { dependencies } from '../../common/dependencies';
-import { WorkspaceModel } from '../../models/workspace-model';
 import '../common/input';
 import '../common/button';
 import '../common/label';

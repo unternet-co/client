@@ -32,11 +32,11 @@ export class CommandBar extends HTMLElement {
         <command-input for=${workspaceId}></command-input>
       </div>
       <div class="right-section">
-        <un-button
+        <!-- <un-button
           icon="home"
           variant="ghost"
           @mousedown=${this.handleHome.bind(this)}
-        ></un-button>
+        ></un-button> -->
       </div>
     `;
 

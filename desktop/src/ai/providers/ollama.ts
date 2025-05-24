@@ -3,7 +3,7 @@ import {
   AIModelProvider,
   AIModelProviderConfig,
   ConfigValidationResult,
-} from '../ai-models';
+} from '../models';
 import { createOllama } from 'ollama-ai-provider';
 
 export const OLLAMA_BASE_URL = 'http://localhost:11434/api';

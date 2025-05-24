@@ -5,7 +5,7 @@ import {
   WorkspaceRecord,
   WorkspaceModel,
   WorkspaceNotification,
-} from '../models/workspace-model';
+} from './workspace-service';
 
 export interface Tab {
   type: 'page' | 'workspace';

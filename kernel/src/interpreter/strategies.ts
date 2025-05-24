@@ -39,7 +39,7 @@ defaultStrategies.RESEARCH = {
     // Get all actions, then execute them
     const actionResponses = await interpreter.generateActionResponses(
       messages,
-      { display: 'snippet' }
+      { display: 'hidden' }
     );
     for (const response of actionResponses) {
       messages = yield response;
@@ -58,7 +58,7 @@ defaultStrategies.DISPLAY = {
   ) {
     // Get all actions, then execute them
     yield await interpreter.generateActionResponse(messages, {
-      display: 'inline',
+      display: 'standalone',
     });
   },
 };

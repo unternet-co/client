@@ -1,17 +1,13 @@
 top-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   height: 32px;
   z-index: 1;
   display: flex;
   flex-shrink: 0;
   -webkit-app-region: drag;
   overflow: visible;
-  border-bottom: 1px solid var(--color-border);
+  /* border-bottom: 1px solid var(--color-border);
   background: color-mix(in srgb, var(--color-bg-chrome) 50%, transparent);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px); */
 }
 
 top-bar.mac {

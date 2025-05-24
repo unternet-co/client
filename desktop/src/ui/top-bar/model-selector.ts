@@ -1,18 +1,18 @@
 import { html, render } from 'lit';
 import { dependencies } from '../../common/dependencies';
-import { ConfigModel } from '../../models/config-model';
-import { AIModelProviderNames } from '../../ai/ai-models';
+import { ConfigService } from '../../config/config-service';
+import { AIModelProviderNames } from '../../ai/models';
 import { ModalService } from '../common/modals/modal-service';
 
 export class ModelSelector extends HTMLElement {
-  configModel = dependencies.resolve<ConfigModel>('ConfigModel');
+  configService = dependencies.resolve<ConfigService>('ConfigService');
   modalService = dependencies.resolve<ModalService>('ModalService');
   #selectedProvider: string = '';
   #selectedModel: string = '';
 
   connectedCallback() {
     this.#syncWithConfig();
-    this.configModel.subscribe((notification) => {
+    this.configService.subscribe((notification) => {
       if (notification?.type === 'model') {
         this.#syncWithConfig();
       }
@@ -21,7 +21,7 @@ export class ModelSelector extends HTMLElement {
   }
 
   #syncWithConfig() {
-    const config = this.configModel.get();
+    const config = this.configService.get();
     this.#selectedProvider = config.ai.primaryModel.provider;
     this.#selectedModel = config.ai.primaryModel.name;
     this.render();

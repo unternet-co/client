@@ -4,7 +4,7 @@ import {
   AIModelProvider,
   AIModelProviderConfig,
   ConfigValidationResult,
-} from '../ai-models';
+} from '../models';
 import { OpenAI } from 'openai';
 import { createOpenAI } from '@ai-sdk/openai';
 

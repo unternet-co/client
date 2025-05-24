@@ -9,6 +9,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/electron/**/*"],
+  "include": ["src/electron/**/*", "src/**/*.main.ts"],
   "exclude": ["node_modules", "dist"]
 }

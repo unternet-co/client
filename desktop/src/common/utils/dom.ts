@@ -28,7 +28,21 @@ export function createEl<T extends HTMLElement = HTMLElement>(
   ...children: (string | Node)[]
 ): T {
   const element = document.createElement(name) as T;
-  if (properties) Object.assign(element, properties);
+
+  if (properties) {
+    // Handle dataset property specially
+    const { dataset, ...otherProps } = properties;
+
+    // Apply all other properties
+    Object.assign(element, otherProps);
+
+    // Handle dataset separately by setting individual data attributes
+    if (dataset) {
+      Object.entries(dataset).forEach(([key, value]) => {
+        element.setAttribute(`data-${key}`, value as string);
+      });
+    }
+  }
 
   children.forEach((child) => {
     if (typeof child === 'string') {

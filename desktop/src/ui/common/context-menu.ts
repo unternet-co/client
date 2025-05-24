@@ -1,4 +1,4 @@
-import { NativeMenu, NativeMenuOption } from './menu/native-menu';
+import { NativeMenu, NativeMenuOption } from './menu/menu';
 
 // Renderer-specific menu option type: click is zero-arg only
 export type RendererMenuOption = Omit<NativeMenuOption, 'click'> & {

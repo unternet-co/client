@@ -1,5 +1,5 @@
 import { html, css, render } from 'lit';
-import { Kernel } from '../../ai/kernel';
+import { Kernel } from '../../kernel/kernel';
 import '../common/input';
 import '../common/button';
 import { attachStyles } from '../../common/utils';
@@ -91,9 +91,8 @@ export class CommandInputElement extends HTMLElement {
 
   private handleSubmit() {
     if (this.disabled) return;
-    const workspaceId = this.getAttribute('for');
     const input = this.shadowRoot.querySelector('.input') as HTMLDivElement;
-    this.#kernel.handleInput(workspaceId, { text: input.innerText });
+    this.#kernel.handleInput({ text: input.innerText });
     input.innerText = '';
   }
 

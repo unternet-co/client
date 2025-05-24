@@ -1,6 +1,5 @@
 import dedent from 'dedent';
 import { ActionDefinition } from '../runtime/actions';
-import { flags } from './flags';
 import { Strategy } from './strategies';
 
 function chooseStrategy(strategies: Record<string, Strategy>) {
@@ -35,8 +34,6 @@ function chooseAction() {
     Choose one or more tools from the given tool options that can help resolve the user's query, and fill out the appropriate parameters if any. Your response should take the form of a JSON object that adheres to this interface:
     { tools: Array<{ id: string; display: string; args?: any; }> }
     Where the "id" should be contain the selected action's key, and "args" is an optional object that corresponds to the required params_schema if present.
-    \`display\` can be one of the following values:
-    ${flags.display}
   `;
 }
 

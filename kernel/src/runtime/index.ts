@@ -85,15 +85,12 @@ export class ProcessRuntime {
       }
     }
 
-    console.log('caloing protocol', scheme, directive);
     const result = await this.protocols.get(scheme).handleAction(directive);
-    console.log(result);
 
     if (result instanceof Process) {
-      console.log('process', result);
-      return actionResultResponse({ process: result });
+      const process = result as Process;
+      return actionResultResponse({ process, content: process.describe });
     } else {
-      console.log('result', result);
       return actionResultResponse({ content: result });
     }
   }
@@ -169,6 +166,9 @@ export class ProcessRuntime {
   }
 
   find(pid: ProcessContainer['pid']) {
+    if (!this.processes.has(pid)) {
+      throw new Error(`No process found for pid '${pid}'`);
+    }
     return this.processes.get(pid);
   }
 

@@ -30,8 +30,10 @@ export class Disposable {
 export class DisposableGroup {
   private disposables: IDisposable[] = [];
 
-  add(disposable: Disposable) {
-    this.disposables.push(disposable);
+  add(...disposables: Array<IDisposable>) {
+    for (const d of disposables) {
+      this.disposables.push(d);
+    }
   }
 
   attachListener(

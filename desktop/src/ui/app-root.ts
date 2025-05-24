@@ -3,31 +3,31 @@ import './top-bar/top-bar';
 import './toolbar/command-bar';
 import './app-root.css';
 import './thread/thread-view';
+import './workbench/workbench-view';
 import { dependencies } from '../common/dependencies';
-import { WorkspaceModel } from '../models/workspace-model';
+import { WorkspaceService } from '../workspaces/workspace-service';
 
 export class AppRoot extends HTMLElement {
-  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  workspaceService = dependencies.resolve<WorkspaceService>('WorkspaceService');
 
   connectedCallback() {
-    this.workspaceModel.subscribe(this.update.bind(this));
+    this.workspaceService.onActivateWorkspace(this.update.bind(this));
     this.update();
   }
 
   update() {
-    const ws = this.workspaceModel.activeWorkspace;
+    const ws = this.workspaceService.activeWorkspaceModel;
     if (!ws) return;
 
     const template = html`
       <top-bar></top-bar>
-      <div class="stack">
-        <div class="workspace-content">
-          <thread-view for=${ws.id}></thread-view>
-        </div>
-        <div class="toolbar">
-          <command-bar for=${ws.id}></command-bar>
-          <resource-bar for=${ws.id}></resource-bar>
-        </div>
+      <div class="workspace-content">
+        <workbench-view></workbench-view>
+        <thread-view for=${ws.id}></thread-view>
+      </div>
+      <div class="toolbar">
+        <command-bar for=${ws.id}></command-bar>
+        <!-- <resource-bar for=${ws.id}></resource-bar> -->
       </div>
     `;
 

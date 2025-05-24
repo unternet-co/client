@@ -1,7 +1,7 @@
 import { JSONSchemaDefinition } from '../shared/types';
 import { Resource } from './resources';
 
-export const ProcessDisplayModes = ['inline', 'snippet', 'auto'] as const;
+export const ProcessDisplayModes = ['standalone', 'hidden', 'auto'] as const;
 export type ProcessDisplayMode = (typeof ProcessDisplayModes)[number];
 /**
  * A definition of an action.

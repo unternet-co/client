@@ -5,11 +5,11 @@ import './resources-popover.css';
 import '../common/checkbox';
 
 import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../models/resource-model';
+import { ResourceModel } from '../../resources/resource-service';
 import { getMetadata, uriWithScheme } from '../../common/utils/http';
 import { InputElement } from '../common/input';
 import { DisposableGroup } from '../../common/disposable';
-import { WorkspaceModel } from '../../models/workspace-model';
+import { WorkspaceModel } from '../../deprecated/workspace-service';
 
 type AppletAction = { description?: string; [key: string]: any };
 

@@ -1,5 +1,5 @@
 import { html, css, render } from 'lit';
-import { NativeMenuOption, NativeMenu } from './menu/native-menu';
+import { NativeMenuOption, NativeMenu } from './menu/menu';
 import { Disposable, DisposableGroup } from '../../common/disposable';
 import { attachStyles } from '../../common/utils/dom';
 import classNames from 'classnames';

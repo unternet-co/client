@@ -10,12 +10,16 @@ export class DatabaseService<Id, T> {
     this.table = db[tableName];
   }
 
-  async create(item: T): Promise<void> {
+  async add(item: T): Promise<void> {
     return this.table.add(item);
   }
 
   async get(id: Id): Promise<T> {
     return this.table.get(id);
+  }
+
+  async update(id: Id, item: Partial<T>): Promise<void> {
+    await this.table.update(id, item);
   }
 
   async put(item: T): Promise<void> {
@@ -41,10 +45,6 @@ export class DatabaseService<Id, T> {
           .delete();
       })
     );
-  }
-
-  async update(id: Id, item: Partial<T>): Promise<void> {
-    await this.table.update(id, item);
   }
 
   all(): Promise<T[]> {

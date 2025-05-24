@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit';
-import { KernelInput } from '../../ai/kernel';
+import { KernelInput } from '../../kernel/kernel';
 import { ShortcutService } from '../../shortcuts/shortcut-service';
 import { dependencies } from '../../common/dependencies';
 

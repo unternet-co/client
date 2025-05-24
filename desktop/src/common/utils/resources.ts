@@ -1,7 +1,7 @@
 import { Resource } from '@unternet/kernel';
 
-import { ResourceModel } from '../../models/resource-model';
-import { WorkspaceModel } from '../../models/workspace-model';
+import { ResourceModel } from '../../resources/resource-service';
+import { WorkspaceModel } from '../../deprecated/workspace-service';
 
 export function enabledResources(
   resourceModel: ResourceModel,

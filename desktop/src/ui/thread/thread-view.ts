@@ -1,41 +1,28 @@
-import {
-  ActionMessage,
-  InputMessage,
-  KernelMessage,
-  ResponseMessage,
-} from '@unternet/kernel';
-import { Kernel, KernelNotification, KernelStatus } from '../../ai/kernel';
-import { createEl, declareEl, getResourceIcon } from '../../common/utils';
 import { html, render } from 'lit';
+import { dependencies } from '../../common/dependencies';
+import { DisposableGroup } from '../../common/disposable';
+import { createEl } from '../../common/utils';
+import {
+  WorkspaceService,
+  WorkspaceServiceNotification,
+} from '../../workspaces/workspace-service';
+import { KernelMessage, ResponseMessage } from '@unternet/kernel';
+import './thread-view.css';
 import {
   WorkspaceModel,
-  Workspace,
-  WorkspaceNotification,
-} from '../../models/workspace-model';
-import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../models/resource-model';
-import { Disposable } from '../../common/disposable';
-import '../common/scroll-container';
-import '../common/markdown-text';
-import './thread-view.css';
-import '../processes/process-frame';
-import '../processes/process-view';
-import './idle-screen';
-import { IdleScreenElement } from './idle-screen';
+  WorkspaceModelNotification,
+} from '../../workspaces/workspace-model';
+import { WorkspaceRecord } from '../../workspaces/types';
+import { Message } from '../../messages/types';
 
 class ThreadView extends HTMLElement {
-  private workspaceModel =
-    dependencies.resolve<WorkspaceModel>('WorkspaceModel');
-  private workspaceSub = new Disposable();
-  private kernelSub = new Disposable();
-  private workspace: Workspace;
-  private status: KernelStatus;
-  private resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
-  private kernel = dependencies.resolve<Kernel>('Kernel');
-  private messageContainerEl: HTMLDivElement;
-  private idleScreenEl: IdleScreenElement;
-  private loadingEl: Element;
-  private messageListEl: HTMLDivElement;
+  private workspaceService =
+    dependencies.resolve<WorkspaceService>('WorkspaceService');
+  private workspaceDisposables = new DisposableGroup();
+  private messageOverlayEl: HTMLDivElement;
+  private workspaceModel: WorkspaceModel | null = null;
+  private loadingIndicatorEl: HTMLElement;
+  private lastInputMessageId: Message['id'] | null = null;
 
   static get observedAttributes() {
     return ['for'];
@@ -43,237 +30,164 @@ class ThreadView extends HTMLElement {
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (this.isConnected && name === 'for' && oldValue !== newValue) {
-      this.updateWorkspace(newValue);
+      this.updateWorkspace();
     }
   }
 
-  connectedCallback() {
-    this.messageContainerEl = this.createMessageContainer();
-    this.idleScreenEl = createEl('idle-screen');
+  updateWorkspace() {
+    this.workspaceDisposables.dispose();
+    this.workspaceModel = this.workspaceService.activeWorkspaceModel;
 
-    // Create the loading element as a real DOM element
-    const loadingTemp = document.createElement('div');
-    loadingTemp.className = 'loading-container';
-    render(
-      html`<un-icon name="loading" spin class="loading"></un-icon>`,
-      loadingTemp
+    this.workspaceDisposables.add(
+      this.workspaceModel.subscribe(
+        (notification: WorkspaceModelNotification) => {
+          if (notification.type === 'add-message') {
+            this.addMessage(notification.message);
+          } else if (notification.type === 'update-message') {
+            this.updateMessage(notification.message);
+          }
+        }
+      )
     );
-    this.loadingEl = loadingTemp.firstElementChild;
 
-    this.kernelSub = this.kernel.subscribe((notification) => {
-      if (notification.status) this.updateLoadingStatus(notification.status);
-    });
-    const workspaceId = this.getAttribute('for') || '';
-    this.updateWorkspace(workspaceId);
-  }
-
-  createMessageContainer() {
-    return createEl<HTMLDivElement>('div', {
-      className: 'message-container',
-    });
-  }
-
-  updateWorkspace(workspaceId: Workspace['id']) {
-    this.workspaceSub.dispose();
-    this.workspaceSub = this.workspaceModel.subscribeToWorkspace(
-      workspaceId,
-      this.handleWorkspaceNotification.bind(this)
-    );
-    this.workspace = this.workspaceModel.get(workspaceId);
     this.firstRender();
   }
 
-  handleWorkspaceNotification(notification: WorkspaceNotification) {
-    if (notification.type === 'addmessage') {
-      if (this.idleScreenEl.isConnected) this.idleScreenEl.remove();
-      this.addMessage(notification.message);
-      if (notification.message.type === 'input') {
-        this.scrollTo({
-          top: this.scrollHeight,
-          behavior: 'smooth',
-        });
-      }
-    } else if (notification.type === 'updatemessage') {
-      this.updateMessage(notification.message);
-    }
-  }
-
-  addMessage(message: KernelMessage) {
-    let currentMessageContainer;
-
-    if (message.type === 'input') {
-      // Create a new message container for input messages
-      currentMessageContainer = this.createMessageContainer();
-      this.appendChild(currentMessageContainer);
+  connectedCallback() {
+    const workspaceId = this.getAttribute('for');
+    if (workspaceId) {
+      this.updateWorkspace();
     } else {
-      // Find the last message container to add to
-      const containers = this.querySelectorAll('.message-container');
-      currentMessageContainer = containers[containers.length - 1];
-
-      // If no container exists yet (shouldn't happen), create one
-      if (!currentMessageContainer) {
-        currentMessageContainer = this.createMessageContainer();
-        this.appendChild(currentMessageContainer);
-      }
+      this.firstRender();
     }
-
-    const fragment = document.createDocumentFragment();
-    render(this.messageTemplate(message), fragment);
-    currentMessageContainer.appendChild(fragment);
-  }
-
-  updateMessage(message: KernelMessage) {
-    const messageEl = this.querySelector(`[data-id="${message.id}"]`);
-
-    const fragment = document.createDocumentFragment();
-    render(this.messageTemplate(message), fragment);
-
-    messageEl.replaceWith(...fragment.childNodes);
-  }
-  updateLoadingStatus(status: KernelNotification['status']) {
-    console.log('Status changed:', status); // Debug log
-
-    if (status === 'thinking') {
-      // Find the last message container
-      const containers = this.querySelectorAll('.message-container');
-      const lastContainer = containers[containers.length - 1];
-
-      if (lastContainer && !this.loadingEl.isConnected) {
-        console.log('Adding loading indicator'); // Debug log
-
-        // Check if the loading element is properly constructed
-        if (!(this.loadingEl instanceof Element)) {
-          console.log('Recreating loading element'); // Debug log
-          // Recreate the loading element if needed
-          const loadingTemp = document.createElement('div');
-          loadingTemp.className = 'loading-container';
-          render(
-            html`<un-icon name="loading" spin class="loading"></un-icon>`,
-            loadingTemp
-          );
-          this.loadingEl = loadingTemp.firstElementChild;
-        }
-
-        // Always append directly to the last container for visibility
-        lastContainer.appendChild(this.loadingEl);
-        console.log('Loading indicator added to DOM'); // Debug log
-      }
-    } else if (this.loadingEl.isConnected) {
-      console.log('Removing loading indicator'); // Debug log
-      this.loadingEl.remove();
-    }
-
-    this.status = status;
-  }
-
-  disconnectedCallback() {
-    this.workspaceSub.dispose();
-    this.kernelSub.dispose();
   }
 
   firstRender() {
-    if (!this.workspace) return;
+    this.messageOverlayEl = createEl<HTMLDivElement>('div', {
+      className: 'message-overlay',
+    });
 
-    // Clear everything
-    this.innerHTML = '';
+    // Create loading indicator container
+    this.loadingIndicatorEl = createEl<HTMLDivElement>('div', {
+      className: 'loading-indicator',
+    });
 
-    // Remove loading indicator if it exists in the DOM
-    if (this.loadingEl.isConnected) {
-      this.loadingEl.remove();
-    }
+    // Add loading icon and text
+    const loadingIcon = document.createElement('un-icon');
+    loadingIcon.setAttribute('name', 'loading');
+    loadingIcon.setAttribute('spin', '');
 
-    // Add all active messages for this workspace
-    for (const message of this.workspace.activeMessages) {
-      this.addMessage(message);
-    }
-    this.appendChild(this.idleScreenEl);
+    // Add message text
+    const loadingText = createEl<HTMLDivElement>('div', {
+      className: 'loading-text',
+    });
+    loadingText.textContent = 'Thinking...';
 
-    setTimeout(() => (this.scrollTop = this.scrollHeight), 0);
+    // Add icon and text to the indicator
+    this.loadingIndicatorEl.appendChild(loadingIcon);
+    this.loadingIndicatorEl.appendChild(loadingText);
+
+    // Hide loading indicator initially
+    this.loadingIndicatorEl.style.display = 'none';
+
+    // Render both elements to the DOM
+    render(html`${this.loadingIndicatorEl}${this.messageOverlayEl}`, this);
   }
 
-  get loadingTemplate() {
-    if (this.status !== 'thinking') return null;
-    return html`<un-icon name="loading" spin class="loading"></un-icon>`;
+  createMessageElement(message: KernelMessage): HTMLElement {
+    const messageEl = createEl<HTMLDivElement>('div', {
+      className: 'message',
+      dataset: {
+        id: message.id,
+        type: message.type,
+      },
+    });
+
+    if (message.type === 'response') {
+      const responseMsg = message as ResponseMessage;
+      // Only show messages with actual content
+      if (responseMsg.text && responseMsg.text.trim()) {
+        messageEl.innerHTML = responseMsg.text;
+      }
+    }
+
+    return messageEl;
   }
 
-  messageTemplate(message: KernelMessage) {
+  addMessage(message: Message) {
+    // Track input messages to know what responses to show
     if (message.type === 'input') {
-      return html`<div
-        class="message"
-        data-id="${message.id}"
-        data-type="input"
-      >
-        ${message.text}
-      </div>`;
-    } else if (message.type === 'response') {
-      return html`<div
-        class="message"
-        data-id="${message.id}"
-        data-type="response"
-      >
-        <markdown-text>${message.text || html`&nbsp;`}</markdown-text>
-      </div>`;
-    } else if (
-      message.type === 'action' &&
-      message.display === 'inline' &&
-      message.process
-    ) {
-      return html`<div
-        class="message"
-        data-id="${message.id}"
-        data-type="process"
-      >
-        <process-frame .process=${message.process}></process-frame>
-      </div>`;
-    } else if (message.type === 'action') {
-      return html`<div
-        class="message"
-        data-id="${message.id}"
-        data-type="action"
-      >
-        ${this.processSnippetTemplate(message)}
-      </div>`;
+      this.lastInputMessageId = message.id;
+      this.messageOverlayEl.innerHTML = '';
+      this.showLoadingIndicator();
+    }
+
+    // If this is a response message and we've seen an input message before it
+    else if (message.type === 'response' && this.lastInputMessageId) {
+      // Only add response to the overlay if it has content
+      const responseMsg = message as ResponseMessage;
+      if (responseMsg.text && responseMsg.text.trim()) {
+        // Hide the loading indicator when we get a response with content
+        this.hideLoadingIndicator();
+
+        // Clear previous messages only when we have non-empty content in a new response
+        if (this.messageOverlayEl.children.length === 0) {
+          // The first response after input with content will clear the overlay
+          this.messageOverlayEl.innerHTML = '';
+        }
+
+        // Create and add the message element
+        const messageEl = this.createMessageElement(message);
+        this.messageOverlayEl.appendChild(messageEl);
+      }
     }
   }
 
-  inputMessageTemplate(message: InputMessage) {
-    return html`<div class="message" data-type="input">${message.text}</div>`;
-  }
+  updateMessage(message: Message) {
+    // Update an existing response message
+    if (message.type === 'response') {
+      const responseMsg = message as ResponseMessage;
+      const existingEl = this.querySelector(`[data-id="${message.id}"]`);
 
-  responseMessageTemplate(message: ResponseMessage) {
-    return html`<div class="message" data-type="response">
-      <markdown-text>${message.text || html`&nbsp;`}</markdown-text>
-    </div>`;
-  }
+      if (responseMsg.text && responseMsg.text.trim()) {
+        // Hide loading indicator when we get a response with content
+        this.hideLoadingIndicator();
 
-  processSnippetTemplate(message: ActionMessage) {
-    const resource = this.resourceModel.get(message.uri);
+        // If we have content and the element exists, update it
+        if (existingEl) {
+          const newEl = this.createMessageElement(message);
+          existingEl.replaceWith(newEl);
+        }
+        // If we have content but no element exists yet, create it
+        else {
+          // If this is the first content, clear old messages
+          if (this.messageOverlayEl.children.length === 0) {
+            this.messageOverlayEl.innerHTML = '';
+          }
 
-    let icon = html``;
-    const iconSrc = getResourceIcon(resource);
-    if (iconSrc) {
-      icon = html`<img src=${iconSrc} class="resource-icon" />`;
+          const messageEl = this.createMessageElement(message);
+          this.messageOverlayEl.appendChild(messageEl);
+        }
+      }
     }
-    return html`
-      ${icon}
-      <span class="notification-text">Used ${resource.name}</span>
-    `;
   }
 
-  processInlineTemplate(message: ActionMessage) {
-    return html`
-      <div class="message" data-type="process" data-id="${message.id}">
-        <process-frame .process=${message.process}></process-frame>
-      </div>
-    `;
-  }
-
-  clearMessageContainer() {
-    const scrollPosition = this.messageContainerEl.scrollTop;
-    while (this.messageContainerEl.firstChild) {
-      this.messageListEl.appendChild(this.messageContainerEl.firstChild);
+  // Show the loading indicator
+  showLoadingIndicator() {
+    if (this.loadingIndicatorEl) {
+      this.loadingIndicatorEl.style.display = 'flex';
     }
-    this.messageContainerEl.scrollTop = scrollPosition;
+  }
+
+  // Hide the loading indicator
+  hideLoadingIndicator() {
+    if (this.loadingIndicatorEl) {
+      this.loadingIndicatorEl.style.display = 'none';
+    }
+  }
+
+  disconnectedCallback() {
+    this.workspaceDisposables.dispose();
   }
 }
 
