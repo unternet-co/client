@@ -1,0 +1,41 @@
+idle-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-default);
+}
+
+idle-screen input {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 530px;
+  background: var(--color-neutral-0);
+  padding: var(--space-5) var(--space-6);
+}
+
+idle-screen .time-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+idle-screen .time {
+  font-size: var(--text-5xl);
+  font-family: var(--font-sans);
+  font-weight: bold;
+  color: var(--color-text-strong);
+  letter-spacing: -1px;
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-4);
+}
+
+idle-screen .date {
+  font-size: var(--text-lg);
+  font-family: var(--font-sans);
+  color: var(--color-text-muted);
+  line-height: var(--leading-base);
+}

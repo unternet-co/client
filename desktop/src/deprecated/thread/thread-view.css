@@ -1,0 +1,130 @@
+thread-view {
+  width: 100%;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+thread-view .message-container:first-child {
+  padding-top: 30px;
+}
+
+thread-view .message-container:last-child {
+  padding-top: 50px;
+  min-height: 100%;
+}
+
+thread-view idle-screen {
+  height: 100%;
+  flex-grow: 1;
+}
+
+thread-view .message-container {
+  gap: var(--space-5);
+  max-width: 84ch;
+  margin: 0 auto;
+  margin-top: var(--space-6);
+  position: relative;
+}
+
+thread-view .message-container-inner {
+  display: flex;
+  flex-direction: column;
+  /* Background and border styles moved to the toggle section at bottom */
+}
+thread-view .message-container:last-child {
+  flex-grow: 1;
+}
+
+thread-view .archived-message {
+  padding: var(--space-2) var(--space-5);
+  margin-top: var(--space-8);
+  background: var(--color-bg-chrome);
+  border-radius: 16px;
+  align-self: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+thread-view .message {
+  user-select: text;
+}
+thread-view .message:first-child {
+  margin-top: 0;
+}
+
+thread-view .loading {
+  position: relative;
+  left: var(--space-5);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-4);
+  display: block;
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-muted);
+}
+
+thread-view .message[data-type='input'] {
+  padding: var(--space-4) var(--space-5);
+  color: var(--color-text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+thread-view .message[data-type='response'] {
+  padding: var(--space-5) var(--space-5);
+  min-height: 36px;
+  border-radius: var(--rounded);
+  background: var(--color-bg-content);
+  border: 1px solid var(--color-border-muted);
+}
+
+thread-view .message[data-type='action'] {
+  padding: 0 var(--space-5);
+  padding-bottom: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--rounded);
+}
+thread-view .message[data-type='action'] .resource-icon {
+  width: 14px;
+  height: 14px;
+}
+thread-view .message[data-type='action'] .notification-text {
+  color: var(--color-neutral-500);
+  font-size: 13px;
+}
+thread-view .message[data-type='process'] {
+  flex-grow: 1;
+  display: flex;
+  max-height: 500px;
+  flex-direction: column;
+}
+.thread-view .message[data-type='process'] process-frame {
+  flex-grow: 1;
+}
+
+/*****************************************************************
+ * CONTAINER STYLE TOGGLE
+ * Uncomment this section to enable white containers around message groups
+ * instead of individual messages
+ *****************************************************************/
+/*
+thread-view .message-container-inner {
+  background: var(--color-bg-content);
+  border-radius: var(--rounded-lg);
+  padding: var(--space-3);
+  border: 1px solid transparent;
+}
+
+thread-view .message-container:hover .message-container-inner {
+  border-color: var(--color-border-muted);
+}
+
+thread-view .message[data-type='response'] {
+  background: transparent;
+  border-radius: 0;
+}
+*/
