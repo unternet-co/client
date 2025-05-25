@@ -22,19 +22,6 @@ export class Modal {
     this.#elementName = definition.element;
   }
 
-  configureDialog(stackPosition: number) {
-    this.#dialog = document.createElement('dialog');
-    this.#dialog.className = 'modal-container';
-    this.#dialog.setAttribute('data-size', this.#contents.options.size);
-    this.#dialog.setAttribute('data-padding', this.#contents.options.padding);
-    this.#dialog.setAttribute('data-position', this.#contents.options.position);
-    this.#dialog.setAttribute('tabindex', '-1');
-    this.#dialog.setAttribute('role', 'dialog');
-    this.#dialog.setAttribute('aria-modal', 'true');
-    this.#dialog.setAttribute('aria-labelledby', 'modal-title');
-    this.#dialog.style.zIndex = String(300 + stackPosition);
-  }
-
   open(stackPosition: number, options?: Record<string, unknown>) {
     if (!this.#elementName) return null;
     this.#contents = document.createElement(this.#elementName) as ModalElement;
@@ -68,6 +55,19 @@ export class Modal {
       keys: 'Escape',
       callback: this.#closeCallback,
     });
+  }
+
+  configureDialog(stackPosition: number) {
+    this.#dialog = document.createElement('dialog');
+    this.#dialog.className = 'modal-container';
+    this.#dialog.setAttribute('data-size', this.#contents.options.size);
+    this.#dialog.setAttribute('data-padding', this.#contents.options.padding);
+    this.#dialog.setAttribute('data-position', this.#contents.options.position);
+    this.#dialog.setAttribute('tabindex', '-1');
+    this.#dialog.setAttribute('role', 'dialog');
+    this.#dialog.setAttribute('aria-modal', 'true');
+    this.#dialog.setAttribute('aria-labelledby', 'modal-title');
+    this.#dialog.style.zIndex = String(300 + stackPosition);
   }
 
   closeOnBackdropClick = (event: MouseEvent) => {

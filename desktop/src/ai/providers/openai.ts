@@ -1,22 +1,21 @@
 import { LanguageModel } from '@unternet/kernel';
+import { OpenAI } from 'openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import {
-  AIModelDescriptor,
   AIModelProvider,
   AIModelProviderConfig,
   ConfigValidationResult,
-} from '../models';
-import { OpenAI } from 'openai';
-import { createOpenAI } from '@ai-sdk/openai';
-
-const OPENAI_MODEL_EXCLUDE_PATTERNS = [
-  'whisper',
-  'tts',
-  'dall-e',
-  'embedding',
-  'moderation',
-];
+} from '../model-provider';
+import { AIModelDescriptor } from '../types';
 
 export class OpenAIModelProvider implements AIModelProvider {
+  allowedOpenAiModels = [
+    'gpt-4o-mini',
+    'gpt-4-turbo',
+    'gpt-3.5-turbo',
+    'gpt-4o',
+  ];
+
   async getAvailableModels(
     providerConfig: AIModelProviderConfig
   ): Promise<AIModelDescriptor[]> {
@@ -24,43 +23,36 @@ export class OpenAIModelProvider implements AIModelProvider {
       throw new Error('OpenAI API Key is missing or empty.');
     }
 
-    try {
-      const client = new OpenAI({
-        apiKey: providerConfig.apiKey,
-        dangerouslyAllowBrowser: true,
-      });
+    const client = new OpenAI({
+      apiKey: providerConfig.apiKey,
+      dangerouslyAllowBrowser: true,
+    });
 
-      const { data: models } = await client.models.list();
+    const { data: models } = await client.models.list();
 
-      function modelFilter(model: OpenAI.Models.Model) {
-        const shouldExclude = OPENAI_MODEL_EXCLUDE_PATTERNS.some((pattern) =>
-          model.id.toLowerCase().includes(pattern)
-        );
-        return !shouldExclude;
-      }
-
-      return models.filter(modelFilter).map((model) => ({
+    return models
+      .filter((model) =>
+        this.allowedOpenAiModels.includes(model.id.toLowerCase())
+      )
+      .map((model) => ({
         name: model.id,
         provider: 'openai',
       }));
-    } catch (error) {
-      throw error;
-    }
   }
 
-  async getModel(
+  resolveModel(
     modelId: string,
     providerConfig: AIModelProviderConfig
-  ): Promise<LanguageModel> {
+  ): LanguageModel {
     return createOpenAI({
       apiKey: providerConfig.apiKey,
       compatibility: 'strict',
     })(modelId);
   }
 
-  async validateConfig(
+  validateConfig(
     providerConfig: AIModelProviderConfig
-  ): Promise<ConfigValidationResult> {
+  ): ConfigValidationResult {
     if (!providerConfig.apiKey) {
       return { valid: false, error: 'OpenAI API Key is required' };
     }

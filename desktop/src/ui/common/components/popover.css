@@ -1,5 +1,5 @@
 /* Resets */
-.un-popover {
+un-popover {
   margin: unset;
   inset: unset;
   border: unset;
@@ -7,7 +7,7 @@
 }
 
 /* Modal-like presentation */
-.un-popover {
+un-popover {
   border: 1px solid var(--color-border-default);
   background: var(--color-bg-content);
   border-radius: var(--rounded-lg);
@@ -15,7 +15,7 @@
   margin: var(--space-6);
 }
 
-.un-popover .header {
+un-popover .header {
   position: sticky;
   top: 0;
   background: var(--color-neutral-50);
@@ -30,27 +30,27 @@
   align-items: center;
 }
 
-.un-popover .content {
+un-popover .content {
   padding: var(--space-6);
 }
 
 /* Positioning logic */
-.un-popover:popover-open {
+un-popover:popover-open {
   position-try-fallbacks: flip-block, flip-inline;
 }
-.un-popover[data-position='top'] {
+un-popover[data-position='top'] {
   position-area: top;
   justify-self: anchor-center;
 }
-.un-popover[data-position='right'] {
+un-popover[data-position='right'] {
   position-area: right;
   align-self: anchor-center;
 }
-.un-popover[data-position='bottom'] {
+un-popover[data-position='bottom'] {
   position-area: bottom;
   justify-self: anchor-center;
 }
-.un-popover[data-position='left'] {
+un-popover[data-position='left'] {
   position-area: left;
   align-self: anchor-center;
 }

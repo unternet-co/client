@@ -1,7 +1,7 @@
 import { html, css, render } from 'lit';
 import { Kernel } from '../../kernel/kernel';
-import '../common/input';
-import '../common/button';
+import '../common/components/input';
+import '../common/components/button';
 import { attachStyles } from '../../common/utils';
 import { Disposable } from '../../common/disposable';
 import { dependencies } from '../../common/dependencies';

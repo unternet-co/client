@@ -1,0 +1,43 @@
+.settings-section {
+  padding: var(--space-7) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.settings-section:first-child {
+  padding-top: 0;
+}
+.settings-section:last-child {
+  border-bottom: 0;
+}
+
+.settings-section h2 {
+  font-size: var(--text-lg);
+  padding-bottom: var(--space-6);
+}
+
+.settings-section-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.settings-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.settings-description {
+  border: 1px solid var(--color-border);
+  padding: var(--space-4);
+  border-radius: var(--rounded);
+}
+
+.settings-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--rounded);
+  padding: var(--space-2) var(--space-4);
+  color: var(--color-error-600);
+  background: var(--color-error-0);
+}

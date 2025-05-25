@@ -1,9 +1,9 @@
 import { html, render, TemplateResult } from 'lit';
 import { ModalElement, ModalOptions } from '../common/modals/modal-element';
 import { dependencies } from '../../common/dependencies';
-import '../common/input';
-import '../common/button';
-import '../common/label';
+import '../common/components/input';
+import '../common/components/button';
+import '../common/components/label';
 
 export class NewWorkspaceModal extends ModalElement {
   #workspaceModel!: WorkspaceModel;

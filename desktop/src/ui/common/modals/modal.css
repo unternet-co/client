@@ -35,34 +35,15 @@
 }
 
 /* Animations */
-@keyframes modal-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(32px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes modal-slide-in-right {
-  from {
-    transform: translateX(320px);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
 
 .modal-container[data-position='center'][open],
 .modal-container[data-position='full'][open] {
-  animation: modal-fade-up 200ms ease-out;
+  animation: fade-up 200ms ease-out;
 }
 
 /* Right modal animation */
 .modal-container[data-position='right'][open] {
-  animation: modal-slide-in-right 150ms ease-out;
+  animation: slide-in-right 150ms ease-out;
 }
 
 /* Right-positioned modal variant */

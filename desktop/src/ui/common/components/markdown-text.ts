@@ -1,5 +1,5 @@
 import { marked } from 'marked';
-import { attachStyles } from '../../common/utils';
+import { attachStyles } from '../../../common/utils';
 import { css } from 'lit';
 
 class MarkdownText extends HTMLElement {

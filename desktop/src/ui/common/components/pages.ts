@@ -1,5 +1,5 @@
 import { HTMLTemplateResult } from 'lit';
-import { IDisposable } from '../../common/disposable';
+import { IDisposable } from '../../../common/disposable';
 
 export interface Page extends IDisposable {
   id: string;

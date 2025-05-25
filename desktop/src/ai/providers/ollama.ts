@@ -1,10 +1,10 @@
+import { createOllama } from 'ollama-ai-provider';
 import {
-  AIModelDescriptor,
   AIModelProvider,
   AIModelProviderConfig,
   ConfigValidationResult,
-} from '../models';
-import { createOllama } from 'ollama-ai-provider';
+} from '../model-provider';
+import { AIModelDescriptor } from '../types';
 
 export const OLLAMA_BASE_URL = 'http://localhost:11434/api';
 
@@ -56,19 +56,13 @@ export class OllamaModelProvider implements AIModelProvider {
     }
   }
 
-  async getModel(
-    modelId: string,
-    providerConfig: AIModelProviderConfig
-  ): Promise<any> {
-    const model = createOllama({
+  resolveModel(modelId: string, providerConfig: AIModelProviderConfig): any {
+    return createOllama({
       baseURL: providerConfig.baseUrl || OLLAMA_BASE_URL,
     })(modelId);
-    return model;
   }
 
-  async validateConfig(
-    providerConfig: AIModelProviderConfig
-  ): Promise<ConfigValidationResult> {
+  validateConfig(config: AIModelProviderConfig): ConfigValidationResult {
     // Ollama doesn't require an API key, but it does need a base URL
     // If no baseUrl is provided, we'll use the default
     return { valid: true };

@@ -1,13 +1,13 @@
 import { html } from 'lit';
 
-import { PopoverElement } from '../common/popover';
+import { PopoverElement } from '../common/components/popover';
 import './resources-popover.css';
-import '../common/checkbox';
+import '../common/components/checkbox';
 
 import { dependencies } from '../../common/dependencies';
 import { ResourceModel } from '../../resources/resource-service';
 import { getMetadata, uriWithScheme } from '../../common/utils/http';
-import { InputElement } from '../common/input';
+import { InputElement } from '../common/components/input';
 import { DisposableGroup } from '../../common/disposable';
 import { WorkspaceModel } from '../../deprecated/workspace-service';
 

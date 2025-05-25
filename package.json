@@ -64,6 +64,7 @@
     "release": "npm run sync-version && git add . && git commit --message 'release' && git push --tags",
     "clean": "rimraf desktop/dist && rimraf kernel/dist && rm -rf dist",
     "dev": "concurrently 'npm run dev:desktop' 'npm run dev:kernel'",
+    "prepare": "husky",
     "dev:kernel": "cd kernel && npm run dev",
     "dev:desktop": "cd desktop && npm run dev",
     "package": "npm run package:desktop",
@@ -75,8 +76,7 @@
     "package:linux": "electron-builder --linux",
     "app:dir": "rm -rf dist && electron-builder --dir",
     "app:dist": "rm -rf dist && electron-builder",
-    "sync-version": "cd desktop && npm version $npm_package_version && cd ../kernel && npm version $npm_package_version",
-    "prepare": "husky"
+    "sync-version": "cd desktop && npm version $npm_package_version && cd ../kernel && npm version $npm_package_version"
   },
   "devDependencies": {
     "@electron/notarize": "^3.0.1",

@@ -1,5 +1,5 @@
 import { css } from 'lit';
-import './icons/icon';
+import '../icons/icon';
 
 export class CheckboxElement extends HTMLElement {
   private input: HTMLInputElement;

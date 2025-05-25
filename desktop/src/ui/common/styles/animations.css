@@ -1,0 +1,19 @@
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(320px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}

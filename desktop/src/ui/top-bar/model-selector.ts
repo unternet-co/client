@@ -1,7 +1,7 @@
 import { html, render } from 'lit';
 import { dependencies } from '../../common/dependencies';
 import { ConfigService } from '../../config/config-service';
-import { AIModelProviderNames } from '../../ai/models';
+import { AIModelProviderNames } from '../../ai/model-service';
 import { ModalService } from '../common/modals/modal-service';
 
 export class ModelSelector extends HTMLElement {

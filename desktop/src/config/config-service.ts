@@ -1,16 +1,11 @@
-import {
-  AIModelDescriptor,
-  AIModelProviderConfig,
-  AIModelProviderName,
-} from '../ai/models';
+import { AIModelProviderConfig } from '../ai/model-provider';
+import { AIModelDescriptor, AIModelProviderId } from '../ai/types';
 import { Notifier } from '../common/notifier';
 import { KeyStoreService } from '../storage/keystore-service';
 
 export interface ConfigData {
   ai: {
-    providers: {
-      [id: string]: AIModelProviderConfig;
-    };
+    providers: Record<string, AIModelProviderConfig>;
     primaryModel: AIModelDescriptor | null;
     globalHint: string;
   };
@@ -26,9 +21,9 @@ export const initConfig: ConfigData = {
   activeWorkspaceId: null,
 };
 
-export type ConfigNotification = {
-  type: 'model' | 'hint';
-} | null;
+export type ConfigNotification = { type: 'model' | 'hint' } | null;
+
+const defaultProviderConfig = { apiKey: '', baseUrl: '' };
 
 export class ConfigService {
   private store: KeyStoreService<ConfigData>;
@@ -45,11 +40,12 @@ export class ConfigService {
     this.notifier.notify();
   }
 
-  updateModelProvider(
-    provider: AIModelProviderName,
-    providerConfig: AIModelProviderConfig
+  updateModelProviderConfig(
+    provider: AIModelProviderId,
+    updates: Partial<AIModelProviderConfig>
   ) {
-    this.config.ai.providers[provider] = providerConfig;
+    const currentConfig = this.config.ai.providers[provider];
+    this.config.ai.providers[provider] = { ...currentConfig, ...updates };
     this.store.set(this.config);
     this.notifier.notify();
   }

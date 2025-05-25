@@ -10,21 +10,23 @@ import { ModalService } from './ui/common/modals/modal-service';
 import { Kernel } from './kernel/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
-import { AIModelService } from './ai/models';
+import { AIModelService } from './ai/model-service';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols';
 import { NUM_CONCURRENT_PROCESSES } from './constants';
+
 import './ui/common/styles/global.css';
+import './ui/common/styles/animations.css';
 import './ui/common/styles/reset.css';
 import './ui/common/styles/markdown.css';
-import './ui/modals/settings-modal/index';
 import './ui/app-root';
 
+import './ui/settings/settings-modal';
 import './ui/modals/bug-modal';
 import './ui/modals/workspace-delete-modal';
 import './ui/modals/new-workspace-modal';
+
 import { WorkspaceRecord } from './workspaces/types';
-import { ProcessRecord, ProcessService } from './processes/process-service';
 import { ConfigData, ConfigService, initConfig } from './config/config-service';
 import { WorkspaceService } from './workspaces/workspace-service';
 import { MessageService } from './messages/message-service';
@@ -83,7 +85,7 @@ async function init() {
 
   const openAIModelProvider = new OpenAIModelProvider();
   const ollamaModelProvider = new OllamaModelProvider();
-  const aiModelService = new AIModelService({
+  const aiModelService = new AIModelService(configService, {
     openai: openAIModelProvider,
     ollama: ollamaModelProvider,
   });

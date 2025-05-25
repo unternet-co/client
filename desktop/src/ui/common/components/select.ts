@@ -1,9 +1,9 @@
 import { html, css, render } from 'lit';
-import { NativeMenuOption, NativeMenu } from './menu/menu';
-import { Disposable, DisposableGroup } from '../../common/disposable';
-import { attachStyles } from '../../common/utils/dom';
+import { NativeMenuOption, NativeMenu } from '../menu/menu';
+import { Disposable, DisposableGroup } from '../../../common/disposable';
+import { attachStyles } from '../../../common/utils/dom';
 import classNames from 'classnames';
-import './icons/icon';
+import '../icons/icon';
 
 export type SelectSize = 'small' | 'medium' | 'large';
 export type SelectVariant = 'default' | 'ghost' | 'flat';
@@ -130,7 +130,6 @@ export class SelectElement extends HTMLElement {
   };
 
   #updateValue(value: string) {
-    console.log('DEBUG', value);
     this.setAttribute('value', value);
     this.dispatchEvent(new ChangeEvent(value));
   }

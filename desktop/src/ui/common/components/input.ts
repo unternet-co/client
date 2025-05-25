@@ -1,6 +1,6 @@
 import { html, render } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import './icons/icon';
+import '../icons/icon';
 import './input.css';
 import './button';
 

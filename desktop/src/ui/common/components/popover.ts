@@ -3,6 +3,11 @@ import './popover.css';
 
 export type PopoverPosition = 'top' | 'right' | 'bottom' | 'left';
 
+type CSSDeclarationWithAnchor = CSSStyleDeclaration & {
+  anchorName?: string;
+  positionAnchor?: string;
+};
+
 /**
  * A generic, composable popover custom element using the native Popover API.
  *
@@ -21,7 +26,6 @@ export class PopoverElement extends HTMLElement {
   constructor() {
     super();
     this.setAttribute('popover', '');
-    this.classList.add('un-popover');
   }
 
   attributeChangedCallback(
@@ -29,43 +33,37 @@ export class PopoverElement extends HTMLElement {
     oldValue: string | null,
     newValue: string | null
   ) {
-    if (oldValue === newValue) return;
-    setTimeout(() => this.render(), 0);
+    if (name === 'position') this.updatePosition(newValue);
+    if (name === 'anchor') this.updateAnchor(newValue);
   }
 
-  /**
-   * Ensures the anchor element exists and updates popover positioning styles.
-   * Throws if the anchor id is defined, but no element with that id is found.
-   */
-  #updateAnchorPositioning() {
-    const anchor = this.getAttribute('anchor');
-    const position = this.getAttribute('position');
+  updatePosition(position: string) {
+    this.setAttribute('data-position', position ?? 'top');
+    this.render();
+  }
 
+  updateAnchor(anchor: string) {
     if (!anchor) return;
     const anchorEl = document.getElementById(anchor);
+
     if (!anchorEl) {
       const msg = `[un-popover] Anchor element with id "${anchor}" not found.`;
       console.error(msg);
-      this.removeAttribute('data-position'); // Remove positioning if anchor is missing
+      this.removeAttribute('data-position');
       return;
     }
 
     const anchorNameValue = `--${anchor}`;
-    const style = anchorEl.style as CSSStyleDeclaration & {
-      anchorName?: string;
-    };
-    style.anchorName = anchorNameValue;
-    (this.style as any).positionAnchor = anchorNameValue;
-    this.setAttribute('data-position', position ?? 'top');
+
+    (anchorEl.style as CSSDeclarationWithAnchor).anchorName = anchorNameValue;
+    (this.style as CSSDeclarationWithAnchor).positionAnchor = anchorNameValue;
+
+    this.render();
   }
 
   render() {
-    this.#updateAnchorPositioning();
-    render(this.template, this);
-  }
-
-  get template() {
-    return html`<section class="content"><slot></slot></section>`;
+    const template = html`<section class="content"><slot></slot></section>`;
+    render(template, this);
   }
 }
 

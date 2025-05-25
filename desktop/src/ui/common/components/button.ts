@@ -1,5 +1,5 @@
 import { html, render } from 'lit';
-import './icons/icon';
+import '../icons/icon';
 import './button.css';
 
 const BUTTON_VARIANTS = [

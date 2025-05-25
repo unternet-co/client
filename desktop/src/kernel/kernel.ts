@@ -8,7 +8,7 @@ import {
 } from '@unternet/kernel';
 
 import { ConfigNotification, ConfigService } from '../config/config-service';
-import { AIModelService } from '../ai/models';
+import { AIModelService } from '../ai/model-service';
 import { Notifier } from '../common/notifier';
 import { WorkspaceService } from '../workspaces/workspace-service';
 import { WorkspaceRecord } from '../workspaces/types';
@@ -61,15 +61,14 @@ export class Kernel {
   }
 
   async loadModel() {
-    const config = this.configService.get();
+    const config = this.configService.get('ai');
 
-    const model = await this.aiModelService.getModel(
-      config.ai.primaryModel.provider,
-      config.ai.primaryModel.name,
-      config.ai.providers[config.ai.primaryModel.provider]
+    const model = this.aiModelService.resolveModel(
+      config.primaryModel.provider,
+      config.primaryModel.name
     );
 
-    const hint = config.ai.globalHint;
+    const hint = config.globalHint;
     // const resources = this.resourceModel.all();
     // this.resourceModel.subscribe(this.updateResources.bind(this));
     // this.workspaceModel.subscribe(this.updateResources.bind(this));
