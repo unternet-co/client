@@ -19,7 +19,7 @@ export class ModelSettingsSection extends SettingsSection {
   errorMessage: string | null = null;
 
   description = `
-    
+    Models are what power the intelligence behind the Unternet Shell.
   `;
 
   constructor() {

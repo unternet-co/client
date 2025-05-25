@@ -50,7 +50,7 @@ A process is an ongoing task that is managed by the `ProcessRuntime` (or can be 
 
 ## Status
 
-The Unternet Kernel is still in active development. It is designed to act as the foundation of Unternet's client, Undo, and we are prioritizing stability and performance alongside a focused set of features. The kernel is designed to be open, easily extensible, and adaptable. We encourage developers wanting to get started with web applets and other tools to use the kernel as a foundation for their apps.
+The Unternet Kernel is still in active development. It is designed to act as the foundation of Unternet's shell, and we are prioritizing stability and performance alongside a focused set of features. The kernel is designed to be open, easily extensible, and adaptable. We encourage developers wanting to get started with web applets and other tools to use the kernel as a foundation for their apps.
 
 ## Contribute
 

@@ -12,9 +12,9 @@
   ],
   "main": "desktop/dist/electron/main.js",
   "build": {
-    "appId": "co.unternet.undo",
-    "artifactName": "undo-${version}.${ext}",
-    "productName": "Undo",
+    "appId": "co.unternet.shell",
+    "artifactName": "unternet-shell-${version}.${ext}",
+    "productName": "Unternet Shell",
     "files": [
       "desktop/dist/electron/**/*",
       "desktop/dist/www/**/*",

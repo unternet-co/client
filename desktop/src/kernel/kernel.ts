@@ -14,7 +14,6 @@ import { WorkspaceService } from '../workspaces/workspace-service';
 import { WorkspaceRecord } from '../workspaces/types';
 import { WorkspaceModel } from '../workspaces/workspace-model';
 import { MessageService } from '../messages/message-service';
-import { stream } from 'glob';
 
 export interface KernelInput {
   text: string;
