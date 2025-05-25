@@ -4,13 +4,14 @@ import { WebProcess } from '../http/processes';
 export class BuiltinProtocol extends Protocol {
   scheme = 'builtin';
 
-  async handleAction(directive: ActionProposal) {
-    switch (directive.actionId) {
+  async handleAction(proposal: ActionProposal) {
+    switch (proposal.actionId) {
       case 'open':
-        return new WebProcess({ url: directive.args.url });
+        console.log(proposal);
+        return WebProcess.create(proposal.args.url);
       default:
         throw new Error(
-          `Invalid actionID for directive. URI: ${directive.uri}, ID: ${directive.actionId}.`
+          `Invalid actionID for directive. URI: ${proposal.uri}, ID: ${proposal.actionId}.`
         );
     }
   }

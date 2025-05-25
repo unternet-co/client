@@ -16,6 +16,14 @@ export class ChangeEvent extends Event {
   }
 }
 
+export class InputEvent extends Event {
+  value: any;
+  constructor(value: any) {
+    super('input');
+    this.value = value;
+  }
+}
+
 const ATTRS_TO_UPDATE = new Set([
   'value',
   'type',
@@ -62,19 +70,16 @@ export class InputElement extends HTMLElement {
   }
 
   #handleInput = (e: Event) => {
+    e.stopPropagation();
     this.setAttribute('value', this.#input.value);
-    this.dispatchEvent(
-      new CustomEvent('input', {
-        detail: { value: this.#input.value },
-        bubbles: true,
-        composed: true,
-      })
-    );
+    this.dispatchEvent(new InputEvent(this.#input.value));
   };
 
   #handleChange = (e: Event) => {
+    e.stopPropagation();
     this.setAttribute('value', this.#input.value);
     this.dispatchEvent(new ChangeEvent(this.#input.value));
+    console.log('change event');
   };
 
   #createInput() {

@@ -2,7 +2,7 @@ process-frame {
   border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  border-radius: var(--rounded);
+  border-radius: var(--rounded-lg);
   overflow: hidden;
   flex-grow: 1;
 }

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@lucide/lab": "^0.1.2",
+    "@mozilla/readability": "^0.6.0",
     "@unternet/kernel": "*",
     "@unternet/sdk": "^0.2.1",
     "@web-applets/sdk": "^0.2.6",

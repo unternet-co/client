@@ -1,8 +1,23 @@
 import { Process, ProcessContainer, ProcessRuntime } from '@unternet/kernel';
 import { DatabaseService } from '../storage/database-service';
 import { ProcessRecord } from './types';
+import { Notifier } from '../common/notifier';
+import { WorkspaceService } from '../workspaces/workspace-service';
+import { WorkspaceModel } from '../workspaces/workspace-model';
+import { Disposable } from '../common/disposable';
+
+interface RemoveProcessNotification {
+  type: 'remove-process';
+  pid: ProcessContainer['pid'];
+}
+
+type ProcessServiceNotification = RemoveProcessNotification;
 
 export class ProcessService {
+  private workspaceSubscription = new Disposable();
+  private readonly notifier = new Notifier<ProcessServiceNotification>();
+  readonly subscribe = this.notifier.subscribe;
+
   constructor(
     private readonly processDatabase: DatabaseService<string, ProcessRecord>,
     private readonly runtime: ProcessRuntime
@@ -15,13 +30,13 @@ export class ProcessService {
     }
   }
 
-  async spawn(process: Process) {
+  spawn(process: Process) {
     const container = this.runtime.spawn(process);
-    await this.processDatabase.add(container.snapshot);
+    this.processDatabase.add(container.snapshot);
     return container;
   }
 
-  getProcess(pid: ProcessContainer['pid']) {
+  get(pid: ProcessContainer['pid']) {
     return this.runtime.find(pid);
   }
 }

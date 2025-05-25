@@ -6,7 +6,7 @@ import {
   FileInput,
   inputMessage,
   toModelMessages,
-} from '#src/interpreter/messages.ts';
+} from '../src/interpreter/messages';
 
 describe('Interpreter | Messages', () => {
   /**

@@ -6,4 +6,4 @@ export * from './runtime/resources';
 export * from './runtime';
 export * from './runtime/actions';
 export * from './runtime/processes';
-export * from './response-types';
+export * from './shared/responses';

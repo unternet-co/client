@@ -109,15 +109,16 @@ export class ProcessContainer {
   private set snapshot(data: ProcessSnapshot) {
     this._snapshot = JSON.stringify(data);
   }
+
   get snapshot(): ProcessSnapshot {
-    if (this._snapshot) {
+    if (this.status !== 'running' && this._snapshot) {
       return JSON.parse(this._snapshot);
     } else {
       return {
         pid: this._pid,
         tag: this._tag,
         source: this._source,
-        state: null,
+        state: this.process?.snapshot || null,
       };
     }
   }
@@ -198,7 +199,7 @@ export class ProcessContainer {
     if (!this.process) return '';
     const process = this.process as any;
     if (typeof process.describe === 'function') {
-      return process.describe();
+      return JSON.stringify(process.describe());
     } else return '';
   }
 

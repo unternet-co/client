@@ -3,10 +3,13 @@ import {
   ProcessRuntime,
   inputMessage,
   responseMessage,
+  thoughtMessage,
+  logMessage,
   KernelResponse,
   DirectResponse,
   ActionProposalResponse,
-  actionMessage,
+  ThoughtResponse,
+  LogResponse,
 } from '@unternet/kernel';
 
 import { ConfigNotification, ConfigService } from '../config/config-service';
@@ -18,6 +21,8 @@ import { WorkspaceModel } from '../workspaces/workspace-model';
 import { MessageService } from '../messages/message-service';
 import { ResourceService } from '../resources/resource-service';
 import { ProcessService } from '../processes/process-service';
+import { isValidURL, uriWithScheme } from '../common/utils/http';
+import { WebProcess } from '../protocols/http/processes';
 
 export interface KernelInput {
   text: string;
@@ -96,9 +101,25 @@ export class Kernel {
   }
 
   async handleInput(input: KernelInput) {
+    this.updateStatus('thinking');
     const workspaceId = this.workspaceModel.id;
     const inputMsg = inputMessage({ text: input.text });
     await this.messageService.createMessageForWorkspace(workspaceId, inputMsg);
+
+    // Check if the input is a valid URL and spawn a web process directly
+    if (isValidURL(input.text)) {
+      const url = uriWithScheme(input.text);
+      try {
+        const webProcess = await WebProcess.create(url);
+        const container = await this.processService.spawn(webProcess);
+        this.workspaceModel.attachProcess(container);
+        this.updateStatus('idle');
+        return;
+      } catch (error) {
+        console.error('Failed to create web process:', error);
+        // Fall through to normal interpreter handling if web process creation fails
+      }
+    }
 
     if (!this.interpreter || !this.initialized) {
       throw new KernelNotInitializedError(
@@ -106,7 +127,10 @@ export class Kernel {
       );
     }
 
-    const runner = this.interpreter.run(this.workspaceModel.messages);
+    const runner = this.interpreter.run({
+      messages: this.workspaceModel.messages,
+      processes: this.workspaceModel.processes,
+    });
 
     let iteration = await runner.next();
     while (!iteration.done) {
@@ -116,6 +140,7 @@ export class Kernel {
       switch (response.type) {
         case 'direct':
           await this.handleTextResponse(workspaceId, response);
+          this.updateStatus('idle');
           break;
 
         case 'actionproposal':
@@ -123,8 +148,22 @@ export class Kernel {
           this.updateStatus('idle');
           break;
 
-        default:
-          throw new Error('Action type not recognized!');
+        case 'thought':
+          console.log('Thought response:', response);
+          const thoughtMsg = thoughtMessage({ text: response.content });
+          this.messageService.createMessageForWorkspace(
+            workspaceId,
+            thoughtMsg
+          );
+          this.updateStatus('idle');
+          break;
+
+        case 'log':
+          console.log(response.content);
+          const logMsg = logMessage({ text: response.content });
+          this.messageService.createMessageForWorkspace(workspaceId, logMsg);
+          this.updateStatus('idle');
+          break;
       }
 
       iteration = await runner.next(this.workspaceModel.messages);
@@ -149,8 +188,6 @@ export class Kernel {
       text += chunk;
       this.messageService.update(message.id, { text });
     }
-
-    this.updateStatus('idle');
   }
 
   async handleActionResponse(
@@ -162,7 +199,7 @@ export class Kernel {
     // if (process && proposal.display === 'standalone') {
     if (process) {
       const container = await this.processService.spawn(process);
-      this.workspaceService.connectProcess(workspaceId, container);
+      this.workspaceModel.attachProcess(container);
     }
 
     // } else {

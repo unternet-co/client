@@ -1,6 +1,8 @@
 import { ProcessContainer } from '@unternet/kernel';
 import './process-view.css';
 
+// TODO: Needs to be more robust. The whole element must be
+// destroyed on unmount
 class ProcessView extends HTMLElement {
   #process: ProcessContainer | null = null;
 
@@ -9,6 +11,7 @@ class ProcessView extends HTMLElement {
       this.#process.unmount();
     }
 
+    this.innerHTML = '';
     this.#process = process;
 
     if (this.#process && this.#process.mount) {

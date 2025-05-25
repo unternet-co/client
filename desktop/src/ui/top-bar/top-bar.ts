@@ -12,37 +12,22 @@ export class TopBar extends HTMLElement {
   settingsButtonContainer?: HTMLElement;
 
   connectedCallback() {
-    this.initializeWindowStateListeners();
+    this.createListeners();
     this.render();
   }
 
-  private initializeWindowStateListeners(): void {
-    if (window.electronAPI) {
-      window.electronAPI
-        .isFullScreen()
-        .then((isFullscreen) => {
-          this.toggleFullscreenClass(isFullscreen);
-        })
-        .catch((err) => {
-          console.error('[TopBar] Error checking fullscreen state:', err);
-        });
-
-      window.electronAPI.onWindowStateChange((isFullscreen) => {
-        this.toggleFullscreenClass(isFullscreen);
-      });
-    }
+  private createListeners(): void {
+    window.electronAPI.isFullScreen().then(this.setFullScreen.bind(this));
+    window.electronAPI.onWindowStateChange(this.setFullScreen.bind(this));
   }
 
-  private toggleFullscreenClass(isFullscreen: boolean): void {
-    if (isFullscreen) {
-      this.classList.add('fullscreen');
-    } else {
-      this.classList.remove('fullscreen');
-    }
+  private setFullScreen(value: boolean): void {
+    value
+      ? this.classList.add('fullscreen')
+      : this.classList.remove('fullscreen');
   }
 
   render() {
-    // Use the new <model-selector> component
     const template = html`
       <div class="button-container">
         <!-- <model-selector></model-selector> -->
@@ -63,6 +48,7 @@ export class TopBar extends HTMLElement {
         <div></div>
       </div>
     `;
+
     render(template, this);
   }
 }

@@ -199,7 +199,8 @@
   --color-text-link: var(--color-action-800);
 
   /* background */
-  --color-bg-chrome: var(--color-neutral-100);
+  /* --color-bg-chrome: var(--color-neutral-100); */
+  --color-bg-chrome: #e7e7e7;
   --color-bg-page: var(--color-neutral-50);
   --color-bg-container: var(--color-neutral-25);
   --color-bg-content: var(--color-neutral-0);

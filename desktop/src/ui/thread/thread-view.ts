@@ -2,22 +2,25 @@ import { html, render } from 'lit';
 import { dependencies } from '../../common/dependencies';
 import { DisposableGroup } from '../../common/disposable';
 import { createEl } from '../../common/utils';
-import {
-  WorkspaceService,
-  WorkspaceServiceNotification,
-} from '../../workspaces/workspace-service';
-import { KernelMessage, ResponseMessage } from '@unternet/kernel';
+import { WorkspaceService } from '../../workspaces/workspace-service';
+import { KernelMessage } from '@unternet/kernel';
 import './thread-view.css';
 import {
   WorkspaceModel,
   WorkspaceModelNotification,
 } from '../../workspaces/workspace-model';
-import { WorkspaceRecord } from '../../workspaces/types';
-import { Message } from '../../messages/types';
+import {
+  Message,
+  ResponseMessage,
+  ThoughtMessage,
+  LogMessage,
+} from '../../messages/types';
+import { Kernel, KernelNotification } from '../../kernel/kernel';
 
 class ThreadView extends HTMLElement {
   private workspaceService =
     dependencies.resolve<WorkspaceService>('WorkspaceService');
+  private kernel = dependencies.resolve<Kernel>('Kernel');
   private workspaceDisposables = new DisposableGroup();
   private messageOverlayEl: HTMLDivElement;
   private workspaceModel: WorkspaceModel | null = null;
@@ -48,6 +51,17 @@ class ThreadView extends HTMLElement {
           }
         }
       )
+    );
+
+    // Subscribe to kernel status changes
+    this.workspaceDisposables.add(
+      this.kernel.subscribe((notification: KernelNotification) => {
+        if (notification.status === 'idle') {
+          this.hideLoadingIndicator();
+        } else {
+          this.showLoadingIndicator();
+        }
+      })
     );
 
     this.firstRender();
@@ -109,6 +123,18 @@ class ThreadView extends HTMLElement {
       if (responseMsg.text && responseMsg.text.trim()) {
         messageEl.innerHTML = responseMsg.text;
       }
+    } else if (message.type === 'thought') {
+      const thoughtMsg = message as ThoughtMessage;
+      if (thoughtMsg.text && thoughtMsg.text.trim()) {
+        messageEl.innerHTML = `<em>💭 ${thoughtMsg.text}</em>`;
+        messageEl.classList.add('thought-message');
+      }
+    } else if (message.type === 'log') {
+      const logMsg = message as LogMessage;
+      if (logMsg.text && logMsg.text.trim()) {
+        messageEl.innerHTML = `<code>📝 ${logMsg.text}</code>`;
+        messageEl.classList.add('log-message');
+      }
     }
 
     return messageEl;
@@ -119,7 +145,7 @@ class ThreadView extends HTMLElement {
     if (message.type === 'input') {
       this.lastInputMessageId = message.id;
       this.messageOverlayEl.innerHTML = '';
-      this.showLoadingIndicator();
+      // Loading indicator is now handled by kernel status changes
     }
 
     // If this is a response message and we've seen an input message before it
@@ -127,9 +153,6 @@ class ThreadView extends HTMLElement {
       // Only add response to the overlay if it has content
       const responseMsg = message as ResponseMessage;
       if (responseMsg.text && responseMsg.text.trim()) {
-        // Hide the loading indicator when we get a response with content
-        this.hideLoadingIndicator();
-
         // Clear previous messages only when we have non-empty content in a new response
         if (this.messageOverlayEl.children.length === 0) {
           // The first response after input with content will clear the overlay
@@ -150,9 +173,6 @@ class ThreadView extends HTMLElement {
       const existingEl = this.querySelector(`[data-id="${message.id}"]`);
 
       if (responseMsg.text && responseMsg.text.trim()) {
-        // Hide loading indicator when we get a response with content
-        this.hideLoadingIndicator();
-
         // If we have content and the element exists, update it
         if (existingEl) {
           const newEl = this.createMessageElement(message);

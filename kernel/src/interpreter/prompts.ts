@@ -1,6 +1,11 @@
 import dedent from 'dedent';
 import { ActionDefinition } from '../runtime/actions';
 import { Strategy } from './strategies';
+import { Process, ProcessContainer } from '../runtime/processes';
+
+export function composePrompts(...prompts: string[]) {
+  prompts.join('\n\n---\n\n');
+}
 
 function chooseStrategy(strategies: Record<string, Strategy>) {
   const possibleOutputs = Object.keys(strategies)
@@ -49,25 +54,43 @@ function think(inputPrompt?: string) {
 
 interface SystemInit {
   actions?: Record<string, ActionDefinition>;
+  processes?: Array<ProcessContainer>;
   hint?: string;
   num?: number;
 }
 
-function system({ actions, hint }: SystemInit) {
+function system({ actions, hint, processes }: SystemInit) {
   let prompt = '';
 
   prompt += `You are a helpful assistant. In responding to the user, you can use a tool or respond directly, or some combination of both. If your responses refer to information with links, be sure to cite them using links in the natural flow of text. If not clear otherwise, use actions to perform a search in response to queries.\n\n`;
+
+  const date = new Date();
+  const dateString = `${date.toDateString()} ${date.toTimeString()}`;
+  prompt += `The current time is ${dateString}.\n\n`;
+
+  if (processes) {
+    prompt += dedent`
+      ACTIVE PROCESSES:
+      The user is currently looking at one or more active processes, represented
+      by the following objects:
+      ${processes.map((p) => p.describe())}\n\n
+    `;
+  }
 
   if (actions) {
     prompt += dedent`
       TOOL USE INFORMATION:
       In this environment you have access to a set of tools you can use.
       Here is an object representing the tools available:
-      ${JSON.stringify(actions)} \n\n`;
+      ${JSON.stringify(actions)}\n\n
+    `;
   }
 
   if (hint) {
-    prompt += `USER INSTRUCTIONS & GUIDELINES: \n${hint} \n\n`;
+    prompt += `
+      USER INSTRUCTIONS & GUIDELINES:
+      ${hint}\n\n
+    `;
   }
 
   return prompt.trim();

@@ -3,7 +3,10 @@ import { Protocol } from './protocols';
 import { Process, ProcessContainer, ProcessSnapshot } from './processes';
 import mitt from 'mitt';
 import { listener } from '../shared/utils';
-import { actionResultResponse, ActionResultResponse } from '../response-types';
+import {
+  actionResultResponse,
+  ActionResultResponse,
+} from '../shared/responses';
 import { ProcessInstantiationOpts } from './processes';
 
 // Must remain a "type" else typescript is sad

@@ -1,16 +1,55 @@
 import { ActionDict, ResourceIcon } from '@unternet/kernel';
+import { Readability } from '@mozilla/readability';
 
 export function uriWithScheme(
   url: string,
   defaultProtocol: 'http' | 'https' = 'https'
 ) {
-  if (url.includes('localhost') && !defaultProtocol) uriWithScheme(url, 'http');
+  const trimmedUrl = url.trim();
+  if (trimmedUrl.includes('localhost') && !defaultProtocol)
+    uriWithScheme(trimmedUrl, 'http');
 
   try {
-    const hasProtocol = /^[a-zA-Z]+:\/\//.test(url);
-    return hasProtocol ? url : `${defaultProtocol}://${url}`;
+    const hasProtocol = /^[a-zA-Z]+:\/\//.test(trimmedUrl);
+    return hasProtocol ? trimmedUrl : `${defaultProtocol}://${trimmedUrl}`;
   } catch (error) {
     return null;
+  }
+}
+
+export function isValidURL(input: string): boolean {
+  const trimmedInput = input.trim();
+
+  // Quick rejection for obviously non-URL inputs
+  if (trimmedInput.length < 3) return false;
+
+  try {
+    // Try parsing as-is first (for full URLs)
+    let url: URL;
+    try {
+      url = new URL(trimmedInput);
+    } catch {
+      // If that fails, try with https:// prefix
+      url = new URL(`https://${trimmedInput}`);
+    }
+
+    const hostname = url.hostname;
+
+    // Allow localhost and IP addresses
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return true;
+    }
+
+    // For domain names, use a simple but effective check:
+    // Must have at least one dot and a reasonable TLD
+    const parts = hostname.split('.');
+    return (
+      parts.length >= 2 &&
+      parts.every((part) => part.length > 0) &&
+      parts[parts.length - 1].length >= 2
+    ); // TLD must be at least 2 chars
+  } catch {
+    return false;
   }
 }
 
@@ -21,6 +60,7 @@ interface WebsiteMetadata {
   description: string;
   icons: ResourceIcon[];
   actions: ActionDict;
+  textContent?: string;
 }
 
 export async function getMetadata(url: string): Promise<WebsiteMetadata> {
@@ -85,6 +125,10 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
   if (!metadata.title) {
     metadata.title = metadata.name;
   }
+
+  const r = new Readability(dom);
+  const content = r.parse();
+  metadata.textContent = content.textContent;
 
   return metadata;
   // dom.querySelector('meta[name="description"]').getAttribute('content');

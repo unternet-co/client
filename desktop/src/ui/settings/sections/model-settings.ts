@@ -73,6 +73,7 @@ export class ModelSettingsSection extends SettingsSection {
       return;
     }
 
+    this.isLoadingModels = true;
     try {
       this.availableModels = await this.aiModelService.getAvailableModels(
         this.selectedProvider
@@ -86,6 +87,7 @@ export class ModelSettingsSection extends SettingsSection {
   }
 
   async updateProviderConfig(updates: Partial<AIModelProviderConfig>) {
+    console.log('update received', updates);
     this.configService.updateModelProviderConfig(
       this.selectedProvider,
       updates

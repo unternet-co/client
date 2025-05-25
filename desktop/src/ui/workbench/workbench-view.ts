@@ -19,24 +19,25 @@ class Workbench extends HTMLElement {
   }
 
   connectedCallback() {
-    this.workspaceModel = this.workspaceService.activeWorkspaceModel;
+    this.updateWorkspace();
     this.render();
   }
 
   updateWorkspace() {
     this.workspaceModelDisposables.dispose();
     this.workspaceModel = this.workspaceService.activeWorkspaceModel;
-    this.workspaceModelDisposables.add(
-      this.workspaceModel.onProcessesChanged(() => this.render())
+    const subscription = this.workspaceModel.onProcessesChanged(() =>
+      this.render()
     );
+    this.workspaceModelDisposables.add(subscription);
     this.render();
   }
 
   render() {
-    console.log(this.workspaceModel.processes[0].process);
-    if (this.workspaceModel.processes) {
+    if (this.workspaceModel.processInstances.length) {
       const template = html`<process-frame
-        .process=${this.workspaceModel.processes[0].process}
+        .process=${this.workspaceModel.processInstances.at(-1).process}
+        noheader
       ></process-frame>`;
       render(template, this);
     } else {

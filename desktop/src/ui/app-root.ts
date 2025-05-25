@@ -20,7 +20,7 @@ export class AppRoot extends HTMLElement {
     if (!ws) return;
 
     const template = html`
-      <top-bar></top-bar>
+      <!-- <top-bar></top-bar> -->
       <div class="workspace-content">
         <workbench-view></workbench-view>
         <thread-view for=${ws.id}></thread-view>

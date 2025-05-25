@@ -1,12 +1,13 @@
-import { ActionProposal, Process, ResourceIcon } from '@unternet/kernel';
-import { Applet, applets } from '@web-applets/sdk';
+import { Process, ResourceIcon } from '@unternet/kernel';
 import { getMetadata } from '../../common/utils/http';
 import { WebviewTag } from 'electron/renderer';
 
 interface WebProcessState {
   url: string;
   title?: string;
+  description?: string;
   icons?: ResourceIcon[];
+  textContent?: string;
   data?: any;
 }
 
@@ -16,6 +17,7 @@ export class WebProcess extends Process {
   title?: string;
   description?: string;
   icons?: ResourceIcon[];
+  textContent?: string;
   data?: any;
 
   static async create(url: string) {
@@ -24,6 +26,7 @@ export class WebProcess extends Process {
     process.title = metadata.title;
     process.description = metadata.description;
     process.icons = metadata.icons;
+    process.textContent = metadata.textContent;
     return process;
   }
 
@@ -32,6 +35,8 @@ export class WebProcess extends Process {
       url: this.url,
       title: this.title,
       icons: this.icons,
+      description: this.description,
+      textContent: this.textContent,
       data: this.data,
     };
   }
@@ -66,6 +71,7 @@ export class WebProcess extends Process {
       url: this.url,
       title: this.title,
       description: this.description,
+      textContent: this.textContent,
       data: this.data,
     };
   }

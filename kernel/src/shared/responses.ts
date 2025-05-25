@@ -1,10 +1,14 @@
-import { ActionProposal, ProcessDisplayMode } from './runtime/actions';
-import { Process, ProcessContainer } from './runtime/processes';
+import { ActionProposal, ProcessDisplayMode } from '../runtime/actions';
+import { Process, ProcessContainer } from '../runtime/processes';
 
-export type KernelResponse =
+export type InterpreterResponse =
   | DirectResponse
   | ActionProposalResponse
-  | ActionResultResponse;
+  | ActionResultResponse
+  | ThoughtResponse
+  | LogResponse;
+
+export type KernelResponse = InterpreterResponse;
 
 export interface DirectResponse {
   type: 'direct';
@@ -59,5 +63,29 @@ export function actionResultResponse(init: {
     type: 'actionresult',
     process: init.process,
     content: init.content || init.process.describe(),
+  };
+}
+
+export interface ThoughtResponse {
+  type: 'thought';
+  content: string;
+}
+
+export function thoughtResponse(content: string): ThoughtResponse {
+  return {
+    type: 'thought',
+    content,
+  };
+}
+
+export interface LogResponse {
+  type: 'log';
+  content: string;
+}
+
+export function logResponse(content: string): LogResponse {
+  return {
+    type: 'log',
+    content,
   };
 }

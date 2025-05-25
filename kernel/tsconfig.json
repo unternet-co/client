@@ -13,5 +13,5 @@
     "forceConsistentCasingInFileNames": true // Enforces consistent casing in file imports
   },
   "include": ["src/**/*"], // Include all TypeScript files in the src directory
-  "exclude": ["node_modules", "dist"] // Exclude node_modules and the build output directory
+  "exclude": ["node_modules", "dist", "tests"] // Exclude node_modules, build output, and tests directory
 }

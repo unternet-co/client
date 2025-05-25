@@ -8,7 +8,7 @@ import {
 } from '../messages/notifications';
 import { ProcessInstance } from '../processes/types';
 
-type ProcessInstanceRecord = Omit<ProcessInstance, 'process'>;
+export type ProcessInstanceRecord = Omit<ProcessInstance, 'process'>;
 
 export interface WorkspaceRecord {
   id: string;
@@ -16,23 +16,29 @@ export interface WorkspaceRecord {
   created: number;
   accessed: number;
   modified: number;
-  processes: ProcessInstanceRecord[];
+  processInstances: ProcessInstanceRecord[];
 }
 
 interface WorkspaceModelInit extends WorkspaceRecord {
   messages: Message[];
-  processes: ProcessInstance[];
+  processInstances: ProcessInstance[];
 }
 
-export interface ProcessConnectEvent {
-  type: 'process-connect';
+export interface ProcessAttachedNotification {
+  type: 'process-attached';
   processInstance: ProcessInstance;
+}
+
+export interface ProcessClosedNotification {
+  type: 'process-closed';
+  pids: ProcessContainer['pid'][];
 }
 
 export type WorkspaceModelNotification =
   | AddMessageNotification
   | UpdateMessageNotification
-  | ProcessConnectEvent;
+  | ProcessAttachedNotification
+  | ProcessClosedNotification;
 
 export class WorkspaceModel extends Disposable {
   id: WorkspaceRecord['id'];
@@ -41,12 +47,12 @@ export class WorkspaceModel extends Disposable {
   accessed: WorkspaceRecord['accessed'];
   modified: WorkspaceRecord['modified'];
   messageMap = new Map<Message['id'], Message>();
-  processMap = new Map<ProcessInstance['pid'], ProcessInstance>();
+  processInstanceMap = new Map<ProcessInstance['pid'], ProcessInstance>();
 
   private notifier = new Notifier<WorkspaceModelNotification>();
   readonly subscribe = this.notifier.subscribe;
   readonly onProcessesChanged = this.notifier.when(
-    (n) => n.type === 'process-connect'
+    (n) => n.type === 'process-attached' || n.type === 'process-closed'
   );
 
   constructor(init: WorkspaceModelInit) {
@@ -64,9 +70,9 @@ export class WorkspaceModel extends Disposable {
       }
     }
 
-    if (init.processes) {
-      for (const process of init.processes) {
-        this.processMap.set(process.pid, process);
+    if (init.processInstances) {
+      for (const instance of init.processInstances) {
+        this.processInstanceMap.set(instance.pid, instance);
       }
     }
   }
@@ -75,8 +81,12 @@ export class WorkspaceModel extends Disposable {
     return Array.from(this.messageMap.values());
   }
 
+  get processInstances() {
+    return Array.from(this.processInstanceMap.values());
+  }
+
   get processes() {
-    return Array.from(this.processMap.values());
+    return this.processInstances.map((instance) => instance.process);
   }
 
   addMessage(message: Message, source?: AddMessageNotification['source']) {
@@ -105,23 +115,28 @@ export class WorkspaceModel extends Disposable {
 
   addProcessInstance(instance: ProcessInstance) {
     this.notifier.notify({
-      type: 'process-connect',
+      type: 'process-attached',
       processInstance: instance,
     });
   }
 
-  // connectProcess(process: ProcessContainer) {
-  //   const processInstance = {
-  //     pid: process.pid,
-  //     process,
-  //   };
-  //   this.processMap.set(process.pid, processInstance);
+  attachProcess(process: ProcessContainer) {
+    const processInstance = {
+      pid: process.pid,
+      process,
+    };
 
-  //   this.notifier.notify({
-  //     type: 'process-connect',
-  //     processInstance,
-  //   });
-  // }
+    for (const p of this.processInstances) {
+      p.process?.suspend();
+    }
+    this.processInstanceMap.clear();
+    this.processInstanceMap.set(process.pid, processInstance);
+
+    this.notifier.notify({
+      type: 'process-attached',
+      processInstance,
+    });
+  }
 
   dispose() {
     this.notifier.dispose();

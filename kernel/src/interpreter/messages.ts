@@ -16,7 +16,12 @@ import { ulid } from 'ulid';
 
 /* KERNEL MESSAGES */
 
-export type KernelMessage = InputMessage | ResponseMessage | ActionMessage;
+export type KernelMessage =
+  | InputMessage
+  | ResponseMessage
+  | ActionMessage
+  | ThoughtMessage
+  | LogMessage;
 
 export interface BaseMessage {
   id: string;
@@ -75,10 +80,36 @@ export function responseMessage(init?: {
   };
 }
 
-export interface LogMessage {
-  type: 'log';
-  source: 'thought';
+export interface ThoughtMessage extends BaseMessage {
+  type: 'thought';
   text: string;
+}
+
+export function thoughtMessage(init?: {
+  text?: string;
+  correlationId?: string;
+}): ThoughtMessage {
+  return {
+    ...baseMessage(init),
+    type: 'thought',
+    text: init?.text || '',
+  };
+}
+
+export interface LogMessage extends BaseMessage {
+  type: 'log';
+  text: string;
+}
+
+export function logMessage(init?: {
+  text?: string;
+  correlationId?: string;
+}): LogMessage {
+  return {
+    ...baseMessage(init),
+    type: 'log',
+    text: init?.text || '',
+  };
 }
 
 export interface ActionMessage extends BaseMessage, ActionProposal {

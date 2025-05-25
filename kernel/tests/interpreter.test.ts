@@ -24,16 +24,22 @@ describe('Interpreter', () => {
     const interpreter = new Interpreter({ model });
 
     it('should choose the given display mode for an action (when defined)', async () => {
-      interpreter.updateResources([testResource('inline')]);
+      interpreter.updateResources([testResource('standalone')]);
       const message = inputMessage({ text: 'hello!' });
-      const response = await interpreter.generateActionResponse([message]);
-      assert(response.display === 'inline');
+      const response = await interpreter.createActionResponse({
+        messages: [message],
+        processes: [],
+      });
+      assert(response.display === 'standalone');
     });
 
     it('should choose an appropriate display mode otherwise', async () => {
       interpreter.updateResources([testResource()]);
       const message = inputMessage({ text: 'hello!' });
-      const response = await interpreter.generateActionResponse([message]);
+      const response = await interpreter.createActionResponse({
+        messages: [message],
+        processes: [],
+      });
       assert(ProcessDisplayModes.includes(response.display));
     });
 
@@ -42,7 +48,10 @@ describe('Interpreter', () => {
       const message = inputMessage({
         text: 'hello! choose "auto" display mode',
       });
-      const response = await interpreter.generateActionResponse([message]);
+      const response = await interpreter.createActionResponse({
+        messages: [message],
+        processes: [],
+      });
       console.log(response);
       assert(response.display !== 'auto');
     });

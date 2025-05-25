@@ -2,12 +2,11 @@ import { ulid } from 'ulid';
 import { DatabaseService } from '../storage/database-service';
 import { WorkspaceRecord } from './workspace-model';
 import { DEFAULT_WORKSPACE_NAME } from '../constants';
-import { WorkspaceModel } from './workspace-model';
+import { WorkspaceModel, ProcessInstanceRecord } from './workspace-model';
 import { ConfigService } from '../config/config-service';
 import { Notifier } from '../common/notifier';
 import { MessageService } from '../messages/message-service';
 import { DisposableGroup } from '../common/disposable';
-import { ProcessContainer } from '@unternet/kernel';
 import { ProcessInstance } from '../processes/types';
 import { ProcessService } from '../processes/process-service';
 
@@ -85,7 +84,7 @@ export class WorkspaceService {
       created: now,
       accessed: now,
       modified: now,
-      processes: [],
+      processInstances: [],
     };
 
     await this.workspaceDatabase.add(workspace);
@@ -104,33 +103,49 @@ export class WorkspaceService {
     if (id === this.activeWorkspaceModel?.id) return;
     if (!this.workspaces.has(id)) throw new Error(`No workspace with ID ${id}`);
 
-    this.activeWorkspaceDisposables.dispose();
-    this.activeWorkspaceDisposables = new DisposableGroup();
+    // TODO: This should be done through processService
+    if (this.activeWorkspaceModel) {
+      for (const instance of this.activeWorkspaceModel.processInstances) {
+        instance.process?.suspend();
+      }
+      this.activeWorkspaceDisposables.dispose();
+    }
 
     const workspaceRecord = this.workspaces.get(id);
     const messages = await this.messageService.fetchMessages(id);
-    const processes = workspaceRecord.processes.map((p) => {
-      return {
-        ...p,
-        process: this.processService.getProcess(p.pid),
-      };
-    });
+
+    const instances: ProcessInstance[] = [];
+    for (const instance of workspaceRecord.processInstances) {
+      const process = this.processService.get(instance.pid);
+      process.resume();
+      instances.push({ ...instance, process });
+    }
 
     this.activeWorkspaceModel = new WorkspaceModel({
       ...this.workspaces.get(id),
       messages,
-      processes,
+      processInstances: instances,
     });
 
     // TODO: Only do it if workspace ID matches
-    const serviceSubscription = this.messageService.subscribe((n) => {
-      // if (n.message.workspaceId === this.activeWorkspaceModel.id)
-      if (n.type === 'add-message') {
-        this.activeWorkspaceModel.addMessage(n.message);
-      } else if (n.type === 'update-message') {
-        this.activeWorkspaceModel.updateMessage(n.patch);
-      }
-    });
+    this.activeWorkspaceDisposables.add(
+      this.messageService.subscribe((n) => {
+        if (n.type === 'add-message') {
+          this.activeWorkspaceModel.addMessage(n.message);
+        } else if (n.type === 'update-message') {
+          this.activeWorkspaceModel.updateMessage(n.patch);
+        }
+      })
+    );
+
+    this.activeWorkspaceDisposables.add(
+      this.activeWorkspaceModel.onProcessesChanged((n) => {
+        this.persistProcessInstances(
+          this.activeWorkspaceModel.id,
+          this.activeWorkspaceModel.processInstances
+        );
+      })
+    );
 
     this.configService.updateActiveWorkspaceId(id);
     this.notifier.notify({
@@ -139,24 +154,18 @@ export class WorkspaceService {
     });
   }
 
-  connectProcess(
+  persistProcessInstances(
     workspaceId: WorkspaceRecord['id'],
-    process: ProcessContainer
+    processInstances: ProcessInstance[]
   ) {
-    const workspace = this.workspaces.get(workspaceId);
-
-    const processInstance: ProcessInstance = {
-      pid: process.pid,
-      process: process,
-    };
-
-    if (this.activeWorkspaceModel.id === workspaceId) {
-      this.activeWorkspaceModel.addProcessInstance(processInstance);
+    const processInstanceRecords: ProcessInstanceRecord[] = [];
+    for (const instance of processInstances) {
+      const { process, ...rest } = instance;
+      processInstanceRecords.push(rest);
     }
 
-    const { process: _, ...processInstanceRecord } = processInstance;
-    const updatedProcesses = [...workspace.processes, processInstanceRecord];
-
-    this.workspaceDatabase.update(workspaceId, { processes: updatedProcesses });
+    this.workspaceDatabase.update(workspaceId, {
+      processInstances: processInstanceRecords,
+    });
   }
 }
