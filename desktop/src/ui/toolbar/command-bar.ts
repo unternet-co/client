@@ -2,7 +2,7 @@ import { html, render } from 'lit';
 import './workspace-selector';
 import './command-input';
 import './command-bar.css';
-import './resource-bar';
+// import './resource-bar';
 
 export class CommandBar extends HTMLElement {
   static get observedAttributes() {

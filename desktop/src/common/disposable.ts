@@ -3,15 +3,7 @@ export interface IDisposable {
   dispose(): void;
 }
 
-export class Disposable {
-  disposed = false;
-  disposables: DisposableGroup;
-  private disposeCallback: () => void;
-
-  constructor(disposeCallback?: () => void) {
-    if (disposeCallback) this.disposeCallback = disposeCallback;
-  }
-
+export class Disposable implements IDisposable {
   static createEventListener(
     target: EventTarget,
     type: string,
@@ -21,8 +13,17 @@ export class Disposable {
     return new Disposable(() => target.removeEventListener(type, listener));
   }
 
+  disposed = false;
+  disposables = new DisposableGroup();
+  private disposeCallback: () => void;
+
+  constructor(disposeCallback?: () => void) {
+    if (disposeCallback) this.disposeCallback = disposeCallback;
+  }
+
   dispose(): void {
     if (this.disposeCallback) this.disposeCallback();
+    this.disposables.dispose();
     this.disposed = true;
   }
 }
@@ -48,5 +49,6 @@ export class DisposableGroup {
     for (const disposable of this.disposables) {
       disposable.dispose();
     }
+    this.disposables = [];
   }
 }

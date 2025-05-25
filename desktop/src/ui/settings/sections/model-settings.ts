@@ -2,7 +2,7 @@ import { html, HTMLTemplateResult } from 'lit';
 import { dependencies } from '../../../common/dependencies';
 import { ConfigService } from '../../../config/config-service';
 import { SettingsSection } from '../settings-section';
-import { ChangeEvent } from '../../common/components/select';
+import { ChangeEvent } from '../../common/elements/select';
 import { AI_MODEL_PROVIDERS, ERROR_MESSAGES } from '../../../constants';
 import { AIModelDescriptor, AIModelProviderId } from '../../../ai/types';
 import { AIModelService } from '../../../ai/model-service';
@@ -19,11 +19,14 @@ export class ModelSettingsSection extends SettingsSection {
   errorMessage: string | null = null;
 
   description = `
-    Models are what power the intelligence behind the Unternet Shell.
+    Models are what power the intelligence behind Unternet Shell. You can select\
+    from any of the providers below, and for total privacy you can install Ollama
+    to access local models. In order to set up a model, you will need to download
+    Ollama or get an API key for one of the hosted providers.
   `;
 
   constructor() {
-    super('Model');
+    super('Model selection');
     this.initialize();
   }
 

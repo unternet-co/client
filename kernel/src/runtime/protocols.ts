@@ -1,5 +1,6 @@
 import { ActionProposal } from './actions';
 import { Process, ProcessConstructor } from './processes';
+import { resource } from './resources';
 
 export type ProtocolHandlerResult = Process | any;
 
@@ -13,6 +14,10 @@ export type ProtocolHandlerResult = Process | any;
  * {@link Resource}
  */
 export abstract class Protocol {
+  static async resolveResource(uri: string) {
+    return resource({ uri });
+  }
+
   scheme: string | string[];
   private processRegistry? = new Map<string, ProcessConstructor>();
 

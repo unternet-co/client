@@ -1,22 +1,18 @@
-import { Resource } from '@unternet/kernel';
-import webResource from '../protocols/buitin/resources';
+import { Protocol, Resource } from '@unternet/kernel';
 import { Notifier } from '../common/notifier';
 import { uriWithScheme } from '../common/utils/http';
 import { DatabaseService } from '../storage/database-service';
 import { WebProtocol } from '../protocols/http/protocol';
+import { protocols, resources } from '../protocols';
 
-const initialResources: Array<Resource> = new Array();
+export const initialResources = [...resources];
 
-if (import.meta.env.APP_UNTERNET_API_KEY) {
-  initialResources.push(webResource);
-}
-
-interface ResourceServiceInit {
+export interface ResourceServiceInit {
   initialResources: Array<Resource>;
   resourceDatabaseService: DatabaseService<string, Resource>;
 }
 
-class ResourceService {
+export class ResourceService {
   private resources = new Map<string, Resource>();
   private db: DatabaseService<string, Resource>;
   private notifier = new Notifier();
@@ -45,19 +41,21 @@ class ResourceService {
 
   async register(uri: string) {
     uri = uriWithScheme(uri);
+    let scheme: string;
+    let protocol: Protocol;
 
     try {
       const urlObj = new URL(uri);
-      if (!['http', 'https'].includes(urlObj.protocol.replace(':', ''))) {
-        throw new Error(
-          `Adding resources from non-web sources not currently supported.`
-        );
-      }
+      scheme = urlObj.protocol.replace(':', '');
+      protocol = protocols.find((p) => p.scheme === scheme);
+      if (!protocol)
+        throw new Error(`No protocol handler installed for '${scheme}'.`);
     } catch (e) {
       console.error(`Error registering resource '${uri}': ${e.message}`);
     }
 
-    const newResource = await WebProtocol.createResource(uri);
+    const ctor = protocol.constructor as typeof Protocol;
+    const newResource = await ctor.resolveResource(uri);
     this.add(newResource);
   }
 
@@ -83,5 +81,3 @@ class ResourceService {
     this.notifier.notify();
   }
 }
-
-export { ResourceService, initialResources };

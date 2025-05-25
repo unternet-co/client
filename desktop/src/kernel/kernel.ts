@@ -5,15 +5,19 @@ import {
   responseMessage,
   KernelResponse,
   DirectResponse,
+  ActionProposalResponse,
+  actionMessage,
 } from '@unternet/kernel';
 
 import { ConfigNotification, ConfigService } from '../config/config-service';
 import { AIModelService } from '../ai/model-service';
 import { Notifier } from '../common/notifier';
 import { WorkspaceService } from '../workspaces/workspace-service';
-import { WorkspaceRecord } from '../workspaces/types';
+import { WorkspaceRecord } from '../workspaces/workspace-model';
 import { WorkspaceModel } from '../workspaces/workspace-model';
 import { MessageService } from '../messages/message-service';
+import { ResourceService } from '../resources/resource-service';
+import { ProcessService } from '../processes/process-service';
 
 export interface KernelInput {
   text: string;
@@ -42,8 +46,11 @@ export class Kernel {
     private readonly messageService: MessageService,
     private readonly configService: ConfigService,
     private readonly aiModelService: AIModelService,
+    private readonly resourceService: ResourceService,
+    private readonly processService: ProcessService,
     private readonly runtime: ProcessRuntime
   ) {
+    this.resourceService.subscribe(this.updateResources.bind(this));
     this.workspaceModel = this.workspaceService.activeWorkspaceModel;
 
     this.loadModel();
@@ -67,24 +74,21 @@ export class Kernel {
       config.primaryModel.name
     );
 
-    const hint = config.globalHint;
-    // const resources = this.resourceModel.all();
-    // this.resourceModel.subscribe(this.updateResources.bind(this));
-    // this.workspaceModel.subscribe(this.updateResources.bind(this));
-
     if (!model) {
       this.initialized = false;
       this.interpreter = null;
     } else {
-      this.interpreter = new Interpreter({ model, hint });
+      this.interpreter = new Interpreter({
+        model,
+        resources: this.resourceService.all(),
+      });
       this.initialized = true;
     }
   }
 
-  // updateResources() {
-  //   const resources = enabledResources(this.resourceModel, this.workspaceModel);
-  //   this.interpreter.updateResources(resources);
-  // }
+  updateResources() {
+    this.interpreter?.updateResources(this.resourceService.all());
+  }
 
   updateStatus(status: KernelStatus) {
     this.status = status;
@@ -115,7 +119,7 @@ export class Kernel {
           break;
 
         case 'actionproposal':
-          // await this.handleActionResponse(workspaceId, response);
+          await this.handleActionResponse(workspaceId, response);
           this.updateStatus('idle');
           break;
 
@@ -149,24 +153,25 @@ export class Kernel {
     this.updateStatus('idle');
   }
 
-  // async handleActionResponse(
-  //   workspaceId: WorkspaceRecord['id'],
-  //   proposal: ActionProposalResponse
-  // ) {
-  //   const { process, content } = await this.runtime.dispatch(proposal);
+  async handleActionResponse(
+    workspaceId: WorkspaceRecord['id'],
+    proposal: ActionProposalResponse
+  ) {
+    const { process, content } = await this.runtime.dispatch(proposal);
 
-  //   if (process && proposal.display === 'standalone') {
-  //     this.workspaceModel.createProcess(workspaceId, process);
-  //   } else {
-  //     const message = actionMessage({
-  //       uri: proposal.uri,
-  //       actionId: proposal.actionId,
-  //       args: proposal.args,
-  //       display: proposal.display,
-  //       content,
-  //     });
+    // if (process && proposal.display === 'standalone') {
+    if (process) {
+      const container = await this.processService.spawn(process);
+      this.workspaceService.connectProcess(workspaceId, container);
+    }
 
-  //     this.workspaceModel.addMessage(workspaceId, message);
-  //   }
-  // }
+    // } else {
+    //   const message = actionMessage({
+    //     uri: proposal.uri,
+    //     actionId: proposal.actionId,
+    //     args: proposal.args,
+    //     display: proposal.display,
+    //     content,
+    //   });
+  }
 }

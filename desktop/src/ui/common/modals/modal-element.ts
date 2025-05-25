@@ -1,5 +1,5 @@
 import { html, TemplateResult } from 'lit';
-import '../components/button';
+import '../elements/button';
 import '../icons/icon';
 
 export interface ModalOptions {

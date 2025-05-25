@@ -2,7 +2,7 @@ import { html, render } from 'lit';
 import { dependencies } from '../../common/dependencies';
 import { WorkspaceService } from '../../workspaces/workspace-service';
 import { ModalService } from '../common/modals/modal-service';
-import { ChangeEvent, SelectElement } from '../common/components/select';
+import { ChangeEvent, SelectElement } from '../common/elements/select';
 import './workspace-selector.css';
 
 export class WorkspaceSelector extends HTMLElement {

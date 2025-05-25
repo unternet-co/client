@@ -1,4 +1,3 @@
-import { initTabStoreData, TabModel, TabStoreData } from './deprecated/tabs';
 import { MessageRecord } from './messages/types';
 import { dependencies } from './common/dependencies';
 import { DatabaseService } from './storage/database-service';
@@ -26,10 +25,16 @@ import './ui/modals/bug-modal';
 import './ui/modals/workspace-delete-modal';
 import './ui/modals/new-workspace-modal';
 
-import { WorkspaceRecord } from './workspaces/types';
+import { WorkspaceRecord } from './workspaces/workspace-model';
 import { ConfigData, ConfigService, initConfig } from './config/config-service';
 import { WorkspaceService } from './workspaces/workspace-service';
 import { MessageService } from './messages/message-service';
+import { ProcessService } from './processes/process-service';
+import { ProcessRecord } from './processes/types';
+import {
+  initialResources,
+  ResourceService,
+} from './resources/resource-service';
 
 async function init() {
   /* Initialize databases & stores */
@@ -37,15 +42,15 @@ async function init() {
   const workspaceDatabaseService = new DatabaseService<string, WorkspaceRecord>(
     'workspaces'
   );
-  // const processDatabaseService = new DatabaseService<string, ProcessRecord>(
-  //   'processes'
-  // );
+  const processDatabaseService = new DatabaseService<string, ProcessRecord>(
+    'processes'
+  );
   const messageDatabaseService = new DatabaseService<string, MessageRecord>(
     'messages'
   );
-  // const resourceDatabaseService = new DatabaseService<string, Resource>(
-  //   'resources'
-  // );
+  const resourceDatabaseService = new DatabaseService<string, Resource>(
+    'resources'
+  );
   const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
   /* Initialize model dependencies */
@@ -56,9 +61,9 @@ async function init() {
 
   /* Initialize models */
 
-  // const processService = new ProcessService(processDatabaseService, runtime);
-  // await processService.load();
-  // dependencies.registerSingleton('ProcessService', processService);
+  const processService = new ProcessService(processDatabaseService, runtime);
+  await processService.load();
+  dependencies.registerSingleton('ProcessService', processService);
 
   const configService = new ConfigService(configStore);
   await configService.load();
@@ -69,17 +74,18 @@ async function init() {
   const workspaceService = new WorkspaceService(
     workspaceDatabaseService,
     messageService,
-    configService
+    configService,
+    processService
   );
   await workspaceService.load();
   dependencies.registerSingleton('WorkspaceService', workspaceService);
 
-  // const resourceModel = new ResourceModel({
-  //   resourceDatabaseService,
-  //   initialResources,
-  // });
-  // await resourceModel.load();
-  // dependencies.registerSingleton('ResourceModel', resourceModel);
+  const resourceService = new ResourceService({
+    resourceDatabaseService,
+    initialResources,
+  });
+  await resourceService.load();
+  dependencies.registerSingleton('ResourceModel', resourceService);
 
   /* Initialize kernel & LLMs */
 
@@ -96,6 +102,8 @@ async function init() {
     messageService,
     configService,
     aiModelService,
+    resourceService,
+    processService,
     runtime
   );
   dependencies.registerSingleton('Kernel', kernel);

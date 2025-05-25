@@ -1,13 +1,13 @@
 import { html, css, render } from 'lit';
 import { Kernel } from '../../kernel/kernel';
-import '../common/components/input';
-import '../common/components/button';
+import '../common/elements/input';
+import '../common/elements/button';
 import { attachStyles } from '../../common/utils';
 import { Disposable } from '../../common/disposable';
 import { dependencies } from '../../common/dependencies';
 
 export class CommandInputElement extends HTMLElement {
-  #defaultPlaceholder = 'Search or type command';
+  #defaultPlaceholder = 'What would you like to do?';
   #inputListener = new Disposable();
   #kernel = dependencies.resolve<Kernel>('Kernel');
 

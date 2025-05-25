@@ -51,7 +51,8 @@ function setupAutoUpdater() {
       type: 'info',
       buttons: ['Restart', 'Later'],
       title: 'Application Update',
-      message: process.platform === 'win32' ? releaseNotes : info.releaseName,
+      message:
+        process.platform === 'win32' ? releaseNotes : info.releaseName || '',
       detail:
         'A new version has been downloaded. Restart the application to apply the updates.',
     };
@@ -118,12 +119,15 @@ function createWindow() {
     shell.openExternal(url); // Open the URL in the default system browser
     return { action: 'deny' };
   });
+
   win.webContents.on('will-navigate', (event, url) => {
     if (url !== win.webContents.getURL()) {
       event.preventDefault(); // Prevent navigation
       shell.openExternal(url); // Open the URL in the default system browser
     }
   });
+
+  win.setWindowButtonVisibility(false);
 
   /* Handle defocus */
 

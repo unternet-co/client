@@ -28,8 +28,10 @@
 
 .settings-description {
   border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
   padding: var(--space-4);
   border-radius: var(--rounded);
+  background: var(--color-neutral-100);
 }
 
 .settings-error {

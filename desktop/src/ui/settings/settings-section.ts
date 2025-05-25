@@ -1,4 +1,4 @@
-import './settings-section.css';
+import './styles.css';
 import { html, HTMLTemplateResult, render } from 'lit';
 import { createEl } from '../../common/utils';
 

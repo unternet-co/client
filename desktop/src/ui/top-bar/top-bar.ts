@@ -2,7 +2,7 @@ import { render, html } from 'lit';
 import { dependencies } from '../../common/dependencies';
 // import './model-selector';
 import '../tab-handle';
-import '../common/components/select';
+import '../common/elements/select';
 import './top-bar.css';
 import { ModalService } from '../common/modals/modal-service';
 import '../toolbar/workspace-selector';

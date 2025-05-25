@@ -1,12 +1,15 @@
 import { ulid } from 'ulid';
 import { DatabaseService } from '../storage/database-service';
-import { WorkspaceRecord } from './types';
+import { WorkspaceRecord } from './workspace-model';
 import { DEFAULT_WORKSPACE_NAME } from '../constants';
 import { WorkspaceModel } from './workspace-model';
 import { ConfigService } from '../config/config-service';
 import { Notifier } from '../common/notifier';
 import { MessageService } from '../messages/message-service';
 import { DisposableGroup } from '../common/disposable';
+import { ProcessContainer } from '@unternet/kernel';
+import { ProcessInstance } from '../processes/types';
+import { ProcessService } from '../processes/process-service';
 
 export type WorkspaceServiceNotification =
   | UpdateWorkspacesNotification
@@ -42,7 +45,8 @@ export class WorkspaceService {
       WorkspaceRecord
     >,
     private readonly messageService: MessageService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly processService: ProcessService
   ) {}
 
   async load() {
@@ -81,6 +85,7 @@ export class WorkspaceService {
       created: now,
       accessed: now,
       modified: now,
+      processes: [],
     };
 
     await this.workspaceDatabase.add(workspace);
@@ -102,22 +107,30 @@ export class WorkspaceService {
     this.activeWorkspaceDisposables.dispose();
     this.activeWorkspaceDisposables = new DisposableGroup();
 
+    const workspaceRecord = this.workspaces.get(id);
     const messages = await this.messageService.fetchMessages(id);
+    const processes = workspaceRecord.processes.map((p) => {
+      return {
+        ...p,
+        process: this.processService.getProcess(p.pid),
+      };
+    });
 
     this.activeWorkspaceModel = new WorkspaceModel({
       ...this.workspaces.get(id),
       messages,
+      processes,
     });
 
+    // TODO: Only do it if workspace ID matches
     const serviceSubscription = this.messageService.subscribe((n) => {
+      // if (n.message.workspaceId === this.activeWorkspaceModel.id)
       if (n.type === 'add-message') {
         this.activeWorkspaceModel.addMessage(n.message);
       } else if (n.type === 'update-message') {
         this.activeWorkspaceModel.updateMessage(n.patch);
       }
     });
-
-    this.activeWorkspaceDisposables.add(serviceSubscription);
 
     this.configService.updateActiveWorkspaceId(id);
     this.notifier.notify({
@@ -126,16 +139,24 @@ export class WorkspaceService {
     });
   }
 
-  // Complete this
-  // Model is served and the service subscribes to its changes
-  // and updates the db appropriately.
-  // Also if any changes, the service updates the model.
-  // Model has its own notification system.
-  // Then add processes to this.
+  connectProcess(
+    workspaceId: WorkspaceRecord['id'],
+    process: ProcessContainer
+  ) {
+    const workspace = this.workspaces.get(workspaceId);
 
-  // Goal is to
-  // - chat can spawn a process
-  // - process shows up in the main workspace view (just one for now)
+    const processInstance: ProcessInstance = {
+      pid: process.pid,
+      process: process,
+    };
 
-  // I guess a file is just a suspended process?
+    if (this.activeWorkspaceModel.id === workspaceId) {
+      this.activeWorkspaceModel.addProcessInstance(processInstance);
+    }
+
+    const { process: _, ...processInstanceRecord } = processInstance;
+    const updatedProcesses = [...workspace.processes, processInstanceRecord];
+
+    this.workspaceDatabase.update(workspaceId, { processes: updatedProcesses });
+  }
 }

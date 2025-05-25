@@ -2,7 +2,7 @@ import { html, render } from 'lit';
 import { ModalElement } from '../common/modals/modal-element';
 import { View } from '../common/view';
 import { SettingsSection } from './settings-section';
-import { ModelSettingsSection } from './general/model-settings';
+import { ModelSettingsSection } from './sections/model-settings';
 
 export class SettingsModal extends View {
   element = document.createElement('div');
