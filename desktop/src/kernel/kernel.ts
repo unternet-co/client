@@ -8,8 +8,6 @@ import {
   KernelResponse,
   DirectResponse,
   ActionProposalResponse,
-  ThoughtResponse,
-  LogResponse,
 } from '@unternet/kernel';
 
 import { ConfigNotification, ConfigService } from '../config/config-service';
@@ -73,22 +71,22 @@ export class Kernel {
 
   async loadModel() {
     const config = this.configService.get('ai');
+    let model = null;
 
-    const model = this.aiModelService.resolveModel(
-      config.primaryModel.provider,
-      config.primaryModel.name
-    );
-
-    if (!model) {
-      this.initialized = false;
-      this.interpreter = null;
-    } else {
-      this.interpreter = new Interpreter({
-        model,
-        resources: this.resourceService.all(),
-      });
-      this.initialized = true;
+    if (config?.primaryModel) {
+      model = this.aiModelService.resolveModel(
+        config.primaryModel.provider,
+        config.primaryModel.name
+      );
     }
+
+    this.initialized = !!model;
+    this.interpreter = model
+      ? new Interpreter({
+          model,
+          resources: this.resourceService.all(),
+        })
+      : null;
   }
 
   updateResources() {

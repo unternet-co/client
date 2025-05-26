@@ -99,7 +99,8 @@ export class InputElement extends HTMLElement {
   get value() {
     return this.#input?.value ?? this.getAttribute('value') ?? '';
   }
-  set value(val: string) {
+  set value(val: string | undefined) {
+    if (!val) return;
     this.setAttribute('value', val);
     if (this.#input) this.#input.value = val;
   }

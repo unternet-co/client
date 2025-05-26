@@ -53,7 +53,7 @@ export class OpenAIModelProvider implements AIModelProvider {
   validateConfig(
     providerConfig: AIModelProviderConfig
   ): ConfigValidationResult {
-    if (!providerConfig.apiKey) {
+    if (!providerConfig?.apiKey) {
       return { valid: false, error: 'OpenAI API Key is required' };
     }
     return { valid: true };

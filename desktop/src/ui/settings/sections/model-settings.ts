@@ -87,7 +87,6 @@ export class ModelSettingsSection extends SettingsSection {
   }
 
   async updateProviderConfig(updates: Partial<AIModelProviderConfig>) {
-    console.log('update received', updates);
     this.configService.updateModelProviderConfig(
       this.selectedProvider,
       updates
@@ -175,13 +174,14 @@ export class ModelSettingsSection extends SettingsSection {
   }
 
   get hostedModelConfigTemplate() {
+    console.log(this.selectedProviderConfig?.apiKey);
     return html`
       <div class="settings-row">
         <un-label for="api-key" text="API Key" variant="required"></un-label>
         <un-input
           id="api-key"
           type="password"
-          .value=${this.selectedProviderConfig.apiKey}
+          .value=${this.selectedProviderConfig?.apiKey}
           @change=${(e: ChangeEvent) =>
             this.updateProviderConfig({ apiKey: e.value })}
           placeholder="Enter your API key"
