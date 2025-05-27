@@ -70,7 +70,7 @@ un-input {
       var(--input-border-color) 100%,
       transparent 25%
     );
-    background-color: var(--input-bg-color);
+    background-color: var(--color-input-bg);
     color: var(--input-text-color);
     font-family: inherit;
     font-size: inherit;

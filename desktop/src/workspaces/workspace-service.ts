@@ -139,11 +139,17 @@ export class WorkspaceService {
     );
 
     this.activeWorkspaceDisposables.add(
-      this.activeWorkspaceModel.onProcessesChanged((n) => {
+      this.activeWorkspaceModel.onProcessesChanged(() => {
         this.persistProcessInstances(
           this.activeWorkspaceModel.id,
           this.activeWorkspaceModel.processInstances
         );
+      })
+    );
+
+    this.activeWorkspaceDisposables.add(
+      this.activeWorkspaceModel.onProcessClosed(({ pid }) => {
+        this.processService.close(pid);
       })
     );
 

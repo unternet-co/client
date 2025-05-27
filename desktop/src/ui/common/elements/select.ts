@@ -322,16 +322,16 @@ export class SelectElement extends HTMLElement {
         height: var(--select-height);
         padding: 0 var(--space-8) 0 var(--space-4);
         border-radius: var(--rounded);
-        background-color: var(--input-bg-color);
-        color: var(--input-text-color);
+        background-color: var(--color-input-bg);
+        color: var(--color-text);
         font-family: inherit;
         font-size: inherit;
         appearance: none;
         box-sizing: border-box;
-        border: 1px solid var(--input-border-color);
+        border: 1px solid var(--color-border-muted);
         border-top-color: color-mix(
           in srgb,
-          var(--input-border-color) 100%,
+          var(--color-border-muted) 100%,
           transparent 50%
         );
         box-shadow: var(--button-shadows);
@@ -393,7 +393,7 @@ export class SelectElement extends HTMLElement {
         top: 50%;
         transform: translateY(-50%);
         pointer-events: none;
-        color: var(--color-text-muted);
+        color: var(--color-text);
         border-left: 1px solid
           color-mix(in srgb, var(--input-border-color) 100%, transparent 50%);
         height: 100%;

@@ -16,6 +16,8 @@ import {
   LogMessage,
 } from '../../messages/types';
 import { Kernel, KernelNotification } from '../../kernel/kernel';
+import markdownit from 'markdown-it';
+const md = markdownit();
 
 class ThreadView extends HTMLElement {
   private workspaceService =
@@ -121,7 +123,7 @@ class ThreadView extends HTMLElement {
       const responseMsg = message as ResponseMessage;
       // Only show messages with actual content
       if (responseMsg.text && responseMsg.text.trim()) {
-        messageEl.innerHTML = responseMsg.text;
+        messageEl.innerHTML = md.render(responseMsg.text);
       }
     } else if (message.type === 'thought') {
       const thoughtMsg = message as ThoughtMessage;

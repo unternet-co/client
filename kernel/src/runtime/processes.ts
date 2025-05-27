@@ -2,13 +2,15 @@ import { ulid } from 'ulid';
 import { ResourceIcon } from './resources';
 import { ActionProposal, ActionDict } from './actions';
 import { ProcessRuntime } from '.';
+import mitt from 'mitt';
+import { listener } from '../shared/utils';
 
 // These are properties that all processes are expected to implement
 // ...but they're optional because this is the web after all. Do what you want.
 export interface ProcessMetadata {
   title?: string;
   icons?: ResourceIcon[];
-  actions?: ActionDict;
+  actions?: ActionDict | (() => ActionDict);
 }
 
 // This is what a ProcessContainer will save & rehydrate from.
@@ -44,26 +46,20 @@ export abstract class Process implements ProcessMetadata {
   source: string;
   title?: string;
   icons?: ResourceIcon[];
-  actions?: ActionDict;
+  actions?: ActionDict | (() => ActionDict);
+  notifyChange: () => void;
 
-  constructor() {
+  constructor(changeHandler?: () => void) {
     const constructor = this.constructor as typeof Process;
     this.tag = constructor.tag;
     this.source = constructor.source;
+    this.notifyChange = () => changeHandler?.();
   }
 
   /**
    * A descriptive string or object to be sent to the model.
    */
   abstract describe(): any;
-
-  protected subscribers: Array<() => void> = [];
-  onChange(callback: () => void): void {
-    this.subscribers.push(callback);
-  }
-  protected notifyChange(): void {
-    this.subscribers.forEach((cb) => cb());
-  }
 
   mount(element: HTMLElement): void {}
   unmount(): void {}
@@ -93,6 +89,10 @@ export interface ProcessInstantiationOpts {
 /**
  * ProcessContainer is the system-level object that wraps a Process, and manages things we want to protect like the URI, tag (used when a protocol has multiple processes), states, etc.
  */
+
+export type ProcessEvents = {
+  processchanged: { pid: ProcessContainer['pid'] };
+};
 export class ProcessContainer {
   readonly protocol = 'process';
   private _pid: string;
@@ -105,6 +105,8 @@ export class ProcessContainer {
   readonly createdAt = Date.now();
   discardable: boolean = true;
   status: RuntimeStatus = 'running';
+  private emitter = mitt<ProcessEvents>();
+  readonly on = listener<ProcessEvents>(this.emitter);
 
   private set snapshot(data: ProcessSnapshot) {
     this._snapshot = JSON.stringify(data);
@@ -132,7 +134,11 @@ export class ProcessContainer {
     return this.process?.icons || this.snapshot?.icons;
   }
   get actions() {
-    return this.process?.actions || this.snapshot?.actions;
+    const processActions = this.process?.actions;
+    if (typeof processActions === 'function') {
+      return processActions();
+    }
+    return processActions || this.snapshot?.actions;
   }
   get pid() {
     return this._pid;
@@ -155,6 +161,9 @@ export class ProcessContainer {
     container._source = process.source;
     container.processConstructor = process.constructor as ProcessConstructor;
     container.process = process;
+    container.process.notifyChange = () => {
+      container.emitter.emit('processchanged', { pid: container.pid });
+    };
     return container;
   }
 
@@ -185,13 +194,22 @@ export class ProcessContainer {
     this.status = 'suspended';
   }
 
+  handleAction(action: ActionProposal): any | Promise<any> {
+    if (!this.process) {
+      throw new Error('Process is not running, cannot handle action.');
+    }
+    return this.process.handleAction(action);
+  }
+
   resume() {
     this.runtime.resume(this.pid);
   }
 
   onResume() {
     this.process = this.processConstructor.resume(this.snapshot.state);
-    console.log('icons', this.snapshot.icons);
+    this.process.notifyChange = () => {
+      this.emitter.emit('processchanged', { pid: this.pid });
+    };
     this.status = 'running';
   }
 

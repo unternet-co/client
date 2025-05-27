@@ -30,7 +30,6 @@ export class TopBar extends HTMLElement {
   render() {
     const template = html`
       <div class="button-container">
-        <!-- <model-selector></model-selector> -->
         <un-button
           variant="ghost"
           icon="bug"

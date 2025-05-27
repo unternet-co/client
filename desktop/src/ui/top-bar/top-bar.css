@@ -19,7 +19,7 @@ top-bar.mac.fullscreen {
 }
 
 .blurred top-bar {
-  color: var(--color-text-muted);
+  color: var(--color-text);
 }
 
 top-bar .workspace-select-container {

@@ -68,7 +68,7 @@ function system({ actions, hint, processes }: SystemInit) {
   const dateString = `${date.toDateString()} ${date.toTimeString()}`;
   prompt += `The current time is ${dateString}.\n\n`;
 
-  if (processes) {
+  if (processes.length) {
     prompt += dedent`
       ACTIVE PROCESSES:
       The user is currently looking at one or more active processes, represented

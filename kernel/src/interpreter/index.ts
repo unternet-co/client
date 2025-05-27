@@ -15,7 +15,6 @@ import {
   actionProposalResponse,
   ActionProposalResponse,
   DirectResponse,
-  InterpreterResponse,
   KernelResponse,
   thoughtResponse,
   logResponse,
@@ -71,6 +70,22 @@ export class Interpreter {
     this.strategies = { ...defaultStrategies, ...strategies };
   }
 
+  actionsWithProcesses(processes: ProcessContainer[]) {
+    const actionsDict = { ...this.actions };
+
+    for (const process of processes) {
+      const processActions = process.actions;
+      if (processActions) {
+        for (const [actionId, action] of Object.entries(processActions)) {
+          const actionHandle = encodeActionHandle(process.uri, actionId);
+          actionsDict[actionHandle] = action;
+        }
+      }
+    }
+
+    return actionsDict;
+  }
+
   /**
    * Runs the interpretation loop with a given set of messages, returning when complete.
    * @param messages An array of messages
@@ -83,6 +98,8 @@ export class Interpreter {
       yield await this.createTextResponse(input);
       return;
     }
+
+    console.log(this.actionsWithProcesses(input.processes));
 
     const strategy = yield* this.chooseStrategy(input);
 
@@ -186,10 +203,12 @@ export class Interpreter {
   async createActionResponses(
     input: InterpreterInput
   ): Promise<ActionProposalResponse[]> {
+    console.log('processes', input.processes);
+    console.log(this.actionsWithProcesses(input.processes));
     const { tools } = await this.generateObject({
       messages: input.messages,
       system: this.prompts.system({
-        actions: this.actions,
+        actions: this.actionsWithProcesses(input.processes),
         hint: this.hint,
         processes: input.processes,
       }),
@@ -198,11 +217,12 @@ export class Interpreter {
     });
 
     return tools.map((tool) => {
+      console.log(tool);
       const { uri, actionId } = decodeActionHandle(tool.id);
 
       let action: ActionDefinition;
       try {
-        action = this.actions[tool.id];
+        action = this.actionsWithProcesses(input.processes)[tool.id];
       } catch {
         throw new Error('Action returned is not a valid action ID.');
       }

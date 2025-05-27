@@ -1,18 +1,11 @@
 import { KernelMessage } from '@unternet/kernel';
-import { Emitter } from '../common/emitter';
 import { Notifier } from '../common/notifier';
-import { ProcessService } from '../processes/process-service';
-import { WorkspaceRecord } from '../workspaces/types';
+import { WorkspaceRecord } from '../workspaces/workspace-model';
 import {
   AddMessageNotification,
   UpdateMessageNotification,
 } from './notifications';
-import {
-  Message,
-  MessageDatabaseService,
-  MessagePatch,
-  MessageRecord,
-} from './types';
+import { Message, MessageDatabaseService, MessageRecord } from './types';
 import { ulid } from 'ulid';
 
 type MessageServiceNotification =

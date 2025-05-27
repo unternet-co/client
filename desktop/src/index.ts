@@ -15,11 +15,7 @@ import { protocols } from './protocols';
 import { NUM_CONCURRENT_PROCESSES } from './constants';
 
 import './ui/common/styles/global.css';
-import './ui/common/styles/animations.css';
-import './ui/common/styles/reset.css';
-import './ui/common/styles/markdown.css';
 import './ui/app-root';
-
 import './ui/settings/settings-modal';
 import './ui/modals/bug-modal';
 import './ui/modals/workspace-delete-modal';

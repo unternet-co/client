@@ -6,7 +6,7 @@ app-root {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg-chrome);
+  background: var(--color-bg);
 }
 
 app-root .workspace-content {

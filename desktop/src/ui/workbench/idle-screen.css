@@ -4,7 +4,7 @@ idle-screen {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-default);
+  color: var(--color-text);
 }
 
 idle-screen input {
@@ -24,7 +24,7 @@ idle-screen .time-container {
 }
 
 idle-screen .time {
-  font-size: var(--text-5xl);
+  font-size: 50px;
   font-family: var(--font-sans);
   font-weight: bold;
   color: var(--color-text-strong);
@@ -34,7 +34,7 @@ idle-screen .time {
 }
 
 idle-screen .date {
-  font-size: var(--text-lg);
+  font-size: 20px;
   font-family: var(--font-sans);
   color: var(--color-text-muted);
   line-height: var(--leading-base);

@@ -159,7 +159,8 @@ export class CommandInputElement extends HTMLElement {
       width: var(--command-target-width, 46ch);
       max-width: 100%;
       margin: 0 auto;
-      background: var(--color-neutral-200);
+      background: var(--color-input-bg);
+      border: 1px solid var(--color-border-muted);
       border-radius: var(--rounded);
       padding: 3px var(--space-4);
       text-align: center;
@@ -182,7 +183,7 @@ export class CommandInputElement extends HTMLElement {
       border-radius: var(--rounded);
       outline: 1px solid var(--color-border);
       outline-color: var(--color-action-800);
-      background: var(--color-neutral-0);
+      background: var(--color-input-bg);
     }
 
     .input {

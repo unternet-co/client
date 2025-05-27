@@ -8,8 +8,8 @@ un-popover {
 
 /* Modal-like presentation */
 un-popover {
-  border: 1px solid var(--color-border-default);
-  background: var(--color-bg-content);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   border-radius: var(--rounded-lg);
   box-shadow: var(--shadow);
   margin: var(--space-6);

@@ -13,6 +13,7 @@ import { ProcessInstantiationOpts } from './processes';
 type RuntimeEvents = {
   processcreated: ProcessContainer;
   processremoved: ProcessContainer['pid'];
+  processchanged: { pid: ProcessContainer['pid'] };
 };
 
 interface RuntimeConfig {
@@ -73,13 +74,13 @@ export class ProcessRuntime {
 
   /* === Action dispatching === */
 
-  async dispatch(directive: ActionProposal): Promise<ActionResultResponse> {
-    const [scheme, ...restParts] = directive.uri.split(':');
+  async dispatch(proposal: ActionProposal): Promise<ActionResultResponse> {
+    const [scheme, ...restParts] = proposal.uri.split(':');
+    console.log(scheme, restParts, this.processes);
     const rest = restParts.join();
 
-    if (scheme === 'process' && this.protocols.has(rest)) {
-      // TODO: Do something with scheme
-      throw new Error('Process calling not implemented yet!');
+    if (scheme === 'process' && this.processes.has(rest)) {
+      this.processes.get(rest).handleAction(proposal);
     } else {
       if (!this.protocols.has(scheme)) {
         throw new Error(
@@ -88,7 +89,7 @@ export class ProcessRuntime {
       }
     }
 
-    const result = await this.protocols.get(scheme).handleAction(directive);
+    const result = await this.protocols.get(scheme).handleAction(proposal);
 
     if (result instanceof Process) {
       const process = result as Process;
@@ -103,6 +104,9 @@ export class ProcessRuntime {
   spawn(process: Process) {
     // TODO: Consider modifying this so all processes start by providing a snapshot instead of live class?
     const container = ProcessContainer.fromImpl(this, process);
+    container.on('processchanged', (e) =>
+      this.emitter.emit('processchanged', e)
+    );
     this.processes.set(container.pid, container);
     this.pruneProcesses();
     this.emitter.emit('processcreated', container);

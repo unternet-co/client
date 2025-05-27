@@ -128,7 +128,7 @@ export async function getMetadata(url: string): Promise<WebsiteMetadata> {
 
   const r = new Readability(dom);
   const content = r.parse();
-  metadata.textContent = content.textContent;
+  metadata.textContent = content?.textContent;
 
   return metadata;
   // dom.querySelector('meta[name="description"]').getAttribute('content');

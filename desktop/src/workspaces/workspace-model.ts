@@ -31,7 +31,7 @@ export interface ProcessAttachedNotification {
 
 export interface ProcessClosedNotification {
   type: 'process-closed';
-  pids: ProcessContainer['pid'][];
+  pid: ProcessInstance['pid'];
 }
 
 export type WorkspaceModelNotification =
@@ -53,6 +53,9 @@ export class WorkspaceModel extends Disposable {
   readonly subscribe = this.notifier.subscribe;
   readonly onProcessesChanged = this.notifier.when(
     (n) => n.type === 'process-attached' || n.type === 'process-closed'
+  );
+  readonly onProcessClosed = this.notifier.when(
+    (n) => n.type === 'process-closed'
   );
 
   constructor(init: WorkspaceModelInit) {
@@ -120,6 +123,20 @@ export class WorkspaceModel extends Disposable {
     });
   }
 
+  hasProcessInstance(pid: ProcessInstance['pid']) {
+    return this.processInstanceMap.has(pid);
+  }
+
+  closeProcessInstance(pid: ProcessInstance['pid']) {
+    if (this.hasProcessInstance(pid)) {
+      this.processInstanceMap.delete(pid);
+      this.notifier.notify({
+        type: 'process-closed',
+        pid: pid,
+      });
+    }
+  }
+
   attachProcess(process: ProcessContainer) {
     const processInstance = {
       pid: process.pid,
@@ -127,9 +144,8 @@ export class WorkspaceModel extends Disposable {
     };
 
     for (const p of this.processInstances) {
-      p.process?.suspend();
+      this.closeProcessInstance(p.pid);
     }
-    this.processInstanceMap.clear();
     this.processInstanceMap.set(process.pid, processInstance);
 
     this.notifier.notify({

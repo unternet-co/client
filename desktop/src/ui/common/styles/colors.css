@@ -1,0 +1,37 @@
+:root {
+  --neutral-100: oklch(98% 0 0);
+  --neutral-150: oklch(94% 0 0);
+  --neutral-200: oklch(88% 0 0);
+  --neutral-300: oklch(78% 0 0);
+  --neutral-400: oklch(66% 0 0);
+  --neutral-500: oklch(54% 0 0);
+  --neutral-600: oklch(42% 0 0);
+  --neutral-700: oklch(32% 0 0);
+  --neutral-800: oklch(22% 0 0);
+  --neutral-850: oklch(15% 0 0);
+  --neutral-900: oklch(8% 0 0);
+}
+
+/* NAMED COLORS */
+
+:root {
+  --color-text: var(--neutral-900);
+  --color-text-muted: var(--neutral-800);
+  --color-bg: var(--neutral-150);
+  --color-surface: var(--neutral-100);
+  --color-input-bg: var(--neutral-200);
+  --color-border: var(--neutral-200);
+  --color-border-muted: var(--neutral-300);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: var(--neutral-100);
+    --color-bg: var(--neutral-800);
+    --color-surface: var(--neutral-700);
+    --color-input-bg: var(--neutral-700);
+    --color-text-muted: var(--neutral-200);
+    --color-border: var(--neutral-600);
+    --color-border-muted: var(--neutral-600);
+  }
+}
