@@ -23,7 +23,7 @@
   --color-inset: var(--neutral-200);
   --color-input-bg: var(--neutral-250);
   --color-border: var(--neutral-300);
-  --color-border-muted: var(--neutral-300);
+  --color-border-muted: var(--neutral-250);
   --color-input-placeholder: var(--neutral-500);
 }
 
@@ -37,6 +37,6 @@
     --color-input-placeholder: var(--neutral-500);
     --color-text-muted: var(--neutral-200);
     --color-border: var(--neutral-600);
-    --color-border-muted: var(--neutral-600);
+    --color-border-muted: var(--neutral-700);
   }
 }
