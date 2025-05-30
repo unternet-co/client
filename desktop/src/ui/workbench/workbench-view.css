@@ -1,4 +1,6 @@
 workbench-view {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   padding: 0 var(--space-3);
   display: flex;

@@ -1,5 +1,6 @@
-import { html, render } from 'lit';
+import { html, HTMLTemplateResult, render } from 'lit';
 import './tab-handle';
+import './tab-bar.css';
 import { Tab } from './types';
 
 const tabs: Tab[] = [{ title: 'hello' }, { title: 'world' }];
@@ -12,10 +13,24 @@ export class TabBar extends HTMLElement {
     this.render();
   }
 
+  handleSelectTab(index: number) {
+    console.log('Selected tab', index);
+  }
+
   render() {
-    const template = this.tabs.map(
-      (t) => html`<tab-handle .tab=${t}></tab-handle>`
-    );
+    const template: HTMLTemplateResult[] = [];
+
+    template.push(html`<un-button icon="home"></un-icon>`);
+
+    this.tabs.forEach((tab, index) => {
+      template.push(
+        html`<tab-handle
+          .tab=${tab}
+          @select=${() => this.handleSelectTab(index)}
+          ?selected=${index === 0}
+        ></tab-handle> `
+      );
+    });
     render(template, this);
   }
 }

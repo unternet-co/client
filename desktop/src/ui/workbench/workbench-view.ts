@@ -6,6 +6,7 @@ import { dependencies } from '../../common/dependencies';
 import { WorkspaceService } from '../../workspaces/workspace-service';
 import { WorkspaceModel } from '../../workspaces/workspace-model';
 import { DisposableGroup } from '../../common/disposable';
+import '../tab-bar/tab-bar';
 
 class Workbench extends HTMLElement {
   private workspaceModel: WorkspaceModel;
@@ -33,18 +34,29 @@ class Workbench extends HTMLElement {
     this.render();
   }
 
+  get isIdle() {
+    return !this.workspaceModel.processInstances.length;
+  }
+
   render() {
-    if (this.workspaceModel.processInstances.length) {
-      const template = html`
+    let inner;
+
+    if (this.isIdle) {
+      inner = html`<idle-screen></idle-screen>`;
+    } else {
+      inner = html`
         <process-frame
           .process=${this.workspaceModel.processInstances.at(-1).process}
         ></process-frame>
       `;
-      render(template, this);
-    } else {
-      const template = html`<idle-screen></idle-screen>`;
-      render(template, this);
     }
+
+    const template = html`
+      <tab-bar></tab-bar>
+      ${inner}
+    `;
+
+    render(template, this);
   }
 }
 
