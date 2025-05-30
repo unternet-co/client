@@ -6,6 +6,20 @@ import { unternet } from '../../common/unternet';
 export class WebProtocol extends Protocol {
   scheme = ['http', 'https'];
   searchEnabledResources: Array<string> = [];
+
+  static async resolveResource(url: string): Promise<Resource> {
+    const metadata = await getMetadata(url);
+    return resource({
+      uri: url,
+      ...metadata,
+    });
+  }
+
+  async handleAction(action: ActionProposal) {
+    const process = await WebProcess.create(action.uri);
+    await process.handleAction(action);
+    return process;
+  }
 }
 
 const webProtocol = new WebProtocol();

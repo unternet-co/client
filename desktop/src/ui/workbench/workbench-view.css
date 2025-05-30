@@ -3,4 +3,5 @@ workbench-view {
   padding: 0 var(--space-3);
   display: flex;
   padding: var(--space-4) var(--space-4) 0 var(--space-4);
+  overflow: visible;
 }

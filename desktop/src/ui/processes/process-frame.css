@@ -5,6 +5,7 @@ process-frame {
   border-radius: var(--rounded-lg);
   overflow: hidden;
   flex-grow: 1;
+  box-shadow: var(--shadow);
 }
 
 process-frame .process-header {

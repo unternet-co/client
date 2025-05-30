@@ -142,12 +142,13 @@ export class Kernel {
           break;
 
         case 'actionproposal':
+          console.log('Action proposal response:', response);
           await this.handleActionResponse(workspaceId, response);
           this.updateStatus('idle');
           break;
 
         case 'thought':
-          console.log('Thought response:', response);
+          console.log('Thought response:', response.content);
           const thoughtMsg = thoughtMessage({ text: response.content });
           this.messageService.createMessageForWorkspace(
             workspaceId,
@@ -157,7 +158,7 @@ export class Kernel {
           break;
 
         case 'log':
-          console.log(response.content);
+          console.log('Log response:', response.content);
           const logMsg = logMessage({ text: response.content });
           this.messageService.createMessageForWorkspace(workspaceId, logMsg);
           this.updateStatus('idle');

@@ -174,7 +174,6 @@ export class ModelSettingsSection extends SettingsSection {
   }
 
   get hostedModelConfigTemplate() {
-    console.log(this.selectedProviderConfig?.apiKey);
     return html`
       <div class="settings-row">
         <un-label for="api-key" text="API Key" variant="required"></un-label>
@@ -194,8 +193,6 @@ export class ModelSettingsSection extends SettingsSection {
     const options = this.availableModels.map(
       (model) => html`<option value="${model.name}">${model.name}</option>`
     );
-
-    console.log(this.selectedModel, options);
 
     return html`
       <div class="settings-row">

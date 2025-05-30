@@ -1,9 +1,9 @@
 import { Disposable } from '../../common/disposable';
 
 export interface IView extends Disposable {
-  elem: HTMLElement;
+  element: HTMLElement;
 }
 
 export class View extends Disposable implements IView {
-  elem: HTMLElement;
+  element: HTMLElement;
 }

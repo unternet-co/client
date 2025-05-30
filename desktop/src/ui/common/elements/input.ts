@@ -79,7 +79,6 @@ export class InputElement extends HTMLElement {
     e.stopPropagation();
     this.setAttribute('value', this.#input.value);
     this.dispatchEvent(new ChangeEvent(this.#input.value));
-    console.log('change event');
   };
 
   #createInput() {

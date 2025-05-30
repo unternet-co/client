@@ -1,5 +1,4 @@
 import { html, render } from 'lit';
-import './top-bar/top-bar';
 import './toolbar/command-bar';
 import './app-root.css';
 import './thread/thread-view';
@@ -20,14 +19,12 @@ export class AppRoot extends HTMLElement {
     if (!ws) return;
 
     const template = html`
-      <!-- <top-bar></top-bar> -->
       <div class="workspace-content">
         <workbench-view></workbench-view>
         <thread-view for=${ws.id}></thread-view>
       </div>
       <div class="toolbar">
         <command-bar for=${ws.id}></command-bar>
-        <!-- <resource-bar for=${ws.id}></resource-bar> -->
       </div>
     `;
 

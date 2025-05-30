@@ -7,7 +7,6 @@ export class BuiltinProtocol extends Protocol {
   async handleAction(proposal: ActionProposal) {
     switch (proposal.actionId) {
       case 'open':
-        console.log(proposal);
         return WebProcess.create(proposal.args.url);
       default:
         throw new Error(

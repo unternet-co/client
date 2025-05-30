@@ -1,8 +1,9 @@
 :root {
   --neutral-100: oklch(98% 0 0);
   --neutral-150: oklch(94% 0 0);
-  --neutral-200: oklch(88% 0 0);
-  --neutral-300: oklch(78% 0 0);
+  --neutral-200: oklch(91% 0 0);
+  --neutral-250: oklch(88% 0 0);
+  --neutral-300: oklch(83% 0 0);
   --neutral-400: oklch(66% 0 0);
   --neutral-500: oklch(54% 0 0);
   --neutral-600: oklch(42% 0 0);
@@ -19,9 +20,11 @@
   --color-text-muted: var(--neutral-800);
   --color-bg: var(--neutral-150);
   --color-surface: var(--neutral-100);
-  --color-input-bg: var(--neutral-200);
-  --color-border: var(--neutral-200);
+  --color-inset: var(--neutral-200);
+  --color-input-bg: var(--neutral-250);
+  --color-border: var(--neutral-300);
   --color-border-muted: var(--neutral-300);
+  --color-input-placeholder: var(--neutral-500);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -29,7 +32,9 @@
     --color-text: var(--neutral-100);
     --color-bg: var(--neutral-800);
     --color-surface: var(--neutral-700);
+    --color-inset: var(--neutral-900);
     --color-input-bg: var(--neutral-700);
+    --color-input-placeholder: var(--neutral-500);
     --color-text-muted: var(--neutral-200);
     --color-border: var(--neutral-600);
     --color-border-muted: var(--neutral-600);

@@ -2,20 +2,14 @@ import { html, render } from 'lit';
 import './resources-popover';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
-import { ResourceModel } from '../../resources/resource-service';
-import { ModalService } from '../common/modals/modal-service';
-import { enabledResources } from '../../common/utils/resources';
-import { WorkspaceModel } from '../../deprecated/workspace-service';
+import { ResourceService } from '../../resources/resource-service';
 
 export class ResourceBar extends HTMLElement {
-  resourceModel = dependencies.resolve<ResourceModel>('ResourceModel');
-  modalService = dependencies.resolve<ModalService>('ModalService');
-  workspaceModel = dependencies.resolve<WorkspaceModel>('WorkspaceModel');
+  resourceService = dependencies.resolve<ResourceService>('ResourceService');
 
   constructor() {
     super();
-    this.resourceModel.subscribe(() => this.render());
-    this.workspaceModel.subscribe(() => this.render());
+    this.resourceService.subscribe(() => this.render());
   }
 
   connectedCallback(): void {
@@ -23,7 +17,7 @@ export class ResourceBar extends HTMLElement {
   }
 
   render(): void {
-    const resources = enabledResources(this.resourceModel, this.workspaceModel);
+    const resources = this.resourceService.all();
 
     const resourceTemplate = resources.map((resource) => {
       return html`<li class="applet-item">
@@ -46,7 +40,7 @@ export class ResourceBar extends HTMLElement {
       ></resource-management-popover>
       <un-button
         variant="ghost"
-        icon="toolbox"
+        icon="plus"
         icon-position="end"
         id="resource-management-button"
         popovertarget="resource-management-popover"

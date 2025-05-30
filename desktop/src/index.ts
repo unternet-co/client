@@ -81,7 +81,7 @@ async function init() {
     initialResources,
   });
   await resourceService.load();
-  dependencies.registerSingleton('ResourceModel', resourceService);
+  dependencies.registerSingleton('ResourceService', resourceService);
 
   /* Initialize kernel & LLMs */
 
@@ -148,6 +148,8 @@ async function init() {
     console.warn('Primary model not defined in config, opening settings modal');
     modalService.open('settings');
   }
+
+  resourceService.register('applets.unternet.co/maps');
 }
 
 // Call the init function to start the application

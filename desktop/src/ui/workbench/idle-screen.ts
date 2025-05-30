@@ -1,5 +1,6 @@
 import { html, render } from 'lit';
 import './idle-screen.css';
+import './resource-bar';
 
 export class IdleScreenElement extends HTMLElement {
   private intervalId: number | null = null;
@@ -36,6 +37,7 @@ export class IdleScreenElement extends HTMLElement {
         <div class="time">${formattedTime}</div>
         <div class="date">${formattedDate}</div>
       </div>
+      <resource-bar></resource-bar>
     `;
 
     render(template, this);

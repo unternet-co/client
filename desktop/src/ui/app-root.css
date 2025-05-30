@@ -13,7 +13,6 @@ app-root .workspace-content {
   position: relative;
   flex-grow: 1;
   display: flex;
-  overflow: hidden;
 }
 
 .toolbar {
@@ -22,7 +21,8 @@ app-root .workspace-content {
   flex-direction: column;
   align-items: center;
   color: var(--color-text-muted);
-  padding-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  height: 44px;
 }
 
 .toolbar resource-bar {

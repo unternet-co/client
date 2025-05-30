@@ -3,8 +3,11 @@ resource-bar {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--space-4) var(--space-3) var(--space-5);
+  padding-left: var(--space-3);
   justify-content: space-between;
+  background: var(--color-inset);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
 }
 
 ul.resources-list {
@@ -37,4 +40,8 @@ resource-bar .applet-name {
   display: block;
   /* font-weight: 400; */
   font-size: 11.5px;
+}
+
+#resource-management-button {
+  color: var(--color-input-placeholder);
 }

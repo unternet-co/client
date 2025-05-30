@@ -114,6 +114,7 @@ class ThreadView extends HTMLElement {
     const messageEl = createEl<HTMLDivElement>('div', {
       className: 'message',
       dataset: {
+        format: 'markdown',
         id: message.id,
         type: message.type,
       },

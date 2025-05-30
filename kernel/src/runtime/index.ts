@@ -80,7 +80,11 @@ export class ProcessRuntime {
     const rest = restParts.join();
 
     if (scheme === 'process' && this.processes.has(rest)) {
-      this.processes.get(rest).handleAction(proposal);
+      const process = this.processes.get(rest);
+      await process.handleAction(proposal);
+      return actionResultResponse({
+        content: 'Action successful, see process.',
+      });
     } else {
       if (!this.protocols.has(scheme)) {
         throw new Error(
@@ -89,6 +93,12 @@ export class ProcessRuntime {
       }
     }
 
+    console.log(
+      'Dispatching action:',
+      scheme,
+      proposal,
+      this.protocols.get(scheme)
+    );
     const result = await this.protocols.get(scheme).handleAction(proposal);
 
     if (result instanceof Process) {

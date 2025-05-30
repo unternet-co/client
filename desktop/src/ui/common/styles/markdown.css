@@ -19,12 +19,15 @@
 [data-format='markdown'] ul,
 [data-format='markdown'] ol,
 [data-format='markdown'] blockquote {
-  margin-bottom: 1.5em;
+  margin-bottom: 0.5em;
+}
+[data-format='markdown'] :last-child {
+  margin-bottom: 0;
 }
 
 [data-format='markdown'] ul,
 [data-format='markdown'] ol {
-  padding-left: 1.5em;
+  padding-left: 1.25em;
 }
 
 [data-format='markdown'] li {

@@ -47,7 +47,9 @@ export class ResourceService {
     try {
       const urlObj = new URL(uri);
       scheme = urlObj.protocol.replace(':', '');
-      protocol = protocols.find((p) => p.scheme === scheme);
+      protocol = protocols.find(
+        (p) => p.scheme === scheme || p.scheme.includes(scheme)
+      );
       if (!protocol)
         throw new Error(`No protocol handler installed for '${scheme}'.`);
     } catch (e) {
@@ -56,7 +58,7 @@ export class ResourceService {
 
     const ctor = protocol.constructor as typeof Protocol;
     const newResource = await ctor.resolveResource(uri);
-    this.add(newResource);
+    console.log(`Registered resource: ${newResource.uri}`);
   }
 
   add(resource: Resource) {
@@ -67,7 +69,6 @@ export class ResourceService {
 
   get(uri: string) {
     const result = this.resources.get(uri);
-    console.log(this.resources);
     if (!result) {
       throw new Error(`No resource matches this URI: ${JSON.stringify(uri)}`);
     }

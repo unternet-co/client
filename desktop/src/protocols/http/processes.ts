@@ -3,6 +3,10 @@ import { getMetadata } from '../../common/utils/http';
 import { WebviewTag } from 'electron/renderer';
 import { Applet, applets } from '@web-applets/sdk';
 
+const hiddenContainer = document.createElement('div');
+hiddenContainer.style.display = 'none';
+document.body.appendChild(hiddenContainer);
+
 interface WebProcessState {
   url: string;
   title?: string;
@@ -22,9 +26,9 @@ export class WebProcess extends Process {
   data?: any;
   applet?: Applet | null;
 
-  static create(url: string) {
+  static async create(url: string) {
     const process = new WebProcess({ url });
-    process.load(url);
+    await process.load(url);
     return process;
   }
 
@@ -34,8 +38,9 @@ export class WebProcess extends Process {
     this.description = metadata.description;
     this.icons = metadata.icons;
     this.textContent = metadata.textContent;
-    console.log('updated');
-    console.log(this);
+    if (this.url.includes('applets.unternet')) {
+      this.applet = await this.connectApplet(hiddenContainer);
+    }
     this.notifyChange();
   }
 
@@ -75,11 +80,15 @@ export class WebProcess extends Process {
 
   async handleAction(action: ActionProposal) {
     if (!this.applet) {
-      // const applet = await this.connectApplet(hiddenContainer);
       return;
     }
-    await this.applet.sendAction(action.actionId, action.args);
-    this.data = this.applet.data;
+    setTimeout(async () => {
+      console.log('Applet:', this.applet);
+      console.log('Handling action:', action);
+      await this.applet.sendAction(action.actionId, action.args);
+      console.log('Action sent to applet:', action.actionId, action.args);
+      this.data = this.applet.data;
+    }, 500);
   }
 
   describe() {
@@ -99,7 +108,6 @@ export class WebProcess extends Process {
         (this.webview as HTMLIFrameElement).contentWindow
       );
       this.actions = this.applet?.actions;
-      console.log('ACTIONS', this.actions);
     }, 0);
   }
 
@@ -107,14 +115,13 @@ export class WebProcess extends Process {
     this.webview.remove();
   }
 
-  // async connectApplet(element: HTMLElement): Promise<Applet> {
-  //   element.appendChild(this.webview);
-  //   const applet = await applets.connect(this.webview.contentWindow);
-  //   applet.data = this.data;
-  //   return applet;
-  // }
+  async connectApplet(element: HTMLElement): Promise<Applet> {
+    console.log('connecting applet');
+    const webview = this.webview as HTMLIFrameElement;
+    element.appendChild(webview);
+    const applet = await applets.connect(webview.contentWindow);
+    applet.data = this.data;
+    console.log('apoplet connected', applet);
+    return applet;
+  }
 }
-
-// const hiddenContainer = document.createElement('div');
-// hiddenContainer.style.display = 'none';
-// document.body.appendChild(hiddenContainer);

@@ -31,6 +31,10 @@ export class Disposable implements IDisposable {
 export class DisposableGroup {
   private disposables: IDisposable[] = [];
 
+  get all() {
+    return this.disposables;
+  }
+
   add(...disposables: Array<IDisposable>) {
     for (const d of disposables) {
       this.disposables.push(d);

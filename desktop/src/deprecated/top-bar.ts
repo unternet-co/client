@@ -1,11 +1,11 @@
 import { render, html } from 'lit';
-import { dependencies } from '../../common/dependencies';
+import { dependencies } from '../common/dependencies';
 // import './model-selector';
 import '../tab-handle';
-import '../common/elements/select';
+import '../ui/common/elements/select';
 import './top-bar.css';
-import { ModalService } from '../common/modals/modal-service';
-import '../toolbar/workspace-selector';
+import { ModalService } from '../ui/common/modals/modal-service';
+import '../ui/toolbar/workspace-selector';
 
 export class TopBar extends HTMLElement {
   modalService = dependencies.resolve<ModalService>('ModalService');

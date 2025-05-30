@@ -5,6 +5,9 @@ idle-screen {
   align-items: center;
   justify-content: center;
   color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
 }
 
 idle-screen input {

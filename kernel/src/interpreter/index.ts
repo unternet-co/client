@@ -99,7 +99,10 @@ export class Interpreter {
       return;
     }
 
-    console.log(this.actionsWithProcesses(input.processes));
+    console.log(
+      'Available actions:',
+      this.actionsWithProcesses(input.processes)
+    );
 
     const strategy = yield* this.chooseStrategy(input);
 
@@ -203,8 +206,7 @@ export class Interpreter {
   async createActionResponses(
     input: InterpreterInput
   ): Promise<ActionProposalResponse[]> {
-    console.log('processes', input.processes);
-    console.log(this.actionsWithProcesses(input.processes));
+    console.log('Active processes:', input.processes);
     const { tools } = await this.generateObject({
       messages: input.messages,
       system: this.prompts.system({
@@ -217,7 +219,6 @@ export class Interpreter {
     });
 
     return tools.map((tool) => {
-      console.log(tool);
       const { uri, actionId } = decodeActionHandle(tool.id);
 
       let action: ActionDefinition;
@@ -241,7 +242,7 @@ export class Interpreter {
         display: display,
       });
 
-      console.log('[INTERPRETER] Action proposal: ', response);
+      console.log('Action proposal: ', response);
       return response;
     });
   }
@@ -265,7 +266,6 @@ export class Interpreter {
 
   async streamText(opts: GenerationOpts) {
     const modelMsgs = toModelMessages(opts.messages);
-    console.log(opts.system);
 
     const output = streamText({
       model: this.model,

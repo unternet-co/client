@@ -35,9 +35,11 @@ class Workbench extends HTMLElement {
 
   render() {
     if (this.workspaceModel.processInstances.length) {
-      const template = html`<process-frame
-        .process=${this.workspaceModel.processInstances.at(-1).process}
-      ></process-frame>`;
+      const template = html`
+        <process-frame
+          .process=${this.workspaceModel.processInstances.at(-1).process}
+        ></process-frame>
+      `;
       render(template, this);
     } else {
       const template = html`<idle-screen></idle-screen>`;
