@@ -10,6 +10,13 @@ function chooseStrategy(strategies: Record<string, Strategy>) {
   const descriptions = JSON.stringify(strategies);
   return dedent`
     Choose from one of the following available strategies to use in order to best respond to the user's query. (This is not your actual response, but will determine the type of response you give).
+    
+    IMPORTANT: For ANY file or directory operations, you MUST use the RESEARCH strategy. This includes:
+    - Reading files
+    - Listing directory contents
+    - Searching files
+    - Any other file system operations
+    
     Available strategies are listed below in a discriminated union format with the name Strategy.
     \`\`\`
     type Strategy = ${possibleOutputs};
