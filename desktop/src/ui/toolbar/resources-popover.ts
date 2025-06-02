@@ -178,6 +178,24 @@ export class ResourceManagementPopover extends PopoverElement {
             Paste the url of any website or app to detect available resources.
           </p>
         </fieldset>
+        <div class="button-group">
+          <un-button
+            variant="secondary"
+            @click=${(e: Event) => this.handleFilePickerAdd('file')}
+            label="Add Local File"
+            icon="file-plus"
+          >
+            Add Local File
+          </un-button>
+          <un-button
+            variant="secondary"
+            @click=${(e: Event) => this.handleFilePickerAdd('directory')}
+            label="Add Local Folder"
+            icon="folder-plus"
+          >
+            Add Local Folder
+          </un-button>
+        </div>
         <footer>
           <un-button variant="secondary" @click=${() => this.goToView('list')}
             >Cancel</un-button
