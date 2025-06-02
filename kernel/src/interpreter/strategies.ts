@@ -27,6 +27,10 @@ defaultStrategies.TEXT = {
 defaultStrategies.RESEARCH = {
   description: dedent`
     Use one or more tools, then respond to the user based on the tool output.
+    This strategy is REQUIRED for file operations - always use this when working with files and directories.
+    For file operations, you should:
+    1. First list the contents of a directory to see what files are available
+    2. Then read or search specific files as needed
     If you already have the required information from a prior tool call DO NOT use this, instead use TEXT (assume all prior information is still up-to-date). If you don't have the required information to use the tool, use TEXT to ask a follow-up question to clarify.
     Here are some tips:
     - You may use as many tools as you wish, it's recommended you err on the side of MORE not less, to retrieve as much relevant information as possible.
@@ -51,7 +55,7 @@ defaultStrategies.RESEARCH = {
 };
 
 defaultStrategies.DISPLAY = {
-  description: `Use one tool, then show the output of that tool directly to the user. Use this in situations where the user most likely wants to directly view the UI of the tool in question, instead of a summary.`,
+  description: `Use one tool, then show the output of that tool directly to the user. Use this in situations where the user most likely wants to directly view the UI of the tool in question, instead of a summary. DO NOT use this for file operations - use RESEARCH instead.`,
   method: async function* (
     interpreter: Interpreter,
     messages: Array<KernelMessage>
