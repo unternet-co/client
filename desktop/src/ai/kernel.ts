@@ -13,7 +13,7 @@ import {
 
 import { WorkspaceRecord, WorkspaceModel } from '../models/workspace-model';
 import { ConfigModel, ConfigNotification } from '../models/config-model';
-import { AIModelService } from './ai-models';
+import { AIModelService, AIModelProviderConfig } from './ai-models';
 import { ResourceModel } from '../models/resource-model';
 import { Notifier } from '../common/notifier';
 import { ProcessModel } from '../models/process-model';
@@ -45,16 +45,17 @@ export interface KernelNotification {
 
 export class Kernel {
   initialized: boolean = false;
-  interpreter?: Interpreter | null;
+  interpreter: Interpreter | null = null;
   runtime: ProcessRuntime;
   workspaceModel: WorkspaceModel;
   configModel: ConfigModel;
   processModel: ProcessModel;
   resourceModel: ResourceModel;
   aiModelService: AIModelService;
-  status: KernelStatus;
+  status: KernelStatus = 'idle';
   private notifier = new Notifier<KernelNotification>();
   readonly subscribe = this.notifier.subscribe;
+  private lastResourceCounts = { total: 0, enabled: 0 };
 
   constructor({
     workspaceModel,
@@ -73,7 +74,7 @@ export class Kernel {
 
     this.initialize();
 
-    this.configModel.subscribe(async (notification: ConfigNotification) => {
+    this.configModel.subscribe((notification?: ConfigNotification) => {
       if (!notification) return;
       if (notification.type === 'model' || notification.type === 'hint') {
         this.initialize();
@@ -83,14 +84,38 @@ export class Kernel {
 
   async initialize() {
     const config = this.configModel.get();
+    const primaryModel = config.ai.primaryModel;
+
+    if (!primaryModel) {
+      this.initialized = false;
+      this.interpreter = null;
+      return;
+    }
+
+    if (!(primaryModel.provider in config.ai.providers)) {
+      console.error(`Provider ${primaryModel.provider} not found in config`);
+      this.initialized = false;
+      this.interpreter = null;
+      return;
+    }
+
+    const provider = config.ai.providers[primaryModel.provider];
+    if (!provider || typeof provider !== 'object') {
+      console.error(`Provider config for ${primaryModel.provider} is invalid`);
+      this.initialized = false;
+      this.interpreter = null;
+      return;
+    }
 
     const model = await this.aiModelService.getModel(
-      config.ai.primaryModel.provider,
-      config.ai.primaryModel.name,
-      config.ai.providers[config.ai.primaryModel.provider]
+      primaryModel.provider,
+      primaryModel.name,
+      provider as AIModelProviderConfig
     );
 
-    const hint = config.ai.globalHint;
+    const hint =
+      (config.ai.globalHint || '') +
+      '\n\nWhen working with files and directories, use the RESEARCH strategy to first list the contents of a directory before attempting to read specific files. This ensures you have the correct file path before attempting to read it.';
     const resources = this.resourceModel.all();
     this.resourceModel.subscribe(this.updateResources.bind(this));
     this.workspaceModel.subscribe(this.updateResources.bind(this));
@@ -106,7 +131,25 @@ export class Kernel {
 
   updateResources() {
     const resources = enabledResources(this.resourceModel, this.workspaceModel);
-    this.interpreter.updateResources(resources);
+    const totalResources = this.resourceModel.all().length;
+
+    if (
+      totalResources !== this.lastResourceCounts.total ||
+      resources.length !== this.lastResourceCounts.enabled
+    ) {
+      console.log('[KERNEL] Resources updated:', {
+        totalResources,
+        enabledCount: resources.length,
+      });
+      this.lastResourceCounts = {
+        total: totalResources,
+        enabled: resources.length,
+      };
+    }
+
+    if (this.interpreter) {
+      this.interpreter.updateResources(resources);
+    }
   }
 
   updateStatus(status: KernelStatus) {
@@ -115,6 +158,14 @@ export class Kernel {
   }
 
   async handleInput(workspaceId: WorkspaceRecord['id'], input: KernelInput) {
+    console.log('[KERNEL] Processing input:', {
+      workspaceId,
+      enabledResourceCount: enabledResources(
+        this.resourceModel,
+        this.workspaceModel
+      ).length,
+    });
+
     const inputMsg = inputMessage({ text: input.text });
     this.workspaceModel.addMessage(workspaceId, inputMsg);
 
@@ -131,9 +182,12 @@ export class Kernel {
       );
     }
 
-    const runner = this.interpreter.run(
-      this.workspaceModel.get(workspaceId).activeMessages
-    );
+    const messages = this.workspaceModel.get(workspaceId).activeMessages;
+    if (!messages) {
+      throw new Error('No active messages found in workspace');
+    }
+
+    const runner = this.interpreter.run(messages);
 
     let iteration = await runner.next();
     while (!iteration.done) {
@@ -153,9 +207,11 @@ export class Kernel {
           throw new Error('Action type not recognized!');
       }
 
-      iteration = await runner.next(
-        this.workspaceModel.get(workspaceId).activeMessages
-      );
+      const nextMessages = this.workspaceModel.get(workspaceId).activeMessages;
+      if (!nextMessages) {
+        throw new Error('No active messages found in workspace');
+      }
+      iteration = await runner.next(nextMessages);
     }
   }
 
@@ -177,9 +233,17 @@ export class Kernel {
     workspaceId: WorkspaceRecord['id'],
     proposal: ActionProposalResponse
   ) {
+    console.log('[KERNEL] Processing action:', {
+      actionId: proposal.actionId,
+      uri: proposal.uri,
+    });
+
     const { process, content } = await this.runtime.dispatch(proposal);
-    let container: ProcessContainer;
-    if (process) container = this.processModel.create(process, workspaceId);
+
+    let container: ProcessContainer | undefined;
+    if (process) {
+      container = this.processModel.create(process, workspaceId);
+    }
 
     const message = actionMessage({
       uri: proposal.uri,

@@ -187,15 +187,33 @@ export function toModelMessages(kernelMsgs: KernelMessage[]): ModelMessage[] {
 
       case 'action': {
         const actionUri = encodeActionHandle(k.uri, k.actionId);
-
         const body = k.process !== undefined ? k.process.describe() : k.content;
 
-        modelMsgs.push({
-          role: 'assistant',
-          content: `Action invoked: ${actionUri}\nOutput: ${JSON.stringify(
-            body
-          )}`,
-        });
+        // Handle FileInput objects in action responses by creating a new input message
+        if (
+          body &&
+          typeof body === 'object' &&
+          'data' in body &&
+          body.data instanceof Uint8Array
+        ) {
+          const fileInput = body as FileInput;
+          // Create a new input message with the file
+          modelMsgs.push({
+            role: 'user',
+            content: [fileToPart(fileInput)],
+          });
+          // Add a response message to indicate the action was performed
+          modelMsgs.push({
+            role: 'assistant',
+            content: `Action invoked: ${actionUri}\nAnalyzing image...`,
+          });
+        } else {
+          // For other types of responses, format as a string
+          modelMsgs.push({
+            role: 'assistant',
+            content: `Action invoked: ${actionUri}\nOutput: ${JSON.stringify(body)}`,
+          });
+        }
         break;
       }
     }

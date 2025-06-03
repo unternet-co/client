@@ -22,6 +22,8 @@ export interface Resource {
   icons?: ResourceIcon[];
   description?: string;
   actions?: ActionDict;
+  type?: string; // Type of resource (e.g. 'image', 'text', etc.)
+  thumbnail?: string; // Base64 encoded thumbnail for image resources
 }
 
 type ResourceInit = { uri: string } & Partial<Resource>;

@@ -220,16 +220,30 @@ class ThreadView extends HTMLElement {
   }
 
   processSnippetTemplate(message: ActionMessage) {
-    const resource = this.resourceModel.get(message.uri);
+    let resource;
+    try {
+      resource = this.resourceModel.get(message.uri);
+    } catch (error) {
+      // Resource was removed, show a generic message
+      return html`
+        <un-icon name="globe" class="resource-icon"></un-icon>
+        <span class="notification-text">Used a resource (now removed)</span>
+      `;
+    }
 
     let icon = html``;
     const iconSrc = getResourceIcon(resource);
     if (iconSrc) {
       icon = html`<img src=${iconSrc} class="resource-icon" />`;
+    } else {
+      // Fallback icon if no icon source is available
+      icon = html`<un-icon name="globe" class="resource-icon"></un-icon>`;
     }
     return html`
       ${icon}
-      <span class="notification-text">Used ${resource.name}</span>
+      <span class="notification-text"
+        >Used ${resource.name || 'a resource'}</span
+      >
     `;
   }
 

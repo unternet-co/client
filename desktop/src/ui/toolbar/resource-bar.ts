@@ -26,11 +26,21 @@ export class ResourceBar extends HTMLElement {
     const resources = enabledResources(this.resourceModel, this.workspaceModel);
 
     const resourceTemplate = resources.map((resource) => {
+      const isImage = resource.type === 'image';
+      const imageResource = resource as any; // Type assertion for image resources
+
       return html`<li class="applet-item">
-        <img
-          class="applet-icon"
-          src=${(resource.icons && resource.icons[0].src) || ''}
-        />
+        ${isImage && imageResource.thumbnail
+          ? html`<img
+              class="applet-icon applet-image"
+              src="${imageResource.thumbnail}"
+              alt="${resource.name || 'Image preview'}"
+            />`
+          : html`<img
+              class="applet-icon"
+              src=${(resource.icons && resource.icons[0].src) || ''}
+              alt="icon"
+            />`}
         <span class="applet-name">${resource.short_name ?? resource.name}</span>
       </li>`;
     });

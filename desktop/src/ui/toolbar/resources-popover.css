@@ -30,10 +30,33 @@ resource-management-popover {
       border-radius: var(--rounded-sm);
       background: var(--color-bg-chrome);
     }
+    &.resource-image {
+      width: 16px;
+      height: 16px;
+      border-radius: var(--rounded-sm);
+      object-fit: contain;
+      background: var(--color-bg-content);
+    }
+  }
+
+  .resource-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1 1 auto;
+    gap: 2px;
   }
 
   .resource-name {
-    flex-grow: 1;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .resource-type {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
   }
 
   .resource-row {
@@ -87,6 +110,14 @@ resource-management-popover {
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &.applet-card-image {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--rounded-md);
+      background: var(--color-bg-content);
+      object-fit: contain;
+    }
   }
 
   .applet-card-icon-placeholder {
@@ -117,8 +148,15 @@ resource-management-popover {
   }
 
   .applet-card-description {
-    color: var(--color-text-default);
-    word-break: break-word;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+
+    .image-metadata {
+      margin-top: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
   }
 
   .applet-card-actions-label {

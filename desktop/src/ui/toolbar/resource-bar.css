@@ -31,6 +31,12 @@ resource-bar .applet-item {
 
 resource-bar .applet-icon {
   width: 16px;
+  height: 16px;
+  object-fit: cover;
+}
+
+resource-bar .applet-image {
+  object-fit: contain;
 }
 
 resource-bar .applet-name {

@@ -18,7 +18,41 @@ class MarkdownText extends HTMLElement {
     const content = this.innerHTML;
     const strippedContent = content.replace(/<!--[\s\S]*?-->/g, '');
     const renderedContent = await marked(strippedContent);
+    if (!this.shadowRoot) {
+      console.error('Shadow root not available');
+      return;
+    }
     this.shadowRoot.innerHTML = renderedContent;
+
+    // Add click handlers for links
+    const links = this.shadowRoot.querySelectorAll('a');
+    links.forEach((link) => {
+      link.addEventListener('click', async (e) => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        // Handle file:// URLs
+        if (href.startsWith('file://')) {
+          e.preventDefault();
+          try {
+            if (
+              !window.electronAPI?.fileURLToPath ||
+              !window.electronAPI?.openFileWithDefault
+            ) {
+              throw new Error('Required Electron APIs not available');
+            }
+            const filePath = window.electronAPI.fileURLToPath(href);
+            const result =
+              await window.electronAPI.openFileWithDefault(filePath);
+            if ('error' in result) {
+              console.error('Failed to open file:', result.error);
+            }
+          } catch (error) {
+            console.error('Error handling file link:', error);
+          }
+        }
+      });
+    });
   }
 
   observeContentChanges() {
