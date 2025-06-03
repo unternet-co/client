@@ -1,9 +1,9 @@
 import { html, css, render } from 'lit';
-import { NativeMenuOption, NativeMenu } from '../menu/menu';
-import { Disposable, DisposableGroup } from '../../../common/disposable';
-import { attachStyles } from '../../../common/utils/dom';
+import { NativeMenuOption, NativeMenu } from './menu/menu';
+import { Disposable, DisposableGroup } from '../common/disposable';
+import { attachStyles } from '../common/utils/dom';
 import classNames from 'classnames';
-import '../icons/icon';
+import '../ui/common/icons/icon';
 
 export type SelectSize = 'small' | 'medium' | 'large';
 export type SelectVariant = 'default' | 'ghost' | 'flat';
@@ -322,7 +322,7 @@ export class SelectElement extends HTMLElement {
         height: var(--select-height);
         padding: 0 var(--space-8) 0 var(--space-4);
         border-radius: var(--rounded);
-        background-color: var(--color-input-bg);
+        background-color: var(--color-interaction-bg);
         color: var(--color-text);
         font-family: inherit;
         font-size: inherit;

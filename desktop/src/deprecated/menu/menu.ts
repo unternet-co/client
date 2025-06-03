@@ -8,9 +8,9 @@ export interface NativeMenuOption extends MenuItemConstructorOptions {
  * and managing native menu event handlers for Electron environments.
  */
 export class NativeMenu {
-  #idValueMap = new Map<string, string>();
-  #idx = 0;
-  #handlerMap: WeakMap<HTMLElement, EventListener> = new WeakMap();
+  private idValueMap = new Map<string, string>();
+  private idx = 0;
+  private handlerMap: WeakMap<HTMLElement, EventListener> = new WeakMap();
 
   /**
    * Normalizes a string or object to a NativeMenuOption array.
@@ -49,14 +49,14 @@ export class NativeMenu {
     value: string | null | undefined
   ): string | undefined {
     if (!value || !Array.isArray(options)) return undefined; // Ensure options is an array
-    const flat = this.#flatten(options);
+    const flat = this.flatten(options);
     return flat.find((opt) => opt.value === value)?.label;
   }
 
-  static #flatten(opts: NativeMenuOption[]): NativeMenuOption[] {
+  private static flatten(opts: NativeMenuOption[]): NativeMenuOption[] {
     return opts.flatMap((opt) =>
       Array.isArray(opt.submenu)
-        ? [opt, ...this.#flatten(opt.submenu as NativeMenuOption[])]
+        ? [opt, ...this.flatten(opt.submenu as NativeMenuOption[])]
         : [opt]
     );
   }
@@ -67,15 +67,15 @@ export class NativeMenu {
    * @returns MenuItemConstructorOptions[]
    */
   buildMenuOptions(options: NativeMenuOption[]): MenuItemConstructorOptions[] {
-    this.#idValueMap.clear();
-    this.#idx = 0;
-    return this.#recurse(options);
+    this.idValueMap.clear();
+    this.idx = 0;
+    return this.recurse(options);
   }
 
   /**
-   * Internal recursive builder for menu options.
+   * Internal recursive builder for building menu options with submenus.
    */
-  #recurse(opts: NativeMenuOption[]): MenuItemConstructorOptions[] {
+  private recurse(opts: NativeMenuOption[]): MenuItemConstructorOptions[] {
     return opts.map((opt) => {
       const { value, submenu, ...rest } = opt as NativeMenuOption & {
         submenu?: NativeMenuOption[];
@@ -86,12 +86,12 @@ export class NativeMenu {
         );
       }
       if (rest.type === 'separator') return { type: 'separator' };
-      const id = `menu-item-${this.#idx++}`;
-      this.#idValueMap.set(id, value);
+      const id = `menu-item-${this.idx++}`;
+      this.idValueMap.set(id, value);
       return {
         ...rest,
         id,
-        ...(Array.isArray(submenu) ? { submenu: this.#recurse(submenu) } : {}),
+        ...(Array.isArray(submenu) ? { submenu: this.recurse(submenu) } : {}),
       };
     });
   }
@@ -101,7 +101,7 @@ export class NativeMenu {
    * @param id string
    */
   getValueForId(id: string): string | undefined {
-    return this.#idValueMap.get(id);
+    return this.idValueMap.get(id);
   }
 
   /**
@@ -120,7 +120,7 @@ export class NativeMenu {
   ) {
     if (!el) return;
     this.unregisterEvents(el);
-    const handler = this.#handleNativeMenuClick.bind(
+    const handler = this.handleNativeMenuClick.bind(
       this,
       el,
       getOptions,
@@ -129,7 +129,7 @@ export class NativeMenu {
     );
 
     el.addEventListener('click', handler);
-    this.#handlerMap.set(el, handler);
+    this.handlerMap.set(el, handler);
   }
 
   /**
@@ -137,10 +137,10 @@ export class NativeMenu {
    * @param el HTMLElement
    */
   unregisterEvents(el: HTMLElement) {
-    const handler = this.#handlerMap.get(el);
+    const handler = this.handlerMap.get(el);
     if (handler) {
       el.removeEventListener('click', handler);
-      this.#handlerMap.delete(el);
+      this.handlerMap.delete(el);
     }
   }
 
@@ -151,7 +151,7 @@ export class NativeMenu {
    * @param onValue (value: string) => void
    * @param e MouseEvent
    */
-  async #handleNativeMenuClick(
+  private async handleNativeMenuClick(
     target: HTMLElement,
     getOptions: () => NativeMenuOption[],
     getValue: () => string | null,

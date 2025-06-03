@@ -1,7 +1,5 @@
 import { html, css, render } from 'lit';
 import { Kernel } from '../../kernel/kernel';
-import '../common/elements/input';
-import '../common/elements/button';
 import { attachStyles } from '../../common/utils';
 import { Disposable } from '../../common/disposable';
 import { dependencies } from '../../common/dependencies';
@@ -131,6 +129,7 @@ export class CommandInputElement extends HTMLElement {
                 @mousedown=${this.handleTargetClick.bind(this)}
               >
                 ${placeholder}
+                <un-button variant="compact" icon="mic"></un-icon>
               </div>
             `}
       </div>
@@ -156,11 +155,11 @@ export class CommandInputElement extends HTMLElement {
     }
 
     .target {
-      color: var(--color-input-placeholder);
+      color: var(--color-placeholder);
       width: var(--command-target-width, 46ch);
       max-width: 100%;
       margin: 0 auto;
-      background: var(--color-input-bg);
+      background: var(--color-interaction-bg);
       border: 1px solid var(--color-border);
       border-radius: var(--rounded);
       padding: 3px var(--space-4);
@@ -182,9 +181,8 @@ export class CommandInputElement extends HTMLElement {
       right: 0;
       margin: 0 auto;
       border-radius: var(--rounded);
-      outline: 1px solid var(--color-border);
-      outline-color: var(--color-action-800);
-      background: var(--color-input-bg);
+      outline: 1px solid var(--color-border-muted);
+      background: var(--color-interaction-bg);
     }
 
     .input {

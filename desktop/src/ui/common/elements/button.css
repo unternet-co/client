@@ -1,125 +1,34 @@
 un-button {
-  pointer-events: none;
+  --button-padding: var(--space-3);
+  -webkit-app-region: no-drag;
+}
+
+un-button[variant='compact'],
+un-button[variant='compact-ghost'] {
+  --button-padding: var(--space-1);
 }
 
 un-button button {
-  pointer-events: auto;
-  transition: all 100ms;
-  overflow: hidden;
-  border: none;
-  --button-height: 24px;
-  --button-color: var(--color-action-800);
-  --button-text-color: var(--color-action-0);
-}
-
-un-button button {
+  color: var(--color-interaction-body);
   display: inline-flex;
-  border-radius: var(--rounded);
   align-items: center;
   justify-content: center;
-  height: var(--button-height);
-  line-height: var(--button-height);
-  gap: var(--space-2);
+  padding: var(--button-padding);
+  background: var(--color-interaction-bg);
+  border: var(--color-border);
+  border-radius: var(--rounded);
+}
 
-  background-color: var(--button-color);
-  color: var(--button-text-color);
-  box-shadow: var(--button-shadows);
+un-button[variant='ghost'] button,
+un-button[variant='compact-ghost'] button {
+  background: transparent;
+}
 
-  &:hover,
-  &:focus {
-    background-color: color-mix(
-      in oklch,
-      var(--button-color) 100%,
-      var(--color-grey-0) 25%
-    );
-  }
+un-button button:hover {
+  background: var(--color-interaction-hover);
+}
 
-  &:focus {
-    outline: var(--outline);
-    outline-offset: var(--outline-offset);
-
-    /* So that focus outline doesn't show on pointer events */
-    &:not(:focus-visible) {
-      outline: none;
-    }
-  }
-
-  &:active {
-    box-shadow: none;
-    background-color: var(--button-color);
-  }
-
-  &:disabled,
-  &.loading {
-    cursor: not-allowed;
-    pointer-events: none;
-    opacity: 0.5;
-    box-shadow: none;
-  }
-
-  &.secondary {
-    --button-color: var(--color-neutral-200);
-    --button-text-color: var(--color-neutral-1000);
-    &:hover {
-      --button-text-color: var(--color-action-800);
-    }
-  }
-
-  &.negative {
-    --button-color: var(--color-error-800);
-    --button-text-color: var(--color-error-0);
-  }
-
-  &.outline,
-  &.ghost,
-  &.link {
-    --button-color: transparent;
-    --button-text-color: currentColor;
-    box-shadow: none;
-
-    &:hover,
-    &:focus {
-      --button-color: var(--color-neutral-200);
-      opacity: 1;
-    }
-  }
-
-  &.link {
-    --button-text-color: var(--color-action-800);
-    &:hover {
-      --button-text-color: var(--color-action-800);
-    }
-  }
-
-  &.outline {
-    --button-text-color: currentColor;
-    border: 1px solid color-mix(in oklch, currentColor 85%, transparent 100%);
-    &:hover {
-      border-color: currentColor;
-    }
-  }
-
-  &.link {
-    --button-height: 18px;
-    font-size: var(--text-sm);
-  }
-
-  &.small {
-    --button-height: 18px;
-    font-size: var(--text-sm);
-  }
-
-  &.large {
-    --button-height: 28px;
-  }
-
-  .icon-container {
-    display: flex;
-    align-items: center;
-    opacity: 0.75;
-  }
-
-  &:hover .icon-container {
-    opacity: 1;
-  }
+un-button[variant='ghost'] button:hover,
+un-button[variant='compact-ghost'] button:hover {
+  background: var(--color-interaction-bg);
 }

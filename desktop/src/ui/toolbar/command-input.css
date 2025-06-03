@@ -1,0 +1,66 @@
+command-input {
+  display: block;
+  width: 100%;
+  position: relative;
+}
+
+command-input .container {
+  width: 100%;
+  position: relative;
+  min-height: calc(1.5em + 2 * var(--space-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+command-input .target {
+  color: var(--color-placeholder);
+  width: var(--command-target-width, 46ch);
+  max-width: 100%;
+  margin: 0 auto;
+  background: var(--color-interaction-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded);
+  padding: 3px var(--space-4);
+  text-align: center;
+  font-size: var(--text-base);
+  transition: opacity 0.2s ease;
+}
+
+command-input .target.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+command-input .input-container {
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  border-radius: var(--rounded);
+  outline: 1px solid var(--color-border-muted);
+  background: var(--color-interaction-bg);
+}
+
+command-input .input {
+  outline: none;
+  padding: var(--space-2) var(--space-4);
+  max-height: calc(1.5em * 3);
+  overflow-y: auto;
+  line-height: 1.5em;
+}
+
+command-input .submit-button {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+}
+
+command-input .submit-button::part(button) {
+  width: 18px;
+  height: 18px;
+  outline-width: 1px;
+  border-radius: var(--rounded);
+}

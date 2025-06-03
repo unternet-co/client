@@ -18,10 +18,15 @@
 :root {
   --color-text: var(--neutral-900);
   --color-text-muted: var(--neutral-800);
+
   --color-bg: var(--neutral-150);
   --color-surface: var(--neutral-100);
   --color-inset: var(--neutral-200);
-  --color-input-bg: var(--neutral-250);
+
+  --color-interaction-bg: var(--neutral-250);
+  --color-interaction-body: var(--neutral-600);
+  --color-interaction-hover: var(--neutral-200);
+
   --color-border: var(--neutral-300);
   --color-border-muted: var(--neutral-250);
   --color-input-placeholder: var(--neutral-500);
@@ -30,12 +35,16 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --color-text: var(--neutral-100);
+    --color-text-muted: var(--neutral-200);
     --color-bg: var(--neutral-800);
     --color-surface: var(--neutral-700);
     --color-inset: var(--neutral-900);
-    --color-input-bg: var(--neutral-700);
-    --color-input-placeholder: var(--neutral-500);
-    --color-text-muted: var(--neutral-200);
+
+    --color-interaction-bg: var(--neutral-700);
+    --color-interaction-body: var(--color-text-muted);
+    --color-interaction-hover: var(--neutral-600);
+    --color-placeholder: var(--neutral-500);
+
     --color-border: var(--neutral-600);
     --color-border-muted: var(--neutral-700);
   }

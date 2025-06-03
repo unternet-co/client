@@ -2,7 +2,7 @@ import { html, render } from 'lit';
 import { dependencies } from '../common/dependencies';
 import { ConfigService } from '../config/config-service';
 import { AIModelProviderNames } from '../ai/model-service';
-import { ModalService } from '../ui/common/modals/modal-service';
+import { ModalService } from './modals/modal-service';
 
 export class ModelSelector extends HTMLElement {
   configService = dependencies.resolve<ConfigService>('ConfigService');

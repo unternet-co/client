@@ -1,6 +1,6 @@
 import { appendEl, attachStyles, createEl } from '../../common/utils';
 import { BUG_REPORT_URL } from '../../constants';
-import { ModalElement } from '../common/modals/modal-element';
+import { ModalElement } from '../../deprecated/modals/modal-element';
 
 export class BugModal extends ModalElement {
   constructor() {

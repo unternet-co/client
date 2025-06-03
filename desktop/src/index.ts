@@ -5,7 +5,7 @@ import { KeyStoreService } from './storage/keystore-service';
 import { ShortcutService } from './shortcuts/shortcut-service';
 import { appendEl, createEl } from './common/utils/dom';
 import { registerGlobalShortcuts } from './shortcuts/global-shortcuts';
-import { ModalService } from './ui/common/modals/modal-service';
+import { ModalService } from './deprecated/modals/modal-service';
 import { Kernel } from './kernel/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
@@ -17,9 +17,7 @@ import { NUM_CONCURRENT_PROCESSES } from './constants';
 import './ui/common/styles/global.css';
 import './ui/app-root';
 import './ui/settings/settings-modal';
-import './ui/modals/bug-modal';
-import './ui/modals/workspace-delete-modal';
-import './ui/modals/new-workspace-modal';
+import './ui/common/elements';
 
 import { WorkspaceRecord } from './workspaces/workspace-model';
 import { ConfigData, ConfigService, initConfig } from './config/config-service';
@@ -114,21 +112,21 @@ async function init() {
 
   /* Register global modals */
 
-  modalService.register('settings', {
-    element: 'settings-modal',
-  });
+  // modalService.register('settings', {
+  //   element: 'settings-modal',
+  // });
 
-  modalService.register('bug', {
-    element: 'bug-modal',
-  });
+  // modalService.register('bug', {
+  //   element: 'bug-modal',
+  // });
 
-  modalService.register('workspace-delete', {
-    element: 'workspace-delete-modal',
-  });
+  // modalService.register('workspace-delete', {
+  //   element: 'workspace-delete-modal',
+  // });
 
-  modalService.register('new-workspace', {
-    element: 'new-workspace-modal',
-  });
+  // modalService.register('new-workspace', {
+  //   element: 'new-workspace-modal',
+  // });
 
   /* Register keyboard shortcuts */
 

@@ -20,7 +20,7 @@ export class TabBar extends HTMLElement {
   render() {
     const template: HTMLTemplateResult[] = [];
 
-    template.push(html`<un-button icon="home"></un-icon>`);
+    template.push(html`<un-button icon="home" variant="ghost"></un-icon>`);
 
     this.tabs.forEach((tab, index) => {
       template.push(

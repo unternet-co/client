@@ -1,5 +1,5 @@
 import { html, render } from 'lit';
-import './resources-popover';
+// import './resources-popover';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
 import { ResourceService } from '../../resources/resource-service';
@@ -39,7 +39,7 @@ export class ResourceBar extends HTMLElement {
         position="top"
       ></resource-management-popover>
       <un-button
-        variant="ghost"
+        variant="compact-ghost"
         icon="plus"
         icon-position="end"
         id="resource-management-button"

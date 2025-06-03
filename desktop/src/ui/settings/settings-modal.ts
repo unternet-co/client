@@ -1,5 +1,5 @@
 import { html, render } from 'lit';
-import { ModalElement } from '../common/modals/modal-element';
+import { ModalElement } from '../../deprecated/modals/modal-element';
 import { View } from '../common/view';
 import { SettingsSection } from './settings-section';
 import { ModelSettingsSection } from './sections/model-settings';

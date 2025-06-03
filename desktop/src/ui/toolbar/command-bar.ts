@@ -26,7 +26,7 @@ export class CommandBar extends HTMLElement {
     const workspaceId = this.getAttribute('for') || null;
     const template = html`
       <div class="left-section">
-        <workspace-selector></workspace-selector>
+        <!-- <workspace-selector></workspace-selector> -->
       </div>
       <div class="center-section">
         <command-input for=${workspaceId}></command-input>

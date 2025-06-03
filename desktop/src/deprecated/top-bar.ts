@@ -2,9 +2,9 @@ import { render, html } from 'lit';
 import { dependencies } from '../common/dependencies';
 // import './model-selector';
 import '../tab-handle';
-import '../ui/common/elements/select';
+import './select';
 import './top-bar.css';
-import { ModalService } from '../ui/common/modals/modal-service';
+import { ModalService } from './modals/modal-service';
 import '../ui/toolbar/workspace-selector';
 
 export class TopBar extends HTMLElement {

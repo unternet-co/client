@@ -22,7 +22,7 @@ export class TabHandle extends HTMLElement {
   }
 
   render(tab: Tab) {
-    const template = html`${tab.title}`;
+    const template = html`<button>${tab.title}</button>`;
 
     render(template, this);
   }

@@ -134,6 +134,10 @@ fieldset + fieldset {
   padding-top: var(--space-6);
 }
 
+button {
+  color: var(--color-text);
+}
+
 body {
   background: var(--color-bg-page);
   -webkit-overflow-scrolling: touch;

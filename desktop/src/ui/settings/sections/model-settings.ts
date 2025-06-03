@@ -2,7 +2,7 @@ import { html, HTMLTemplateResult } from 'lit';
 import { dependencies } from '../../../common/dependencies';
 import { ConfigService } from '../../../config/config-service';
 import { SettingsSection } from '../settings-section';
-import { ChangeEvent } from '../../common/elements/select';
+import { ChangeEvent } from '../../../deprecated/select';
 import { AI_MODEL_PROVIDERS, ERROR_MESSAGES } from '../../../constants';
 import { AIModelDescriptor, AIModelProviderId } from '../../../ai/types';
 import { AIModelService } from '../../../ai/model-service';
