@@ -1,10 +1,15 @@
 command-bar {
+  height: 50px;
+  -webkit-app-region: drag;
+  /* background: var(--color-chrome); */
   display: flex;
+  flex-shrink: 0;
   align-items: center;
-  padding: var(--space-5) var(--space-4);
-  gap: var(--space-2);
+  gap: var(--space-4);
   width: 100%;
   position: relative;
+  /* border-top: 1px solid var(--color-border); */
+  /* box-shadow: var(--shadow-subtle-large); */
 }
 
 command-bar .left-section,
@@ -17,6 +22,8 @@ command-bar .right-section {
 
 command-bar .right-section {
   justify-content: flex-end;
+  align-items: center;
+  padding-right: var(--space-4);
 }
 
 command-bar .center-section {
@@ -33,4 +40,8 @@ command-bar .center-section {
 
 command-bar .center-section command-input {
   pointer-events: auto;
+}
+
+command-bar > * > * {
+  -webkit-app-region: no-drag;
 }

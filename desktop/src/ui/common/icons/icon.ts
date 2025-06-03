@@ -1,86 +1,36 @@
-import { html, css, render } from 'lit';
-import { createElement } from 'lucide';
-import { getIcon } from './icon-registry';
-import { attachStyles } from '../../../common/utils/dom';
+import { html, css, LitElement } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { icon, IconName } from './icon-registry';
 
 export type IconSize = 'small' | 'medium' | 'large';
 const sizeMap = {
   small: '12',
-  medium: '14',
+  medium: '15',
   large: '18',
 };
 
-export class IconElement extends HTMLElement {
-  static get observedAttributes() {
-    return ['name', 'size', 'spin'];
-  }
+@customElement('un-icon')
+export class IconElement extends LitElement {
+  @property({ type: String })
+  accessor icon: IconName | null = null;
 
-  #name: string | null = null;
-  #size: IconSize = 'medium';
-  #spin: string | null = null;
-  #shadow: ShadowRoot;
+  @property({ type: String })
+  accessor size: IconSize = 'medium';
 
-  constructor() {
-    super();
-    this.#shadow = this.attachShadow({ mode: 'open' });
-  }
+  @property({ type: Boolean })
+  accessor spin: boolean = false;
 
-  attributeChangedCallback(
-    attr: string,
-    oldVal: string | null,
-    newVal: string | null
-  ) {
-    if (oldVal === newVal) return;
-    switch (attr) {
-      case 'name':
-        this.#name = newVal;
-        break;
-      case 'size':
-        if (newVal === 'small' || newVal === 'medium' || newVal === 'large') {
-          this.#size = newVal;
-        } else {
-          this.#size = 'medium';
-        }
-        break;
-      case 'spin':
-        this.#spin = newVal;
-        break;
-    }
-    render(this.#template, this.#shadow);
-  }
+  render() {
+    const iconRenderer = icon(this.icon || 'help');
+    const size = sizeMap[this.size || 'medium'];
 
-  connectedCallback() {
-    attachStyles(this.#shadow, IconElement.styles.toString());
-    render(this.#template, this.#shadow);
-  }
+    // Use the icon renderer with size overrides
+    const svgElement = iconRenderer({
+      width: size,
+      height: size,
+    });
 
-  get #iconAttributes() {
-    return {
-      stroke: 'currentColor',
-      'stroke-linecap': 'round',
-      'stroke-linejoin': 'round',
-      width: sizeMap[this.#size || 'medium'],
-      height: sizeMap[this.#size || 'medium'],
-      fill: 'none',
-    };
-  }
-
-  get #template() {
-    const iconFactory = getIcon(this.#name || 'HelpCircle');
-    const attrs = this.#iconAttributes;
-    const svgNode = iconFactory(attrs);
-    const spin = this.#spin !== null && this.#spin !== undefined;
-    const spinClass = spin ? 'spin' : '';
-    const svgElement = createElement(svgNode);
-
-    if (spinClass && svgElement instanceof SVGElement) {
-      svgElement.classList.add('spin');
-    }
-
-    if (svgElement instanceof SVGElement) {
-      svgElement.setAttribute('width', attrs.width);
-      svgElement.setAttribute('height', attrs.height);
-    }
+    const spinClass = this.spin ? 'spin' : '';
 
     return html`
       <span class="container ${spinClass}" part="container">
@@ -117,5 +67,3 @@ export class IconElement extends HTMLElement {
     `;
   }
 }
-
-customElements.define('un-icon', IconElement);

@@ -2,10 +2,7 @@ import { MessageRecord } from './messages/types';
 import { dependencies } from './common/dependencies';
 import { DatabaseService } from './storage/database-service';
 import { KeyStoreService } from './storage/keystore-service';
-import { ShortcutService } from './shortcuts/shortcut-service';
 import { appendEl, createEl } from './common/utils/dom';
-import { registerGlobalShortcuts } from './shortcuts/global-shortcuts';
-import { ModalService } from './deprecated/modals/modal-service';
 import { Kernel } from './kernel/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
 import { OllamaModelProvider } from './ai/providers/ollama';
@@ -13,12 +10,6 @@ import { AIModelService } from './ai/model-service';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols';
 import { NUM_CONCURRENT_PROCESSES } from './constants';
-
-import './ui/common/styles/global.css';
-import './ui/app-root';
-import './ui/settings/settings-modal';
-import './ui/common/elements';
-
 import { WorkspaceRecord } from './workspaces/workspace-model';
 import { ConfigData, ConfigService, initConfig } from './config/config-service';
 import { WorkspaceService } from './workspaces/workspace-service';
@@ -29,6 +20,7 @@ import {
   initialResources,
   ResourceService,
 } from './resources/resource-service';
+import './ui/app-root';
 
 async function init() {
   /* Initialize databases & stores */
@@ -102,36 +94,6 @@ async function init() {
   );
   dependencies.registerSingleton('Kernel', kernel);
 
-  /* Initialize other services */
-
-  const shortcutService = new ShortcutService();
-  dependencies.registerSingleton('ShortcutService', shortcutService);
-
-  const modalService = new ModalService();
-  dependencies.registerSingleton('ModalService', modalService);
-
-  /* Register global modals */
-
-  // modalService.register('settings', {
-  //   element: 'settings-modal',
-  // });
-
-  // modalService.register('bug', {
-  //   element: 'bug-modal',
-  // });
-
-  // modalService.register('workspace-delete', {
-  //   element: 'workspace-delete-modal',
-  // });
-
-  // modalService.register('new-workspace', {
-  //   element: 'new-workspace-modal',
-  // });
-
-  /* Register keyboard shortcuts */
-
-  registerGlobalShortcuts();
-
   /* Initialize UI */
 
   appendEl(document.body, createEl('app-root'));
@@ -144,13 +106,9 @@ async function init() {
     !config.ai.primaryModel.name
   ) {
     console.warn('Primary model not defined in config, opening settings modal');
-    modalService.open('settings');
   }
-
-  resourceService.register('applets.unternet.co/maps');
 }
 
-// Call the init function to start the application
 init().catch((error) => {
   console.error('Failed to initialize application:', error);
 });

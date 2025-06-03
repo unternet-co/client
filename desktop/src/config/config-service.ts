@@ -10,6 +10,9 @@ export interface ConfigData {
     globalHint: string;
   };
   activeWorkspaceId: string | null;
+  ui: {
+    sidebarVisible: boolean;
+  };
 }
 
 export const initConfig: ConfigData = {
@@ -19,9 +22,12 @@ export const initConfig: ConfigData = {
     globalHint: '',
   },
   activeWorkspaceId: null,
+  ui: {
+    sidebarVisible: true,
+  },
 };
 
-export type ConfigNotification = { type: 'model' | 'hint' } | null;
+export type ConfigNotification = { type: 'model' | 'hint' | 'ui' } | null;
 
 const defaultProviderConfig = { apiKey: '', baseUrl: '' };
 
@@ -65,6 +71,21 @@ export class ConfigService {
     this.config.ai.globalHint = hint;
     this.store.set(this.config);
     this.notifier.notify({ type: 'hint' });
+  }
+
+  toggleSidebar() {
+    console.log(
+      'ConfigService: toggleSidebar called, current value:',
+      this.config.ui.sidebarVisible
+    );
+    this.config.ui.sidebarVisible = !this.config.ui.sidebarVisible;
+    console.log(
+      'ConfigService: new sidebar value:',
+      this.config.ui.sidebarVisible
+    );
+    this.store.set(this.config);
+    this.notifier.notify({ type: 'ui' });
+    console.log('ConfigService: notification sent with type "ui"');
   }
 
   get(): ConfigData;

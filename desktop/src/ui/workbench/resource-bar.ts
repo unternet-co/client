@@ -30,21 +30,9 @@ export class ResourceBar extends HTMLElement {
     });
 
     const template = html`
-      <ul class="resources-list">
+      <ul class="resource-list"></ul>
         ${resourceTemplate}
       </ul>
-      <resource-management-popover
-        id="resource-management-popover"
-        anchor="resource-management-button"
-        position="top"
-      ></resource-management-popover>
-      <un-button
-        variant="compact-ghost"
-        icon="plus"
-        icon-position="end"
-        id="resource-management-button"
-        popovertarget="resource-management-popover"
-      ></un-button>
     `;
 
     render(template, this);

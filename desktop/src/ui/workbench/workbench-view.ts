@@ -52,7 +52,7 @@ class Workbench extends HTMLElement {
     }
 
     const template = html`
-      <tab-bar></tab-bar>
+      <!-- <tab-bar></tab-bar> -->
       ${inner}
     `;
 

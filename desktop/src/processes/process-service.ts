@@ -2,7 +2,6 @@ import { Process, ProcessContainer, ProcessRuntime } from '@unternet/kernel';
 import { DatabaseService } from '../storage/database-service';
 import { ProcessRecord } from './types';
 import { Notifier } from '../common/notifier';
-import { WorkspaceModel } from '../workspaces/workspace-model';
 
 export class ProcessService {
   private readonly notifier = new Notifier();

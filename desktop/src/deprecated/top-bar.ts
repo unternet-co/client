@@ -5,7 +5,7 @@ import '../tab-handle';
 import './select';
 import './top-bar.css';
 import { ModalService } from './modals/modal-service';
-import '../ui/toolbar/workspace-selector';
+import './workspace-selector';
 
 export class TopBar extends HTMLElement {
   modalService = dependencies.resolve<ModalService>('ModalService');

@@ -27,113 +27,84 @@ import {
   ArrowUp,
   ArrowDown,
   Search,
+  PanelRight,
   Upload,
   Paperclip,
   CheckCheck,
 } from 'lucide';
+import { createElement } from 'lucide';
 import { broom } from '@lucide/lab';
 
 export const icons = {
-  HelpCircle,
-  X,
-  Home,
-  Plus,
-  Bug,
-  Shapes,
-  Settings,
-  Pencil,
-  Settings2,
-  Check,
-  ChevronsUpDown,
-  CornerDownLeft,
-  Mic,
-  GripHorizontal,
-  Trash,
-  History,
-  RefreshCw,
-  AlertTriangle,
-  Loader,
-  Info,
-  ExternalLink,
-  Download,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUp,
-  ArrowDown,
-  Search,
-  Upload,
-  Paperclip,
-  CheckCheck,
-  Broom: broom,
+  panelRight: PanelRight,
+  help: HelpCircle,
+  close: X,
+  home: Home,
+  plus: Plus,
+  bug: Bug,
+  toolbox: Shapes,
+  settings: Settings,
+  pencil: Pencil,
+  sliders: Settings2,
+  check: Check,
+  dropdown: ChevronsUpDown,
+  enter: CornerDownLeft,
+  handle: GripHorizontal,
+  delete: Trash,
+  mic: Mic,
+  history: History,
+  refresh: RefreshCw,
+  error: AlertTriangle,
+  loading: Loader,
+  info: Info,
+  external: ExternalLink,
+  download: Download,
+  left: ArrowLeft,
+  right: ArrowRight,
+  up: ArrowUp,
+  down: ArrowDown,
+  search: Search,
+  upload: Upload,
+  attachment: Paperclip,
+  checkcheck: CheckCheck,
+  archive: broom,
 } as const;
 
-export type CanonicalIconName = keyof typeof icons;
-export type IconName =
-  | CanonicalIconName
-  | keyof typeof ALIASES
-  | Lowercase<CanonicalIconName>
-  | string;
+export type IconName = keyof typeof icons;
 
-export const ALIASES: Record<string, CanonicalIconName> = {
-  close: 'X',
-  toolbox: 'Shapes',
-  sliders: 'Settings2',
-  dropdown: 'ChevronsUpDown',
-  enter: 'CornerDownLeft',
-  handle: 'GripHorizontal',
-  delete: 'Trash',
-  refresh: 'RefreshCw',
-  error: 'AlertTriangle',
-  loading: 'Loader',
-  external: 'ExternalLink',
-  left: 'ArrowLeft',
-  right: 'ArrowRight',
-  up: 'ArrowUp',
-  down: 'ArrowDown',
-  attachment: 'Paperclip',
-  archive: 'Broom',
-};
+export type IconRenderer = (attributes?: Record<string, any>) => SVGElement;
 
-export type IconFactory = (attrs: Record<string, any>) => IconNode;
+export function icon(name: IconName | string): IconRenderer {
+  // Direct lookup - much simpler!
+  const iconData = icons[name as IconName] || icons.help;
 
-export function getIcon(name: IconName): IconFactory {
-  const wrapIconNode =
-    (node: IconNode): IconFactory =>
-    (_attrs: Record<string, any>) =>
-      node;
-  if (!name) return wrapIconNode(icons.HelpCircle);
+  return (attributes: Record<string, any> = {}) => {
+    // Default attributes for all icons
+    const defaultAttrs = {
+      stroke: 'currentColor',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      fill: 'none',
+      width: '14',
+      height: '14',
+    };
 
-  // Resolve alias
-  let canonical = name as string;
-  if (ALIASES[canonical as keyof typeof ALIASES]) {
-    canonical = ALIASES[canonical as keyof typeof ALIASES];
+    // Merge defaults with provided attributes
+    const finalAttrs = { ...defaultAttrs, ...attributes };
+
+    return createElement(iconData, finalAttrs);
+  };
+}
+
+export function getIcon(name: IconName | string) {
+  // Direct lookup - much simpler!
+  const icon = icons[name as IconName];
+
+  if (icon) {
+    // Return the IconNode directly
+    return icon;
   }
 
-  // Prepare candidate keys to try in order
-  const pascal = canonical.replace(
-    /(^|[-_])(\w)/g,
-    (_: string, __: string, p2: string) => p2.toUpperCase()
-  );
-  const capFirst = canonical.charAt(0).toUpperCase() + canonical.slice(1);
-  const lower = canonical.toLowerCase();
-  const keysToTry = [canonical, pascal, capFirst];
-
-  // Try direct keys
-  for (const key of keysToTry) {
-    const candidate = (icons as any)[key];
-    if (typeof candidate === 'function') return candidate;
-    if (candidate) return wrapIconNode(candidate);
-  }
-
-  // Try any key matching lowercased name
-  for (const key of Object.keys(icons)) {
-    if (key.toLowerCase() === lower) {
-      const icon = (icons as any)[key];
-      if (typeof icon === 'function') return icon;
-      if (icon) return wrapIconNode(icon);
-    }
-  }
-
-  // Fallback
-  return wrapIconNode(icons.HelpCircle);
+  // Fallback to help circle if icon not found
+  return icons.help;
 }

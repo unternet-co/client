@@ -10,7 +10,9 @@
     "sourceMap": true, // Generates source maps for easier debugging
     "declarationMap": true, // Generates declaration maps for easier consumption of your types
     "skipLibCheck": true, // Skip type checking of all declaration files
-    "forceConsistentCasingInFileNames": true // Enforces consistent casing in file imports
+    "forceConsistentCasingInFileNames": true, // Enforces consistent casing in file imports
+    "strict": true,
+    "noImplicitAny": true
   },
   "include": ["src/**/*"], // Include all TypeScript files in the src directory
   "exclude": ["node_modules", "dist", "tests"] // Exclude node_modules, build output, and tests directory

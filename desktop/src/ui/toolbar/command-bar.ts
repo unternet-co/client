@@ -1,47 +1,45 @@
-import { html, render } from 'lit';
-import './workspace-selector';
+import { html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import './command-input';
 import './command-bar.css';
-// import './resource-bar';
+import '../common/elements/button';
+import { dependencies } from '../../common/dependencies';
+import { ConfigService } from '../../config/config-service';
 
-export class CommandBar extends HTMLElement {
-  static get observedAttributes() {
-    return ['for'];
-  }
+@customElement('command-bar')
+export class CommandBar extends LitElement {
+  renderRoot = this;
+  configService = dependencies.resolve<ConfigService>('ConfigService');
 
   connectedCallback() {
-    this.render();
+    super.connectedCallback();
+    this.configService.subscribe((notification) => {
+      if (notification?.type === 'ui') {
+        this.requestUpdate();
+      }
+    });
   }
 
-  attributeChangedCallback() {
-    this.render();
-  }
-
-  handleHome() {
-    // TODO: A little hacky, but works. Handle this better in future!
-    window.location.href = '/';
+  private handleSidebarToggle() {
+    this.configService.toggleSidebar();
   }
 
   render() {
-    const workspaceId = this.getAttribute('for') || null;
-    const template = html`
-      <div class="left-section">
-        <!-- <workspace-selector></workspace-selector> -->
-      </div>
+    const sidebarVisible = this.configService.get('ui').sidebarVisible;
+
+    return html`
+      <div class="left-section"></div>
       <div class="center-section">
-        <command-input for=${workspaceId}></command-input>
+        <command-input></command-input>
       </div>
       <div class="right-section">
-        <!-- <un-button
-          icon="home"
-          variant="ghost"
-          @mousedown=${this.handleHome.bind(this)}
-        ></un-button> -->
+        <un-button
+          .icon=${'panelRight'}
+          .variant=${'ghost'}
+          .toggled=${sidebarVisible}
+          @click=${this.handleSidebarToggle}
+        ></un-button>
       </div>
     `;
-
-    render(template, this);
   }
 }
-
-customElements.define('command-bar', CommandBar);

@@ -16,6 +16,14 @@ html {
   text-size-adjust: none;
 }
 
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 /* Remove default margin in favour of better control in authored CSS */
 body,
 h1,

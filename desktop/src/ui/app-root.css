@@ -1,5 +1,3 @@
-/* Main layout */
-
 app-root {
   width: 100%;
   height: 100%;
@@ -9,22 +7,12 @@ app-root {
   background: var(--color-bg);
 }
 
-app-root .workspace-content {
+.workspace-content {
   position: relative;
   flex-grow: 1;
   display: flex;
-}
-
-.toolbar {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: var(--color-text-muted);
-  padding-bottom: var(--space-2);
-  height: 44px;
-}
-
-.toolbar resource-bar {
-  align-self: stretch;
+  min-height: 0;
+  padding: var(--space-4);
+  padding-bottom: 0;
+  gap: var(--space-4);
 }

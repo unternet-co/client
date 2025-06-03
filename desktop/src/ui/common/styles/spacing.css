@@ -1,0 +1,19 @@
+:root {
+  --spacing: 4px;
+  --space-0: 0;
+  --space-1: calc(var(--spacing) * 0.25);
+  --space-2: calc(var(--spacing) * 0.5);
+  --space-3: calc(var(--spacing) * 1);
+  --space-4: calc(var(--spacing) * 2);
+  --space-5: calc(var(--spacing) * 3);
+  --space-6: calc(var(--spacing) * 4);
+  --space-7: calc(var(--spacing) * 6);
+  --space-8: calc(var(--spacing) * 8);
+  --space-9: calc(var(--spacing) * 12);
+  --space-10: calc(var(--spacing) * 16);
+
+  --rounded-sm: var(--space-1);
+  --rounded: var(--space-3);
+  --rounded-lg: var(--space-4);
+  --rounded-xl: var(--space-6);
+}

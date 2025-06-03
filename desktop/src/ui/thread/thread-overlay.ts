@@ -1,10 +1,12 @@
 import { html, render } from 'lit';
+import { ReactiveElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import { dependencies } from '../../common/dependencies';
 import { DisposableGroup } from '../../common/disposable';
 import { createEl } from '../../common/utils';
 import { WorkspaceService } from '../../workspaces/workspace-service';
 import { KernelMessage } from '@unternet/kernel';
-import './thread-view.css';
+import './thread-overlay.css';
 import {
   WorkspaceModel,
   WorkspaceModelNotification,
@@ -19,7 +21,10 @@ import { Kernel, KernelNotification } from '../../kernel/kernel';
 import markdownit from 'markdown-it';
 const md = markdownit();
 
-class ThreadView extends HTMLElement {
+@customElement('thread-overlay')
+export class ThreadView extends ReactiveElement {
+  renderRoot = this;
+
   private workspaceService =
     dependencies.resolve<WorkspaceService>('WorkspaceService');
   private kernel = dependencies.resolve<Kernel>('Kernel');
@@ -29,14 +34,9 @@ class ThreadView extends HTMLElement {
   private loadingIndicatorEl: HTMLElement;
   private lastInputMessageId: Message['id'] | null = null;
 
-  static get observedAttributes() {
-    return ['for'];
-  }
-
-  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    if (this.isConnected && name === 'for' && oldValue !== newValue) {
-      this.updateWorkspace();
-    }
+  connectedCallback() {
+    super.connectedCallback();
+    this.updateWorkspace();
   }
 
   updateWorkspace() {
@@ -67,15 +67,6 @@ class ThreadView extends HTMLElement {
     );
 
     this.firstRender();
-  }
-
-  connectedCallback() {
-    const workspaceId = this.getAttribute('for');
-    if (workspaceId) {
-      this.updateWorkspace();
-    } else {
-      this.firstRender();
-    }
   }
 
   firstRender() {
@@ -210,8 +201,7 @@ class ThreadView extends HTMLElement {
   }
 
   disconnectedCallback() {
+    super.disconnectedCallback();
     this.workspaceDisposables.dispose();
   }
 }
-
-customElements.define('thread-view', ThreadView);
