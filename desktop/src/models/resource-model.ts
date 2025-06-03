@@ -1,15 +1,26 @@
-import { Resource } from '@unternet/kernel';
+import { Resource, resource } from '@unternet/kernel';
 import webResource from '../protocols/buitin/resources';
 import { Notifier } from '../common/notifier';
 import { uriWithScheme } from '../common/utils/http';
 import { DatabaseService } from '../storage/database-service';
 import { WebProtocol } from '../protocols/http/protocol';
+import { LocalAppletProtocol } from '../protocols/applet/local/protocol';
 
 const initialResources: Array<Resource> = new Array();
 
 if (import.meta.env.APP_UNTERNET_API_KEY) {
   initialResources.push(webResource);
 }
+
+// Add local applets
+const localUris = await system.listLocalApplets();
+const localApplets = await Promise.all(
+  localUris.map((uri) => {
+    return LocalAppletProtocol.createResource(uri);
+  })
+);
+
+initialResources.push(...localApplets);
 
 interface ResourceModelInit {
   initialResources: Array<Resource>;
@@ -34,7 +45,10 @@ class ResourceModel {
   async load() {
     const allResources = await this.db.all();
     for (const resource of allResources) {
-      this.resources.set(resource.uri, resource);
+      // Ignore (removed) local applets, add all the rest.
+      if (!resource.uri.startsWith('applet+local:')) {
+        this.resources.set(resource.uri, resource);
+      }
     }
     this.notifier.notify();
   }
