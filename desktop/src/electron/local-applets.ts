@@ -26,10 +26,10 @@ export function setup() {
   protocol.handle(SCHEME, async (request) => {
     const uri = URI.parse(request.url);
 
-    let path = uri.path;
+    let path = Path.join(uri.host, uri.path);
     if (path.endsWith('/')) {
       return new Response(null, {
-        headers: new Headers([['Location', path + 'index.html']]),
+        headers: new Headers([['Location', uri.path + 'index.html']]),
         status: 308,
       });
     }
@@ -59,6 +59,8 @@ ipcMain.handle('open-local-applets-dir', async (event) => {
 
 /* === LIST === */
 
+const IGNORED_DIRS = ['node_modules', 'src'];
+
 ipcMain.handle('list-local-applets', async (event) => {
   console.log('Loading local applets from: ' + APPLETS_DIR);
 
@@ -75,26 +77,35 @@ ipcMain.handle('list-local-applets', async (event) => {
 function findManifests(path: string[]): Array<string> {
   const dir = Path.join(APPLETS_DIR, ...path);
   const indexHtmlExists = FS.existsSync(Path.join(dir, 'index.html'));
-  const manifestExists = FS.existsSync(Path.join(dir, 'manifest.json'));
 
-  if (!manifestExists || !indexHtmlExists) {
-    return FS.readdirSync(dir, {
-      withFileTypes: true,
+  // Nested items
+  const items = FS.readdirSync(dir, {
+    withFileTypes: true,
+  })
+    .flatMap((entry) => {
+      if (!entry.isDirectory() || IGNORED_DIRS.includes(entry.name)) return [];
+      return findManifests([...path, entry.name]);
     })
-      .flatMap((entry) => {
-        if (!entry.isDirectory()) return [];
-        return findManifests([...path, entry.name]);
-      })
-      .filter((a) => typeof a === 'string');
+    .filter((a) => typeof a === 'string');
+
+  if (indexHtmlExists) {
+    const indexFile = FS.readFileSync(Path.join(dir, 'index.html'), {
+      encoding: 'utf8',
+    });
+
+    const refersToManifest = indexFile.includes('<link rel="manifest" href="');
+    if (!refersToManifest) return items;
+
+    const uri = URI.serialize({
+      scheme: SCHEME,
+      host: path[0],
+      path: [...path.slice(1), ''].join('/'),
+    });
+
+    return [...items, uri];
   }
 
-  return [
-    URI.serialize({
-      scheme: SCHEME,
-      host: 'localhost',
-      path: [...path, ''].join('/'),
-    }),
-  ];
+  return items;
 }
 
 /* === 🛠️ === */

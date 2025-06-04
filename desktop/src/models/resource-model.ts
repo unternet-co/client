@@ -44,11 +44,9 @@ class ResourceModel {
 
   async load() {
     const allResources = await this.db.all();
+
     for (const resource of allResources) {
-      // Ignore (removed) local applets, add all the rest.
-      if (!resource.uri.startsWith('applet+local:')) {
-        this.resources.set(resource.uri, resource);
-      }
+      this.resources.set(resource.uri, resource);
     }
     this.notifier.notify();
   }
@@ -77,13 +75,12 @@ class ResourceModel {
 
   add(resource: Resource) {
     this.resources.set(resource.uri, resource);
-    this.db.put(resource);
+    if (!resource.uri.startsWith('applet+local:')) this.db.put(resource);
     this.notifier.notify();
   }
 
   get(uri: string) {
     const result = this.resources.get(uri);
-    console.log(this.resources);
     if (!result) {
       throw new Error(`No resource matches this URI: ${JSON.stringify(uri)}`);
     }
