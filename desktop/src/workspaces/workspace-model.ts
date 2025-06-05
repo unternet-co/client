@@ -57,6 +57,9 @@ export class WorkspaceModel extends Disposable {
   readonly onProcessClosed = this.notifier.when(
     (n) => n.type === 'process-closed'
   );
+  readonly onMessagesChanged = this.notifier.when(
+    (n) => n.type === 'add-message' || n.type === 'update-message'
+  );
 
   constructor(init: WorkspaceModelInit) {
     super();

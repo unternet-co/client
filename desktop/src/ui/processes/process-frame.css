@@ -15,7 +15,7 @@ process-frame .process-header {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
   border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: var(--color-inset);
 }
 
 process-frame .title {

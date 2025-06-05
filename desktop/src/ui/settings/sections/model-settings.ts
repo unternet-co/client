@@ -87,7 +87,7 @@ export class ModelSettingsSection extends SettingsSection {
   }
 
   async updateProviderConfig(updates: Partial<AIModelProviderConfig>) {
-    this.configService.updateModelProviderConfig(
+    await this.configService.updateModelProviderConfig(
       this.selectedProvider,
       updates
     );

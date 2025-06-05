@@ -153,7 +153,7 @@ export class WorkspaceService {
       })
     );
 
-    this.configService.updateActiveWorkspaceId(id);
+    await this.configService.updateActiveWorkspaceId(id);
     this.notifier.notify({
       type: 'activate-workspace',
       workspaceModel: this.activeWorkspaceModel,

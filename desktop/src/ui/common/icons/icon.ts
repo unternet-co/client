@@ -51,6 +51,10 @@ export class IconElement extends LitElement {
         display: block;
       }
 
+      .spin svg {
+        --spin-duration: 3s;
+        animation: spin var(--spin-duration) linear infinite;
+      }
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -58,11 +62,6 @@ export class IconElement extends LitElement {
         100% {
           transform: rotate(360deg);
         }
-      }
-
-      .spin {
-        --spin-duration: 3s;
-        animation: spin var(--spin-duration) linear infinite;
       }
     `;
   }

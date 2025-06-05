@@ -10,6 +10,7 @@ import path from 'path';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import { registerNativeMenuHandler } from '../deprecated/menu/menu.main';
+import { setupFileService } from '../files/file-service.main';
 
 const isDev = !app.isPackaged;
 const AUTOUPDATE_INTERVAL = 3_600_000; // 60 * 60 * 1000
@@ -84,14 +85,13 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 770,
     height: 790,
-    // transparent: true,
-    // vibrancy: 'under-window',
     webPreferences: {
       webviewTag: true,
       nodeIntegration: false, // is default value after Electron v5
       contextIsolation: true, // protect against prototype pollution
       preload: path.join(__dirname, 'preload.js'),
     },
+    vibrancy: 'fullscreen-ui',
     // Set icon based on platform
     icon: path.join(
       __dirname,
@@ -208,6 +208,9 @@ registerNativeMenuHandler(ipcMain);
 // });
 
 app.on('ready', () => {
+  console.log('Main process ready, setting up file service...');
+  setupFileService();
+  console.log('File service setup complete, creating window...');
   createWindow();
   setupAutoUpdater();
 });

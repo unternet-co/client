@@ -4,4 +4,5 @@ workbench-view {
   flex-grow: 1;
   display: flex;
   overflow: visible;
+  padding: var(--space-4);
 }

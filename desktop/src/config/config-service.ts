@@ -1,7 +1,8 @@
 import { AIModelProviderConfig } from '../ai/model-provider';
 import { AIModelDescriptor, AIModelProviderId } from '../ai/types';
 import { Notifier } from '../common/notifier';
-import { KeyStoreService } from '../storage/keystore-service';
+import { JsonStoreService } from '../storage/json-store-service';
+import { SETTINGS_FILE_NAME } from '../constants';
 
 export interface ConfigData {
   ai: {
@@ -17,8 +18,20 @@ export interface ConfigData {
 
 export const initConfig: ConfigData = {
   ai: {
-    providers: {},
-    primaryModel: null,
+    providers: {
+      openai: {
+        apiKey: '<your-api-key-here>',
+        baseUrl: 'https://api.openai.com/v1',
+      },
+      ollama: {
+        baseUrl: 'http://localhost:11434',
+      },
+    },
+    primaryModel: {
+      name: 'gpt-4o',
+      provider: 'openai',
+      description: "GPT-4 Omni - OpenAI's latest multimodal model",
+    },
     globalHint: '',
   },
   activeWorkspaceId: null,
@@ -27,22 +40,28 @@ export const initConfig: ConfigData = {
   },
 };
 
-export type ConfigNotification = { type: 'model' | 'hint' | 'ui' } | null;
-
-const defaultProviderConfig = { apiKey: '', baseUrl: '' };
+export type ConfigNotification = {
+  type: 'model' | 'hint' | 'ui' | 'workspace';
+} | null;
 
 export class ConfigService {
-  private store: KeyStoreService<ConfigData>;
+  private store = new JsonStoreService(
+    SETTINGS_FILE_NAME.replace('.json', ''),
+    initConfig
+  );
   private notifier = new Notifier<ConfigNotification>();
   readonly subscribe = this.notifier.subscribe;
   private config: ConfigData;
 
-  constructor(store: KeyStoreService<ConfigData>) {
-    this.store = store;
-  }
-
   async load() {
-    this.config = this.store.get();
+    this.config = await this.store.load();
+
+    // Set up watching for external changes
+    this.store.watch((newConfig) => {
+      this.config = newConfig;
+      this.notifier.notify({ type: 'ui' }); // Notify of external changes
+    });
+
     this.notifier.notify();
   }
 
@@ -52,38 +71,41 @@ export class ConfigService {
   ) {
     const currentConfig = this.config.ai.providers[provider];
     this.config.ai.providers[provider] = { ...currentConfig, ...updates };
-    this.store.set(this.config);
-    this.notifier.notify();
+    this.store
+      .set(this.config)
+      .catch((err) => console.error('Failed to save config:', err));
+    this.notifier.notify({ type: 'model' });
   }
 
   updateActiveWorkspaceId(id: string | null) {
     this.config.activeWorkspaceId = id;
-    this.store.set(this.config);
+    this.store
+      .set(this.config)
+      .catch((err) => console.error('Failed to save config:', err));
+    this.notifier.notify({ type: 'workspace' });
   }
 
   updatePrimaryModel(model: AIModelDescriptor) {
     this.config.ai.primaryModel = model;
-    this.store.set(this.config);
+    this.store
+      .set(this.config)
+      .catch((err) => console.error('Failed to save config:', err));
     this.notifier.notify({ type: 'model' });
   }
 
   updateGlobalHint(hint: string) {
     this.config.ai.globalHint = hint;
-    this.store.set(this.config);
+    this.store
+      .set(this.config)
+      .catch((err) => console.error('Failed to save config:', err));
     this.notifier.notify({ type: 'hint' });
   }
 
   toggleSidebar() {
-    console.log(
-      'ConfigService: toggleSidebar called, current value:',
-      this.config.ui.sidebarVisible
-    );
     this.config.ui.sidebarVisible = !this.config.ui.sidebarVisible;
-    console.log(
-      'ConfigService: new sidebar value:',
-      this.config.ui.sidebarVisible
-    );
-    this.store.set(this.config);
+    this.store
+      .set(this.config)
+      .catch((err) => console.error('Failed to save config:', err));
     this.notifier.notify({ type: 'ui' });
     console.log('ConfigService: notification sent with type "ui"');
   }

@@ -1,19 +1,24 @@
 thread-overlay {
   position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none; /* Allow clicks to pass through to elements below */
+  z-index: 10; /* Ensure it's above other elements */
 }
 
 thread-overlay .message-overlay {
   position: absolute;
   bottom: 0;
   right: 0;
-  padding: var(--space-5) var(--space-7);
+  padding: var(--space-6);
+  pointer-events: auto; /* Enable interaction with messages */
 }
 
-thread-overlay .loading-indicator {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  margin: var(--space-5) var(--space-7);
+thread-overlay .message-overlay .loading-indicator {
+  display: flex;
+  align-items: center;
 }
 
 thread-overlay .message-overlay .message,
@@ -22,14 +27,26 @@ thread-overlay .loading-indicator {
   border-radius: var(--rounded-lg);
   border: 1px solid rgba(0, 0, 0, 0.1);
   width: 340px;
+  pointer-events: auto;
   box-shadow: var(--shadow);
-  background: color-mix(in srgb, var(--color-surface) 50%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
   backdrop-filter: blur(40px);
   border: 1px solid var(--color-border);
+}
+
+thread-overlay .message {
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 thread-overlay .loading-text {
   color: var(--color-text-muted);
   font-size: var(--text-sm);
   margin-left: var(--space-4);
+}
+
+/* Style for thought messages */
+thread-overlay .message-content[data-type='thought'] {
+  font-style: italic;
+  color: var(--color-text-muted);
 }

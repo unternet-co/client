@@ -1,15 +1,19 @@
 /// <reference types="vite/client" />
 
-interface System {
-  fetch: (url: string) => Promise<string>;
-}
-
-declare global {
-  const system: System;
-}
+import type {
+  IFileService,
+  FileChangeEvent,
+} from './src/files/file-service.interface';
 
 declare global {
   interface Window {
+    fileService: IFileService & {
+      onFileChanged: (callback: (event: FileChangeEvent) => void) => void;
+      removeFileChangeListeners: () => void;
+    };
+    system: {
+      fetch: (url: string) => Promise<Response>;
+    };
     electronAPI?: {
       showNativeMenu?: (
         options: MenuItemConstructorOptions[],

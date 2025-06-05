@@ -79,7 +79,7 @@ class ProcessFrame extends HTMLElement {
     const header = html`<div class="process-header">
       <div class="title">${iconTemplate} ${process.title}</div>
       <div class="controls">
-        <un-icon name="x" @click=${this.close.bind(this)}></un-icon>
+        <un-icon .icon=${'close'} @click=${this.close.bind(this)}></un-icon>
       </div>
     </div>`;
 

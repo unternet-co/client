@@ -4,6 +4,10 @@ export const BUG_REPORT_URL =
 export const NUM_CONCURRENT_PROCESSES = 50;
 export const MAX_ACTIVE_MESSAGES = 50;
 
+// File system constants
+export const USER_DATA_FOLDER = 'User Data';
+export const SETTINGS_FILE_NAME = 'settings.json';
+
 export const AI_MODEL_PROVIDERS = {
   openai: 'OpenAI',
   ollama: 'Ollama',

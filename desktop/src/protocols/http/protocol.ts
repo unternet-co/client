@@ -1,7 +1,6 @@
 import { ActionProposal, Protocol, resource, Resource } from '@unternet/kernel';
 import { WebProcess } from './processes';
 import { getMetadata } from '../../common/utils/http';
-import { unternet } from '../../common/unternet';
 
 export class WebProtocol extends Protocol {
   scheme = ['http', 'https'];

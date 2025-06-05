@@ -1,7 +1,6 @@
 import { MessageRecord } from './messages/types';
 import { dependencies } from './common/dependencies';
 import { DatabaseService } from './storage/database-service';
-import { KeyStoreService } from './storage/keystore-service';
 import { appendEl, createEl } from './common/utils/dom';
 import { Kernel } from './kernel/kernel';
 import { OpenAIModelProvider } from './ai/providers/openai';
@@ -11,7 +10,7 @@ import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols';
 import { NUM_CONCURRENT_PROCESSES } from './constants';
 import { WorkspaceRecord } from './workspaces/workspace-model';
-import { ConfigData, ConfigService, initConfig } from './config/config-service';
+import { ConfigService } from './config/config-service';
 import { WorkspaceService } from './workspaces/workspace-service';
 import { MessageService } from './messages/message-service';
 import { ProcessService } from './processes/process-service';
@@ -37,7 +36,6 @@ async function init() {
   const resourceDatabaseService = new DatabaseService<string, Resource>(
     'resources'
   );
-  const configStore = new KeyStoreService<ConfigData>('config', initConfig);
 
   /* Initialize model dependencies */
 
@@ -50,8 +48,9 @@ async function init() {
   const processService = new ProcessService(processDatabaseService, runtime);
   await processService.load();
   dependencies.registerSingleton('ProcessService', processService);
+  console.log('init ui');
 
-  const configService = new ConfigService(configStore);
+  const configService = new ConfigService();
   await configService.load();
   dependencies.registerSingleton('ConfigService', configService);
 
@@ -65,7 +64,6 @@ async function init() {
   );
   await workspaceService.load();
   dependencies.registerSingleton('WorkspaceService', workspaceService);
-
   const resourceService = new ResourceService({
     resourceDatabaseService,
     initialResources,
@@ -96,6 +94,7 @@ async function init() {
 
   /* Initialize UI */
 
+  console.log('init ui');
   appendEl(document.body, createEl('app-root'));
 
   // Open settings if no model defined
