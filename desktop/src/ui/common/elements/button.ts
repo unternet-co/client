@@ -2,6 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { IconName } from '../icons/icon-registry';
 import '../icons/icon';
+import { IconSize } from '../icons/icon';
 
 type ButtonVariant = 'auto' | 'compact' | 'ghost' | 'compact-ghost';
 
@@ -19,9 +20,12 @@ export class Button extends LitElement {
   @property({ type: Boolean, reflect: true })
   accessor toggled: boolean = false;
 
+  @property({ type: String, reflect: true })
+  accessor iconSize: IconSize = 'large';
+
   render() {
     const iconTemplate = this.icon
-      ? html`<un-icon .icon=${this.icon} .size=${'large'}></un-icon>`
+      ? html`<un-icon .icon=${this.icon} .size=${this.iconSize}></un-icon>`
       : null;
 
     return html`
@@ -34,7 +38,7 @@ export class Button extends LitElement {
     :host {
       --button-padding: var(--space-3);
       -webkit-app-region: no-drag;
-      color: var(--color-interaction-body);
+      color: var(--color-inset-variant);
       display: inline-flex;
       align-items: center;
       justify-content: center;

@@ -137,7 +137,7 @@ export class CommandInputElement extends LitElement {
       background: var(--color-inset);
       border: 1px solid var(--color-border);
       border-radius: var(--rounded);
-      padding: var(--space-3);
+      padding: 5px var(--space-3);
       text-align: center;
       font-size: var(--text-base);
       transition: opacity 0.2s ease;

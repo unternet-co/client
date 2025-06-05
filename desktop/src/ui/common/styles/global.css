@@ -3,7 +3,7 @@
 @import url(./spacing.css);
 @import url(./animations.css);
 @import url(./markdown.css);
-/* @import url(./theme.css); */
+@import url(./text.css);
 
 /* TEXT */
 :root {

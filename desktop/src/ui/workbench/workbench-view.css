@@ -2,7 +2,10 @@ workbench-view {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+}
+
+workbench-view .workbench-content {
   display: flex;
-  overflow: visible;
-  padding: var(--space-4);
+  flex-grow: 1;
+  padding: 0 var(--space-4);
 }

@@ -1,4 +1,4 @@
-import { html, render } from 'lit';
+import { html, HTMLTemplateResult, render } from 'lit';
 import './idle-screen';
 import './workbench-view.css';
 import '../processes/process-frame';
@@ -39,7 +39,7 @@ class Workbench extends HTMLElement {
   }
 
   render() {
-    let inner;
+    let inner: HTMLTemplateResult;
 
     if (this.isIdle) {
       inner = html`<idle-screen></idle-screen>`;
@@ -52,8 +52,8 @@ class Workbench extends HTMLElement {
     }
 
     const template = html`
-      <!-- <tab-bar></tab-bar> -->
-      ${inner}
+      <tab-bar></tab-bar>
+      <div class="workbench-content">${inner}</div>
     `;
 
     render(template, this);

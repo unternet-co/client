@@ -1,0 +1,37 @@
+:root {
+  --text-scale: 1.2;
+  --text-base: 17px;
+  --text-interval: 1px;
+  --text-5xl: round(
+    calc(var(--text-4xl) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-4xl: round(
+    calc(var(--text-3xl) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-3xl: round(
+    calc(var(--text-2xl) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-2xl: round(
+    calc(var(--text-xl) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-xl: round(
+    calc(var(--text-lg) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-lg: round(
+    calc(var(--text-base) * var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-sm: round(
+    calc(var(--text-base) / var(--text-scale)),
+    var(--text-interval)
+  );
+  --text-xs: round(
+    calc(var(--text-sm) / var(--text-scale)),
+    var(--text-interval)
+  );
+}
