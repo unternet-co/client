@@ -46,11 +46,11 @@ Protocols are developer-created classes that turn actions into outputs. Each pro
 
 You can register protocols with `ProcessRuntime`. Then, any time you dispatch an action directive that matches that protocol, you will get a response object that corresponds to the output of that action. Response objects can either consist of a direct return value, or an ongoing process.
 
-A process is an ongoing task that is managed by the `ProcessRuntime` (or can be managed independently). Processes are a bit like resources, in that they can have their own actions & URIs (`process:<pid>`) that the interpreter can use. They're also a bit like Processes, in that they can handle actions. Together, this means you can issue actions to any running process.
+A process is an ongoing task that is managed by the `ProcessRuntime` (or can be managed independently). Processes are a bit like resources, in that they can have their own actions & URIs (`process:<pid>`) that the interpreter can use. They're also a bit like Protocols, in that they can handle actions. Together, this means you can issue actions to any running process.
 
 ## Status
 
-The Unternet Kernel is still in active development. It is designed to act as the foundation of Unternet's client, Undo, and we are prioritizing stability and performance alongside a focused set of features. The kernel is designed to be open, easily extensible, and adaptable. We encourage developers wanting to get started with web applets and other tools to use the kernel as a foundation for their apps.
+The Unternet Kernel is still in active development. It is designed to act as the foundation of Unternet's client, and we are prioritizing stability and performance alongside a focused set of features. The kernel is designed to be open, easily extensible, and adaptable. We encourage developers wanting to get started with web applets and other tools to use the kernel as a foundation for their apps.
 
 ## Contribute
 
