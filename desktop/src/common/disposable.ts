@@ -1,6 +1,7 @@
 export interface IDisposable {
   disposed: boolean;
   dispose(): void;
+  bind(group: DisposableGroup): void;
 }
 
 export class Disposable implements IDisposable {
@@ -25,6 +26,10 @@ export class Disposable implements IDisposable {
     if (this.disposeCallback) this.disposeCallback();
     this.disposables.dispose();
     this.disposed = true;
+  }
+
+  bind(group: DisposableGroup) {
+    group.add(this);
   }
 }
 

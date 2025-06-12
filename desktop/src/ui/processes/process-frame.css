@@ -11,11 +11,12 @@ process-frame {
 process-frame .process-header {
   display: flex;
   align-self: stretch;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-5);
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-muted);
   background: var(--color-surface);
+  /* display: none; */
 }
 
 process-frame .title {

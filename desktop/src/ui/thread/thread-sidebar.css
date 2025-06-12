@@ -11,9 +11,9 @@ thread-sidebar .message-list {
   flex-direction: column-reverse;
   list-style: none;
   gap: var(--space-5);
-  border: 1px solid var(--color-border);
-  border-radius: var(--rounded-lg);
-  background: var(--color-surface);
+  /* border: 1px solid var(--color-border); */
+  /* border-radius: var(--rounded-lg); */
+  /* background: var(--color-surface); */
   margin: var(--space-4);
   margin-left: 0;
   margin-bottom: 0;
@@ -21,13 +21,13 @@ thread-sidebar .message-list {
   overflow-y: auto;
   padding: var(--space-5) var(--space-4);
 
-  /* mask: linear-gradient(
+  mask: linear-gradient(
     to bottom,
     transparent 0%,
     transparent 5px,
-    black 70px,
+    black 40px,
     black 100%
-  ); */
+  );
 }
 
 thread-sidebar .message {

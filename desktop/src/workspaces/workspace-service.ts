@@ -52,6 +52,10 @@ export class WorkspaceService {
     // Add workspaces from the db
     const workspaces = await this.workspaceDatabase.all();
     for (const ws of workspaces) {
+      // Ensure selectedTabIndex is valid (migration for old workspaces)
+      if (ws.selectedTabIndex === undefined || ws.selectedTabIndex === null) {
+        ws.selectedTabIndex = this.configService.get('ui').selectedTabIndex;
+      }
       this.workspaces.set(ws.id, ws);
     }
 
@@ -85,6 +89,7 @@ export class WorkspaceService {
       accessed: now,
       modified: now,
       processInstances: [],
+      selectedTabIndex: this.configService.get('ui').selectedTabIndex,
     };
 
     await this.workspaceDatabase.add(workspace);
@@ -128,6 +133,7 @@ export class WorkspaceService {
     });
 
     // TODO: Only do it if workspace ID matches
+    // MessageService -> WorkspaceModel
     this.activeWorkspaceDisposables.add(
       this.messageService.subscribe((n) => {
         if (n.type === 'add-message') {
@@ -138,6 +144,7 @@ export class WorkspaceService {
       })
     );
 
+    // WorkspaceModel -> Persist process instances
     this.activeWorkspaceDisposables.add(
       this.activeWorkspaceModel.onProcessesChanged(() => {
         this.persistProcessInstances(
@@ -147,13 +154,21 @@ export class WorkspaceService {
       })
     );
 
+    // WorkspaceModel -> Close process instances
     this.activeWorkspaceDisposables.add(
       this.activeWorkspaceModel.onProcessClosed(({ pid }) => {
         this.processService.close(pid);
       })
     );
 
-    await this.configService.updateActiveWorkspaceId(id);
+    // WorkspaceModel -> Config service
+    this.activeWorkspaceDisposables.add(
+      this.activeWorkspaceModel.onMetadataChanged((n) => {
+        this.configService.updateSelectedTabIndex(n.selectedTabIndex);
+      })
+    );
+
+    this.configService.updateActiveWorkspaceId(id);
     this.notifier.notify({
       type: 'activate-workspace',
       workspaceModel: this.activeWorkspaceModel,

@@ -13,6 +13,7 @@ export interface ConfigData {
   activeWorkspaceId: string | null;
   ui: {
     sidebarVisible: boolean;
+    selectedTabIndex: number;
   };
 }
 
@@ -37,6 +38,7 @@ export const initConfig: ConfigData = {
   activeWorkspaceId: null,
   ui: {
     sidebarVisible: true,
+    selectedTabIndex: -1,
   },
 };
 
@@ -99,6 +101,12 @@ export class ConfigService {
       .set(this.config)
       .catch((err) => console.error('Failed to save config:', err));
     this.notifier.notify({ type: 'hint' });
+  }
+
+  updateSelectedTabIndex(index: number) {
+    this.config.ui.selectedTabIndex = index;
+    this.store.set(this.config);
+    this.notifier.notify({ type: 'ui' });
   }
 
   toggleSidebar() {

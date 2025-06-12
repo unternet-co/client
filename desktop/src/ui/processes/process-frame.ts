@@ -66,10 +66,14 @@ class ProcessFrame extends HTMLElement {
     const isHeaderVisible = this.getAttribute('noheader') === null;
     const iconTemplate = html`<img src=${iconSrc} />`;
 
-    let bodyTemplate: HTMLTemplateResult;
+    let bodyTemplate;
 
     if (process.status === 'running') {
-      bodyTemplate = html`<process-view .process=${process}></process-view>`;
+      // Use guard directive to prevent re-creating process-view unless process actually changes
+      bodyTemplate = guard(
+        [process],
+        () => html`<process-view .process=${process}></process-view>`
+      );
     } else {
       bodyTemplate = html`<button @click=${() => this.handleResume(process)}>
         Click to resume

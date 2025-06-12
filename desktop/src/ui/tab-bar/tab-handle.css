@@ -4,6 +4,16 @@ tab-handle button {
   border-radius: var(--rounded);
   -webkit-app-region: no-drag;
   background: transparent;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+tab-handle .tab-icon {
+  width: 13px;
+  height: 13px;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 tab-handle[selected] button {

@@ -17,11 +17,13 @@ export interface WorkspaceRecord {
   accessed: number;
   modified: number;
   processInstances: ProcessInstanceRecord[];
+  selectedTabIndex: number;
 }
 
 interface WorkspaceModelInit extends WorkspaceRecord {
   messages: Message[];
   processInstances: ProcessInstance[];
+  selectedTabIndex: number;
 }
 
 export interface ProcessAttachedNotification {
@@ -34,11 +36,17 @@ export interface ProcessClosedNotification {
   pid: ProcessInstance['pid'];
 }
 
+export interface MetadataChangedNotification {
+  type: 'metadata';
+  selectedTabIndex: number;
+}
+
 export type WorkspaceModelNotification =
   | AddMessageNotification
   | UpdateMessageNotification
   | ProcessAttachedNotification
-  | ProcessClosedNotification;
+  | ProcessClosedNotification
+  | MetadataChangedNotification;
 
 export class WorkspaceModel extends Disposable {
   id: WorkspaceRecord['id'];
@@ -46,6 +54,7 @@ export class WorkspaceModel extends Disposable {
   created: WorkspaceRecord['created'];
   accessed: WorkspaceRecord['accessed'];
   modified: WorkspaceRecord['modified'];
+  selectedTabIndex: number;
   messageMap = new Map<Message['id'], Message>();
   processInstanceMap = new Map<ProcessInstance['pid'], ProcessInstance>();
 
@@ -60,6 +69,7 @@ export class WorkspaceModel extends Disposable {
   readonly onMessagesChanged = this.notifier.when(
     (n) => n.type === 'add-message' || n.type === 'update-message'
   );
+  readonly onMetadataChanged = this.notifier.when((n) => n.type === 'metadata');
 
   constructor(init: WorkspaceModelInit) {
     super();
@@ -69,6 +79,7 @@ export class WorkspaceModel extends Disposable {
     this.created = init.created;
     this.accessed = init.accessed;
     this.modified = init.modified;
+    this.selectedTabIndex = init.selectedTabIndex;
 
     if (init.messages) {
       for (const message of init.messages) {
@@ -119,13 +130,6 @@ export class WorkspaceModel extends Disposable {
     });
   }
 
-  addProcessInstance(instance: ProcessInstance) {
-    this.notifier.notify({
-      type: 'process-attached',
-      processInstance: instance,
-    });
-  }
-
   hasProcessInstance(pid: ProcessInstance['pid']) {
     return this.processInstanceMap.has(pid);
   }
@@ -140,15 +144,20 @@ export class WorkspaceModel extends Disposable {
     }
   }
 
+  setSelectedTabIndex(index: number) {
+    this.selectedTabIndex = index;
+    this.notifier.notify({
+      type: 'metadata',
+      selectedTabIndex: index,
+    });
+  }
+
   attachProcess(process: ProcessContainer) {
     const processInstance = {
       pid: process.pid,
       process,
     };
 
-    for (const p of this.processInstances) {
-      this.closeProcessInstance(p.pid);
-    }
     this.processInstanceMap.set(process.pid, processInstance);
 
     this.notifier.notify({

@@ -2,10 +2,74 @@ workbench-view {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+
+  /* Transition timing variables */
+  --slide-duration: 0.15s;
+  --springboard-duration: 0.25s;
+  --overlay-duration: 0.2s;
+  --springboard-scale: 0.85;
+  --overlay-blur: 8px;
+  --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 workbench-view .workbench-content {
   display: flex;
   flex-grow: 1;
+  overflow: hidden; /* Hide slides that are off-screen */
+  position: relative;
+}
+
+workbench-view .workbench-slider {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  transition: transform var(--slide-duration) var(--transition-easing);
+  width: 100%;
+}
+
+/* Springboard effect: zoom out slider when home is active */
+workbench-view .workbench-slider[data-home-active] {
+  transform: scale(var(--springboard-scale)) !important;
+  opacity: 0;
+  transition:
+    transform var(--springboard-duration) var(--transition-easing),
+    opacity var(--springboard-duration) var(--transition-easing);
+}
+
+workbench-view .workbench-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  display: flex;
+  width: 100%;
   padding: 0 var(--space-4);
+  box-sizing: border-box;
+}
+
+/* Home overlay that fades in for springboard effect */
+workbench-view .workbench-home-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  padding: 0 var(--space-4);
+  box-sizing: border-box;
+  opacity: 0;
+  pointer-events: none;
+  filter: blur(0px);
+  transition:
+    opacity var(--overlay-duration) var(--transition-easing),
+    filter var(--overlay-duration) var(--transition-easing);
+}
+
+workbench-view .workbench-home-overlay[data-visible] {
+  opacity: 1;
+  pointer-events: auto;
+  filter: blur(0px);
+}
+
+/* Blur and fade out quickly when transitioning away from home */
+workbench-view .workbench-home-overlay:not([data-visible]) {
+  filter: blur(var(--overlay-blur));
 }
