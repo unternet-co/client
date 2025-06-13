@@ -17,3 +17,5 @@ export const AI_MODEL_PROVIDERS = {
 export const ERROR_MESSAGES = {
   modelLoad: 'Failed to load models. Please check configuration.',
 };
+
+export const INIT_RESOURCES = ['https://applets.unternet.co/maps'];

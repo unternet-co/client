@@ -8,7 +8,7 @@ import { OllamaModelProvider } from './ai/providers/ollama';
 import { AIModelService } from './ai/model-service';
 import { ProcessRuntime, Resource } from '@unternet/kernel';
 import { protocols } from './protocols';
-import { NUM_CONCURRENT_PROCESSES } from './constants';
+import { INIT_RESOURCES, NUM_CONCURRENT_PROCESSES } from './constants';
 import { WorkspaceRecord } from './workspaces/workspace-model';
 import { ConfigService } from './config/config-service';
 import { WorkspaceService } from './workspaces/workspace-service';
@@ -48,7 +48,6 @@ async function init() {
   const processService = new ProcessService(processDatabaseService, runtime);
   await processService.load();
   dependencies.registerSingleton('ProcessService', processService);
-  console.log('init ui');
 
   const configService = new ConfigService();
   await configService.load();
@@ -70,6 +69,12 @@ async function init() {
   });
   await resourceService.load();
   dependencies.registerSingleton('ResourceService', resourceService);
+
+  /* Add initial resources */
+
+  for (const uri of INIT_RESOURCES) {
+    resourceService.register(uri);
+  }
 
   /* Initialize kernel & LLMs */
 
@@ -94,7 +99,6 @@ async function init() {
 
   /* Initialize UI */
 
-  console.log('init ui');
   appendEl(document.body, createEl('app-root'));
 
   // Open settings if no model defined

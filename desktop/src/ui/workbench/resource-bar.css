@@ -10,7 +10,7 @@ resource-bar {
   border-radius: 12px;
 }
 
-ul.resources-list {
+ul.resource-list {
   list-style: none;
   display: flex;
   align-items: center;

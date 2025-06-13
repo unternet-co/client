@@ -159,6 +159,7 @@ export class WorkspaceModel extends Disposable {
     };
 
     this.processInstanceMap.set(process.pid, processInstance);
+    this.setSelectedTabIndex(this.processInstanceMap.size - 1);
 
     this.notifier.notify({
       type: 'process-attached',

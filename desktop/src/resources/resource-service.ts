@@ -58,6 +58,7 @@ export class ResourceService {
 
     const ctor = protocol.constructor as typeof Protocol;
     const newResource = await ctor.resolveResource(uri);
+    this.add(newResource);
     console.log(`Registered resource: ${newResource.uri}`);
   }
 

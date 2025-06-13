@@ -1,22 +1,21 @@
-import { html, render } from 'lit';
+import { html, LitElement, TemplateResult } from 'lit';
+import { customElement } from 'lit/decorators.js';
 // import './resources-popover';
 import './resource-bar.css';
 import { dependencies } from '../../common/dependencies';
 import { ResourceService } from '../../resources/resource-service';
 
-export class ResourceBar extends HTMLElement {
+@customElement('resource-bar')
+export class ResourceBar extends LitElement {
+  renderRoot = this;
   resourceService = dependencies.resolve<ResourceService>('ResourceService');
 
   constructor() {
     super();
-    this.resourceService.subscribe(() => this.render());
+    this.resourceService.subscribe(() => this.requestUpdate());
   }
 
-  connectedCallback(): void {
-    this.render();
-  }
-
-  render(): void {
+  render(): TemplateResult {
     const resources = this.resourceService.all();
 
     const resourceTemplate = resources.map((resource) => {
@@ -30,13 +29,11 @@ export class ResourceBar extends HTMLElement {
     });
 
     const template = html`
-      <ul class="resource-list"></ul>
+      <ul class="resource-list">
         ${resourceTemplate}
       </ul>
     `;
 
-    render(template, this);
+    return template;
   }
 }
-
-customElements.define('resource-bar', ResourceBar);
