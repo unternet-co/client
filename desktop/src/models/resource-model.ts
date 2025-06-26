@@ -12,16 +12,6 @@ if (import.meta.env.APP_UNTERNET_API_KEY) {
   initialResources.push(webResource);
 }
 
-// Add local applets
-const localUris = await system.listLocalApplets();
-const localApplets = await Promise.all(
-  localUris.map((uri) => {
-    return LocalAppletProtocol.createResource(uri);
-  })
-);
-
-initialResources.push(...localApplets);
-
 interface ResourceModelInit {
   initialResources: Array<Resource>;
   resourceDatabaseService: DatabaseService<string, Resource>;
