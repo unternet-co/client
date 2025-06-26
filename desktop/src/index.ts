@@ -27,6 +27,7 @@ import './ui/app-root';
 import './ui/modals/bug-modal';
 import './ui/modals/workspace-delete-modal';
 import './ui/modals/new-workspace-modal';
+import { LocalAppletProtocol } from './protocols/applet/local/protocol';
 
 async function init() {
   /* Initialize databases & stores */
@@ -69,6 +70,15 @@ async function init() {
   );
   await workspaceModel.load();
   dependencies.registerSingleton('WorkspaceModel', workspaceModel);
+
+  // Load local applets
+  const localUris = await system.listLocalApplets();
+  const localApplets = await Promise.all(
+    localUris.map((uri) => {
+      return LocalAppletProtocol.createResource(uri);
+    })
+  );
+  initialResources.push(...localApplets);
 
   const resourceModel = new ResourceModel({
     resourceDatabaseService,
