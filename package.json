@@ -1,6 +1,6 @@
 {
   "name": "@unternet/client",
-  "version": "0.10.8",
+  "version": "0.10.9",
   "description": "Unternet Client",
   "author": {
     "name": "Rupert Manfredi",
@@ -83,6 +83,7 @@
     "@electron/notarize": "^3.0.1",
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
+    "electron": "^37.1.0",
     "electron-builder": "^26.0.12",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
